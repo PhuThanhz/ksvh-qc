@@ -1,0 +1,17 @@
+# Chỉ dùng cho máy dev. KHÔNG dùng các giá trị này ở môi trường thật.
+app:
+  jwt:
+    secret: ${JWT_SECRET:dev-only-secret-change-me-0123456789abcdef}
+  storage:
+    # Ảnh upload qua proxy HTTPS của Vite (xem frontend/vite.config.ts).
+    # Test trên điện thoại: đặt S3_PUBLIC_ENDPOINT=https://<IP-máy-tính>:5273
+    public-endpoint: ${S3_PUBLIC_ENDPOINT:https://localhost:5273}
+    access-key: ${S3_ACCESS_KEY:minioadmin}
+    secret-key: ${S3_SECRET_KEY:minioadmin}
+  seed:
+    admin-username: admin
+    admin-password: Admin@123
+
+logging:
+  level:
+    vn.ksvh.qc: DEBUG
