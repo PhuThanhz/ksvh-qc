@@ -19,7 +19,7 @@ export default defineConfig({
     strictPort: true, // cố định cổng vì S3_PUBLIC_ENDPOINT phụ thuộc vào nó
     proxy: {
       // API Spring Boot: trình duyệt chỉ gọi cùng origin → không cần CORS.
-      '/api': { target: 'http://localhost:8080', changeOrigin: true },
+      '/api': { target: 'http://localhost:8088', changeOrigin: true },
       // Upload ảnh lên MinIO qua presigned URL. Giữ nguyên Host (changeOrigin: false)
       // để khớp chữ ký; backend cần S3_PUBLIC_ENDPOINT=https://<IP-máy-tính>:5273.
       '/ksvh-qc': { target: 'http://localhost:9000', changeOrigin: false },

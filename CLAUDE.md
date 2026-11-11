@@ -16,22 +16,23 @@ backend/   Spring Boot 4, package theo feature: vn.ksvh.qc.<module>
 frontend/  React + Vite, src/features/<khu-vực>
 docs/      tài liệu nghiệp vụ, tech stack
 ```
-Module nghiệp vụ: `auth`, `user`, `location`, `checklist`, `audit`, `media`, `report`. Thêm module mới phải giữ đúng tên ở cả backend và frontend.
+Module nghiệp vụ: `auth`, `user`, `location`, `checklist`, `audit`, `media`, `report` (frontend: `features/<tên-số-nhiều>`). Kiến trúc và quy ước đã duyệt: [docs/ARCHITECTURE_PROPOSAL.md](docs/ARCHITECTURE_PROPOSAL.md).
 
 ## Quy tắc bắt buộc (bảo mật & toàn vẹn dữ liệu)
 1. **Không tin client.** Server tự tính khoảng cách GPS (`GeoUtils.distanceMeters`), tự tính tổng điểm, tự kiểm tra quyền. Toạ độ/điểm từ client chỉ là dữ liệu đầu vào.
-2. **Phân quyền ở backend** bằng `@PreAuthorize` theo vai trò `ADMIN` / `MANAGER` / `AUDITOR`. Ẩn nút ở frontend chỉ là trải nghiệm, không phải bảo mật. AUDITOR chỉ thấy/sửa phiên chấm của chính mình.
-3. **Ảnh** đi qua presigned URL (`/api/media/presign-upload`), không upload file qua Spring. Object key do server sinh. Ảnh gắn với phiên chấm phải được server xác nhận object tồn tại.
+2. **Phân quyền theo permission** (`module:action`, một user nhiều role). Backend kiểm tra bằng `@PreAuthorize` + kiểm tra sở hữu dữ liệu trong service; frontend chỉ ẩn/hiện qua `permissions/`. Không viết chuỗi role/permission rải rác.
+3. **Ảnh** đi qua presigned URL (`/api/v1/media/presign-upload`), không upload file qua Spring. Object key do server sinh. Ảnh gắn với phiên chấm phải được server xác nhận object tồn tại.
 4. **Phiên chấm đã nộp (SUBMITTED/APPROVED) là bất biến** với AUDITOR; mọi thay đổi sau nộp phải có người thực hiện và thời điểm.
-5. **Không commit bí mật.** JWT secret, mật khẩu DB, key S3 lấy từ biến môi trường. Giá trị dev chỉ nằm trong `application-dev.yml`.
-6. **Schema chỉ đổi bằng Flyway migration mới** (`V<n>__mo_ta.sql`). Không sửa migration đã chạy, không tạo bảng bằng tay trong DBeaver.
+5. **Token:** access token chỉ ở bộ nhớ trình duyệt; refresh token chỉ ở cookie HttpOnly và DB lưu SHA-256. Không ghi token vào localStorage.
+6. **Không commit bí mật.** JWT secret, mật khẩu DB, key S3 lấy từ biến môi trường. Giá trị dev chỉ nằm trong `application-dev.yml`.
+7. **Schema chỉ đổi bằng Flyway migration mới** (`V<yyyyMMdd_HHmm>__mo_ta.sql`). Không sửa migration đã chạy, không tạo bảng bằng tay trong DBeaver.
 
 ## Quy trình làm việc
 - Trước khi sửa: đọc code liên quan và quy tắc của thư mục đó.
 - Sau khi sửa, chạy kiểm tra tương ứng và báo kết quả thật:
   - Backend: `cd backend && ./mvnw -q verify` (cần Postgres chạy)
   - Frontend: `cd frontend && npm run typecheck && npm run lint && npm run build`
-- Đổi API → cập nhật cả backend DTO và `frontend/src/api/*` trong cùng thay đổi.
+- Đổi API → chạy backend rồi `cd frontend && npm run api:types`, sửa `features/<m>/api/*` trong cùng thay đổi.
 - Thay đổi lớn (module mới, đổi schema, đổi luồng chấm) → lên kế hoạch và hỏi trước.
 - Commit theo Conventional Commits: `feat(audit): ...`, `fix(media): ...`. Chỉ commit khi người dùng yêu cầu.
 
@@ -45,5 +46,5 @@ Module nghiệp vụ: `auth`, `user`, `location`, `checklist`, `audit`, `media`,
 | `code-reviewer` | Review thay đổi theo các quy tắc trên trước khi commit |
 
 ## Môi trường dev
-- Postgres 17 (Homebrew), DB `ksvh_qc`, cổng 5432. Backend cổng 8080, frontend cổng 5273 (cố định).
+- Postgres 17 (Homebrew), DB `ksvh_qc`, cổng 5432. Backend cổng 8088, frontend cổng 5273 (cố định).
 - Test GPS/camera trên điện thoại cần HTTPS: `npm run dev` + `S3_PUBLIC_ENDPOINT` (xem README).

@@ -1,6 +1,6 @@
 # Đề xuất kiến trúc – KSVH QC (Phase 1: Architecture)
 
-> Trạng thái: **CHỜ DUYỆT**. Tài liệu này chỉ phân tích và đề xuất; chưa thay đổi source code.
+> Trạng thái: **ĐÃ DUYỆT** (09/11/2026). Phase 2 – Foundation đã triển khai; xem [Ghi chú triển khai](#ghi-chú-triển-khai-phase-2) cuối tài liệu.
 > Ngày: 09/11/2026. Phạm vi: `backend/` (Spring Boot) và `frontend/` (React).
 
 Mục lục: [1. Phân tích hiện trạng](#1-báo-cáo-phân-tích-dự-án-hiện-tại) · [2. Kiến trúc tổng thể](#2-kiến-trúc-tổng-thể) · [3. Tech stack](#3-tech-stack-và-lý-do) · [4–5. Cấu trúc thư mục](#4-cấu-trúc-thư-mục-chi-tiết) · [6. Authentication](#6-authentication--jwt--session) · [7. Permission](#7-permission--rbac) · [8. API layer](#8-kiến-trúc-api-layer) · [9. Component dùng chung](#9-component-dùng-chung) · [10. Thư viện](#10-thư-viện-cần-cài) · [11. AI agents](#11-ai-agents--workflow) · [12. Kế hoạch](#12-kế-hoạch-triển-khai) · [13. Cần bạn quyết định](#13-các-quyết-định-cần-duyệt)
@@ -712,3 +712,20 @@ Phân tích, tech stack, kiến trúc, cấu trúc thư mục, luồng auth/perm
 | D7 | Unit test **đặt cạnh file**, `tests/` chỉ cho setup/mocks/fixtures/e2e | Đồng ý |
 | D8 | **Hoãn Storybook** | Đồng ý |
 | D9 | Spring Modulith để kiểm tra ranh giới module | Đồng ý |
+
+---
+
+## Ghi chú triển khai Phase 2
+
+Những điểm khác so với đề xuất khi làm thật (đã cập nhật vào `CLAUDE.md` các thư mục):
+
+| Đề xuất | Thực tế | Lý do |
+|---|---|---|
+| `app/config/env.ts` | `lib/env.ts` | `lib/http` cần base URL; `lib` không được import `app` |
+| `openapi-typescript` là devDependency của frontend | Gói riêng `frontend/tools/api-types` (TypeScript 5) | openapi-typescript yêu cầu TS 5, dự án dùng TS 7 |
+| Query client trong `app/config` | `lib/query-client.ts` | Dùng chung cho test sau này |
+| Layout tự đọc session | Layout nhận `user`/`onLogout` qua props; ghép ở `app/router/shells.tsx` | Giữ `components/` không phụ thuộc `features/` |
+| Type route trong `app/router` | `types/route.types.ts` (`AppRoute`, `RouteHandle`) | Feature khai báo route mà không import `app` |
+| — | Backend bỏ qua Bearer token ở `/auth/login|refresh|logout` | Access token hết hạn gửi kèm làm refresh bị 401 (lỗi phát hiện khi test) |
+| — | `Pageables.restrictSort` (danh sách trường được sắp xếp) | Sắp xếp theo trường lạ trước đây gây lỗi 500 |
+| — | Tự xoá khoá `ksvh-auth` cũ trong localStorage | Bản trước lưu token ở đó |

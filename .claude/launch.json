@@ -5,7 +5,7 @@
       "name": "backend",
       "runtimeExecutable": "./backend/mvnw",
       "runtimeArgs": ["-q", "-f", "backend/pom.xml", "spring-boot:run"],
-      "port": 8080
+      "port": 8088
     },
     {
       "name": "frontend",

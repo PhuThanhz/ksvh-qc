@@ -17,11 +17,17 @@
     "jsx": "react-jsx",
     "paths": { "@/*": ["./src/*"] },
 
+    /* Type checking */
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+
     /* Linting */
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true
+    "erasableSyntaxOnly": true
   },
   "include": ["src"]
 }

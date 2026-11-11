@@ -1,0 +1,12 @@
+{
+  "name": "ksvh-api-types-generator",
+  "private": true,
+  "description": "Sinh src/types/api.generated.ts từ OpenAPI của backend. Tách riêng vì openapi-typescript cần TypeScript 5 (dự án dùng TS 7).",
+  "scripts": {
+    "generate": "openapi-typescript ${API_DOCS_URL:-http://localhost:8088/v3/api-docs} --properties-required-by-default --root-types --root-types-no-schema-prefix -o ../../src/types/api.generated.ts"
+  },
+  "devDependencies": {
+    "openapi-typescript": "7.13.0",
+    "typescript": "~5.9.3"
+  }
+}

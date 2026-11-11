@@ -19,22 +19,22 @@ Chi tiết công nghệ: [docs/TECH_STACK.md](docs/TECH_STACK.md).
 # 1. Tạo database (một lần)
 psql -h localhost -d postgres -c "CREATE DATABASE ksvh_qc;"
 
-# 2. Backend – http://localhost:8080 (Flyway tự tạo bảng)
+# 2. Backend – http://localhost:8088 (Flyway tự tạo bảng)
 cd backend && ./mvnw spring-boot:run
 
 # 3. Frontend – terminal khác
 cd frontend && npm install && npm run dev:http   # http://localhost:5273
 ```
 
-Tài khoản dev được tạo tự động ở profile `dev`, xem `app.seed` trong
+Tài khoản dev (admin / manager / auditor) được tạo tự động ở profile `dev`, xem `app.seed.users` trong
 [backend/src/main/resources/application-dev.yml](backend/src/main/resources/application-dev.yml).
 
 ## Địa chỉ hữu ích
 | | |
 |---|---|
 | App (máy tính) | http://localhost:5273 |
-| Swagger UI | http://localhost:8080/swagger-ui.html |
-| Health | http://localhost:8080/actuator/health |
+| Swagger UI | http://localhost:8088/swagger-ui.html |
+| Health | http://localhost:8088/actuator/health |
 | MinIO console | http://localhost:9001 |
 
 ## Test trên điện thoại (GPS + camera)
@@ -49,8 +49,14 @@ Trình duyệt điện thoại chỉ cho dùng GPS/camera qua **HTTPS**.
 |---|---|
 | `DB_URL` / `DB_USERNAME` / `DB_PASSWORD` | `jdbc:postgresql://localhost:5432/ksvh_qc` / `postgres` / `postgres` |
 | `JWT_SECRET` | giá trị dev; **bắt buộc đặt** ở môi trường thật (≥ 32 ký tự) |
+| `AUTH_ALLOWED_ORIGINS` | rỗng (dev); môi trường thật đặt domain, vd `https://qc.ksvh.vn` |
 | `S3_PUBLIC_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY` | `https://localhost:5273`, `ksvh-qc`, `minioadmin`, `minioadmin` |
 | `SPRING_PROFILES_ACTIVE` | `dev` |
+
+## Sau khi đổi API backend
+```bash
+cd frontend && npm run api:types   # backend phải đang chạy
+```
 
 ## Lệnh kiểm tra
 ```bash
