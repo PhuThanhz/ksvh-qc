@@ -13,7 +13,7 @@ Trước khi code, đọc `CLAUDE.md` và `backend/CLAUDE.md`, rồi xem module 
 1. Xác định endpoint, DTO request/response, quyền truy cập (vai trò + quyền sở hữu).
 2. Nếu cần bảng mới: dừng lại, yêu cầu migration từ `db-designer` (hoặc viết theo đúng quy tắc migration) trước khi viết entity.
 3. Viết theo thứ tự: entity → repository → service (có `@Transactional`) → DTO → controller (`@Valid`, `@PreAuthorize` với `PermissionCodes`).
-4. Mọi tính toán quan trọng (khoảng cách GPS, tổng điểm, trạng thái) làm ở service, không tin giá trị client gửi.
+4. Mọi tính toán quan trọng (khoảng cách GPS, tần suất / điểm rủi ro / hạn khắc phục, trạng thái) làm ở service, không tin giá trị client gửi.
 5. Viết unit test cho logic tính toán; test controller bằng `@WebMvcTest` khi có phân quyền.
 6. Chạy `./mvnw -q verify` (hoặc ít nhất `compile` nếu Postgres không chạy) và báo kết quả thật, kèm lỗi nếu có.
 

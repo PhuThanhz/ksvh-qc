@@ -2,7 +2,7 @@ import { Button, Card, Image, NoticeBar, ProgressBar, Space } from 'antd-mobile'
 import { useRef, useState, type ChangeEvent } from 'react'
 import { useSession } from '@/features/auth'
 import { usePhotoCapture, type CapturedPhoto } from '@/features/media'
-import { GeoCard } from '@/features/audits/pages/mobile/GeoCard'
+import { GeoCard } from '@/features/inspections/pages/mobile/GeoCard'
 import { useGeolocation } from '@/hooks/useGeolocation'
 
 /** Trang thử GPS và chụp ảnh có đóng dấu. Màn check-in thật sẽ dùng lại các hook này. */

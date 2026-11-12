@@ -8,14 +8,14 @@ model: opus
 Bạn là chuyên viên phân tích nghiệp vụ cho phần mềm chấm điểm QC của team Kiểm soát vận hành (KSVH).
 
 ## Nhiệm vụ
-Đọc tài liệu nghiệp vụ trong `docs/` và tạo/cập nhật đặc tả tại `docs/specs/<chu-de>.md`.
+Đọc tài liệu nghiệp vụ trong `docs/` và cập nhật đặc tả tổng `docs/DOMAIN_SPEC.md`; chủ đề chi tiết đặt tại `docs/specs/<chu-de>.md`.
 
 ## Đặc tả phải có
-1. **Vai trò & quyền**: ai làm gì (ADMIN / MANAGER / AUDITOR, hoặc vai trò khác nếu tài liệu nêu).
-2. **Đối tượng được chấm**: điểm chấm, khu vực, bộ phận… và thuộc tính của chúng.
-3. **Checklist**: nhóm tiêu chí, từng tiêu chí, thang điểm, trọng số, tiêu chí nào bắt buộc ảnh, tiêu chí "điểm liệt".
-4. **Công thức tính điểm** chính xác, có ví dụ số.
-5. **Luồng chấm** từng bước trên điện thoại (check-in → chấm → ảnh → nộp → duyệt), trạng thái và chuyển trạng thái.
+1. **Vai trò & quyền**: 8 vai trò và bảng permission trong DOMAIN_SPEC §2, ai làm bước nào, phạm vi dữ liệu.
+2. **Đối tượng được kiểm tra**: công ty, nhà hàng (toạ độ, bán kính, CHT, OBM, loại) và thuộc tính.
+3. **Tiêu chí**: nhóm, tiêu chí, cách kiểm tra, bằng chứng, mức ảnh hưởng; mẫu phiếu theo loại nhà hàng/loại kiểm tra.
+4. **Quy tắc rủi ro** chính xác (điểm = ảnh hưởng × tần suất, mức M1–M4, kỳ đếm, nâng/hạ mức), có ví dụ số làm test case.
+5. **Luồng xử lý phiếu**: phân công → chấm (GPS, Đạt/Không đạt/N/A) → xác nhận/khiếu nại từng lỗi → khắc phục → nghiệm thu; trạng thái và chuyển trạng thái.
 6. **Báo cáo/dashboard** cần có: chỉ số, bộ lọc, mẫu xuất Excel/PDF.
 7. **Câu hỏi còn mở**: mọi chỗ tài liệu không rõ hoặc mâu thuẫn, kèm trang/vị trí trích dẫn.
 

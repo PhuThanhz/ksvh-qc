@@ -116,7 +116,7 @@ export interface components {
             expiresAt: string;
         };
         /** @enum {string} */
-        Permission: "user:read" | "user:manage" | "location:read" | "location:manage" | "checklist:read" | "checklist:manage" | "audit:read:own" | "audit:read:all" | "audit:create" | "audit:approve" | "report:read" | "report:export" | "media:upload";
+        Permission: "user:read" | "user:manage" | "role:manage" | "system:config" | "system:log:read" | "organization:read" | "organization:manage" | "criteria:read" | "criteria:manage" | "plan:read" | "plan:create" | "plan:approve" | "inspection:read:own" | "inspection:read:all" | "inspection:perform" | "inspection:cancel" | "finding:respond" | "finding:review-appeal" | "finding:conclude-appeal" | "finding:remediate" | "finding:verify" | "report:read" | "report:export" | "media:upload";
         SessionResponse: {
             accessToken: string;
             /** Format: int64 */

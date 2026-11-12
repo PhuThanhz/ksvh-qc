@@ -9,7 +9,8 @@ vn.ksvh.qc
 ├── security/   (OPEN) SecurityConfig · jwt (JwtService) · permission (Permission, PermissionCodes) · CurrentUser
 ├── auth/       đăng nhập, refresh token rotation, logout
 ├── user/       user, role; api/ (UserAccountApi) là giao diện công khai; dev/ (DataInitializer)
-└── location/ checklist/ audit/ media/ report/
+├── media/      presigned upload ảnh/video
+└── organization/ criteria/ plan/ inspection/ finding/ risk/ notification/ report/   (nghiệp vụ, xem docs/DOMAIN_SPEC.md)
 ```
 Khuôn mẫu module: `web/` controller · `service/` · `domain/` entity + repository · `dto/` record · `api/` (tuỳ chọn, `@NamedInterface`) · `config/`.
 

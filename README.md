@@ -26,7 +26,7 @@ cd backend && ./mvnw spring-boot:run
 cd frontend && npm install && npm run dev:http   # http://localhost:5273
 ```
 
-Tài khoản dev (admin / manager / auditor) được tạo tự động ở profile `dev`, xem `app.seed.users` trong
+Tài khoản dev – mỗi vai trò một tài khoản (admin, bizadmin, lead, manager, inspector, store, obm, executive) – được tạo tự động ở profile `dev`, xem `app.seed.users` trong
 [backend/src/main/resources/application-dev.yml](backend/src/main/resources/application-dev.yml).
 
 ## Địa chỉ hữu ích

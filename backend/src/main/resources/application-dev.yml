@@ -18,9 +18,15 @@ app:
         - https://localhost:5273
   seed:
     users:
-      - { username: admin, password: Admin@123, full-name: Quản trị viên, roles: [ADMIN] }
-      - { username: manager, password: Manager@123, full-name: Quản lý Demo, roles: [MANAGER] }
-      - { username: auditor, password: Auditor@123, full-name: Người chấm Demo, roles: [AUDITOR] }
+      # Mỗi vai trò một tài khoản thử (docs/DOMAIN_SPEC.md §2). Chỉ tạo nếu username chưa tồn tại.
+      - { username: admin, password: Admin@123, full-name: Quản trị hệ thống Demo, roles: [SYSTEM_ADMIN] }
+      - { username: bizadmin, password: Bizadmin@123, full-name: Quản trị nghiệp vụ Demo, roles: [BUSINESS_ADMIN] }
+      - { username: lead, password: Lead@123, full-name: Trưởng nhóm KSVH Demo, roles: [KSVH_LEAD] }
+      - { username: manager, password: Manager@123, full-name: Quản lý KSVH Demo, roles: [KSVH_MANAGER] }
+      - { username: inspector, password: Inspector@123, full-name: Chuyên viên KSVH Demo, roles: [KSVH_INSPECTOR] }
+      - { username: store, password: Store@123, full-name: Cửa hàng trưởng Demo, roles: [STORE_MANAGER] }
+      - { username: obm, password: Obm@123, full-name: OBM Demo, roles: [OBM] }
+      - { username: executive, password: Executive@123, full-name: Ban Giám đốc Demo, roles: [EXECUTIVE] }
 
 logging:
   level:

@@ -9,7 +9,7 @@ import vn.ksvh.qc.shared.persistence.BaseEntity;
 import java.util.HashSet;
 import java.util.Set;
 
-/** Vai trò. Danh sách permission (mã dạng "audit:approve") lưu ở bảng role_permissions. */
+/** Vai trò. Danh sách permission (mã dạng "plan:approve") lưu ở bảng role_permissions. */
 @Entity
 @Table(name = "roles")
 @Getter
@@ -25,6 +25,10 @@ public class Role extends BaseEntity {
 
     @Column(nullable = false, length = 100)
     private String name;
+
+    /** Mô tả công việc của vai trò (theo docs/DOMAIN_SPEC.md §2). */
+    @Column(length = 255)
+    private String description;
 
     @ElementCollection
     @BatchSize(size = 50)

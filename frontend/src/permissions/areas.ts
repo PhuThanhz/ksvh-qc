@@ -4,16 +4,28 @@ import { PERMISSIONS, type AccessRule } from '@/permissions/permissions'
 
 /** Điều kiện vào từng khu vực giao diện. */
 export const AREA_ACCESS = {
+  /** Dashboard: quản trị, Phòng KSVH, Ban Giám đốc. */
   admin: {
     anyOf: [
       PERMISSIONS.USER.READ,
+      PERMISSIONS.ORGANIZATION.MANAGE,
+      PERMISSIONS.CRITERIA.MANAGE,
+      PERMISSIONS.PLAN.READ,
+      PERMISSIONS.INSPECTION.READ_ALL,
       PERMISSIONS.REPORT.READ,
-      PERMISSIONS.AUDIT.READ_ALL,
-      PERMISSIONS.CHECKLIST.MANAGE,
-      PERMISSIONS.LOCATION.MANAGE,
     ],
   },
-  qc: { anyOf: [PERMISSIONS.AUDIT.CREATE, PERMISSIONS.AUDIT.READ_OWN, PERMISSIONS.MEDIA.UPLOAD] },
+  /** Giao diện điện thoại: Chuyên viên chấm/nghiệm thu, CHT xác nhận/khắc phục, người thẩm định khiếu nại. */
+  qc: {
+    anyOf: [
+      PERMISSIONS.INSPECTION.PERFORM,
+      PERMISSIONS.INSPECTION.READ_OWN,
+      PERMISSIONS.FINDING.RESPOND,
+      PERMISSIONS.FINDING.REMEDIATE,
+      PERMISSIONS.FINDING.VERIFY,
+      PERMISSIONS.FINDING.REVIEW_APPEAL,
+    ],
+  },
 } as const satisfies Record<string, AccessRule>
 
 /** Trang chủ sau đăng nhập theo quyền: ưu tiên dashboard, không có thì giao diện chấm. */

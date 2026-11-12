@@ -4,7 +4,7 @@ import { GuestRoute, HomeRedirect, ProtectedRoute } from '@/app/router/guards'
 import { AdminShell, MobileShell } from '@/app/router/shells'
 import { ErrorState } from '@/components/feedback/ErrorState'
 import { RouteErrorBoundary } from '@/components/feedback/RouteErrorBoundary'
-import { auditsMobileRoutes } from '@/features/audits'
+import { inspectionsMobileRoutes } from '@/features/inspections'
 import { authRoutes } from '@/features/auth'
 import { dashboardRoutes } from '@/features/dashboard'
 import { usersAdminRoutes } from '@/features/users'
@@ -15,7 +15,7 @@ import { AREA_ACCESS } from '@/permissions'
  * Thêm module mới: thêm mảng route của feature vào adminRoutes hoặc qcRoutes.
  */
 const adminRoutes = [...dashboardRoutes, ...usersAdminRoutes]
-const qcRoutes = [...auditsMobileRoutes]
+const qcRoutes = [...inspectionsMobileRoutes]
 
 export const router = createBrowserRouter([
   {

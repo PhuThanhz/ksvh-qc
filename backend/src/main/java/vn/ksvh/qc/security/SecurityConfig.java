@@ -96,7 +96,7 @@ public class SecurityConfig {
         return decoder;
     }
 
-    /** Authorities = permission (vd "audit:approve") + ROLE_<role>. Chỉ chấp nhận access token. */
+    /** Authorities = permission (vd "plan:approve") + ROLE_<role>. Chỉ chấp nhận access token. */
     private static JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(jwt -> {

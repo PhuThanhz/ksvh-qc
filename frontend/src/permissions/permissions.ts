@@ -9,9 +9,24 @@ export type { Permission }
  */
 export const PERMISSIONS = {
   USER: { READ: 'user:read', MANAGE: 'user:manage' },
-  LOCATION: { READ: 'location:read', MANAGE: 'location:manage' },
-  CHECKLIST: { READ: 'checklist:read', MANAGE: 'checklist:manage' },
-  AUDIT: { READ_OWN: 'audit:read:own', READ_ALL: 'audit:read:all', CREATE: 'audit:create', APPROVE: 'audit:approve' },
+  ROLE: { MANAGE: 'role:manage' },
+  SYSTEM: { CONFIG: 'system:config', LOG_READ: 'system:log:read' },
+  ORGANIZATION: { READ: 'organization:read', MANAGE: 'organization:manage' },
+  CRITERIA: { READ: 'criteria:read', MANAGE: 'criteria:manage' },
+  PLAN: { READ: 'plan:read', CREATE: 'plan:create', APPROVE: 'plan:approve' },
+  INSPECTION: {
+    READ_OWN: 'inspection:read:own',
+    READ_ALL: 'inspection:read:all',
+    PERFORM: 'inspection:perform',
+    CANCEL: 'inspection:cancel',
+  },
+  FINDING: {
+    RESPOND: 'finding:respond',
+    REVIEW_APPEAL: 'finding:review-appeal',
+    CONCLUDE_APPEAL: 'finding:conclude-appeal',
+    REMEDIATE: 'finding:remediate',
+    VERIFY: 'finding:verify',
+  },
   REPORT: { READ: 'report:read', EXPORT: 'report:export' },
   MEDIA: { UPLOAD: 'media:upload' },
 } as const satisfies Record<string, Record<string, Permission>>

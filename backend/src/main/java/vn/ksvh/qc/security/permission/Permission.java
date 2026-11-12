@@ -11,20 +11,31 @@ import java.util.stream.Collectors;
 
 /**
  * Danh mục permission của hệ thống (nguồn sự thật là code). Gán role → permission nằm trong DB.
- * Serialize ra JSON/OpenAPI bằng code (ví dụ "audit:approve") để frontend sinh type union.
+ * Serialize ra JSON/OpenAPI bằng code (ví dụ "plan:approve") để frontend sinh type union.
  */
 @Schema(name = "Permission", enumAsRef = true)
 public enum Permission {
     USER_READ(PermissionCodes.USER_READ),
     USER_MANAGE(PermissionCodes.USER_MANAGE),
-    LOCATION_READ(PermissionCodes.LOCATION_READ),
-    LOCATION_MANAGE(PermissionCodes.LOCATION_MANAGE),
-    CHECKLIST_READ(PermissionCodes.CHECKLIST_READ),
-    CHECKLIST_MANAGE(PermissionCodes.CHECKLIST_MANAGE),
-    AUDIT_READ_OWN(PermissionCodes.AUDIT_READ_OWN),
-    AUDIT_READ_ALL(PermissionCodes.AUDIT_READ_ALL),
-    AUDIT_CREATE(PermissionCodes.AUDIT_CREATE),
-    AUDIT_APPROVE(PermissionCodes.AUDIT_APPROVE),
+    ROLE_MANAGE(PermissionCodes.ROLE_MANAGE),
+    SYSTEM_CONFIG(PermissionCodes.SYSTEM_CONFIG),
+    SYSTEM_LOG_READ(PermissionCodes.SYSTEM_LOG_READ),
+    ORGANIZATION_READ(PermissionCodes.ORGANIZATION_READ),
+    ORGANIZATION_MANAGE(PermissionCodes.ORGANIZATION_MANAGE),
+    CRITERIA_READ(PermissionCodes.CRITERIA_READ),
+    CRITERIA_MANAGE(PermissionCodes.CRITERIA_MANAGE),
+    PLAN_READ(PermissionCodes.PLAN_READ),
+    PLAN_CREATE(PermissionCodes.PLAN_CREATE),
+    PLAN_APPROVE(PermissionCodes.PLAN_APPROVE),
+    INSPECTION_READ_OWN(PermissionCodes.INSPECTION_READ_OWN),
+    INSPECTION_READ_ALL(PermissionCodes.INSPECTION_READ_ALL),
+    INSPECTION_PERFORM(PermissionCodes.INSPECTION_PERFORM),
+    INSPECTION_CANCEL(PermissionCodes.INSPECTION_CANCEL),
+    FINDING_RESPOND(PermissionCodes.FINDING_RESPOND),
+    FINDING_REVIEW_APPEAL(PermissionCodes.FINDING_REVIEW_APPEAL),
+    FINDING_CONCLUDE_APPEAL(PermissionCodes.FINDING_CONCLUDE_APPEAL),
+    FINDING_REMEDIATE(PermissionCodes.FINDING_REMEDIATE),
+    FINDING_VERIFY(PermissionCodes.FINDING_VERIFY),
     REPORT_READ(PermissionCodes.REPORT_READ),
     REPORT_EXPORT(PermissionCodes.REPORT_EXPORT),
     MEDIA_UPLOAD(PermissionCodes.MEDIA_UPLOAD);

@@ -2,7 +2,7 @@ import type { RouteObject } from 'react-router'
 import type { AccessRule } from '@/permissions/permissions'
 
 /** Khoá icon menu; app/router/menu-icons.tsx ánh xạ sang icon thật (file routes không chứa JSX). */
-export type MenuIconKey = 'dashboard' | 'users' | 'audits' | 'checkin' | 'home'
+export type MenuIconKey = 'dashboard' | 'users' | 'inspections' | 'checkin' | 'home'
 
 /**
  * Metadata gắn vào route (handle):

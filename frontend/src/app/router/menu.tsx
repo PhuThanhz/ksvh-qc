@@ -6,7 +6,7 @@ import type { AppRoute, MenuIconKey } from '@/types/route.types'
 const MENU_ICONS: Record<MenuIconKey, ReactNode> = {
   dashboard: <DashboardOutlined />,
   users: <TeamOutlined />,
-  audits: <AppstoreOutlined />,
+  inspections: <AppstoreOutlined />,
   checkin: <EnvironmentOutlined />,
   home: <HomeOutlined />,
 }

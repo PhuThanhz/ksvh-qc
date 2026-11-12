@@ -15,8 +15,9 @@ Trước khi làm, đọc `CLAUDE.md`, `backend/CLAUDE.md`, các migration hiệ
 - FK luôn có index; đặt `ON DELETE` có chủ đích (thường `RESTRICT`, dữ liệu chấm không được mất theo dây chuyền).
 - Enum lưu `VARCHAR` + `CHECK (col IN (...))`, khớp `@Enumerated(EnumType.STRING)`.
 - Điểm/trọng số: `NUMERIC(p,s)`. Toạ độ: `DOUBLE PRECISION`. Thời gian: `TIMESTAMPTZ`.
-- Dữ liệu chấm đã nộp phải truy vết được: lưu snapshot tiêu chí/điểm tối đa tại thời điểm chấm, để sửa checklist sau không làm sai kết quả cũ.
-- Thêm index cho truy vấn dashboard (lọc theo ngày, điểm chấm, người chấm).
+- Dữ liệu chấm đã gửi phải truy vết được: lưu snapshot tiêu chí / mức ảnh hưởng tại thời điểm chấm, để sửa danh mục sau không làm sai kết quả cũ. Danh mục cấu hình rủi ro có ngày hiệu lực.
+- Mỗi lần lỗi được tính tần suất là một dòng (`finding_occurrence`: nhà hàng, tiêu chí, thời điểm, nguồn); không lưu tần suất cộng dồn. Nghiệp vụ: docs/DOMAIN_SPEC.md.
+- Thêm index cho truy vấn dashboard và đếm tần suất (nhà hàng + tiêu chí + thời điểm; lọc theo ngày, nhà hàng, người chấm).
 - Comment tiếng Việt ngắn trên mỗi bảng.
 
 ## Kiểm tra

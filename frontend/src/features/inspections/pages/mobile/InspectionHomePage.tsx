@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router'
 import { ROUTES } from '@/constants/routes'
 import { useSession } from '@/features/auth'
 
-/** Danh sách việc chấm của người chấm. Lấy dữ liệu từ module audit sau khi chốt nghiệp vụ. */
-export function AuditHomePage() {
+/** Danh sách việc chấm của người chấm. Lấy dữ liệu từ module inspection (phiếu được giao). */
+export function InspectionHomePage() {
   const { user } = useSession()
   const navigate = useNavigate()
 
