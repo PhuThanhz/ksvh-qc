@@ -6,10 +6,10 @@ import java.time.Instant;
 import java.util.List;
 
 public record UserResponse(Long id, String username, String fullName, boolean active, List<String> roles,
-                           Instant createdAt) {
+                           Instant createdAt, Instant updatedAt) {
 
     public static UserResponse from(User u) {
         return new UserResponse(u.getId(), u.getUsername(), u.getFullName(), u.isActive(),
-                u.roleCodes().stream().sorted().toList(), u.getCreatedAt());
+                u.roleCodes().stream().sorted().toList(), u.getCreatedAt(), u.getUpdatedAt());
     }
 }

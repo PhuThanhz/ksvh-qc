@@ -30,8 +30,9 @@ class RolePermissionCatalogTests {
     private JdbcTemplate jdbc;
 
     @Test
-    void hasExactlyTheEightBusinessRoles() {
-        List<String> roles = jdbc.queryForList("SELECT code FROM roles", String.class);
+    void hasExactlyTheEightBusinessRolesAsSystemRoles() {
+        // Vai trò tự tạo trên giao diện (system_role = false) không tính.
+        List<String> roles = jdbc.queryForList("SELECT code FROM roles WHERE system_role", String.class);
         assertThat(roles).containsExactlyInAnyOrderElementsOf(EXPECTED_ROLES);
     }
 

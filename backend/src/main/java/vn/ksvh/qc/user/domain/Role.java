@@ -2,6 +2,7 @@ package vn.ksvh.qc.user.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 import vn.ksvh.qc.shared.persistence.BaseEntity;
@@ -13,6 +14,7 @@ import java.util.Set;
 @Entity
 @Table(name = "roles")
 @Getter
+@Setter
 @NoArgsConstructor
 public class Role extends BaseEntity {
 
@@ -29,6 +31,13 @@ public class Role extends BaseEntity {
     /** Mô tả công việc của vai trò (theo docs/DOMAIN_SPEC.md §2). */
     @Column(length = 255)
     private String description;
+
+    /** Vai trò gốc theo tài liệu nghiệp vụ: không xoá, không đổi mã. */
+    @Column(name = "system_role", nullable = false)
+    private boolean systemRole;
+
+    @Column(name = "updated_by")
+    private Long updatedBy;
 
     @ElementCollection
     @BatchSize(size = 50)

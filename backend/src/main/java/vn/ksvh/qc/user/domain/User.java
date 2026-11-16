@@ -34,6 +34,9 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private boolean active = true;
 
+    @Column(name = "updated_by")
+    private Long updatedBy;
+
     @ManyToMany
     @BatchSize(size = 50)
     @JoinTable(name = "user_roles",
