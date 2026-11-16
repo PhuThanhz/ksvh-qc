@@ -1,1 +1,1 @@
-export { inspectionsMobileRoutes } from '@/features/inspections/inspections.routes'
+export { inspectionsAdminRoutes, inspectionsMobileRoutes } from '@/features/inspections/inspections.routes'
