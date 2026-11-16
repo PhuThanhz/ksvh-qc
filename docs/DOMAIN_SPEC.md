@@ -37,7 +37,7 @@ Quy mô: 6 nhóm chức năng, 8 vai trò, 70 tiêu chí rủi ro mỗi kỳ, 5 
 | 7 | OBM | Vận hành | Tham gia xem xét khiếu nại | `OBM` |
 | 8 | Ban Giám đốc | Ban Giám đốc | Xem kết quả kiểm tra; **không sửa dữ liệu** | `EXECUTIVE` |
 
-### 2.1 Permission (đã áp dụng – migration `V20261112_1130__ksvh_roles_and_permissions.sql`)
+### 2.1 Permission (đã áp dụng – migration `V20261112_1130__ksvh_roles_and_permissions.sql`, `V20261112_1500__user_admin_and_employees.sql`)
 Dạng `module:action[:scope]`, khai báo trong `PermissionCodes` + `enum Permission`, gán cho role bằng Flyway. Test `RolePermissionCatalogTests` bắt buộc code và DB khớp nhau.
 
 | Permission | Ý nghĩa | SYS | BIZ | LEAD | MGR | INSP | CHT | OBM | BGĐ |
@@ -45,6 +45,8 @@ Dạng `module:action[:scope]`, khai báo trong `PermissionCodes` + `enum Permis
 | `user:read` | xem người dùng | ✓ | | ✓ | ✓ | | | | |
 | `user:manage`, `role:manage` | tạo tài khoản, phân quyền | ✓ | | | | | | | |
 | `system:config`, `system:log:read` | cấu hình, nhật ký hệ thống | ✓ | | | | | | | |
+| `employee:read` | xem hồ sơ nhân viên | ✓ | | ✓ | ✓ | | | | |
+| `employee:manage` | tạo, sửa nhân viên; liên kết tài khoản | ✓ | | | | | | | |
 | `organization:read` | xem công ty, nhà hàng | ✓ | ✓ | ✓ | ✓ | ✓ | | | ✓ |
 | `organization:manage` | khai báo công ty, nhà hàng | ✓ | | | | | | | |
 | `criteria:read` | xem tiêu chí, mẫu phiếu, cấu hình rủi ro | ✓ | ✓ | ✓ | ✓ | ✓ | | | ✓ |
@@ -66,6 +68,7 @@ Dạng `module:action[:scope]`, khai báo trong `PermissionCodes` + `enum Permis
 | `media:upload` | tải ảnh / video bằng chứng | | | | | ✓ | ✓ | | |
 
 Ghi chú:
+- Quản trị trên giao diện (`/admin`, nhóm "Quản trị hệ thống"): xem danh mục permission (chỉ xem – permission định nghĩa trong code), tạo vai trò mới và sửa quyền của vai trò (8 vai trò gốc không xoá / đổi mã; SYSTEM_ADMIN luôn giữ `user:manage`, `role:manage`), quản lý tài khoản, hồ sơ nhân viên. Bảng trên là cấu hình ban đầu.
 - Ban Giải pháp nhập dữ liệu tiêu chí ban đầu: gán **thêm** role BUSINESS_ADMIN tạm thời (một user nhiều role), không mở `criteria:manage` cho SYSTEM_ADMIN.
 - Chưa chắc chắn, cần xác nhận khi trả lời Q6: Trưởng nhóm có tham gia thẩm định không; ai được huỷ phiếu (hiện chỉ Quản lý); CHT chọn người thẩm định cần quyền xem danh sách nào.
 - Giao diện: có quyền dashboard (`user:read`, `organization:manage`, `criteria:manage`, `plan:read`, `inspection:read:all`, `report:read`) → `/admin`; còn lại → `/qc` (`frontend/src/permissions/areas.ts`).
@@ -147,6 +150,19 @@ flowchart LR
 
 ---
 
+### Bổ sung theo tài liệu Word "Ví dụ quy trình kiểm tra ... YS-LTT" (chốt với người dùng 16/11/2026)
+| Loại kiểm tra | Điều kiện | Phạm vi | Hình thức |
+|---|---|---|---|
+| Định kỳ tháng (`PERIODIC`) | Theo kế hoạch tháng đã duyệt | Đủ mọi tiêu chí của mẫu phiếu (vd 70 điểm), không ngoại lệ | Thực tế tại nhà hàng |
+| Đột xuất (`SURPRISE`) | Rủi ro cao / dấu hiệu bất thường | Chỉ **chuyên đề** được kích hoạt = các **nhóm tiêu chí** được chọn | Thực tế hoặc từ xa |
+| Kiểm tra kết quả khắc phục | Sau khi nhà hàng gửi bằng chứng | Các lỗi cần xác minh | Thực tế hoặc từ xa — **chưa làm**, hiện dùng thao tác Nghiệm thu trên từng lỗi |
+
+- **Bỏ "loại nhà hàng"**; mẫu phiếu chỉ còn giới hạn theo công ty.
+- **GPS chưa bắt buộc:** nhà hàng không bắt buộc khai toạ độ; khi bắt đầu kiểm tra hệ thống chỉ **ghi nhận** vị trí (`VERIFIED` / `OUTSIDE_RADIUS` / `UNVERIFIED` / `REMOTE`), không chặn.
+- **Điểm tuân thủ** (NT03) = tổng trọng số tiêu chí Đạt / tổng trọng số Đạt + Không đạt × 100, N/A không tính; trọng số = mức ảnh hưởng gốc 1–5. Khác và không thay thế điểm rủi ro.
+- **Công thức rủi ro giữ theo PDF** (§6); các số trong Word (ngưỡng 1/6/12/20, hạ mức sau 2 kỳ, hệ số tái phạm 1,0–2,0, Phó/Trưởng phòng phê duyệt mức rủi ro) chỉ là minh hoạ — chưa áp dụng.
+- Chưa làm (theo Word): xử lý giải trình nhiều cấp (cấp vận hành → OBM/Phó/Trưởng phòng → BGĐ, có "yêu cầu bổ sung"), kế hoạch khắc phục chi tiết (nguyên nhân gốc, biện pháp, người phụ trách), trạng thái "mở lại", đề xuất kiểm tra đột xuất khi rủi ro cao, cảnh báo lỗi chưa xác minh tháng trước khi lập kế hoạch tháng sau.
+
 ## 5. Máy trạng thái [ĐỀ XUẤT]
 
 ### 5.1 Kế hoạch kiểm tra (`inspection_plan`)
@@ -199,7 +215,11 @@ Tính theo cặp **(nhà hàng, tiêu chí)**.
 | M3 | Cao | 6 – 12 | 7 ngày | Khắc phục, phòng ngừa, kiểm tra lại |
 | M4 | Nghiêm trọng | 12 – 20 | 1 ngày | Lập biên bản, báo cáo lãnh đạo |
 
-Khoảng điểm chồng mép; ví dụ ở s.16 cho điểm 1 → M2, điểm 6 → M3 ⇒ **[ĐỀ XUẤT]** khoảng `[min, max)`, mức cuối `[12, +∞)`. Xem **[MỞ Q1]**.
+**Đã chốt 12/11/2026:** khoảng `[min, max)` (điểm 1 → M2, điểm 6 → M3 như ví dụ s.16), mức cao nhất `[12, +∞)`. Thang mức ảnh hưởng **1–5**, mức trần nâng mức là giá trị cấu hình (mặc định 5).
+
+**Đã làm (12/11/2026):** danh mục 5–9 trên `/admin` nhóm "Danh mục thiết lập" (migration `V20261112_1700__criteria_catalog.sql`). Số liệu M1–M4, kỳ đếm 6 tháng, ngưỡng 3 lần / +1 bậc / trần 5 / hạ lại 6 tháng được nạp sẵn là **ví dụ PDF – chờ Phòng KSVH xác nhận**. Tần suất và nâng mức lưu theo phiên bản ngày hiệu lực (không áp dụng ngược, không sửa bản cũ).
+
+**Đã làm (16/11/2026):** bộ tính thuần `vn.ksvh.qc.risk.RiskCalculator` (unit test TC-1…TC-5) dùng khi gửi phiếu và khi nghiệm thu chưa đạt; đọc kỳ đếm, quy tắc nâng mức, bảng mức **đang hiệu lực tại ngày tính**. Lỗi lưu cả `base_impact` (gốc) và `effective_impact` (sau nâng mức); điểm = effective × tần suất. **Giả định chờ xác nhận Q3:** kỳ đếm và kỳ hạ mức tính theo **tháng dương lịch** (kỳ 6 tháng tại T8 = T3..T8). Q4 chưa chốt nên nghiệm thu chưa đạt chỉ tính lại điểm/mức, giữ nguyên hạn. Mô phỏng trên giao diện gọi `GET /api/v1/risk/preview` (cùng bộ tính).
 
 ### 6.3 Đếm tần suất theo kỳ [PDF s.15]
 - Cộng **mọi** lần lỗi của cùng tiêu chí, tại cùng nhà hàng, trong **kỳ đếm gần nhất** (3 hoặc 6 tháng, theo cấu hình có ngày hiệu lực).
@@ -256,7 +276,7 @@ Việc kéo theo: sửa danh sách module trong CLAUDE.md gốc; sửa "tự tí
 
 | # | Câu hỏi | Ảnh hưởng tới |
 |---|---|---|
-| Q1 | Biên khoảng điểm M1–M4 chồng mép: có đúng là `[min, max)` không? Thang mức ảnh hưởng là 1–4 hay 1–5? Mức trần là bao nhiêu? Điểm > 20 xếp mức nào? | Bảng `risk_level`, hàm phân loại |
+| Q1 | ~~Biên khoảng điểm, thang ảnh hưởng~~ – **đã chốt 12/11/2026**: `[min, max)`, thang 1–5, điểm > 20 vẫn là M4. Còn chờ KSVH xác nhận số ngày / khoảng điểm thực tế. | Bảng `risk_levels` |
 | Q2 | Một tiêu chí lỗi nhiều lần trong cùng tháng (chấm lại, nghiệm thu chưa đạt, quá hạn) tính mấy lần? Quá hạn **và** nghiệm thu chưa đạt cùng một vòng có +2 không? | `finding_occurrence` |
 | Q3 | Kỳ đếm cuốn theo **tháng dương lịch** (T3–T8) hay theo **số ngày** (180 ngày trước)? | Hàm đếm tần suất |
 | Q4 | Hạn khắc phục lấy theo mức rủi ro **lúc xác nhận** hay tính lại mỗi vòng ("hạn rút ngắn" ở s.14)? | Hạn của vòng khắc phục |
