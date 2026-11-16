@@ -31,7 +31,7 @@ src/
 - **UI kit & Thông báo:** `pages/admin` + `components/*` dùng `antd`; `pages/mobile` dùng `antd-mobile`. Toast/notify dùng `useNotify()` (desktop) hoặc `mobileToast` / `confirmMobile` (mobile); modal xác nhận desktop dùng `useConfirm()`.
 - **Hằng số** trong `constants/` (timeout, phân trang, ngưỡng GPS…); đường dẫn trang trong `constants/routes.ts`.
 - Không `any`, không `enum`, không `console.log`, dùng `import type` cho type.
-- Kích thước: component 100–200 dòng (xem lại > 300), hook < 150, file api < 200.
+- Kích thước: component 100–200 dòng, hook < 150, file api < 200. Giới hạn cứng trong linter oxlint: `max-lines` ≤ 250 dòng (bỏ qua dòng trống, comment và file sinh tự động `api.generated.ts`). Vượt quá phải tách component nhỏ hơn.
 
 ## Mobile `/qc`
 - Nút lớn, hành động chính `block`, có loading/lỗi rõ ràng.

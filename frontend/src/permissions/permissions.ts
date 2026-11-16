@@ -10,6 +10,7 @@ export type { Permission }
 export const PERMISSIONS = {
   USER: { READ: 'user:read', MANAGE: 'user:manage' },
   ROLE: { MANAGE: 'role:manage' },
+  EMPLOYEE: { READ: 'employee:read', MANAGE: 'employee:manage' },
   SYSTEM: { CONFIG: 'system:config', LOG_READ: 'system:log:read' },
   ORGANIZATION: { READ: 'organization:read', MANAGE: 'organization:manage' },
   CRITERIA: { READ: 'criteria:read', MANAGE: 'criteria:manage' },

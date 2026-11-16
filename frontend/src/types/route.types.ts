@@ -2,7 +2,30 @@ import type { RouteObject } from 'react-router'
 import type { AccessRule } from '@/permissions/permissions'
 
 /** Khoá icon menu; app/router/menu-icons.tsx ánh xạ sang icon thật (file routes không chứa JSX). */
-export type MenuIconKey = 'dashboard' | 'users' | 'inspections' | 'checkin' | 'home'
+export type MenuIconKey =
+  | 'dashboard'
+  | 'users'
+  | 'organizations'
+  | 'restaurants'
+  | 'departments'
+  | 'companies'
+  | 'permissions'
+  | 'roles'
+  | 'employees'
+  | 'system'
+  | 'criteriaGroups'
+  | 'criteria'
+  | 'templates'
+  | 'riskLevels'
+  | 'riskRules'
+  | 'plans'
+  | 'inspections'
+  | 'findings'
+  | 'checkin'
+  | 'home'
+
+/** Nhóm menu sidebar; app/router/menu.tsx ánh xạ sang nhãn + icon. */
+export type MenuGroupKey = 'operations' | 'catalog' | 'system'
 
 /**
  * Metadata gắn vào route (handle):
@@ -11,7 +34,7 @@ export type MenuIconKey = 'dashboard' | 'users' | 'inspections' | 'checkin' | 'h
  */
 export interface RouteHandle {
   access?: AccessRule
-  menu?: { label: string; icon: MenuIconKey }
+  menu?: { label: string; icon: MenuIconKey; group?: MenuGroupKey }
 }
 
 type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never

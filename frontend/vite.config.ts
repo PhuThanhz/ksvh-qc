@@ -25,4 +25,24 @@ export default defineConfig({
       '/ksvh-qc': { target: 'http://localhost:9000', changeOrigin: false },
     },
   },
+  build: {
+    chunkSizeWarningLimit: 1500,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+              return 'vendor-react'
+            }
+            if (id.includes('antd') || id.includes('@ant-design')) {
+              return 'vendor-antd'
+            }
+            if (id.includes('@tanstack/react-query')) {
+              return 'vendor-query'
+            }
+          }
+        },
+      },
+    },
+  },
 })

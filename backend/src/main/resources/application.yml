@@ -21,6 +21,10 @@ spring:
     web:
       pageable:
         max-page-size: 100
+  servlet:
+    multipart:
+      max-file-size: 5MB      # file Excel nhập danh mục (ảnh không đi qua Spring, xem quy tắc 3)
+      max-request-size: 6MB
 
 server:
   port: ${PORT:8088}

@@ -11,6 +11,8 @@ export const SEARCH_DEBOUNCE_MS = 400
 /** GPS: sai số tối đa chấp nhận (mét) và thời gian dò tối đa. */
 export const GPS_MAX_ACCURACY_M = 50
 export const GPS_TIMEOUT_MS = 15_000
+/** Bán kính check-in gợi ý khi tạo nhà hàng (m); server chấp nhận 10–5000. */
+export const DEFAULT_CHECKIN_RADIUS_M = 100
 
 /** Ảnh bằng chứng: kích thước cạnh dài nhất và dung lượng sau nén. */
 export const IMAGE_MAX_DIMENSION_PX = 1600

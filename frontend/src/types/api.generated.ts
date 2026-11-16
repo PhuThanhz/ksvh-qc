@@ -4,6 +4,262 @@
  */
 
 export interface paths {
+    "/api/v1/users/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get"];
+        put: operations["update"];
+        post?: never;
+        delete: operations["delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/roles/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_1"];
+        put: operations["update_1"];
+        post?: never;
+        delete: operations["delete_1"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/risk-levels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["riskLevels"];
+        put: operations["saveRiskLevelVersion"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/org-units/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_2"];
+        put: operations["update_2"];
+        post?: never;
+        delete: operations["delete_2"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspection-templates/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_3"];
+        put: operations["update_3"];
+        post?: never;
+        delete: operations["delete_3"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspection-plans/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_4"];
+        put: operations["update_4"];
+        post?: never;
+        delete: operations["delete_4"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/employees/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_5"];
+        put: operations["update_5"];
+        post?: never;
+        delete: operations["delete_5"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/criterion-groups/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["updateGroup"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/criteria/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_6"];
+        put: operations["update_6"];
+        post?: never;
+        delete: operations["deleteCriterion"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_7"];
+        put: operations["update_7"];
+        post?: never;
+        delete: operations["delete_6"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["search"];
+        put?: never;
+        post: operations["create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{id}/reset-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["resetPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["importFile"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list"];
+        put?: never;
+        post: operations["create_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["importFile_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/org-units": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["search_1"];
+        put?: never;
+        post: operations["create_2"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/presign-upload": {
         parameters: {
             query?: never;
@@ -14,6 +270,390 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["presignUpload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["search_2"];
+        put?: never;
+        post: operations["create_3"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspections/{id}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["submit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspections/{id}/checkin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["checkin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspections/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspection-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["search_3"];
+        put?: never;
+        post: operations["create_4"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspection-templates/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["importTemplates"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspection-plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["search_4"];
+        put?: never;
+        post: operations["create_5"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspection-plans/{id}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["submit_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspection-plans/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["reject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspection-plans/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["approve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/frequency-configs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["frequencyConfigs"];
+        put?: never;
+        post: operations["createFrequency"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/findings/{id}/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["verify"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/findings/{id}/submit-remediation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["submitRemediation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/findings/{id}/remediation-plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["setRemediationPlan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/findings/{id}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["confirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/findings/{id}/conclude-appeal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["concludeAppeal"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/findings/{id}/appeal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["appeal"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/escalation-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["escalationRules"];
+        put?: never;
+        post: operations["createEscalation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/employees": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["search_5"];
+        put?: never;
+        post: operations["create_6"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/employees/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["importFile_2"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/criterion-groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["groups"];
+        put?: never;
+        post: operations["createGroup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/criteria": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["search_6"];
+        put?: never;
+        post: operations["create_7"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/criteria/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["importCriteria"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["search_7"];
+        put?: never;
+        post: operations["create_8"];
         delete?: never;
         options?: never;
         head?: never;
@@ -68,14 +708,334 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/users": {
+    "/api/v1/users/import-template": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["search"];
+        get: operations["template"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["export"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/risk/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["preview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/risk-levels/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["riskLevelVersions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["dashboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["permissions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/import-template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["template_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["export_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspections/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_8"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspections/{id}/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getItems"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspections/my-tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["myTasks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspection-templates/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["options"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspection-templates/import-template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["templatesTemplate"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspection-templates/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["exportTemplates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/findings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["search_8"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/findings/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_9"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/employees/import-template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["template_2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/employees/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["export_2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/criteria/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["options_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/criteria/import-template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["criteriaTemplate"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/criteria/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["exportCriteria"];
         put?: never;
         post?: never;
         delete?: never;
@@ -100,10 +1060,372 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/risk-levels/versions/{effectiveFrom}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteRiskLevelVersion"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/frequency-configs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteFrequency"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/escalation-rules/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteEscalation"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        UserUpdateRequest: {
+            fullName: string;
+            roles: string[];
+            active?: boolean;
+        };
+        UserResponse: {
+            /** Format: int64 */
+            id: number;
+            username: string;
+            fullName: string;
+            active: boolean;
+            roles: string[];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        RoleRequest: {
+            code: string;
+            name: string;
+            description?: string;
+            permissions: string[];
+        };
+        RoleResponse: {
+            /** Format: int64 */
+            id: number;
+            code: string;
+            name: string;
+            description: string | null;
+            systemRole: boolean;
+            permissions: string[];
+            /** Format: int64 */
+            userCount: number;
+            /** Format: date-time */
+            updatedAt: string;
+            updatedByName: string | null;
+        };
+        RiskLevelItem: {
+            code: string;
+            name: string;
+            minScore: number;
+            maxScore?: number | null;
+            /** Format: int32 */
+            remediationDays: number;
+            action?: string | null;
+        };
+        RiskLevelVersionRequest: {
+            /** Format: date */
+            effectiveFrom: string;
+            levels: components["schemas"]["RiskLevelItem"][];
+        };
+        RiskLevelVersionResponse: {
+            /** Format: date */
+            effectiveFrom: string;
+            /** @enum {string} */
+            status: "CURRENT" | "SCHEDULED" | "PAST";
+            /** Format: date-time */
+            updatedAt: string;
+            updatedByName: string;
+            levels: components["schemas"]["RiskLevelItem"][];
+        };
+        OrgUnitRequest: {
+            /** Format: int64 */
+            companyId: number;
+            /** @enum {string} */
+            unitType: "RESTAURANT" | "DEPARTMENT";
+            code: string;
+            name: string;
+            address?: string;
+            /** Format: int64 */
+            storeManagerUserId?: number;
+            /** Format: int64 */
+            obmUserId?: number;
+            /** Format: double */
+            latitude?: number;
+            /** Format: double */
+            longitude?: number;
+            /** Format: int32 */
+            checkinRadiusM?: number;
+            active?: boolean;
+        };
+        OrgUnitResponse: {
+            /** Format: int64 */
+            id: number;
+            /** Format: int64 */
+            companyId: number;
+            companyCode: string;
+            companyName: string;
+            /** @enum {string} */
+            unitType: "RESTAURANT" | "DEPARTMENT";
+            code: string;
+            name: string;
+            address: string | null;
+            storeManager: components["schemas"]["UserRef"];
+            obm: components["schemas"]["UserRef"];
+            /** Format: double */
+            latitude: number | null;
+            /** Format: double */
+            longitude: number | null;
+            /** Format: int32 */
+            checkinRadiusM: number | null;
+            active: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        UserRef: {
+            /** Format: int64 */
+            id: number;
+            username: string;
+            fullName: string;
+        };
+        TemplateRequest: {
+            code: string;
+            name: string;
+            inspectionType?: string;
+            description?: string;
+            /** Format: int64 */
+            companyId?: number;
+            criterionIds: number[];
+            active?: boolean;
+        };
+        CriterionResponse: {
+            /** Format: int64 */
+            id: number;
+            /** Format: int64 */
+            groupId: number;
+            groupName: string;
+            /** Format: int64 */
+            groupCompanyId: number | null;
+            code: string;
+            name: string;
+            checkMethod: string | null;
+            evidenceRequired: string | null;
+            /** Format: int32 */
+            baseImpact: number;
+            /** Format: int32 */
+            sortOrder: number;
+            active: boolean;
+            /** Format: date-time */
+            updatedAt: string;
+            templates: components["schemas"]["CriterionTemplateRef"][];
+        };
+        CriterionTemplateRef: {
+            /** Format: int64 */
+            id: number;
+            code: string;
+            name: string;
+        };
+        TemplateResponse: {
+            /** Format: int64 */
+            id: number;
+            code: string;
+            name: string;
+            inspectionType: string | null;
+            description: string | null;
+            /** Format: int64 */
+            companyId: number | null;
+            companyName: string | null;
+            active: boolean;
+            /** Format: int32 */
+            criterionCount: number;
+            /** Format: date-time */
+            updatedAt: string;
+            criteria: components["schemas"]["CriterionResponse"][];
+        };
+        PlanUpdateRequest: {
+            title: string;
+            /** Format: date */
+            startDate: string;
+            /** Format: date */
+            endDate: string;
+            notes?: string;
+        };
+        PlanResponse: {
+            /** Format: int64 */
+            id: number;
+            planCode: string;
+            title: string;
+            /** Format: date */
+            startDate: string;
+            /** Format: date */
+            endDate: string;
+            /** @enum {string} */
+            status: "DRAFT" | "PENDING_APPROVAL" | "APPROVED" | "REJECTED";
+            rejectionReason: string;
+            notes: string;
+            /** Format: int64 */
+            createdBy: number;
+            createdByName: string;
+            /** Format: int64 */
+            approvedBy: number;
+            approvedByName: string;
+            /** Format: date-time */
+            approvedAt: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        EmployeeRequest: {
+            employeeCode: string;
+            fullName: string;
+            jobTitle?: string;
+            /** Format: int64 */
+            orgUnitId?: number;
+            phone?: string;
+            /** Format: email */
+            email?: string;
+            /** Format: int64 */
+            userId?: number;
+            active?: boolean;
+        };
+        EmployeeResponse: {
+            /** Format: int64 */
+            id: number;
+            employeeCode: string;
+            fullName: string;
+            jobTitle: string | null;
+            /** Format: int64 */
+            orgUnitId: number | null;
+            orgUnitName: string | null;
+            phone: string | null;
+            email: string | null;
+            /** Format: int64 */
+            userId: number | null;
+            username: string | null;
+            active: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        CriterionGroupRequest: {
+            code: string;
+            name: string;
+            /** Format: int32 */
+            sortOrder?: number;
+            /** Format: int64 */
+            companyId?: number;
+            active?: boolean;
+        };
+        CriterionGroupResponse: {
+            /** Format: int64 */
+            id: number;
+            code: string;
+            name: string;
+            /** Format: int32 */
+            sortOrder: number;
+            /** Format: int64 */
+            companyId: number;
+            companyName: string;
+            active: boolean;
+            /** Format: int64 */
+            criterionCount: number;
+        };
+        CriterionRequest: {
+            /** Format: int64 */
+            groupId: number;
+            code: string;
+            name: string;
+            checkMethod?: string;
+            evidenceRequired?: string;
+            /** Format: int32 */
+            baseImpact: number;
+            /** Format: int32 */
+            sortOrder?: number;
+            active?: boolean;
+            templateIds?: number[];
+        };
+        CompanyRequest: {
+            code: string;
+            name: string;
+            active?: boolean;
+        };
+        CompanyResponse: {
+            /** Format: int64 */
+            id: number;
+            code: string;
+            name: string;
+            active: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        UserCreateRequest: {
+            username: string;
+            fullName: string;
+            password: string;
+            roles: string[];
+            active?: boolean;
+        };
+        PasswordResetRequest: {
+            newPassword: string;
+        };
+        ImportResult: {
+            committed: boolean;
+            /** Format: int32 */
+            totalRows: number;
+            /** Format: int32 */
+            created: number;
+            /** Format: int32 */
+            updated: number;
+            errors: components["schemas"]["ImportRowError"][];
+        };
+        ImportRowError: {
+            sheet: string;
+            /** Format: int32 */
+            row: number;
+            column: string | null;
+            message: string;
+        };
         PresignUploadRequest: {
             contentType: string;
             /** Format: int64 */
@@ -115,8 +1437,279 @@ export interface components {
             /** Format: date-time */
             expiresAt: string;
         };
+        InspectionCreateRequest: {
+            code: string;
+            /** Format: int64 */
+            planId?: number;
+            /** Format: int64 */
+            restaurantId: number;
+            /** Format: int64 */
+            templateId?: number;
+            /** Format: int64 */
+            inspectorId: number;
+            /** @enum {string} */
+            inspectionType: "PERIODIC" | "SURPRISE";
+            /** @enum {string} */
+            inspectionMode?: "ON_SITE" | "REMOTE";
+            topicGroupIds?: number[];
+            notes?: string;
+        };
+        InspectionItemResponse: {
+            /** Format: int64 */
+            id: number;
+            /** Format: int64 */
+            criterionId: number;
+            criterionCode: string;
+            criterionName: string;
+            groupName: string;
+            /** Format: int32 */
+            baseImpact: number;
+            /** @enum {string} */
+            result: "UNRATED" | "PASS" | "FAIL" | "NA";
+            comment: string;
+            evidenceUrls: string;
+            /** Format: int32 */
+            sortOrder: number;
+            /** Format: date-time */
+            evaluatedAt: string;
+        };
+        InspectionResponse: {
+            /** Format: int64 */
+            id: number;
+            code: string;
+            /** Format: int64 */
+            planId: number;
+            /** Format: int64 */
+            restaurantId: number;
+            restaurantName: string;
+            /** Format: int64 */
+            templateId: number;
+            templateName: string;
+            /** Format: int64 */
+            inspectorId: number;
+            inspectorName: string;
+            /** @enum {string} */
+            inspectionType: "PERIODIC" | "SURPRISE";
+            /** @enum {string} */
+            inspectionMode: "ON_SITE" | "REMOTE";
+            /** @enum {string|null} */
+            locationStatus: "VERIFIED" | "OUTSIDE_RADIUS" | "UNVERIFIED" | "REMOTE" | null;
+            topicNames: string[];
+            /** @enum {string} */
+            status: "ASSIGNED" | "IN_PROGRESS" | "SUBMITTED" | "COMPLETED" | "CANCELLED";
+            cancelReason: string;
+            /** Format: double */
+            checkinLat: number;
+            /** Format: double */
+            checkinLng: number;
+            /** Format: double */
+            checkinDistanceM: number;
+            /** Format: date-time */
+            checkinAt: string;
+            /** Format: date-time */
+            submittedAt: string;
+            /** Format: date-time */
+            completedAt: string;
+            /** Format: int32 */
+            totalCriteria: number;
+            /** Format: int32 */
+            passedCriteria: number;
+            /** Format: int32 */
+            failedCriteria: number;
+            /** Format: int32 */
+            naCriteria: number;
+            complianceScore: number | null;
+            /** Format: int32 */
+            totalRiskScore: number;
+            maxRiskLevel: string;
+            notes: string;
+            /** Format: date-time */
+            createdAt: string;
+            items: components["schemas"]["InspectionItemResponse"][];
+        };
+        InspectionSubmitItemRequest: {
+            /** Format: int64 */
+            criterionId: number;
+            /** @enum {string} */
+            result: "UNRATED" | "PASS" | "FAIL" | "NA";
+            comment?: string;
+            evidenceUrls?: string;
+        };
+        InspectionSubmitRequest: {
+            items: components["schemas"]["InspectionSubmitItemRequest"][];
+            notes?: string;
+        };
+        InspectionCheckinRequest: {
+            /** Format: double */
+            latitude: number;
+            /** Format: double */
+            longitude: number;
+        };
+        InspectionCancelRequest: {
+            reason: string;
+        };
+        PlanCreateRequest: {
+            planCode: string;
+            title: string;
+            /** Format: date */
+            startDate: string;
+            /** Format: date */
+            endDate: string;
+            notes?: string;
+        };
+        PlanRejectRequest: {
+            reason: string;
+        };
+        FrequencyConfigRequest: {
+            /** Format: int32 */
+            periodMonths: number;
+            /** Format: date */
+            effectiveFrom: string;
+            note?: string;
+        };
+        FrequencyConfigResponse: {
+            /** Format: int64 */
+            id: number;
+            /** Format: int32 */
+            periodMonths: number;
+            /** Format: date */
+            effectiveFrom: string;
+            note: string | null;
+            /** @enum {string} */
+            status: "CURRENT" | "SCHEDULED" | "PAST";
+            /** Format: date-time */
+            createdAt: string;
+            createdByName: string | null;
+        };
+        FindingVerifyRequest: {
+            passed: boolean;
+            comment?: string;
+        };
+        FindingEventResponse: {
+            /** Format: int64 */
+            id: number;
+            /** @enum {string} */
+            action: "CREATED" | "CONFIRMED" | "APPEALED" | "APPEAL_UPHELD" | "APPEAL_DISMISSED" | "REMEDIATION_PLANNED" | "REMEDIATION_SUBMITTED" | "VERIFY_PASSED" | "VERIFY_FAILED";
+            /** @enum {string} */
+            fromStatus: "OPEN" | "CONFIRMED" | "APPEALED" | "REMEDIATING" | "PENDING_VERIFICATION" | "CLOSED" | "DISMISSED";
+            /** @enum {string} */
+            toStatus: "OPEN" | "CONFIRMED" | "APPEALED" | "REMEDIATING" | "PENDING_VERIFICATION" | "CLOSED" | "DISMISSED";
+            /** Format: int64 */
+            actorId: number;
+            actorName: string;
+            note: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        FindingResponse: {
+            /** Format: int64 */
+            id: number;
+            /** Format: int64 */
+            inspectionId: number;
+            inspectionCode: string;
+            /** Format: int64 */
+            inspectionItemId: number;
+            /** Format: int64 */
+            restaurantId: number;
+            restaurantName: string;
+            /** Format: int64 */
+            criterionId: number;
+            criterionCode: string;
+            criterionName: string;
+            /** Format: int32 */
+            baseImpact: number;
+            /** Format: int32 */
+            effectiveImpact: number;
+            /** Format: int32 */
+            violationCount: number;
+            /** Format: int32 */
+            calculatedScore: number;
+            riskLevelCode: string;
+            riskLevelName: string;
+            /** Format: int32 */
+            remediationDays: number;
+            /** Format: date */
+            deadlineDate: string;
+            /** @enum {string} */
+            status: "OPEN" | "CONFIRMED" | "APPEALED" | "REMEDIATING" | "PENDING_VERIFICATION" | "CLOSED" | "DISMISSED";
+            description: string;
+            evidenceUrls: string;
+            remediationPlan: string;
+            /** Format: date */
+            remediationTargetDate: string;
+            remediationEvidenceUrls: string;
+            /** Format: date-time */
+            remediationSubmittedAt: string;
+            verificationComment: string;
+            /** Format: int64 */
+            verifiedBy: number;
+            verifiedByName: string;
+            /** Format: date-time */
+            verifiedAt: string;
+            appealReason: string;
+            appealEvidenceUrls: string;
+            /** Format: date-time */
+            appealSubmittedAt: string;
+            /** Format: int64 */
+            appealConcludedBy: number;
+            appealConcludedByName: string;
+            /** @enum {string} */
+            appealConclusion: "UPHELD" | "DISMISSED";
+            /** Format: date-time */
+            createdAt: string;
+            history: components["schemas"]["FindingEventResponse"][];
+        };
+        FindingSubmitRemediationRequest: {
+            remediationEvidenceUrls: string;
+        };
+        FindingRemediationPlanRequest: {
+            remediationPlan: string;
+            /** Format: date */
+            remediationDeadline: string;
+        };
+        FindingConcludeAppealRequest: {
+            /** @enum {string} */
+            conclusion: "UPHELD" | "DISMISSED";
+        };
+        FindingAppealRequest: {
+            appealReason: string;
+            appealEvidenceUrls?: string;
+        };
+        EscalationRuleRequest: {
+            /** Format: int32 */
+            thresholdCount: number;
+            /** Format: int32 */
+            stepIncrease: number;
+            /** Format: int32 */
+            maxImpact: number;
+            /** Format: int32 */
+            resetPeriodMonths: number;
+            /** Format: date */
+            effectiveFrom: string;
+            note?: string;
+        };
+        EscalationRuleResponse: {
+            /** Format: int64 */
+            id: number;
+            /** Format: int32 */
+            thresholdCount: number;
+            /** Format: int32 */
+            stepIncrease: number;
+            /** Format: int32 */
+            maxImpact: number;
+            /** Format: int32 */
+            resetPeriodMonths: number;
+            /** Format: date */
+            effectiveFrom: string;
+            note: string | null;
+            /** @enum {string} */
+            status: "CURRENT" | "SCHEDULED" | "PAST";
+            /** Format: date-time */
+            createdAt: string;
+            createdByName: string | null;
+        };
         /** @enum {string} */
-        Permission: "user:read" | "user:manage" | "role:manage" | "system:config" | "system:log:read" | "organization:read" | "organization:manage" | "criteria:read" | "criteria:manage" | "plan:read" | "plan:create" | "plan:approve" | "inspection:read:own" | "inspection:read:all" | "inspection:perform" | "inspection:cancel" | "finding:respond" | "finding:review-appeal" | "finding:conclude-appeal" | "finding:remediate" | "finding:verify" | "report:read" | "report:export" | "media:upload";
+        Permission: "user:read" | "user:manage" | "role:manage" | "system:config" | "system:log:read" | "employee:read" | "employee:manage" | "organization:read" | "organization:manage" | "criteria:read" | "criteria:manage" | "plan:read" | "plan:create" | "plan:approve" | "inspection:read:own" | "inspection:read:all" | "inspection:perform" | "inspection:cancel" | "finding:respond" | "finding:review-appeal" | "finding:conclude-appeal" | "finding:remediate" | "finding:verify" | "report:read" | "report:export" | "media:upload";
         SessionResponse: {
             accessToken: string;
             /** Format: int64 */
@@ -146,15 +1739,181 @@ export interface components {
             /** Format: int32 */
             totalPages: number;
         };
-        UserResponse: {
+        RiskPreviewResponse: {
+            /** Format: date */
+            date: string;
+            /** Format: int32 */
+            periodMonths: number;
+            /** Format: date */
+            periodStart: string;
+            /** Format: int32 */
+            thresholdCount: number | null;
+            /** Format: int32 */
+            stepIncrease: number | null;
+            /** Format: int32 */
+            maxImpact: number | null;
+            /** Format: int32 */
+            resetPeriodMonths: number | null;
+            /** Format: int32 */
+            baseImpact: number;
+            /** Format: int32 */
+            frequency: number;
+            /** Format: int32 */
+            effectiveImpact: number;
+            escalated: boolean;
+            /** Format: int32 */
+            score: number;
+            levelCode: string | null;
+            levelName: string | null;
+            /** Format: int32 */
+            remediationDays: number | null;
+        };
+        CountItem: {
+            key: string;
+            label: string;
+            /** Format: int64 */
+            count: number;
+        };
+        DashboardResponse: {
+            kpis: components["schemas"]["Kpis"];
+            trend: components["schemas"]["MonthPoint"][];
+            openByRiskLevel: components["schemas"]["CountItem"][];
+            findingsByStatus: components["schemas"]["CountItem"][];
+            topRestaurants: components["schemas"]["RestaurantRisk"][];
+            topCriteria: components["schemas"]["CountItem"][];
+        };
+        Kpis: {
+            /** Format: int64 */
+            inspectionsThisMonth: number;
+            /** Format: int64 */
+            inspectionsLastMonth: number;
+            /** Format: int64 */
+            restaurantsInspectedThisMonth: number;
+            /** Format: int64 */
+            openFindings: number;
+            /** Format: int64 */
+            overdueFindings: number;
+            onTimeRate: number | null;
+        };
+        MonthPoint: {
+            month: string;
+            /** Format: int64 */
+            inspections: number;
+            /** Format: int64 */
+            findings: number;
+        };
+        RestaurantRisk: {
             /** Format: int64 */
             id: number;
-            username: string;
-            fullName: string;
-            active: boolean;
+            code: string;
+            name: string;
+            /** Format: int64 */
+            openFindings: number;
+            /** Format: int64 */
+            riskScore: number;
+        };
+        PermissionResponse: {
+            code: string;
+            module: string;
+            description: string;
             roles: string[];
-            /** Format: date-time */
-            createdAt: string;
+        };
+        PageResponseOrgUnitResponse: {
+            items: components["schemas"]["OrgUnitResponse"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            size: number;
+            /** Format: int64 */
+            totalItems: number;
+            /** Format: int32 */
+            totalPages: number;
+        };
+        PageResponseInspectionResponse: {
+            items: components["schemas"]["InspectionResponse"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            size: number;
+            /** Format: int64 */
+            totalItems: number;
+            /** Format: int32 */
+            totalPages: number;
+        };
+        PageResponseTemplateResponse: {
+            items: components["schemas"]["TemplateResponse"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            size: number;
+            /** Format: int64 */
+            totalItems: number;
+            /** Format: int32 */
+            totalPages: number;
+        };
+        TemplateOption: {
+            /** Format: int64 */
+            id: number;
+            code: string;
+            name: string;
+            /** Format: int64 */
+            companyId: number | null;
+            active: boolean;
+        };
+        PageResponsePlanResponse: {
+            items: components["schemas"]["PlanResponse"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            size: number;
+            /** Format: int64 */
+            totalItems: number;
+            /** Format: int32 */
+            totalPages: number;
+        };
+        PageResponseFindingResponse: {
+            items: components["schemas"]["FindingResponse"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            size: number;
+            /** Format: int64 */
+            totalItems: number;
+            /** Format: int32 */
+            totalPages: number;
+        };
+        PageResponseEmployeeResponse: {
+            items: components["schemas"]["EmployeeResponse"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            size: number;
+            /** Format: int64 */
+            totalItems: number;
+            /** Format: int32 */
+            totalPages: number;
+        };
+        PageResponseCriterionResponse: {
+            items: components["schemas"]["CriterionResponse"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            size: number;
+            /** Format: int64 */
+            totalItems: number;
+            /** Format: int32 */
+            totalPages: number;
+        };
+        PageResponseCompanyResponse: {
+            items: components["schemas"]["CompanyResponse"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            size: number;
+            /** Format: int64 */
+            totalItems: number;
+            /** Format: int32 */
+            totalPages: number;
         };
     };
     responses: never;
@@ -163,16 +1922,927 @@ export interface components {
     headers: never;
     pathItems: never;
 }
+export type UserUpdateRequest = components['schemas']['UserUpdateRequest'];
+export type UserResponse = components['schemas']['UserResponse'];
+export type RoleRequest = components['schemas']['RoleRequest'];
+export type RoleResponse = components['schemas']['RoleResponse'];
+export type RiskLevelItem = components['schemas']['RiskLevelItem'];
+export type RiskLevelVersionRequest = components['schemas']['RiskLevelVersionRequest'];
+export type RiskLevelVersionResponse = components['schemas']['RiskLevelVersionResponse'];
+export type OrgUnitRequest = components['schemas']['OrgUnitRequest'];
+export type OrgUnitResponse = components['schemas']['OrgUnitResponse'];
+export type UserRef = components['schemas']['UserRef'];
+export type TemplateRequest = components['schemas']['TemplateRequest'];
+export type CriterionResponse = components['schemas']['CriterionResponse'];
+export type CriterionTemplateRef = components['schemas']['CriterionTemplateRef'];
+export type TemplateResponse = components['schemas']['TemplateResponse'];
+export type PlanUpdateRequest = components['schemas']['PlanUpdateRequest'];
+export type PlanResponse = components['schemas']['PlanResponse'];
+export type EmployeeRequest = components['schemas']['EmployeeRequest'];
+export type EmployeeResponse = components['schemas']['EmployeeResponse'];
+export type CriterionGroupRequest = components['schemas']['CriterionGroupRequest'];
+export type CriterionGroupResponse = components['schemas']['CriterionGroupResponse'];
+export type CriterionRequest = components['schemas']['CriterionRequest'];
+export type CompanyRequest = components['schemas']['CompanyRequest'];
+export type CompanyResponse = components['schemas']['CompanyResponse'];
+export type UserCreateRequest = components['schemas']['UserCreateRequest'];
+export type PasswordResetRequest = components['schemas']['PasswordResetRequest'];
+export type ImportResult = components['schemas']['ImportResult'];
+export type ImportRowError = components['schemas']['ImportRowError'];
 export type PresignUploadRequest = components['schemas']['PresignUploadRequest'];
 export type PresignUploadResponse = components['schemas']['PresignUploadResponse'];
+export type InspectionCreateRequest = components['schemas']['InspectionCreateRequest'];
+export type InspectionItemResponse = components['schemas']['InspectionItemResponse'];
+export type InspectionResponse = components['schemas']['InspectionResponse'];
+export type InspectionSubmitItemRequest = components['schemas']['InspectionSubmitItemRequest'];
+export type InspectionSubmitRequest = components['schemas']['InspectionSubmitRequest'];
+export type InspectionCheckinRequest = components['schemas']['InspectionCheckinRequest'];
+export type InspectionCancelRequest = components['schemas']['InspectionCancelRequest'];
+export type PlanCreateRequest = components['schemas']['PlanCreateRequest'];
+export type PlanRejectRequest = components['schemas']['PlanRejectRequest'];
+export type FrequencyConfigRequest = components['schemas']['FrequencyConfigRequest'];
+export type FrequencyConfigResponse = components['schemas']['FrequencyConfigResponse'];
+export type FindingVerifyRequest = components['schemas']['FindingVerifyRequest'];
+export type FindingEventResponse = components['schemas']['FindingEventResponse'];
+export type FindingResponse = components['schemas']['FindingResponse'];
+export type FindingSubmitRemediationRequest = components['schemas']['FindingSubmitRemediationRequest'];
+export type FindingRemediationPlanRequest = components['schemas']['FindingRemediationPlanRequest'];
+export type FindingConcludeAppealRequest = components['schemas']['FindingConcludeAppealRequest'];
+export type FindingAppealRequest = components['schemas']['FindingAppealRequest'];
+export type EscalationRuleRequest = components['schemas']['EscalationRuleRequest'];
+export type EscalationRuleResponse = components['schemas']['EscalationRuleResponse'];
 export type Permission = components['schemas']['Permission'];
 export type SessionResponse = components['schemas']['SessionResponse'];
 export type SessionUser = components['schemas']['SessionUser'];
 export type LoginRequest = components['schemas']['LoginRequest'];
 export type PageResponseUserResponse = components['schemas']['PageResponseUserResponse'];
-export type UserResponse = components['schemas']['UserResponse'];
+export type RiskPreviewResponse = components['schemas']['RiskPreviewResponse'];
+export type CountItem = components['schemas']['CountItem'];
+export type DashboardResponse = components['schemas']['DashboardResponse'];
+export type Kpis = components['schemas']['Kpis'];
+export type MonthPoint = components['schemas']['MonthPoint'];
+export type RestaurantRisk = components['schemas']['RestaurantRisk'];
+export type PermissionResponse = components['schemas']['PermissionResponse'];
+export type PageResponseOrgUnitResponse = components['schemas']['PageResponseOrgUnitResponse'];
+export type PageResponseInspectionResponse = components['schemas']['PageResponseInspectionResponse'];
+export type PageResponseTemplateResponse = components['schemas']['PageResponseTemplateResponse'];
+export type TemplateOption = components['schemas']['TemplateOption'];
+export type PageResponsePlanResponse = components['schemas']['PageResponsePlanResponse'];
+export type PageResponseFindingResponse = components['schemas']['PageResponseFindingResponse'];
+export type PageResponseEmployeeResponse = components['schemas']['PageResponseEmployeeResponse'];
+export type PageResponseCriterionResponse = components['schemas']['PageResponseCriterionResponse'];
+export type PageResponseCompanyResponse = components['schemas']['PageResponseCompanyResponse'];
 export type $defs = Record<string, never>;
 export interface operations {
+    get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UserResponse"];
+                };
+            };
+        };
+    };
+    update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UserResponse"];
+                };
+            };
+        };
+    };
+    delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    get_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RoleResponse"];
+                };
+            };
+        };
+    };
+    update_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RoleRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RoleResponse"];
+                };
+            };
+        };
+    };
+    delete_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    riskLevels: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RiskLevelItem"][];
+                };
+            };
+        };
+    };
+    saveRiskLevelVersion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RiskLevelVersionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RiskLevelVersionResponse"];
+                };
+            };
+        };
+    };
+    get_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["OrgUnitResponse"];
+                };
+            };
+        };
+    };
+    update_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrgUnitRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["OrgUnitResponse"];
+                };
+            };
+        };
+    };
+    delete_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    get_3: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TemplateResponse"];
+                };
+            };
+        };
+    };
+    update_3: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TemplateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TemplateResponse"];
+                };
+            };
+        };
+    };
+    delete_3: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    get_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PlanResponse"];
+                };
+            };
+        };
+    };
+    update_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlanUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PlanResponse"];
+                };
+            };
+        };
+    };
+    delete_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    get_5: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EmployeeResponse"];
+                };
+            };
+        };
+    };
+    update_5: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmployeeRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EmployeeResponse"];
+                };
+            };
+        };
+    };
+    delete_5: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateGroup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CriterionGroupRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CriterionGroupResponse"];
+                };
+            };
+        };
+    };
+    get_6: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CriterionResponse"];
+                };
+            };
+        };
+    };
+    update_6: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CriterionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CriterionResponse"];
+                };
+            };
+        };
+    };
+    deleteCriterion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    get_7: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CompanyResponse"];
+                };
+            };
+        };
+    };
+    update_7: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompanyRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CompanyResponse"];
+                };
+            };
+        };
+    };
+    delete_6: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    search: {
+        parameters: {
+            query?: {
+                keyword?: string;
+                role?: string;
+                active?: boolean;
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageResponseUserResponse"];
+                };
+            };
+        };
+    };
+    create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UserResponse"];
+                };
+            };
+        };
+    };
+    resetPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasswordResetRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    importFile: {
+        parameters: {
+            query?: {
+                commit?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportResult"];
+                };
+            };
+        };
+    };
+    list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RoleResponse"][];
+                };
+            };
+        };
+    };
+    create_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RoleRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RoleResponse"];
+                };
+            };
+        };
+    };
+    importFile_1: {
+        parameters: {
+            query?: {
+                commit?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportResult"];
+                };
+            };
+        };
+    };
+    search_1: {
+        parameters: {
+            query?: {
+                keyword?: string;
+                companyId?: number;
+                unitType?: "RESTAURANT" | "DEPARTMENT";
+                active?: boolean;
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageResponseOrgUnitResponse"];
+                };
+            };
+        };
+    };
+    create_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrgUnitRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["OrgUnitResponse"];
+                };
+            };
+        };
+    };
     presignUpload: {
         parameters: {
             query?: never;
@@ -193,6 +2863,852 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PresignUploadResponse"];
+                };
+            };
+        };
+    };
+    search_2: {
+        parameters: {
+            query?: {
+                keyword?: string;
+                restaurantId?: number;
+                inspectorId?: number;
+                status?: "ASSIGNED" | "IN_PROGRESS" | "SUBMITTED" | "COMPLETED" | "CANCELLED";
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageResponseInspectionResponse"];
+                };
+            };
+        };
+    };
+    create_3: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InspectionCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["InspectionResponse"];
+                };
+            };
+        };
+    };
+    submit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InspectionSubmitRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["InspectionResponse"];
+                };
+            };
+        };
+    };
+    checkin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InspectionCheckinRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["InspectionResponse"];
+                };
+            };
+        };
+    };
+    cancel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InspectionCancelRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["InspectionResponse"];
+                };
+            };
+        };
+    };
+    search_3: {
+        parameters: {
+            query?: {
+                keyword?: string;
+                companyId?: number;
+                active?: boolean;
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageResponseTemplateResponse"];
+                };
+            };
+        };
+    };
+    create_4: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TemplateRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TemplateResponse"];
+                };
+            };
+        };
+    };
+    importTemplates: {
+        parameters: {
+            query?: {
+                commit?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportResult"];
+                };
+            };
+        };
+    };
+    search_4: {
+        parameters: {
+            query?: {
+                keyword?: string;
+                status?: "DRAFT" | "PENDING_APPROVAL" | "APPROVED" | "REJECTED";
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageResponsePlanResponse"];
+                };
+            };
+        };
+    };
+    create_5: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlanCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PlanResponse"];
+                };
+            };
+        };
+    };
+    submit_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PlanResponse"];
+                };
+            };
+        };
+    };
+    reject: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlanRejectRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PlanResponse"];
+                };
+            };
+        };
+    };
+    approve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PlanResponse"];
+                };
+            };
+        };
+    };
+    frequencyConfigs: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["FrequencyConfigResponse"][];
+                };
+            };
+        };
+    };
+    createFrequency: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FrequencyConfigRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["FrequencyConfigResponse"];
+                };
+            };
+        };
+    };
+    verify: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FindingVerifyRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["FindingResponse"];
+                };
+            };
+        };
+    };
+    submitRemediation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FindingSubmitRemediationRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["FindingResponse"];
+                };
+            };
+        };
+    };
+    setRemediationPlan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FindingRemediationPlanRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["FindingResponse"];
+                };
+            };
+        };
+    };
+    confirm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["FindingResponse"];
+                };
+            };
+        };
+    };
+    concludeAppeal: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FindingConcludeAppealRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["FindingResponse"];
+                };
+            };
+        };
+    };
+    appeal: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FindingAppealRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["FindingResponse"];
+                };
+            };
+        };
+    };
+    escalationRules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EscalationRuleResponse"][];
+                };
+            };
+        };
+    };
+    createEscalation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EscalationRuleRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EscalationRuleResponse"];
+                };
+            };
+        };
+    };
+    search_5: {
+        parameters: {
+            query?: {
+                keyword?: string;
+                orgUnitId?: number;
+                active?: boolean;
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageResponseEmployeeResponse"];
+                };
+            };
+        };
+    };
+    create_6: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmployeeRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EmployeeResponse"];
+                };
+            };
+        };
+    };
+    importFile_2: {
+        parameters: {
+            query?: {
+                commit?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportResult"];
+                };
+            };
+        };
+    };
+    groups: {
+        parameters: {
+            query?: {
+                companyId?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CriterionGroupResponse"][];
+                };
+            };
+        };
+    };
+    createGroup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CriterionGroupRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CriterionGroupResponse"];
+                };
+            };
+        };
+    };
+    search_6: {
+        parameters: {
+            query?: {
+                keyword?: string;
+                groupId?: number;
+                templateId?: number;
+                assignedToTemplate?: boolean;
+                active?: boolean;
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageResponseCriterionResponse"];
+                };
+            };
+        };
+    };
+    create_7: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CriterionRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CriterionResponse"];
+                };
+            };
+        };
+    };
+    importCriteria: {
+        parameters: {
+            query?: {
+                commit?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportResult"];
+                };
+            };
+        };
+    };
+    search_7: {
+        parameters: {
+            query?: {
+                keyword?: string;
+                active?: boolean;
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageResponseCompanyResponse"];
+                };
+            };
+        };
+    };
+    create_8: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompanyRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CompanyResponse"];
                 };
             };
         };
@@ -259,10 +3775,302 @@ export interface operations {
             };
         };
     };
-    search: {
+    template: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
+                };
+            };
+        };
+    };
+    export: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
+                };
+            };
+        };
+    };
+    preview: {
+        parameters: {
+            query: {
+                baseImpact: number;
+                violations: number;
+                date?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RiskPreviewResponse"];
+                };
+            };
+        };
+    };
+    riskLevelVersions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RiskLevelVersionResponse"][];
+                };
+            };
+        };
+    };
+    dashboard: {
         parameters: {
             query?: {
-                keyword?: string;
+                months?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["DashboardResponse"];
+                };
+            };
+        };
+    };
+    permissions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PermissionResponse"][];
+                };
+            };
+        };
+    };
+    template_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
+                };
+            };
+        };
+    };
+    export_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
+                };
+            };
+        };
+    };
+    get_8: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["InspectionResponse"];
+                };
+            };
+        };
+    };
+    getItems: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["InspectionItemResponse"][];
+                };
+            };
+        };
+    };
+    myTasks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["InspectionResponse"][];
+                };
+            };
+        };
+    };
+    options: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TemplateOption"][];
+                };
+            };
+        };
+    };
+    templatesTemplate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
+                };
+            };
+        };
+    };
+    exportTemplates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
+                };
+            };
+        };
+    };
+    search_8: {
+        parameters: {
+            query?: {
+                restaurantId?: number;
+                inspectionId?: number;
+                status?: "OPEN" | "CONFIRMED" | "APPEALED" | "REMEDIATING" | "PENDING_VERIFICATION" | "CLOSED" | "DISMISSED";
                 /** @description Zero-based page index (0..N) */
                 page?: number;
                 /** @description The size of the page to be returned */
@@ -282,7 +4090,129 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["PageResponseUserResponse"];
+                    "*/*": components["schemas"]["PageResponseFindingResponse"];
+                };
+            };
+        };
+    };
+    get_9: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["FindingResponse"];
+                };
+            };
+        };
+    };
+    template_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
+                };
+            };
+        };
+    };
+    export_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
+                };
+            };
+        };
+    };
+    options_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CriterionResponse"][];
+                };
+            };
+        };
+    };
+    criteriaTemplate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
+                };
+            };
+        };
+    };
+    exportCriteria: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
                 };
             };
         };
@@ -304,6 +4234,66 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["SessionUser"];
                 };
+            };
+        };
+    };
+    deleteRiskLevelVersion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                effectiveFrom: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deleteFrequency: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deleteEscalation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

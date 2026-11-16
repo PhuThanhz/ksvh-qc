@@ -4,15 +4,36 @@
     {
       "name": "backend",
       "runtimeExecutable": "./backend/mvnw",
-      "runtimeArgs": ["-q", "-f", "backend/pom.xml", "spring-boot:run"],
+      "runtimeArgs": [
+        "-q",
+        "-f",
+        "backend/pom.xml",
+        "spring-boot:run"
+      ],
       "port": 8088
     },
     {
       "name": "frontend",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "frontend", "run", "dev"],
+      "runtimeArgs": [
+        "--prefix",
+        "frontend",
+        "run",
+        "dev"
+      ],
       "port": 5273,
       "url": "https://localhost:5273"
+    },
+    {
+      "name": "frontend-http",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "frontend",
+        "run",
+        "dev:http"
+      ],
+      "port": 5273
     }
   ]
 }

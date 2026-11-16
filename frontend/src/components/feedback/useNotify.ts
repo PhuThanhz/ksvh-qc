@@ -3,34 +3,55 @@ import type { ReactNode } from 'react'
 import { useMemo } from 'react'
 
 export interface NotifyOptions {
-  title: ReactNode
+  title?: ReactNode
+  message?: ReactNode
   description?: ReactNode
   duration?: number
 }
 
 /**
- * Thông báo nhanh (toast/message) và thông báo góc phải (notification) cho kênh /admin.
- * Dùng thông qua App.useApp() để kế thừa theme và context của <AntdApp>.
+ * Toast thông báo góc trên bên phải (Top-Right Notification) chuẩn Apple macOS.
+ * Hiển thị to, rõ ràng, sang xịn mịn kế thừa từ <AntdApp>.
  */
 export function useNotify() {
-  const { message, notification } = App.useApp()
+  const { notification, message } = App.useApp()
 
   return useMemo(
     () => ({
-      success: (content: ReactNode, duration?: number) => message.success(content, duration),
-      error: (content: ReactNode, duration?: number) => message.error(content, duration),
-      info: (content: ReactNode, duration?: number) => message.info(content, duration),
-      warning: (content: ReactNode, duration?: number) => message.warning(content, duration),
+      success: (content: ReactNode, duration = 3) =>
+        notification.success({
+          title: content,
+          placement: 'topRight',
+          duration,
+        }),
+      error: (content: ReactNode, duration = 4.5) =>
+        notification.error({
+          title: content,
+          placement: 'topRight',
+          duration,
+        }),
+      info: (content: ReactNode, duration = 3) =>
+        notification.info({
+          title: content,
+          placement: 'topRight',
+          duration,
+        }),
+      warning: (content: ReactNode, duration = 4) =>
+        notification.warning({
+          title: content,
+          placement: 'topRight',
+          duration,
+        }),
       loading: (content: ReactNode, duration = 0) => message.loading(content, duration),
-      notifySuccess: ({ title, description, duration }: NotifyOptions) =>
-        notification.success({ title, description, duration }),
-      notifyError: ({ title, description, duration }: NotifyOptions) =>
-        notification.error({ title, description, duration }),
-      notifyInfo: ({ title, description, duration }: NotifyOptions) =>
-        notification.info({ title, description, duration }),
-      notifyWarning: ({ title, description, duration }: NotifyOptions) =>
-        notification.warning({ title, description, duration }),
+      notifySuccess: ({ title, message: msg, description, duration = 3 }: NotifyOptions) =>
+        notification.success({ title: title ?? msg, description, placement: 'topRight', duration }),
+      notifyError: ({ title, message: msg, description, duration = 4.5 }: NotifyOptions) =>
+        notification.error({ title: title ?? msg, description, placement: 'topRight', duration }),
+      notifyInfo: ({ title, message: msg, description, duration = 3 }: NotifyOptions) =>
+        notification.info({ title: title ?? msg, description, placement: 'topRight', duration }),
+      notifyWarning: ({ title, message: msg, description, duration = 4 }: NotifyOptions) =>
+        notification.warning({ title: title ?? msg, description, placement: 'topRight', duration }),
     }),
-    [message, notification],
+    [notification, message],
   )
 }

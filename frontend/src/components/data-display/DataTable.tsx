@@ -36,22 +36,33 @@ export function DataTable<T extends object>(props: DataTableProps<T>) {
   }
 
   return (
-    <Table<T>
-      rowKey={rowKey}
-      columns={columns}
-      dataSource={data?.items}
-      loading={loading}
-      onChange={handleChange}
-      locale={{ emptyText: <EmptyState /> }}
-      scroll={{ x: 'max-content' }}
-      pagination={{
-        current: params.page + 1,
-        pageSize: params.size,
-        total: data?.totalItems ?? 0,
-        showSizeChanger: true,
-        pageSizeOptions: PAGE_SIZE_OPTIONS.map(String),
-        showTotal: (total) => `Tổng ${total}`,
+    <div
+      style={{
+        background: '#ffffff',
+        borderRadius: 14,
+        border: '1px solid rgba(0, 0, 0, 0.06)',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 16px -2px rgba(0, 0, 0, 0.04)',
+        padding: '6px 14px 14px 14px',
+        overflow: 'hidden',
       }}
-    />
+    >
+      <Table<T>
+        rowKey={rowKey}
+        columns={columns}
+        dataSource={data?.items}
+        loading={loading}
+        onChange={handleChange}
+        locale={{ emptyText: <EmptyState /> }}
+        scroll={{ x: 'max-content' }}
+        pagination={{
+          current: params.page + 1,
+          pageSize: params.size,
+          total: data?.totalItems ?? 0,
+          showSizeChanger: true,
+          pageSizeOptions: PAGE_SIZE_OPTIONS.map(String),
+          showTotal: (total) => `Tổng ${total}`,
+        }}
+      />
+    </div>
   )
 }

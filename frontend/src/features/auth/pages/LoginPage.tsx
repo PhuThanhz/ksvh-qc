@@ -4,12 +4,14 @@ import { AuthLayout } from '@/components/layout/AuthLayout'
 import { LoginForm } from '@/features/auth/components/LoginForm'
 import { useLogin } from '@/features/auth/hooks/useLogin'
 import { useSession } from '@/features/auth/hooks/useSession'
+import { useNotify } from '@/hooks/useNotify'
 import { getErrorMessage } from '@/lib/http'
 import { getHomePath } from '@/permissions/areas'
 import { safeRedirectPath } from '@/utils/safe-redirect'
 
 export function LoginPage() {
   const login = useLogin()
+  const notify = useNotify()
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const { endReason } = useSession()
@@ -27,8 +29,10 @@ export function LoginPage() {
         loading={login.isPending}
         onSubmit={(values) =>
           login.mutate(values, {
-            onSuccess: (session) =>
-              navigate(safeRedirectPath(params.get('redirect')) ?? getHomePath(session.user), { replace: true }),
+            onSuccess: (session) => {
+              notify.success(`Đăng nhập thành công! Xin chào ${session.user.fullName}`)
+              navigate(safeRedirectPath(params.get('redirect')) ?? getHomePath(session.user), { replace: true })
+            },
           })
         }
       />

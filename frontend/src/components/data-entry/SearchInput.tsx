@@ -2,7 +2,6 @@ import { SearchOutlined } from '@ant-design/icons'
 import { Input } from 'antd'
 import { useEffect, useRef, useState } from 'react'
 import { SEARCH_DEBOUNCE_MS } from '@/constants/app.constants'
-import { useDebounce } from '@/hooks/useDebounce'
 
 export interface SearchInputProps {
   value?: string
@@ -29,20 +28,25 @@ export function SearchInput({
     }
   }
 
-  const debounced = useDebounce(inner.trim(), SEARCH_DEBOUNCE_MS)
   const lastEmittedRef = useRef((controlledValue ?? defaultValue).trim())
+  const onSearchRef = useRef(onSearch)
+  useEffect(() => {
+    onSearchRef.current = onSearch
+  }, [onSearch])
 
   useEffect(() => {
+    const trimmed = inner.trim()
     if (controlledValue !== undefined) {
-      if (debounced !== controlledValue.trim()) {
-        onSearch(debounced)
-      }
+      if (trimmed === controlledValue.trim()) return
+    } else if (trimmed === lastEmittedRef.current) {
       return
     }
-    if (debounced === lastEmittedRef.current) return
-    lastEmittedRef.current = debounced
-    onSearch(debounced)
-  }, [debounced, controlledValue, onSearch])
+    const id = window.setTimeout(() => {
+      lastEmittedRef.current = trimmed
+      onSearchRef.current(trimmed)
+    }, SEARCH_DEBOUNCE_MS)
+    return () => window.clearTimeout(id)
+  }, [inner, controlledValue])
 
   return (
     <Input

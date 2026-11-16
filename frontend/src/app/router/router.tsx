@@ -4,9 +4,13 @@ import { GuestRoute, HomeRedirect, ProtectedRoute } from '@/app/router/guards'
 import { AdminShell, MobileShell } from '@/app/router/shells'
 import { ErrorState } from '@/components/feedback/ErrorState'
 import { RouteErrorBoundary } from '@/components/feedback/RouteErrorBoundary'
-import { inspectionsMobileRoutes } from '@/features/inspections'
+import { inspectionsAdminRoutes, inspectionsMobileRoutes } from '@/features/inspections'
 import { authRoutes } from '@/features/auth'
 import { dashboardRoutes } from '@/features/dashboard'
+import { criteriaAdminRoutes } from '@/features/criteria'
+import { employeesAdminRoutes } from '@/features/employees'
+import { organizationsAdminRoutes } from '@/features/organizations'
+import { permissionsAdminRoutes, rolesAdminRoutes } from '@/features/roles'
 import { usersAdminRoutes } from '@/features/users'
 import { AREA_ACCESS } from '@/permissions'
 
@@ -14,7 +18,19 @@ import { AREA_ACCESS } from '@/permissions'
  * Mỗi feature tự khai báo route của mình (*.routes.ts). File này chỉ ghép lại.
  * Thêm module mới: thêm mảng route của feature vào adminRoutes hoặc qcRoutes.
  */
-const adminRoutes = [...dashboardRoutes, ...usersAdminRoutes]
+const adminRoutes = [
+  ...dashboardRoutes,
+  // Nhóm "Vận hành kiểm soát"
+  ...inspectionsAdminRoutes,
+  // Nhóm "Danh mục thiết lập"
+  ...organizationsAdminRoutes,
+  ...criteriaAdminRoutes,
+  // Nhóm "Quản trị hệ thống"
+  ...permissionsAdminRoutes,
+  ...rolesAdminRoutes,
+  ...usersAdminRoutes,
+  ...employeesAdminRoutes,
+]
 const qcRoutes = [...inspectionsMobileRoutes]
 
 export const router = createBrowserRouter([

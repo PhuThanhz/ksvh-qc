@@ -41,11 +41,40 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(code.status()).body(ProblemDetails.of(code, "Trường sắp xếp không hợp lệ"));
     }
 
+    /** Tham số query / path sai ràng buộc (@Min, @Max... trên controller @Validated). */
+    @ExceptionHandler(jakarta.validation.ConstraintViolationException.class)
+    public ResponseEntity<ProblemDetail> handleConstraintViolation(jakarta.validation.ConstraintViolationException ex) {
+        ErrorCode code = ErrorCode.VALIDATION_FAILED;
+        String message = ex.getConstraintViolations().stream().map(jakarta.validation.ConstraintViolation::getMessage)
+                .sorted().findFirst().orElse("Dữ liệu không hợp lệ");
+        return ResponseEntity.status(code.status()).body(ProblemDetails.of(code, message));
+    }
+
+    @ExceptionHandler(org.springframework.orm.ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ProblemDetail> handleOptimisticLock(org.springframework.orm.ObjectOptimisticLockingFailureException ex) {
+        ErrorCode code = ErrorCode.CONCURRENT_UPDATE;
+        return ResponseEntity.status(code.status()).body(ProblemDetails.of(code, "Dữ liệu vừa được người khác cập nhật, vui lòng tải lại rồi thử lại"));
+    }
+
+    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    public ResponseEntity<ProblemDetail> handleDataIntegrity(org.springframework.dao.DataIntegrityViolationException ex) {
+        ErrorCode code = ErrorCode.CONFLICT;
+        return ResponseEntity.status(code.status()).body(ProblemDetails.of(code, "Dữ liệu đang được liên kết ở mục khác, không thể xoá"));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ProblemDetail> handleUnexpected(Exception ex) {
         log.error("Lỗi không mong đợi", ex);
         ErrorCode code = ErrorCode.INTERNAL_ERROR;
         return ResponseEntity.status(code.status()).body(ProblemDetails.of(code, "Hệ thống gặp sự cố, vui lòng thử lại sau"));
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMaxUploadSizeExceededException(
+            org.springframework.web.multipart.MaxUploadSizeExceededException ex, HttpHeaders headers,
+            HttpStatusCode status, org.springframework.web.context.request.WebRequest request) {
+        ErrorCode code = ErrorCode.PAYLOAD_TOO_LARGE;
+        return ResponseEntity.status(code.status()).body(ProblemDetails.of(code, "File vượt quá dung lượng cho phép (5 MB)"));
     }
 
     @Override

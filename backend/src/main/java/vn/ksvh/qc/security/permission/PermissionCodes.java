@@ -18,6 +18,10 @@ public final class PermissionCodes {
     public static final String SYSTEM_CONFIG = "system:config";
     public static final String SYSTEM_LOG_READ = "system:log:read";
 
+    // Nhân viên
+    public static final String EMPLOYEE_READ = "employee:read";
+    public static final String EMPLOYEE_MANAGE = "employee:manage";
+
     // Danh mục công ty, nhà hàng
     public static final String ORGANIZATION_READ = "organization:read";
     public static final String ORGANIZATION_MANAGE = "organization:manage";
