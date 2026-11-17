@@ -15,9 +15,9 @@ Tài liệu kiểm thử nghiệm thu người dùng theo 6 bước quy trình v
 
 | STT | Vai trò | Thao tác thực hiện | Kết quả mong đợi | Kết quả kiểm thử |
 |---|---|---|---|:---:|
-| 1.1 | Trưởng nhóm KSVH | Đăng nhập tài khoản `lead` / `Admin@123`, truy cập menu **Kế hoạch kiểm tra**, bấm **"Tạo kế hoạch mới"**, chọn tháng, công ty, thêm các dòng phân công nhà hàng + Chuyên viên + mẫu phiếu chấm. | Kế hoạch được tạo ở trạng thái **Dự thảo (`DRAFT`)**, hiển thị đúng danh sách các phân công. Cảnh báo lỗi tồn đọng tháng trước (`PriorFindingsWarning`) hiển thị trực quan nếu nhà hàng còn lỗi chưa nghiệm thu. | [ ] Đạt<br>[ ] Chưa đạt |
+| 1.1 | Trưởng nhóm KSVH | Đăng nhập tài khoản `lead` / `Lead@123`, truy cập menu **Kế hoạch kiểm tra**, bấm **"Tạo kế hoạch mới"**, chọn tháng, công ty, thêm các dòng phân công nhà hàng + Chuyên viên + mẫu phiếu chấm. | Kế hoạch được tạo ở trạng thái **Dự thảo (`DRAFT`)**, hiển thị đúng danh sách các phân công. Cảnh báo lỗi tồn đọng tháng trước (`PriorFindingsWarning`) hiển thị trực quan nếu nhà hàng còn lỗi chưa nghiệm thu. | [ ] Đạt<br>[ ] Chưa đạt |
 | 1.2 | Trưởng nhóm KSVH | Bấm nút **"Gửi duyệt kế hoạch"**. | Trạng thái kế hoạch chuyển sang **Chờ duyệt (`PENDING_APPROVAL`)**. Hệ thống gửi chuông thông báo và email đến Quản lý KSVH. | [ ] Đạt<br>[ ] Chưa đạt |
-| 1.3 | Quản lý KSVH | Đăng nhập tài khoản `manager` / `Admin@123`, mở kế hoạch chờ duyệt, bấm **"Phê duyệt kế hoạch"**. | Kế hoạch chuyển sang **Đã duyệt (`APPROVED`)**. Hệ thống tự động sinh các phiếu kiểm tra định kỳ mã `PER-<yyMM>-<mã NH>-<stt>` và gửi thông báo giao việc đến từng Chuyên viên KSVH. | [ ] Đạt<br>[ ] Chưa đạt |
+| 1.3 | Quản lý KSVH | Đăng nhập tài khoản `manager` / `Manager@123`, mở kế hoạch chờ duyệt, bấm **"Phê duyệt kế hoạch"**. | Kế hoạch chuyển sang **Đã duyệt (`APPROVED`)**. Hệ thống tự động sinh các phiếu kiểm tra định kỳ mã `PER-<yyMM>-<mã NH>-<stt>` và gửi thông báo giao việc đến từng Chuyên viên KSVH. | [ ] Đạt<br>[ ] Chưa đạt |
 
 ---
 
@@ -25,7 +25,7 @@ Tài liệu kiểm thử nghiệm thu người dùng theo 6 bước quy trình v
 
 | STT | Vai trò | Thao tác thực hiện | Kết quả mong đợi | Kết quả kiểm thử |
 |---|---|---|---|:---:|
-| 2.1 | Chuyên viên KSVH | Đăng nhập tài khoản `inspector` / `Admin@123` trên trình duyệt điện thoại (`/qc`), xem danh sách việc chấm, chọn phiếu kiểm tra được giao. | Màn hình hiển thị thông tin nhà hàng, loại kiểm tra và mẫu phiếu chấm. Nút **"Bắt đầu kiểm tra (GPS)"** sẵn sàng. | [ ] Đạt<br>[ ] Chưa đạt |
+| 2.1 | Chuyên viên KSVH | Đăng nhập tài khoản `inspector` / `Inspector@123` trên trình duyệt điện thoại (`/qc`), xem danh sách việc chấm, chọn phiếu kiểm tra được giao. | Màn hình hiển thị thông tin nhà hàng, loại kiểm tra và mẫu phiếu chấm. Nút **"Bắt đầu kiểm tra (GPS)"** sẵn sàng. | [ ] Đạt<br>[ ] Chưa đạt |
 | 2.2 | Chuyên viên KSVH | Bấm **"Bắt đầu kiểm tra"**. | Trình duyệt yêu cầu quyền truy cập GPS. Hệ thống tính khoảng cách thực tế tới nhà hàng, gắn nhãn vị trí (`VERIFIED` nếu $\le 150m$ hoặc `OUTSIDE_RADIUS`), chuyển trạng thái phiếu sang **Đang chấm (`IN_PROGRESS`)**. | [ ] Đạt<br>[ ] Chưa đạt |
 | 2.3 | Chuyên viên KSVH | Đánh giá từng tiêu chí: Chọn **Đạt**, **Không đạt** (bắt buộc chụp ảnh và ghi chú mô tả), hoặc **N/A** (bắt buộc ghi lý do ngoại cảnh). | Ảnh chụp được tự động nén, gắn watermark (thời gian, toạ độ GPS, chuyên viên, nhà hàng) và tải lên kho MinIO. Hỗ trợ quay video ngắn $\le 50MB$. | [ ] Đạt<br>[ ] Chưa đạt |
 | 2.4 | Chuyên viên KSVH | Thử ngắt kết nối mạng (Bật chế độ máy bay) khi đang chấm và chụp ảnh/video. | Hệ thống thông báo banner màu cam: *"⚠️ Đang offline. Dữ liệu và ảnh được lưu nháp an toàn trên máy"*. Ảnh được lưu vào hàng đợi IndexedDB, không làm mất dữ liệu. | [ ] Đạt<br>[ ] Chưa đạt |
@@ -37,7 +37,7 @@ Tài liệu kiểm thử nghiệm thu người dùng theo 6 bước quy trình v
 
 | STT | Vai trò | Thao tác thực hiện | Kết quả mong đợi | Kết quả kiểm thử |
 |---|---|---|---|:---:|
-| 3.1 | Cửa hàng trưởng | Đăng nhập tài khoản `store` / `Admin@123` trên điện thoại hoặc máy tính. Xem thông báo chuông và email thông báo có kết quả kiểm tra mới. | Nhận được thông báo đầy đủ. Mục **"Việc của tôi"** hiển thị danh sách các lỗi vi phạm cần xử lý của nhà hàng. | [ ] Đạt<br>[ ] Chưa đạt |
+| 3.1 | Cửa hàng trưởng | Đăng nhập tài khoản `store` / `Store@123` trên điện thoại hoặc máy tính. Xem thông báo chuông và email thông báo có kết quả kiểm tra mới. | Nhận được thông báo đầy đủ. Mục **"Việc của tôi"** hiển thị danh sách các lỗi vi phạm cần xử lý của nhà hàng. | [ ] Đạt<br>[ ] Chưa đạt |
 | 3.2 | Cửa hàng trưởng | Đối với lỗi vi phạm đúng thực tế: Bấm **"Xác nhận lỗi"**. | Lỗi chuyển sang trạng thái **Đã xác nhận (`CONFIRMED`)**, tăng tần suất vi phạm (+1). Chuyển sang giai đoạn lập kế hoạch khắc phục. | [ ] Đạt<br>[ ] Chưa đạt |
 | 3.3 | Cửa hàng trưởng | Đối với lỗi do yếu tố khách quan: Bấm **"Khiếu nại"**, nhập lý do, đính kèm ảnh bằng chứng giải trình, và chọn Hội đồng thẩm định ($N \in [2, 5]$ người gồm đại diện KSVH và OBM). | Lỗi chuyển sang trạng thái **Đang khiếu nại (`APPEALED`)**. Không bị tăng tần suất. Hệ thống gửi thông báo mời thẩm định đến các thành viên trong hội đồng. | [ ] Đạt<br>[ ] Chưa đạt |
 | 3.4 | Cửa hàng trưởng | Đối với phiếu kiểm tra đạt 100% không có lỗi vi phạm: Bấm **"Xác nhận đã xem"**. | Phiếu kiểm tra chuyển ngay sang trạng thái **Hoàn thành (`COMPLETED`)**. Lưu vết người và thời điểm xác nhận. | [ ] Đạt<br>[ ] Chưa đạt |

@@ -78,6 +78,9 @@ cd frontend && npm install && npm run dev:http
 
 ### 8 Tài khoản Thử nghiệm (Môi trường Dev)
 Mật khẩu mặc định: `<TênVaiTrò>@123` (ví dụ `Admin@123`, `Lead@123`, `Inspector@123`).
+
+> [!NOTE]
+> Các tài khoản thử nghiệm trên máy dev chỉ được tạo tự động khi username chưa tồn tại trong cơ sở dữ liệu (`DataInitializer.java`). Do đó, nếu thay đổi vai trò hoặc cấu hình trong `application-dev.yml`, hệ thống sẽ không tự động ghi đè dữ liệu user đã có; muốn cập nhật lại toàn bộ tài khoản thử nghiệm, cần reset cơ sở dữ liệu hoặc cập nhật trực tiếp qua API quản trị người dùng.
 | Username | Vai trò | Chức năng chính |
 |---|---|---|
 | `admin` | SYSTEM_ADMIN | Quản trị tài khoản, phân quyền, xem nhật ký kiểm toán |
