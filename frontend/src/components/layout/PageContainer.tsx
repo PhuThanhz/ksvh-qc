@@ -53,7 +53,11 @@ export function PageContainer({ title, subtitle, extra, children }: PageContaine
               </Typography.Text>
             )}
           </div>
-          {extra}
+          {extra && (
+            <Flex align="center" gap={8} wrap style={{ maxWidth: '100%' }}>
+              {extra}
+            </Flex>
+          )}
         </Flex>
       </div>
       {children}

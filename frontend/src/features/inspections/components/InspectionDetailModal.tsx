@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { Button, Card, Descriptions, Image, Modal, Space, Table, Tag } from 'antd'
 import { FilePdfOutlined, PrinterOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
@@ -8,21 +8,18 @@ import { reportApi } from '@/features/reports/api/report.api'
 import { useNotify } from '@/hooks/useNotify'
 import { formatDate } from '@/utils/format-date'
 import { INSPECTION_KIND_LABEL, INSPECTION_MODE_LABEL, LOCATION_STATUS_META } from '@/features/inspections/inspection.types'
+import { ITEM_RESULT_META } from '@/features/inspections/constants/status'
 import { isVideoUrl, parseMediaUrls, toMediaUrl } from '@/utils/media-url'
 import { formatInspectionDuration, getComplianceGrade } from '@/features/inspections/utils/inspection-metrics'
-import { InspectionPrintModal } from './InspectionPrintModal'
+
+const InspectionPrintModal = lazy(() =>
+  import('./InspectionPrintModal').then((m) => ({ default: m.InspectionPrintModal })),
+)
 
 interface Props {
   open: boolean
   inspectionId?: number
   onClose: () => void
-}
-
-const RESULT_TAG: Record<ItemResult, { color: string; label: string }> = {
-  PASS: { color: 'success', label: 'Đạt' },
-  FAIL: { color: 'error', label: 'Không đạt' },
-  NA: { color: 'default', label: 'K/A' },
-  UNRATED: { color: 'warning', label: 'Chưa chấm' },
 }
 
 export function InspectionDetailModal({ open, inspectionId, onClose }: Props) {
@@ -61,30 +58,15 @@ export function InspectionDetailModal({ open, inspectionId, onClose }: Props) {
             <div style={{ fontSize: 12, color: 'var(--app-text-secondary)' }}>{r.criterionCode} · Ảnh hưởng: {r.baseImpact}/5</div>
             {r.comment && <div style={{ fontSize: 13, color: 'var(--app-text-body)', marginTop: 4 }}>Ghi chú: {r.comment}</div>}
             {photos.length > 0 && (
-              <div style={{ marginTop: 6 }}>
-                <Space size={6} wrap>
-                  {photos.map((url, i) =>
-                    isVideoUrl(url) ? (
-                      <video
-                        key={i}
-                        src={toMediaUrl(url)}
-                        controls
-                        style={{ width: 100, height: 48, objectFit: 'cover', borderRadius: 4, border: '1px solid var(--app-border)' }}
-                      />
-                    ) : (
-                      <Image
-                        key={i}
-                        src={toMediaUrl(url)}
-                        alt={`Bằng chứng #${i + 1}`}
-                        loading="lazy"
-                        width={48}
-                        height={48}
-                        style={{ objectFit: 'cover', borderRadius: 4, border: '1px solid var(--app-border)' }}
-                      />
-                    )
-                  )}
-                </Space>
-              </div>
+              <Space size={6} wrap style={{ marginTop: 6 }}>
+                {photos.map((url, i) =>
+                  isVideoUrl(url) ? (
+                    <video key={i} src={toMediaUrl(url)} controls style={{ width: 90, height: 48, objectFit: 'cover', borderRadius: 4, border: '1px solid var(--app-border)' }} />
+                  ) : (
+                    <Image key={i} src={toMediaUrl(url)} alt={`Bằng chứng #${i + 1}`} loading="lazy" width={48} height={48} style={{ objectFit: 'cover', borderRadius: 4, border: '1px solid var(--app-border)' }} />
+                  )
+                )}
+              </Space>
             )}
           </div>
         )
@@ -104,7 +86,8 @@ export function InspectionDetailModal({ open, inspectionId, onClose }: Props) {
             </Space>
           )
         }
-        return <Tag color={RESULT_TAG[res]?.color}>{RESULT_TAG[res]?.label}</Tag>
+        const meta = ITEM_RESULT_META[res]
+        return <Tag color={meta?.color}>{meta?.label}</Tag>
       },
     },
   ]
@@ -193,11 +176,15 @@ export function InspectionDetailModal({ open, inspectionId, onClose }: Props) {
             />
           </Card>
 
-          <InspectionPrintModal
-            open={printOpen}
-            inspection={ins}
-            onClose={() => setPrintOpen(false)}
-          />
+          {printOpen && (
+            <Suspense fallback={null}>
+              <InspectionPrintModal
+                open={printOpen}
+                inspection={ins}
+                onClose={() => setPrintOpen(false)}
+              />
+            </Suspense>
+          )}
         </div>
       )}
     </Modal>

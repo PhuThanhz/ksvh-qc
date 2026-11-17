@@ -1,5 +1,6 @@
 import type { BadgeTone } from '@/components/data-display/StatusBadge'
 import type { FindingEventAction, FindingStatus } from '../finding.types'
+import type { ItemResult } from '../inspection.types'
 import type { InspectionStatus, PlanStatus } from '../plan.types'
 
 export interface StatusMeta {
@@ -59,3 +60,10 @@ export const INSPECTION_STATUS_TABS: { value: string; label: string }[] = [
   { value: 'COMPLETED', label: 'Hoàn thành' },
   { value: 'CANCELLED', label: 'Đã huỷ' },
 ]
+
+export const ITEM_RESULT_META: Record<ItemResult, StatusMeta> = {
+  PASS: { label: 'Đạt', tone: 'success', color: 'success' },
+  FAIL: { label: 'Không đạt', tone: 'danger', color: 'error' },
+  NA: { label: 'K/A', tone: 'default', color: 'default' },
+  UNRATED: { label: 'Chưa chấm', tone: 'warning', color: 'warning' },
+}

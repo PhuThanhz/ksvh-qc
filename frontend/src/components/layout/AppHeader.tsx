@@ -23,7 +23,7 @@ export function AppHeader({ collapsed, onToggleSidebar, menu }: AppHeaderProps) 
 
   return (
     <Flex align="center" justify="space-between" style={{ height: '100%', width: '100%' }}>
-      <Flex align="center" gap={12}>
+      <Flex align="center" gap={12} style={{ minWidth: 0, overflow: 'hidden' }}>
         {onToggleSidebar && (
           <Button
             type="text"
@@ -43,19 +43,28 @@ export function AppHeader({ collapsed, onToggleSidebar, menu }: AppHeaderProps) 
               background: 'var(--app-on-dark-glass)',
               backdropFilter: 'blur(8px)',
               border: '1px solid var(--app-on-dark-glass-border)',
+              flexShrink: 0,
             }}
           />
         )}
 
         {activeEntry && (
-          <Flex align="center" gap={6} style={{ fontSize: 13.5, userSelect: 'none' }}>
+          <Flex align="center" gap={6} style={{ fontSize: 13.5, userSelect: 'none', minWidth: 0, overflow: 'hidden' }}>
             {activeEntry.group && (
-              <>
+              <span className="app-header-breadcrumb-group" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                 <span style={{ color: 'var(--app-on-dark-secondary)', fontWeight: 500 }}>{activeEntry.group}</span>
                 <span style={{ color: 'var(--app-on-dark-faint)' }}>/</span>
-              </>
+              </span>
             )}
-            <span style={{ color: 'var(--app-on-dark)', fontWeight: 600 }}>
+            <span
+              style={{
+                color: 'var(--app-on-dark)',
+                fontWeight: 600,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
               {activeEntry.label}
             </span>
           </Flex>

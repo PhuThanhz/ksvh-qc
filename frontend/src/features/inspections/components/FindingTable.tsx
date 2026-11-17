@@ -54,6 +54,7 @@ export function FindingTable({
     {
       title: 'Nhà hàng & Phiếu',
       key: 'res',
+      width: 200,
       render: (_, r) => (
         <div>
           <div style={{ fontWeight: 600 }}>{r.restaurantName}</div>
@@ -64,6 +65,7 @@ export function FindingTable({
     {
       title: 'Tiêu chí vi phạm',
       key: 'crit',
+      minWidth: 260,
       render: (_, r) => (
         <div>
           <div style={{ fontWeight: 500 }}>{r.criterionName}</div>
@@ -199,6 +201,7 @@ export function FindingTable({
       dataSource={data}
       rowKey="id"
       loading={loading}
+      scroll={{ x: 1100 }}
       onRow={(record) => ({
         onDoubleClick: () => onView?.(record),
         style: { cursor: 'pointer' },

@@ -1,5 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons'
-import { Badge, Button, Flex, Select, Space, Tag } from 'antd'
+import { Badge, Button, Flex, Select, Tag } from 'antd'
 import { useMemo, useState } from 'react'
 import { AdvancedFilter } from '@/components/data-entry/AdvancedFilter'
 import { BatchCriterionModal } from '@/features/criteria/components/BatchCriterionModal'
@@ -89,14 +89,19 @@ export function GroupTab({ onAddCriterionToGroup, onBatchAddCriteriaToGroup, onE
           options={companyFilterOptions}
           loading={companies.isLoading}
         />
-        <Space size={8} style={{ fontSize: 13, color: 'var(--app-text-secondary)' }}>
-          <span>Tổng: <strong>{stats.total}</strong> nhóm</span>
-          <span>•</span>
-          <span>Tổng: <Tag>{stats.totalCriteria} tiêu chí con</Tag></span>
+        <Flex wrap gap={8} align="center" style={{ fontSize: 13, color: 'var(--app-text-secondary)' }}>
+          <span className="app-stat-chip">
+            Tổng: <strong style={{ color: 'var(--app-text)' }}>{stats.total}</strong> nhóm
+          </span>
+          <span className="app-stat-chip">
+            Tổng: <strong style={{ color: 'var(--app-text)' }}>{stats.totalCriteria}</strong> tiêu chí
+          </span>
           {stats.emptyCount > 0 && (
-            <Tag color="warning"><Badge status="warning" /> {stats.emptyCount} nhóm chưa có tiêu chí</Tag>
+            <Tag color="warning" style={{ margin: 0, borderRadius: 6, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <Badge status="warning" /> {stats.emptyCount} nhóm chưa có tiêu chí
+            </Tag>
           )}
-        </Space>
+        </Flex>
       </AdvancedFilter>
 
       <GroupTable

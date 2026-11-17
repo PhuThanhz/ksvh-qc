@@ -1,8 +1,9 @@
-import { CloudUploadOutlined, DownloadOutlined, FileExcelOutlined } from '@ant-design/icons'
-import { Button, Space, Tooltip } from 'antd'
+import { CloudUploadOutlined, DownOutlined, DownloadOutlined, FileExcelOutlined } from '@ant-design/icons'
+import { Button, Dropdown, type MenuProps, Space, Tooltip } from 'antd'
 import { useState } from 'react'
 import { ExcelImportModal } from '@/components/excel/ExcelImportModal'
 import { useNotify } from '@/components/feedback/useNotify'
+import { useIsMobile } from '@/hooks/useIsMobile'
 import type { ImportResult } from '@/types/api.generated'
 
 export interface ExcelActionsProps {
@@ -17,11 +18,29 @@ export interface ExcelActionsProps {
   /** Ẩn nút nhập khi không có quyền ghi. */
   canImport: boolean
   errorMessage: (err: unknown) => string
+  /**
+   * 'dropdown': luôn gom thành 1 nút dropdown Excel
+   * 'buttons': hiển thị riêng 3 nút (có wrap)
+   * 'auto' (mặc định): tự động gom thành dropdown trên màn hình nhỏ (< 768px)
+   */
+  mode?: 'dropdown' | 'buttons' | 'auto'
 }
 
 /** Nhóm nút Excel dùng chung cho các danh mục: Nhập Excel, File mẫu (tải file mẫu nhập), Xuất Excel. */
 export function ExcelActions(props: ExcelActionsProps) {
-  const { importTitle, sheets, onExport, onDownloadTemplate, onUpload, onImported, canImport, errorMessage } = props
+  const {
+    importTitle,
+    sheets,
+    onExport,
+    onDownloadTemplate,
+    onUpload,
+    onImported,
+    canImport,
+    errorMessage,
+    mode = 'auto',
+  } = props
+
+  const isMobile = useIsMobile()
   const notify = useNotify()
   const [exporting, setExporting] = useState(false)
   const [downloadingTemplate, setDownloadingTemplate] = useState(false)
@@ -51,29 +70,78 @@ export function ExcelActions(props: ExcelActionsProps) {
     }
   }
 
+  const useDropdown = mode === 'dropdown' || (mode === 'auto' && isMobile)
+
+  const dropdownItems: MenuProps['items'] = [
+    {
+      key: 'export',
+      icon: <FileExcelOutlined style={{ color: '#217346' }} />,
+      label: 'Xuất file Excel (.xlsx)',
+      disabled: exporting,
+      onClick: () => void exportFile(),
+    },
+    ...(canImport
+      ? [
+          { type: 'divider' as const },
+          {
+            key: 'import',
+            icon: <CloudUploadOutlined style={{ color: '#1677ff' }} />,
+            label: 'Nhập dữ liệu từ Excel...',
+            onClick: () => setImportOpen(true),
+          },
+          {
+            key: 'template',
+            icon: <DownloadOutlined style={{ color: '#fa8c16' }} />,
+            label: 'Tải file Excel mẫu (.xlsx)',
+            disabled: downloadingTemplate,
+            onClick: () => void downloadTemplate(),
+          },
+        ]
+      : []),
+  ]
+
   return (
     <>
-      <Space size={8}>
-        {canImport && (
-          <Tooltip title="Thêm / cập nhật hàng loạt từ file Excel">
-            <Button className="btn-tint-excel" icon={<CloudUploadOutlined />} onClick={() => setImportOpen(true)}>
-              Nhập Excel
-            </Button>
-          </Tooltip>
-        )}
-        {canImport && (
-          <Tooltip title="Tải file Excel mẫu đúng cột để điền rồi nhập">
-            <Button icon={<DownloadOutlined />} loading={downloadingTemplate} onClick={() => void downloadTemplate()}>
-              File mẫu
-            </Button>
-          </Tooltip>
-        )}
-        <Tooltip title="Tải toàn bộ dữ liệu ra file Excel (.xlsx)">
-          <Button className="btn-tint-excel" icon={<FileExcelOutlined />} loading={exporting} onClick={() => void exportFile()}>
-            Xuất Excel
+      {useDropdown ? (
+        <Dropdown menu={{ items: dropdownItems }} placement="bottomRight" trigger={['click']}>
+          <Button
+            className="btn-tint-excel"
+            icon={<FileExcelOutlined />}
+            loading={exporting || downloadingTemplate}
+            style={{ fontWeight: 500 }}
+          >
+            Excel <DownOutlined style={{ fontSize: 10, marginLeft: 2 }} />
           </Button>
-        </Tooltip>
-      </Space>
+        </Dropdown>
+      ) : (
+        <Space size={8} wrap>
+          {canImport && (
+            <Tooltip title="Thêm / cập nhật hàng loạt từ file Excel">
+              <Button className="btn-tint-excel" icon={<CloudUploadOutlined />} onClick={() => setImportOpen(true)}>
+                Nhập Excel
+              </Button>
+            </Tooltip>
+          )}
+          {canImport && (
+            <Tooltip title="Tải file Excel mẫu đúng cột để điền rồi nhập">
+              <Button icon={<DownloadOutlined />} loading={downloadingTemplate} onClick={() => void downloadTemplate()}>
+                File mẫu
+              </Button>
+            </Tooltip>
+          )}
+          <Tooltip title="Tải toàn bộ dữ liệu ra file Excel (.xlsx)">
+            <Button
+              className="btn-tint-excel"
+              icon={<FileExcelOutlined />}
+              loading={exporting}
+              onClick={() => void exportFile()}
+            >
+              Xuất Excel
+            </Button>
+          </Tooltip>
+        </Space>
+      )}
+
       {canImport && (
         <ExcelImportModal
           open={importOpen}

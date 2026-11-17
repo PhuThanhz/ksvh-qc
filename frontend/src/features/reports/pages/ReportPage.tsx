@@ -5,7 +5,7 @@ import {
   TeamOutlined,
   TrophyOutlined,
 } from '@ant-design/icons'
-import { Tabs } from 'antd'
+import { Tabs, Tooltip } from 'antd'
 import { useState } from 'react'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { CriteriaViolationTab } from '@/features/reports/components/CriteriaViolationTab'
@@ -39,9 +39,11 @@ export function ReportPage() {
     {
       key: 'pareto',
       label: (
-        <span>
-          <BarChartOutlined /> Lỗi theo tiêu chí (Pareto)
-        </span>
+        <Tooltip title="Lỗi theo tiêu chí (Phân tích Pareto 80/20)">
+          <span>
+            <BarChartOutlined /> Tiêu chí (Pareto)
+          </span>
+        </Tooltip>
       ),
       children: <CriteriaViolationTab />,
     },

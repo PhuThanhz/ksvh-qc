@@ -7,9 +7,13 @@ import {
   RightOutlined,
 } from '@ant-design/icons'
 import { Space, Table, Tag, Tooltip, Typography } from 'antd'
-import { TableCard } from '@/components/data-display/TableCard'
+import { EmptyState } from '@/components/data-display/EmptyState'
 import { StatusBadge } from '@/components/data-display/StatusBadge'
+import { TableCard } from '@/components/data-display/TableCard'
+import { LoadingState } from '@/components/feedback/LoadingState'
+import { GroupMobileCard } from '@/features/criteria/components/GroupMobileCard'
 import type { CriterionGroup } from '@/features/criteria/criteria.types'
+import { useIsMobile } from '@/hooks/useIsMobile'
 import { PERMISSIONS, ProtectedAction } from '@/permissions'
 
 const ACTIVE_META = {
@@ -34,6 +38,34 @@ export function GroupTable({
   onBatchAddCriteria,
   onViewCriteria,
 }: GroupTableProps) {
+  const isMobile = useIsMobile()
+
+  if (isMobile) {
+    return (
+      <TableCard>
+        {loading && !groups?.length ? (
+          <LoadingState />
+        ) : !groups?.length ? (
+          <EmptyState description="Chưa có nhóm tiêu chí nào" />
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '4px 0' }}>
+            {groups.map((g, idx) => (
+              <GroupMobileCard
+                key={g.id}
+                group={g}
+                index={idx}
+                onEdit={onEdit}
+                onAddCriterion={onAddCriterion}
+                onBatchAddCriteria={onBatchAddCriteria}
+                onViewCriteria={onViewCriteria}
+              />
+            ))}
+          </div>
+        )}
+      </TableCard>
+    )
+  }
+
   return (
     <TableCard>
       <Table<CriterionGroup>

@@ -62,6 +62,7 @@ export function InspectionTable({
       title: 'Nhà hàng',
       dataIndex: 'restaurantName',
       key: 'restaurantName',
+      width: 220,
       render: (v, r) => (
         <div>
           <div style={{ fontWeight: 500 }}>{v || '—'}</div>
@@ -197,6 +198,7 @@ export function InspectionTable({
       dataSource={data}
       rowKey="id"
       loading={loading}
+      scroll={{ x: 1250 }}
       onRow={(r) => ({
         onDoubleClick: () => onView(r),
         style: { cursor: 'pointer' },
