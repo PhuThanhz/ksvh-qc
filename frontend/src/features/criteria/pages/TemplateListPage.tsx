@@ -1,5 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons'
-import { Button, Card, Flex, Select, Space } from 'antd'
+import { Button, Flex, Select, Space } from 'antd'
 import { useCallback, useMemo, useState } from 'react'
 import { AdvancedFilter, type FilterTagItem } from '@/components/data-entry/AdvancedFilter'
 import { ActiveFilter } from '@/components/data-entry/ActiveFilter'
@@ -94,43 +94,43 @@ export function TemplateListPage() {
         </Space>
       }
     >
-      <Card>
-        <Flex vertical gap={16}>
-          <AdvancedFilter
-            search={{ value: filters.keyword ?? '', placeholder: 'Tìm theo mã, tên, loại nhà hàng, loại kiểm tra', onSearch }}
-            activeCount={activeFilterCount}
-            onReset={resetFilters}
-            activeTags={activeTags}
-          >
-            <Select
-              allowClear
-              placeholder="Lọc theo công ty"
-              style={{ width: 220 }}
-              value={filters.companyId}
-              onChange={(v) => setFilter('companyId', v)}
-              options={companies.data?.items.map((c) => ({ value: c.id, label: `${c.code} – ${c.name}` }))}
-              loading={companies.isLoading}
-            />
-            <ActiveFilter
-              value={filters.active}
-              onChange={(v) => setFilter('active', v)}
-              activeLabel="Đang dùng"
-              inactiveLabel="Ngưng"
-            />
-          </AdvancedFilter>
-          <TemplateTable
-            data={templates.data}
-            loading={templates.isFetching}
-            error={templates.error}
-            onRetry={() => void templates.refetch()}
-            params={params}
-            onParamsChange={onTableChange}
-            onView={setViewing}
-            onEdit={(t) => setModal({ open: true, id: t.id })}
-            onDelete={onDelete}
+      <Flex vertical gap={16}>
+        <AdvancedFilter
+          search={{ value: filters.keyword ?? '', placeholder: 'Tìm theo mã, tên, loại nhà hàng, loại kiểm tra', onSearch }}
+          activeCount={activeFilterCount}
+          onReset={resetFilters}
+          activeTags={activeTags}
+        >
+          <Select
+            allowClear
+            showSearch
+            optionFilterProp="label"
+            placeholder="Lọc theo công ty"
+            style={{ width: 240 }}
+            value={filters.companyId}
+            onChange={(v) => setFilter('companyId', v)}
+            options={companies.data?.items.map((c) => ({ value: c.id, label: `${c.code} – ${c.name}` }))}
+            loading={companies.isLoading}
           />
-        </Flex>
-      </Card>
+          <ActiveFilter
+            value={filters.active}
+            onChange={(v) => setFilter('active', v)}
+            activeLabel="Đang dùng"
+            inactiveLabel="Ngưng"
+          />
+        </AdvancedFilter>
+        <TemplateTable
+          data={templates.data}
+          loading={templates.isFetching}
+          error={templates.error}
+          onRetry={() => void templates.refetch()}
+          params={params}
+          onParamsChange={onTableChange}
+          onView={setViewing}
+          onEdit={(t) => setModal({ open: true, id: t.id })}
+          onDelete={onDelete}
+        />
+      </Flex>
       <TemplateFormModal open={modal.open} templateId={modal.id} onClose={() => setModal({ open: false })} />
       <TemplateDetailModal
         open={Boolean(viewing)}

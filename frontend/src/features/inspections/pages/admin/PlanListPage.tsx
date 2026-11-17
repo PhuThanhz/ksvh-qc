@@ -1,9 +1,9 @@
 import { PlusOutlined } from '@ant-design/icons'
-import { Button, Card, Flex, Input, Modal, Select } from 'antd'
+import { Button, Flex, Input, Modal, Select } from 'antd'
 import { useCallback, useState } from 'react'
 import { AdvancedFilter } from '@/components/data-entry/AdvancedFilter'
-import { DetailModal } from '@/components/feedback/DetailModal'
 import { PageContainer } from '@/components/layout/PageContainer'
+import { PlanDetailModal } from '@/features/inspections/components/PlanDetailModal'
 import { PlanFormModal } from '@/features/inspections/components/PlanFormModal'
 import { PlanTable } from '@/features/inspections/components/PlanTable'
 import { usePlanActions, usePlans } from '@/features/inspections/hooks/useInspectionData'
@@ -12,7 +12,6 @@ import { useConfirm } from '@/hooks/useConfirm'
 import { useListParams } from '@/hooks/useListParams'
 import { useNotify } from '@/hooks/useNotify'
 import { PERMISSIONS, ProtectedAction } from '@/permissions'
-import { formatDate } from '@/utils/format-date'
 
 interface Filters extends Record<string, unknown> {
   keyword?: string
@@ -117,48 +116,46 @@ export function PlanListPage() {
         </ProtectedAction>
       }
     >
-      <Card>
-        <Flex vertical gap={16}>
-          <AdvancedFilter
-            search={{
-              placeholder: 'Tìm theo mã hoặc tiêu đề kế hoạch...',
-              value: filters.keyword,
-              onSearch,
-            }}
-            activeCount={activeFilterCount}
-            onReset={resetFilters}
-          >
-            <Select
-              placeholder="Trạng thái"
-              allowClear
-              value={filters.status}
-              onChange={(v) => setFilter('status', v)}
-              style={{ width: 160 }}
-              options={[
-                { value: 'DRAFT', label: 'Bản nháp' },
-                { value: 'PENDING_APPROVAL', label: 'Chờ duyệt' },
-                { value: 'APPROVED', label: 'Đã duyệt' },
-                { value: 'REJECTED', label: 'Từ chối' },
-              ]}
-            />
-          </AdvancedFilter>
-
-          <PlanTable
-            data={plans.data?.items}
-            loading={plans.isLoading}
-            currentPage={params.page}
-            pageSize={params.size}
-            totalItems={plans.data?.totalItems}
-            onPageChange={(p, s) => onTableChange({ page: p - 1, size: s })}
-            onView={setViewing}
-            onEdit={(plan) => setModal({ open: true, plan })}
-            onSubmit={onSubmitPlan}
-            onApprove={onApprovePlan}
-            onReject={(plan) => setRejectDialog({ open: true, plan, reason: '' })}
-            onDelete={onDeletePlan}
+      <Flex vertical gap={16}>
+        <AdvancedFilter
+          search={{
+            placeholder: 'Tìm theo mã hoặc tiêu đề kế hoạch...',
+            value: filters.keyword,
+            onSearch,
+          }}
+          activeCount={activeFilterCount}
+          onReset={resetFilters}
+        >
+          <Select
+            placeholder="Trạng thái"
+            allowClear
+            value={filters.status}
+            onChange={(v) => setFilter('status', v)}
+            style={{ width: 160 }}
+            options={[
+              { value: 'DRAFT', label: 'Bản nháp' },
+              { value: 'PENDING_APPROVAL', label: 'Chờ duyệt' },
+              { value: 'APPROVED', label: 'Đã duyệt' },
+              { value: 'REJECTED', label: 'Từ chối' },
+            ]}
           />
-        </Flex>
-      </Card>
+        </AdvancedFilter>
+
+        <PlanTable
+          data={plans.data?.items}
+          loading={plans.isLoading}
+          currentPage={params.page}
+          pageSize={params.size}
+          totalItems={plans.data?.totalItems}
+          onPageChange={(p, s) => onTableChange({ page: p - 1, size: s })}
+          onView={setViewing}
+          onEdit={(plan) => setModal({ open: true, plan })}
+          onSubmit={onSubmitPlan}
+          onApprove={onApprovePlan}
+          onReject={(plan) => setRejectDialog({ open: true, plan, reason: '' })}
+          onDelete={onDeletePlan}
+        />
+      </Flex>
 
       <PlanFormModal
         open={modal.open}
@@ -166,22 +163,10 @@ export function PlanListPage() {
         onClose={() => setModal({ open: false })}
       />
 
-      <DetailModal
+      <PlanDetailModal
         open={Boolean(viewing)}
-        title={`Chi tiết kế hoạch: ${viewing?.planCode ?? ''}`}
+        planId={viewing?.id}
         onClose={() => setViewing(undefined)}
-        fields={[
-          { label: 'Mã kế hoạch', value: viewing?.planCode },
-          { label: 'Tiêu đề', value: viewing?.title },
-          { label: 'Thời gian thực hiện', value: viewing ? `${formatDate(viewing.startDate)} - ${formatDate(viewing.endDate)}` : undefined },
-          { label: 'Trạng thái', value: viewing?.status },
-          { label: 'Người tạo', value: viewing?.createdByName },
-          { label: 'Ngày tạo', value: viewing ? formatDate(viewing.createdAt) : undefined },
-          { label: 'Người duyệt', value: viewing?.approvedByName },
-          { label: 'Ngày duyệt', value: viewing?.approvedAt ? formatDate(viewing.approvedAt) : undefined },
-          ...(viewing?.rejectionReason ? [{ label: 'Lý do từ chối', value: viewing.rejectionReason, span: 2 }] : []),
-          { label: 'Ghi chú', value: viewing?.notes, span: 2 },
-        ]}
       />
 
       <Modal

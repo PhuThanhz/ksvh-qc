@@ -47,13 +47,13 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class RiskConfigService {
 
-    private static final Set<Integer> ALLOWED_PERIODS = Set.of(3, 6);
 
     private final RiskLevelRepository riskLevelRepository;
     private final FrequencyConfigRepository frequencyRepository;
     private final EscalationRuleRepository escalationRepository;
     private final UserAccountApi users;
     private final Clock clock;
+    private final org.springframework.context.ApplicationEventPublisher eventPublisher;
 
     // ---- Phân loại rủi ro ----
 
@@ -91,6 +91,10 @@ public class RiskConfigService {
         }
         List<RiskLevelItem> levels = req.levels().stream().sorted(Comparator.comparing(RiskLevelItem::minScore)).toList();
         validateLevels(levels);
+        List<RiskLevel> previous = riskLevelRepository.findEffectiveAt(date.minusDays(1));
+        if (!previous.isEmpty() && sameLevels(levels, previous)) {
+            throw unchanged("bảng phân loại rủi ro", previous.getFirst().getEffectiveFrom());
+        }
 
         riskLevelRepository.deleteAll(riskLevelRepository.findByEffectiveFromOrderByMinScoreAsc(date));
         riskLevelRepository.flush();
@@ -110,6 +114,12 @@ public class RiskConfigService {
             toSave.add(r);
         }
         riskLevelRepository.saveAllAndFlush(toSave);
+        if (eventPublisher != null) {
+            eventPublisher.publishEvent(vn.ksvh.qc.shared.audit.AuditLogEvent.of(
+                    actorId, "RISK_CONFIG_UPDATE", "RISK_LEVEL", date.toString(),
+                    "Cập nhật bảng phân loại mức rủi ro hiệu lực từ ngày " + date
+            ));
+        }
         return riskLevelVersions().stream().filter(v -> v.effectiveFrom().equals(date)).findFirst().orElseThrow();
     }
 
@@ -184,16 +194,23 @@ public class RiskConfigService {
 
     @Transactional
     public FrequencyConfigResponse createFrequency(FrequencyConfigRequest req, Long actorId) {
-        if (!ALLOWED_PERIODS.contains(req.periodMonths())) {
-            throw new BusinessException(ErrorCode.BAD_REQUEST, "Kỳ đếm chỉ được 3 hoặc 6 tháng");
-        }
         assertNewEffectiveDate(req.effectiveFrom(), frequencyRepository.existsByEffectiveFrom(req.effectiveFrom()));
+        var previous = frequencyRepository.findFirstByEffectiveFromLessThanOrderByEffectiveFromDesc(req.effectiveFrom());
+        if (previous.isPresent() && previous.get().getPeriodMonths() == req.periodMonths()) {
+            throw unchanged("cấu hình tần suất", previous.get().getEffectiveFrom());
+        }
         FrequencyConfig c = new FrequencyConfig();
         c.setPeriodMonths(req.periodMonths().shortValue());
         c.setEffectiveFrom(req.effectiveFrom());
         c.setNote(StringUtils.hasText(req.note()) ? req.note().trim() : null);
         c.setCreatedBy(actorId);
         frequencyRepository.saveAndFlush(c);
+        if (eventPublisher != null) {
+            eventPublisher.publishEvent(vn.ksvh.qc.shared.audit.AuditLogEvent.of(
+                    actorId, "RISK_CONFIG_UPDATE", "FREQUENCY_CONFIG", req.effectiveFrom().toString(),
+                    "Tạo phiên bản cấu hình tần suất (" + req.periodMonths() + " tháng) hiệu lực từ ngày " + req.effectiveFrom()
+            ));
+        }
         return frequencyConfigs().stream().filter(r -> r.id().equals(c.getId())).findFirst().orElseThrow();
     }
 
@@ -222,6 +239,14 @@ public class RiskConfigService {
     @Transactional
     public EscalationRuleResponse createEscalation(EscalationRuleRequest req, Long actorId) {
         assertNewEffectiveDate(req.effectiveFrom(), escalationRepository.existsByEffectiveFrom(req.effectiveFrom()));
+        var previous = escalationRepository.findFirstByEffectiveFromLessThanOrderByEffectiveFromDesc(req.effectiveFrom());
+        if (previous.isPresent()
+                && previous.get().getThresholdCount() == req.thresholdCount()
+                && previous.get().getStepIncrease() == req.stepIncrease()
+                && previous.get().getMaxImpact() == req.maxImpact()
+                && previous.get().getResetPeriodMonths() == req.resetPeriodMonths()) {
+            throw unchanged("quy tắc nâng mức", previous.get().getEffectiveFrom());
+        }
         EscalationRule r = new EscalationRule();
         r.setThresholdCount(req.thresholdCount().shortValue());
         r.setStepIncrease(req.stepIncrease().shortValue());
@@ -231,6 +256,12 @@ public class RiskConfigService {
         r.setNote(StringUtils.hasText(req.note()) ? req.note().trim() : null);
         r.setCreatedBy(actorId);
         escalationRepository.saveAndFlush(r);
+        if (eventPublisher != null) {
+            eventPublisher.publishEvent(vn.ksvh.qc.shared.audit.AuditLogEvent.of(
+                    actorId, "RISK_CONFIG_UPDATE", "ESCALATION_RULE", req.effectiveFrom().toString(),
+                    "Tạo phiên bản quy tắc nâng mức ảnh hưởng (ngưỡng " + req.thresholdCount() + " lần, tăng +" + req.stepIncrease() + ") hiệu lực từ ngày " + req.effectiveFrom()
+            ));
+        }
         return escalationRules().stream().filter(x -> x.id().equals(r.getId())).findFirst().orElseThrow();
     }
 
@@ -243,6 +274,34 @@ public class RiskConfigService {
     }
 
     // ---- dùng chung ----
+
+    /** Phiên bản mới giống hệt bản có hiệu lực ngay trước nó → tạo ra cũng không đổi gì, nên chặn. */
+    private static BusinessException unchanged(String what, LocalDate previousDate) {
+        return new BusinessException(ErrorCode.CONFIG_UNCHANGED, "Phiên bản mới giống hệt " + what
+                + " đang hiệu lực từ " + previousDate.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                + ". Hãy thay đổi ít nhất một giá trị.");
+    }
+
+    private static boolean sameLevels(List<RiskLevelItem> levels, List<RiskLevel> previous) {
+        if (levels.size() != previous.size()) {
+            return false;
+        }
+        for (int i = 0; i < levels.size(); i++) {
+            RiskLevelItem a = levels.get(i);
+            RiskLevel b = previous.get(i);
+            boolean same = a.code().equals(b.getCode())
+                    && a.name().trim().equals(b.getName())
+                    && a.minScore().compareTo(b.getMinScore()) == 0
+                    && (a.maxScore() == null ? b.getMaxScore() == null
+                        : b.getMaxScore() != null && a.maxScore().compareTo(b.getMaxScore()) == 0)
+                    && a.remediationDays().equals(b.getRemediationDays())
+                    && Objects.equals(StringUtils.hasText(a.action()) ? a.action().trim() : null, b.getAction());
+            if (!same) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /** dates sắp giảm dần: bản đầu tiên có ngày ≤ hôm nay là CURRENT, sau đó PAST; ngày > hôm nay là SCHEDULED. */
     private List<ConfigStatus> statuses(List<LocalDate> datesDesc) {

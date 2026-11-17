@@ -1,6 +1,7 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { findingsApi, inspectionsApi, plansApi } from '@/features/inspections/api/inspection.api'
 import type {
+  AppealReviewRequest,
   FindingAppealRequest,
   FindingConcludeAppealRequest,
   FindingRemediationPlanRequest,
@@ -35,6 +36,8 @@ export const inspectionKeys = {
   findings: () => [...inspectionKeys.all, 'findings'] as const,
   findingList: (params?: Record<string, unknown>) => [...inspectionKeys.findings(), 'list', params] as const,
   finding: (id: Id) => [...inspectionKeys.findings(), 'detail', id] as const,
+  pendingReviews: () => [...inspectionKeys.findings(), 'pending-reviews'] as const,
+  candidateReviewers: (id: Id) => [...inspectionKeys.findings(), 'candidates', id] as const,
 }
 
 // ---- Plans ----
@@ -43,6 +46,14 @@ export function usePlans(params?: { keyword?: string; status?: PlanStatus; page?
     queryKey: inspectionKeys.planList(params),
     queryFn: () => plansApi.list(params),
     placeholderData: keepPreviousData,
+  })
+}
+
+export function usePlan(id?: Id) {
+  return useQuery({
+    queryKey: inspectionKeys.plan(id!),
+    queryFn: () => plansApi.get(id!),
+    enabled: Boolean(id),
   })
 }
 
@@ -142,7 +153,11 @@ export function useInspectionMutations() {
     mutationFn: ({ id, body }: { id: Id; body: InspectionCancelRequest }) => inspectionsApi.cancel(id, body),
     onSuccess: () => qc.invalidateQueries({ queryKey: inspectionKeys.inspections() }),
   })
-  return { create, createBatch, checkin, submit, cancel }
+  const acknowledge = useMutation({
+    mutationFn: (id: Id) => inspectionsApi.acknowledge(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: inspectionKeys.inspections() }),
+  })
+  return { create, createBatch, checkin, submit, cancel, acknowledge }
 }
 
 // ---- Findings ----
@@ -169,6 +184,21 @@ export function useFinding(id?: Id) {
   })
 }
 
+export function usePendingReviews() {
+  return useQuery({
+    queryKey: inspectionKeys.pendingReviews(),
+    queryFn: () => findingsApi.pendingReviews(),
+  })
+}
+
+export function useCandidateReviewers(id?: Id) {
+  return useQuery({
+    queryKey: inspectionKeys.candidateReviewers(id ?? 0),
+    queryFn: () => findingsApi.candidateReviewers(id ?? 0),
+    enabled: !!id && id > 0,
+  })
+}
+
 export function useFindingMutations() {
   const qc = useQueryClient()
   const invalidate = () => qc.invalidateQueries({ queryKey: inspectionKeys.findings() })
@@ -179,6 +209,10 @@ export function useFindingMutations() {
   })
   const appeal = useMutation({
     mutationFn: ({ id, body }: { id: Id; body: FindingAppealRequest }) => findingsApi.appeal(id, body),
+    onSuccess: invalidate,
+  })
+  const submitReview = useMutation({
+    mutationFn: ({ id, body }: { id: Id; body: AppealReviewRequest }) => findingsApi.submitReview(id, body),
     onSuccess: invalidate,
   })
   const concludeAppeal = useMutation({
@@ -198,5 +232,5 @@ export function useFindingMutations() {
     onSuccess: invalidate,
   })
 
-  return { confirm, appeal, concludeAppeal, remediationPlan, submitRemediation, verify }
+  return { confirm, appeal, submitReview, concludeAppeal, remediationPlan, submitRemediation, verify }
 }

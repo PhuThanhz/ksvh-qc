@@ -1,6 +1,7 @@
 import { CameraOutlined, DeleteOutlined } from '@ant-design/icons'
-import { Button, Card, Image, Input, ProgressBar, Space, Tag, TextArea, Toast } from 'antd-mobile'
+import { Button, Card, Image, ProgressBar, Space, Tag, TextArea, Toast } from 'antd-mobile'
 import { useRef, type ChangeEvent } from 'react'
+import { FindingRemediationInfo } from '@/features/inspections/components/FindingRemediationInfo'
 import { usePhotoCapture } from '@/features/media'
 import type { InspectionItemResponse, ItemResult } from '@/features/inspections/inspection.types'
 import { toMediaUrl } from '@/utils/media-url'
@@ -77,9 +78,17 @@ export function InspectionCriterionCard({
         </div>
         <Tag color="default" style={{ marginLeft: 8 }}>Ảnh hưởng {item.baseImpact}/5</Tag>
       </div>
-      <div style={{ fontSize: 12, color: '#8c8c8c', marginTop: 2 }}>
+      <div style={{ fontSize: 12, color: 'var(--app-text-secondary)', marginTop: 2 }}>
         {item.groupName} · {item.criterionCode}
       </div>
+
+      <FindingRemediationInfo
+        findingId={item.findingId}
+        findingDescription={item.findingDescription}
+        findingEvidenceUrls={item.findingEvidenceUrls}
+        remediationPlan={item.remediationPlan}
+        remediationEvidenceUrls={item.remediationEvidenceUrls}
+      />
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginTop: 12 }}>
         <Button
@@ -112,14 +121,20 @@ export function InspectionCriterionCard({
       </div>
 
       {rating.result === 'FAIL' && (
-        <div style={{ marginTop: 10, background: '#fff1f0', padding: 8, borderRadius: 6, border: '1px solid #ffa39e' }}>
+        <div style={{ marginTop: 10, background: 'var(--app-danger-bg)', padding: 8, borderRadius: 6, border: '1px solid var(--app-danger-border)' }}>
           <TextArea
-            placeholder={readOnly ? 'Không có mô tả' : 'Mô tả lỗi vi phạm phát hiện (bắt buộc)...'}
+            placeholder={
+              readOnly
+                ? 'Không có mô tả'
+                : item.findingId
+                  ? 'Lý do nghiệm thu chưa đạt (bắt buộc)...'
+                  : 'Mô tả lỗi vi phạm phát hiện (bắt buộc)...'
+            }
             rows={2}
             readOnly={readOnly}
             value={rating.comment ?? ''}
             onChange={onSetComment}
-            style={{ background: '#fff', padding: 6, borderRadius: 4 }}
+            style={{ background: 'var(--app-surface)', padding: 6, borderRadius: 4 }}
           />
 
           <div style={{ marginTop: 8 }}>
@@ -144,7 +159,7 @@ export function InspectionCriterionCard({
                   <CameraOutlined style={{ marginRight: 6 }} /> Chụp ảnh / Chọn ảnh bằng chứng
                 </Button>
                 {photo.step === 'uploading' && <ProgressBar percent={photo.progress} style={{ marginTop: 6 }} />}
-                {photo.error && <div style={{ color: '#ff4d4f', fontSize: 12, marginTop: 4 }}>{photo.error}</div>}
+                {photo.error && <div style={{ color: 'var(--app-danger)', fontSize: 12, marginTop: 4 }}>{photo.error}</div>}
               </>
             )}
 
@@ -168,27 +183,19 @@ export function InspectionCriterionCard({
               </Space>
             )}
 
-            {!readOnly && (
-              <Input
-                placeholder="Hoặc nhập link ảnh (https://...)"
-                value={rating.evidenceUrls ?? ''}
-                onChange={onSetEvidence}
-                style={{ background: '#fff', padding: 4, borderRadius: 4, marginTop: 8, fontSize: 12 }}
-              />
-            )}
           </div>
         </div>
       )}
 
       {rating.result === 'NA' && (
-        <div style={{ marginTop: 10, background: '#e6f4ff', padding: 8, borderRadius: 6, border: '1px solid #91caff' }}>
+        <div style={{ marginTop: 10, background: 'var(--app-info-bg)', padding: 8, borderRadius: 6, border: '1px solid var(--app-info-border)' }}>
           <TextArea
             placeholder={readOnly ? 'Không có lý do' : 'Lý do chọn N/A (bắt buộc: thiết bị cũ, ngoại cảnh...)...'}
             rows={2}
             readOnly={readOnly}
             value={rating.comment ?? ''}
             onChange={onSetComment}
-            style={{ background: '#fff', padding: 6, borderRadius: 4 }}
+            style={{ background: 'var(--app-surface)', padding: 6, borderRadius: 4 }}
           />
         </div>
       )}

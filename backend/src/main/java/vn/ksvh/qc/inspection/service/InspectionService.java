@@ -1,6 +1,7 @@
 package vn.ksvh.qc.inspection.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -11,8 +12,12 @@ import vn.ksvh.qc.criteria.api.CriteriaLookupApi;
 import vn.ksvh.qc.criteria.api.CriterionGroupRef;
 import vn.ksvh.qc.criteria.api.CriterionRef;
 import vn.ksvh.qc.criteria.api.TemplateRef;
+import vn.ksvh.qc.inspection.api.event.FindingM4AlertEvent;
+import vn.ksvh.qc.inspection.api.event.InspectionAssignedEvent;
+import vn.ksvh.qc.inspection.api.event.InspectionSubmittedEvent;
 import vn.ksvh.qc.inspection.domain.*;
 import vn.ksvh.qc.inspection.dto.*;
+import vn.ksvh.qc.media.api.EvidenceApi;
 import vn.ksvh.qc.organization.api.OrgUnitLookupApi;
 import vn.ksvh.qc.organization.api.OrgUnitRef;
 import vn.ksvh.qc.risk.RiskAssessment;
@@ -33,6 +38,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,8 +56,11 @@ public class InspectionService {
     private final FindingEventRepository eventRepository;
     private final UserAccountApi userAccountApi;
     private final InspectionAccess access;
+    private final EvidenceApi evidenceApi;
     private final RiskAssessor riskAssessor;
+    private final FindingService findingService;
     private final Clock clock;
+    private final ApplicationEventPublisher eventPublisher;
 
     public PageResponse<InspectionResponse> search(String keyword, Long restaurantId, Long inspectorId,
                                                   InspectionStatus status, Pageable pageable, CurrentUser user) {
@@ -186,17 +195,60 @@ public class InspectionService {
     public List<InspectionItemResponse> listItems(Long id, CurrentUser user) {
         Inspection inspection = load(id);
         access.requireRead(inspection, user);
+        List<Long> findingIds = inspection.getItems().stream()
+                .map(InspectionItem::getFindingId)
+                .filter(Objects::nonNull)
+                .toList();
+        Map<Long, Finding> findingMap = findingIds.isEmpty() ? Map.of()
+                : findingRepository.findAllById(findingIds).stream()
+                .collect(Collectors.toMap(Finding::getId, Function.identity()));
         return inspection.getItems().stream()
-                .map(InspectionItemResponse::from)
+                .map(item -> InspectionItemResponse.from(item, item.getFindingId() != null ? findingMap.get(item.getFindingId()) : null))
                 .toList();
     }
 
     @Transactional
     public InspectionResponse create(InspectionCreateRequest req, CurrentUser user) {
+        // Người không có quyền lập kế hoạch chỉ được tạo phiếu cho chính mình.
+        if (!user.has(PermissionCodes.PLAN_CREATE) && !Objects.equals(req.inspectorId(), user.id())) {
+            throw new BusinessException(ErrorCode.ACCESS_DENIED, "Bạn chỉ được tạo phiếu chấm cho chính mình");
+        }
+        return createChecked(req, user.id());
+    }
+
+    /**
+     * Tạo phiếu cho một dòng phân công của kế hoạch vừa duyệt (PDF s.9). Mã phiếu theo mẫu PDF
+     * {@code PER-<yyMM>-<mã nhà hàng>-<stt>}; kiểm tra nhà hàng / mẫu phiếu y như tạo tay.
+     */
+    @Transactional
+    public InspectionResponse createFromPlanAssignment(InspectionPlan plan, PlanAssignment a, String restaurantCode, Long actorId) {
+        String prefix = "PER-%s-%s-".formatted(a.getScheduledDate().format(java.time.format.DateTimeFormatter.ofPattern("yyMM")),
+                restaurantCode.toUpperCase(java.util.Locale.ROOT));
+        String code = null;
+        for (int n = 1; n < 100; n++) {
+            String candidate = prefix + "%02d".formatted(n);
+            if (!inspectionRepository.existsByCodeIgnoreCase(candidate)) {
+                code = candidate;
+                break;
+            }
+        }
+        if (code == null || code.length() > 30) {
+            throw new BusinessException(ErrorCode.VALIDATION_FAILED,
+                    "Không sinh được mã phiếu cho nhà hàng '%s' (mã quá dài hoặc đã đủ 99 phiếu trong tháng)".formatted(restaurantCode));
+        }
+        InspectionCreateRequest req = new InspectionCreateRequest(code, plan.getId(), a.getRestaurantId(), a.getTemplateId(),
+                a.getInspectorId(), InspectionKind.PERIODIC, InspectionMode.ON_SITE, null,
+                "Theo kế hoạch %s, ngày dự kiến %s".formatted(plan.getPlanCode(), a.getScheduledDate()));
+        return createChecked(req, actorId);
+    }
+
+    /** Kiểm tra nghiệp vụ và tạo phiếu (dùng chung cho tạo tay và tạo khi duyệt kế hoạch). */
+    private InspectionResponse createChecked(InspectionCreateRequest req, Long actorId) {
         String code = req.code().trim();
         if (inspectionRepository.existsByCodeIgnoreCase(code)) {
             throw codeTaken(code);
         }
+        requirePlanForPeriodic(req.inspectionType(), req.planId());
         if (req.planId() != null) {
             InspectionPlan plan = planRepository.findById(req.planId())
                     .orElseThrow(() -> new NotFoundException("Không tìm thấy kế hoạch #" + req.planId()));
@@ -205,10 +257,6 @@ public class InspectionService {
                         "Kế hoạch '%s' chưa được phê duyệt (trạng thái: %s)".formatted(plan.getTitle(), plan.getStatus()));
             }
         }
-        // Người không có quyền lập kế hoạch chỉ được tạo phiếu cho chính mình.
-        if (!user.has(PermissionCodes.PLAN_CREATE) && !Objects.equals(req.inspectorId(), user.id())) {
-            throw new BusinessException(ErrorCode.ACCESS_DENIED, "Bạn chỉ được tạo phiếu chấm cho chính mình");
-        }
         OrgUnitRef restaurant = orgUnitLookupApi.findRefs(List.of(req.restaurantId())).get(req.restaurantId());
         if (restaurant == null || !"RESTAURANT".equals(restaurant.unitType()) || !restaurant.active()) {
             throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Nhà hàng không tồn tại hoặc đã ngừng hoạt động");
@@ -216,9 +264,11 @@ public class InspectionService {
 
         InspectionKind kind = req.inspectionType();
         InspectionMode mode = req.inspectionMode() != null ? req.inspectionMode() : InspectionMode.ON_SITE;
-        List<CriterionRef> criteria;
+        List<CriterionRef> criteria = List.of();
         Long templateId = null;
         List<Long> topics = List.of();
+        List<Finding> verificationFindings = List.of();
+
         if (kind == InspectionKind.PERIODIC) {
             // Định kỳ tháng: thực tế tại nhà hàng, đủ mọi tiêu chí đang dùng của mẫu phiếu.
             if (mode != InspectionMode.ON_SITE) {
@@ -235,7 +285,7 @@ public class InspectionService {
             }
             templateId = template.id();
             criteria = template.items();
-        } else {
+        } else if (kind == InspectionKind.SURPRISE) {
             // Đột xuất: chỉ các tiêu chí thuộc chuyên đề (nhóm tiêu chí) được kích hoạt, không kiểm lại toàn bộ.
             topics = req.topicGroupIds() == null ? List.of() : req.topicGroupIds().stream().filter(Objects::nonNull).distinct().toList();
             if (topics.isEmpty()) {
@@ -245,6 +295,32 @@ public class InspectionService {
             criteria = criteriaLookupApi.findActiveCriteriaInGroups(topics);
             if (criteria.isEmpty()) {
                 throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Các chuyên đề đã chọn chưa có tiêu chí nào đang hoạt động");
+            }
+        } else if (kind == InspectionKind.VERIFICATION) {
+            // Kiểm tra kết quả khắc phục: gom các lỗi chờ nghiệm thu vào một phiếu
+            if (req.findingIds() != null && !req.findingIds().isEmpty()) {
+                verificationFindings = findingRepository.findAllById(req.findingIds());
+                if (verificationFindings.size() != req.findingIds().size()) {
+                    throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Một số lỗi được chọn không tồn tại");
+                }
+                for (Finding f : verificationFindings) {
+                    if (!Objects.equals(f.getRestaurantId(), req.restaurantId())) {
+                        throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Lỗi #" + f.getId() + " không thuộc nhà hàng đã chọn");
+                    }
+                    if (f.getStatus() != FindingStatus.PENDING_VERIFICATION && f.getStatus() != FindingStatus.REMEDIATING) {
+                        throw new BusinessException(ErrorCode.VALIDATION_FAILED,
+                                "Lỗi #" + f.getId() + " đang ở trạng thái " + f.getStatus() + ", không thể nghiệm thu");
+                    }
+                }
+            } else {
+                verificationFindings = findingRepository.findByRestaurantIdAndStatusIn(
+                        req.restaurantId(),
+                        List.of(FindingStatus.PENDING_VERIFICATION, FindingStatus.REMEDIATING)
+                );
+                if (verificationFindings.isEmpty()) {
+                    throw new BusinessException(ErrorCode.VALIDATION_FAILED,
+                            "Nhà hàng này hiện không có lỗi nào đang chờ nghiệm thu kết quả khắc phục");
+                }
             }
         }
 
@@ -259,24 +335,47 @@ public class InspectionService {
         inspection.getTopicGroupIds().addAll(topics);
         inspection.setNotes(StringUtils.hasText(req.notes()) ? req.notes().trim() : null);
         inspection.setStatus(InspectionStatus.ASSIGNED);
-        inspection.setCreatedBy(user.id());
+        inspection.setCreatedBy(actorId);
 
         int order = 1;
-        for (CriterionRef c : criteria) {
-            InspectionItem item = new InspectionItem();
-            item.setInspection(inspection);
-            item.setCriterionId(c.id());
-            item.setCriterionCode(c.code());
-            item.setCriterionName(c.name());
-            item.setGroupName(c.groupName());
-            item.setBaseImpact((short) c.baseImpact());
-            item.setSortOrder(order++);
-            item.setResult(ItemResult.UNRATED);
-            inspection.getItems().add(item);
+        if (kind == InspectionKind.VERIFICATION) {
+            var critIds = verificationFindings.stream().map(Finding::getCriterionId).distinct().toList();
+            Map<Long, CriterionRef> critMap = criteriaLookupApi.findCriteria(critIds);
+            for (Finding f : verificationFindings) {
+                CriterionRef c = critMap.get(f.getCriterionId());
+                InspectionItem item = new InspectionItem();
+                item.setInspection(inspection);
+                item.setFindingId(f.getId());
+                item.setCriterionId(f.getCriterionId());
+                item.setCriterionCode(c != null ? c.code() : ("C" + f.getCriterionId()));
+                item.setCriterionName(c != null ? c.name() : ("Tiêu chí #" + f.getCriterionId()));
+                item.setGroupName(c != null ? c.groupName() : null);
+                item.setBaseImpact(f.getEffectiveImpact());
+                item.setSortOrder(order++);
+                item.setResult(ItemResult.UNRATED);
+                inspection.getItems().add(item);
+            }
+        } else {
+            for (CriterionRef c : criteria) {
+                InspectionItem item = new InspectionItem();
+                item.setInspection(inspection);
+                item.setCriterionId(c.id());
+                item.setCriterionCode(c.code());
+                item.setCriterionName(c.name());
+                item.setGroupName(c.groupName());
+                item.setBaseImpact((short) c.baseImpact());
+                item.setSortOrder(order++);
+                item.setResult(ItemResult.UNRATED);
+                inspection.getItems().add(item);
+            }
         }
 
         try {
-            return toResponse(inspectionRepository.saveAndFlush(inspection));
+            InspectionResponse res = toResponse(inspectionRepository.saveAndFlush(inspection));
+            eventPublisher.publishEvent(new InspectionAssignedEvent(
+                    res.id(), res.code(), res.restaurantId(), res.restaurantName(), res.inspectorId(), res.inspectionType().name()
+            ));
+            return res;
         } catch (DataIntegrityViolationException e) {
             throw codeTaken(code); // hai người tạo cùng mã cùng lúc: unique index chặn lại
         }
@@ -287,6 +386,11 @@ public class InspectionService {
         if (!user.has(PermissionCodes.PLAN_CREATE) && !Objects.equals(req.inspectorId(), user.id())) {
             throw new BusinessException(ErrorCode.ACCESS_DENIED, "Bạn chỉ được tạo phiếu chấm cho chính mình");
         }
+        if (req.inspectionType() == InspectionKind.VERIFICATION) {
+            throw new BusinessException(ErrorCode.VALIDATION_FAILED,
+                    "Phiếu kiểm tra kết quả khắc phục chỉ được tạo đơn lẻ cho từng nhà hàng");
+        }
+        requirePlanForPeriodic(req.inspectionType(), req.planId());
         if (req.planId() != null) {
             InspectionPlan plan = planRepository.findById(req.planId())
                     .orElseThrow(() -> new NotFoundException("Không tìm thấy kế hoạch #" + req.planId()));
@@ -394,7 +498,13 @@ public class InspectionService {
             throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Lỗi trùng lặp mã phiếu hoặc dữ liệu không hợp lệ trong đợt tạo hàng loạt");
         }
 
-        return createdList.stream().map(this::toResponse).toList();
+        List<InspectionResponse> responses = createdList.stream().map(this::toResponse).toList();
+        for (InspectionResponse res : responses) {
+            eventPublisher.publishEvent(new InspectionAssignedEvent(
+                    res.id(), res.code(), res.restaurantId(), res.restaurantName(), res.inspectorId(), res.inspectionType().name()
+            ));
+        }
+        return responses;
     }
 
     /** Mẫu phải đang hoạt động và là mẫu dùng chung hoặc của đúng công ty của nhà hàng. */
@@ -420,6 +530,23 @@ public class InspectionService {
                 throw new BusinessException(ErrorCode.VALIDATION_FAILED,
                         "Chuyên đề '%s' thuộc công ty khác, không dùng được cho nhà hàng '%s'".formatted(g.name(), restaurant.name()));
             }
+        }
+    }
+
+    /** PDF s.9: phiếu định kỳ chỉ sinh từ kế hoạch đã được Quản lý KSVH duyệt. Đột xuất được tạo riêng. */
+    private static void requirePlanForPeriodic(InspectionKind kind, Long planId) {
+        if (kind == InspectionKind.PERIODIC && planId == null) {
+            throw new BusinessException(ErrorCode.VALIDATION_FAILED,
+                    "Kiểm tra định kỳ phải thuộc một kế hoạch kiểm tra đã được phê duyệt");
+        }
+    }
+
+    /** Dùng khi lưu phân công kế hoạch: mẫu phiếu phải đang dùng, đúng công ty và còn tiêu chí. */
+    static void validateTemplateForAssignment(TemplateRef template, OrgUnitRef restaurant) {
+        validateTemplateForRestaurant(template, restaurant);
+        if (template.items().isEmpty()) {
+            throw new BusinessException(ErrorCode.VALIDATION_FAILED,
+                    "Mẫu phiếu '%s' không còn tiêu chí nào đang hoạt động".formatted(template.name()));
         }
     }
 
@@ -470,7 +597,19 @@ public class InspectionService {
                     "Phiếu chưa check-in GPS hoặc đã gửi, không thể gửi kết quả");
         }
 
+        if (inspection.getInspectionType() == InspectionKind.VERIFICATION) {
+            return submitVerification(inspection, req, user);
+        }
+
         Map<Long, InspectionSubmitItemRequest> submitMap = validateSubmission(inspection, req);
+        // Ảnh bằng chứng: chỉ nhận key do server cấp, của chính chuyên viên, đã có trên kho (CLAUDE.md quy tắc 3).
+        Map<Long, String> evidenceByCriterion = new HashMap<>();
+        submitMap.forEach((criterionId, sub) -> {
+            String keys = evidenceApi.requireUploaded(sub.evidenceUrls(), user.id());
+            if (keys != null) {
+                evidenceByCriterion.put(criterionId, keys);
+            }
+        });
 
         Instant now = clock.instant();
         LocalDate today = BusinessDates.today(clock);
@@ -492,12 +631,13 @@ public class InspectionService {
         }
 
         List<FindingEvent> eventsToSave = new ArrayList<>();
-
+        List<Finding> createdFindings = new ArrayList<>();
+        Map<Long, String> criterionNamesByFindingId = new HashMap<>();
         for (InspectionItem item : inspection.getItems()) {
             InspectionSubmitItemRequest sub = submitMap.get(item.getCriterionId());
             item.setResult(sub.result());
             item.setComment(trimToNull(sub.comment()));
-            item.setEvidenceUrls(trimToNull(sub.evidenceUrls()));
+            item.setEvidenceUrls(evidenceByCriterion.get(item.getCriterionId()));
             item.setEvaluatedAt(now);
 
             if (sub.result() != ItemResult.FAIL) {
@@ -527,6 +667,8 @@ public class InspectionService {
             finding.setEvidenceUrls(item.getEvidenceUrls());
 
             Finding saved = findingRepository.save(finding);
+            createdFindings.add(saved);
+            criterionNamesByFindingId.put(saved.getId(), item.getCriterionName());
             eventsToSave.add(new FindingEvent(saved.getId(), FindingEventAction.CREATED, null,
                     FindingStatus.OPEN, user.id(), null, now));
         }
@@ -542,10 +684,100 @@ public class InspectionService {
         if (hasFail) {
             inspection.setStatus(InspectionStatus.SUBMITTED);
         } else {
-            inspection.setStatus(InspectionStatus.COMPLETED);
-            inspection.setCompletedAt(now);
+            // Không có lỗi: chờ CHT xác nhận đã xem (DOMAIN_SPEC §4 bước 3) rồi mới hoàn thành.
+            inspection.setStatus(InspectionStatus.AWAITING_ACK);
         }
 
+        InspectionResponse res = toResponse(inspectionRepository.saveAndFlush(inspection));
+        eventPublisher.publishEvent(new InspectionSubmittedEvent(
+                res.id(), res.code(), res.restaurantId(), res.restaurantName(), res.inspectorId(), failedSubs.size()
+        ));
+        for (Finding f : createdFindings) {
+            if ("M4".equalsIgnoreCase(f.getRiskLevelCode())) {
+                eventPublisher.publishEvent(new FindingM4AlertEvent(
+                        f.getId(), res.id(), res.restaurantId(), res.restaurantName(),
+                        criterionNamesByFindingId.getOrDefault(f.getId(), "Tiêu chí #" + f.getCriterionId()),
+                        f.getCalculatedScore()
+                ));
+            }
+        }
+        return res;
+    }
+
+    private InspectionResponse submitVerification(Inspection inspection, InspectionSubmitRequest req, CurrentUser user) {
+        Map<Long, InspectionSubmitItemRequest> submitByItem = new HashMap<>();
+        Map<Long, InspectionSubmitItemRequest> submitByCriterion = new HashMap<>();
+        for (InspectionSubmitItemRequest sub : req.items()) {
+            if (sub.itemId() != null) {
+                submitByItem.put(sub.itemId(), sub);
+            }
+            submitByCriterion.put(sub.criterionId(), sub);
+        }
+
+        Instant now = clock.instant();
+        int failedCount = 0;
+
+        for (InspectionItem item : inspection.getItems()) {
+            InspectionSubmitItemRequest sub = submitByItem.get(item.getId());
+            if (sub == null) {
+                sub = submitByCriterion.get(item.getCriterionId());
+            }
+            if (sub == null) {
+                throw new BusinessException(ErrorCode.VALIDATION_FAILED,
+                        "Thiếu kết quả nghiệm thu cho tiêu chí '" + item.getCriterionName() + "'");
+            }
+            if (sub.result() != ItemResult.PASS && sub.result() != ItemResult.FAIL) {
+                throw new BusinessException(ErrorCode.VALIDATION_FAILED,
+                        "Kết quả nghiệm thu phải là Đạt (PASS) hoặc Không đạt (FAIL)");
+            }
+
+            String evidence = evidenceApi.requireUploaded(sub.evidenceUrls(), user.id());
+            item.setResult(sub.result());
+            item.setComment(trimToNull(sub.comment()));
+            item.setEvidenceUrls(evidence);
+            item.setEvaluatedAt(now);
+
+            boolean passed = sub.result() == ItemResult.PASS;
+            if (!passed) {
+                failedCount++;
+            }
+
+            if (item.getFindingId() != null) {
+                Finding f = findingRepository.findById(item.getFindingId()).orElse(null);
+                if (f != null) {
+                    findingService.verifyInternal(f, passed, item.getComment(), user.id(), user.username());
+                }
+            }
+        }
+
+        inspection.setSubmittedAt(now);
+        inspection.setCompletedAt(now);
+        inspection.setStatus(InspectionStatus.COMPLETED);
+        if (StringUtils.hasText(req.notes())) {
+            inspection.setNotes(req.notes().trim());
+        }
+
+        InspectionResponse res = toResponse(inspectionRepository.saveAndFlush(inspection));
+        eventPublisher.publishEvent(new InspectionSubmittedEvent(
+                res.id(), res.code(), res.restaurantId(), res.restaurantName(), res.inspectorId(), failedCount
+        ));
+        return res;
+    }
+
+    /** CHT của nhà hàng xác nhận đã xem phiếu không có lỗi → phiếu hoàn thành. */
+    @Transactional
+    public InspectionResponse acknowledge(Long id, CurrentUser user) {
+        Inspection inspection = load(id);
+        access.requireStoreManager(inspection.getRestaurantId(), user);
+        if (inspection.getStatus() != InspectionStatus.AWAITING_ACK) {
+            throw new BusinessException(ErrorCode.INSPECTION_INVALID_STATE,
+                    "Chỉ xác nhận đã xem được phiếu không có lỗi đang chờ Cửa hàng trưởng xác nhận");
+        }
+        Instant now = clock.instant();
+        inspection.setAcknowledgedBy(user.id());
+        inspection.setAcknowledgedAt(now);
+        inspection.setStatus(InspectionStatus.COMPLETED);
+        inspection.setCompletedAt(now);
         return toResponse(inspectionRepository.saveAndFlush(inspection));
     }
 
@@ -608,7 +840,20 @@ public class InspectionService {
         }
         inspection.setStatus(InspectionStatus.CANCELLED);
         inspection.setCancelReason(req.reason().trim());
-        return toResponse(inspectionRepository.saveAndFlush(inspection));
+        Inspection saved = inspectionRepository.saveAndFlush(inspection);
+        if (eventPublisher != null) {
+            eventPublisher.publishEvent(vn.ksvh.qc.shared.audit.AuditLogEvent.of(
+                    user != null ? user.id() : null,
+                    user != null ? user.username() : null,
+                    null,
+                    "INSPECTION_CANCEL",
+                    "INSPECTION",
+                    saved.getCode(),
+                    "Huỷ phiếu kiểm tra " + saved.getCode() + ": " + req.reason().trim(),
+                    req.reason().trim()
+            ));
+        }
+        return toResponse(saved);
     }
 
     private Inspection load(Long id) {

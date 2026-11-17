@@ -13,24 +13,24 @@ type MenuItem = NonNullable<MenuProps['items']>[number]
 
 const groupKey = (label: string) => `group:${label}`
 
-/** Theme token độc quyền cho Menu trên nền kính mờ Apple Frosted Glass */
+/** Theme token phẳng, thanh thoát cho Menu Sidebar (phẳng, không bóng đổ 3D) */
 const sidebarMenuTheme = {
   components: {
     Menu: {
-      itemColor: '#334155',
-      itemHoverColor: '#0f172a',
-      itemHoverBg: 'rgba(255, 255, 255, 0.45)',
-      itemSelectedColor: '#0f172a',
-      itemSelectedBg: 'rgba(255, 255, 255, 0.82)',
+      itemColor: 'rgba(255, 255, 255, 0.75)',
+      itemHoverColor: '#ffffff',
+      itemHoverBg: 'rgba(255, 255, 255, 0.08)',
+      itemSelectedColor: '#ffffff',
+      itemSelectedBg: 'rgba(255, 255, 255, 0.16)',
       subMenuItemBg: 'transparent',
       itemBg: 'transparent',
       fontSize: 13.5,
       iconSize: 16,
       itemHeight: 36,
-      itemMarginBlock: 3,
-      itemMarginInline: 6,
-      itemBorderRadius: 8,
-      groupTitleColor: '#64748b',
+      itemMarginBlock: 2,
+      itemMarginInline: 8,
+      itemBorderRadius: 6,
+      groupTitleColor: 'rgba(255, 255, 255, 0.45)',
     },
   },
 }

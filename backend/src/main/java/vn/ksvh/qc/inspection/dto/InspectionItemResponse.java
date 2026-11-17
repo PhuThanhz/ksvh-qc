@@ -1,5 +1,6 @@
 package vn.ksvh.qc.inspection.dto;
 
+import vn.ksvh.qc.inspection.domain.Finding;
 import vn.ksvh.qc.inspection.domain.InspectionItem;
 import vn.ksvh.qc.inspection.domain.ItemResult;
 
@@ -16,9 +17,18 @@ public record InspectionItemResponse(
         String comment,
         String evidenceUrls,
         int sortOrder,
-        Instant evaluatedAt
+        Instant evaluatedAt,
+        Long findingId,
+        String findingDescription,
+        String findingEvidenceUrls,
+        String remediationPlan,
+        String remediationEvidenceUrls
 ) {
     public static InspectionItemResponse from(InspectionItem item) {
+        return from(item, null);
+    }
+
+    public static InspectionItemResponse from(InspectionItem item, Finding finding) {
         return new InspectionItemResponse(
                 item.getId(),
                 item.getCriterionId(),
@@ -30,7 +40,12 @@ public record InspectionItemResponse(
                 item.getComment(),
                 item.getEvidenceUrls(),
                 item.getSortOrder(),
-                item.getEvaluatedAt()
+                item.getEvaluatedAt(),
+                item.getFindingId(),
+                finding != null ? finding.getDescription() : null,
+                finding != null ? finding.getEvidenceUrls() : null,
+                finding != null ? finding.getRemediationPlan() : null,
+                finding != null ? finding.getRemediationEvidenceUrls() : null
         );
     }
 }

@@ -86,4 +86,25 @@ class RiskCalculatorTests {
         assertThat(r.frequency()).isEqualTo(3); // T4..T6
         assertThat(r.score()).isEqualTo(9);
     }
+
+    @Test
+    void evaluateCurrentRisk_tracksEscalationAndExpectedResetDate() {
+        List<LocalDate> escalatedAtT3 = List.of(t(1), t(2), t(3));
+
+        // Tại T6 (ngày 15/06/2026): các tháng sạch trọn vẹn giữa T3 và T6 là T4, T5 (2 tháng sạch)
+        LocalDate asOfJune = LocalDate.of(2026, 6, 15);
+        CurrentCriterionRisk june = RiskCalculator.evaluateCurrentRisk(1, escalatedAtT3, asOfJune, SIX_MONTHS, RULE, BANDS);
+        assertThat(june.isEscalated()).isTrue();
+        assertThat(june.effectiveImpact()).isEqualTo(2);
+        assertThat(june.cleanMonthsCount()).isEqualTo(2);
+        assertThat(june.expectedResetDate()).isEqualTo(LocalDate.of(2026, 10, 1));
+
+        // Tại T10 (ngày 05/10/2026): các tháng sạch trọn vẹn là T4, T5, T6, T7, T8, T9 (6 tháng sạch >= 6) -> đã hạ mức
+        LocalDate asOfOct = LocalDate.of(2026, 10, 5);
+        CurrentCriterionRisk oct = RiskCalculator.evaluateCurrentRisk(1, escalatedAtT3, asOfOct, SIX_MONTHS, RULE, BANDS);
+        assertThat(oct.isEscalated()).isFalse();
+        assertThat(oct.effectiveImpact()).isEqualTo(1);
+        assertThat(oct.cleanMonthsCount()).isEqualTo(6);
+        assertThat(oct.expectedResetDate()).isNull();
+    }
 }

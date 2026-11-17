@@ -144,16 +144,31 @@ export function CriterionFormModal({ open, criterion, groups, defaultGroupId, on
         <button type="submit" hidden />
         <Row gutter={16}>
           <Col xs={24} md={12}>
-            <FormSelect<CriterionFormValues, number> control={control} name="groupId" label="Nhóm tiêu chí" required options={groupOptions} />
+            <FormSelect<CriterionFormValues, number>
+              control={control}
+              name="groupId"
+              label="Nhóm tiêu chí"
+              required
+              showSearch={{ optionFilterProp: 'label' }}
+              placeholder="Chọn nhóm tiêu chí"
+              options={groupOptions}
+            />
           </Col>
           <Col xs={24} md={6}>
-            <FormInput control={control} name="code" label="Mã" required maxLength={30} placeholder="VD: VSB.01" />
+            <FormInput
+              control={control}
+              name="code"
+              label="Mã tiêu chí"
+              required
+              maxLength={30}
+              placeholder="VD: VS-01"
+            />
           </Col>
           <Col xs={24} md={6}>
             <FormNumber control={control} name="sortOrder" label="Thứ tự" required min={0} max={9999} precision={0} />
           </Col>
           <Col span={24}>
-            <FormInput control={control} name="name" label="Tên tiêu chí" required maxLength={300} />
+            <FormInput control={control} name="name" label="Tên tiêu chí con" required maxLength={300} placeholder="VD: Sàn nhà sạch sẽ, khô ráo..." />
           </Col>
           <Col span={24}>
             <FormSelect<CriterionFormValues, number[]>
@@ -161,10 +176,11 @@ export function CriterionFormModal({ open, criterion, groups, defaultGroupId, on
               name="templateIds"
               label="Mẫu phiếu áp dụng"
               mode="multiple"
-              placeholder="Chọn các mẫu phiếu áp dụng tiêu chí này"
+              showSearch={{ optionFilterProp: 'label' }}
+              placeholder="Chọn các mẫu phiếu áp dụng tiêu chí này (tuỳ chọn)"
               options={templateOptions}
               allowClear
-              extra="Tiêu chí sẽ tự động được thêm vào các mẫu phiếu đã chọn."
+              extra="Tiêu chí sẽ tự động được đưa vào danh sách kiểm tra của các mẫu phiếu đã chọn."
             />
           </Col>
           <Col span={24}>

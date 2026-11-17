@@ -113,6 +113,7 @@ class CriteriaLookupService implements CriteriaLookupApi {
                 c.getId(),
                 c.getCode(),
                 c.getName(),
+                c.getGroup() != null ? c.getGroup().getId() : null,
                 c.getGroup() != null ? c.getGroup().getName() : null,
                 c.getBaseImpact(),
                 c.isActive()

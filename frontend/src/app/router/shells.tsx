@@ -3,6 +3,7 @@ import type { MenuEntry } from '@/components/layout/menu.types'
 import { MobileLayout } from '@/components/layout/MobileLayout'
 import { ROUTES } from '@/constants/routes'
 import { useLogout, useSession } from '@/features/auth'
+import { NotificationBell } from '@/features/notifications'
 import { useConfirm } from '@/hooks/useConfirm'
 import { useNotify } from '@/hooks/useNotify'
 
@@ -53,9 +54,12 @@ export function MobileShell({ tabs }: { tabs: readonly MenuEntry[] }) {
       rootPath={ROUTES.qc.root}
       tabs={tabs}
       headerRight={
-        <span role="button" onClick={handleLogout} style={{ cursor: 'pointer', color: '#8c8c8c', fontSize: 13 }}>
-          Thoát
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <NotificationBell isMobile />
+          <span role="button" onClick={handleLogout} style={{ cursor: 'pointer', color: 'var(--app-text-secondary)', fontSize: 13 }}>
+            Thoát
+          </span>
+        </div>
       }
     />
   )

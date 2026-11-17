@@ -18,14 +18,16 @@ const PERIODS = [
 
 function SectionTitle({ children }: { children: string }) {
   return (
-    <Flex align="center" gap={12} style={{ marginTop: 4 }}>
-      <Typography.Text style={{ fontSize: 13, fontWeight: 600, color: '#3a3936', whiteSpace: 'nowrap' }}>{children}</Typography.Text>
-      <div style={{ flex: 1, height: 1, background: 'rgba(0, 0, 0, 0.08)' }} />
+    <Flex align="center" gap={12} style={{ marginTop: 6, marginBottom: 2 }}>
+      <Typography.Text style={{ fontSize: 13, fontWeight: 700, color: 'var(--app-text-body)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+        {children}
+      </Typography.Text>
+      <div style={{ flex: 1, height: 1, background: 'var(--app-border)' }} />
     </Flex>
   )
 }
 
-/** Trang Tổng quan: số liệu vận hành (nếu có quyền xem báo cáo) và tình hình danh mục. */
+/** Trang Tổng quan: Số liệu điều hành vận hành QC thật và tình hình danh mục thiết lập. */
 export function DashboardPage() {
   const { user } = useSession()
   const { canAny } = usePermission()
@@ -35,23 +37,30 @@ export function DashboardPage() {
 
   return (
     <PageContainer
-      title="Tổng quan"
+      title="Tổng quan vận hành"
       subtitle={`Xin chào ${user?.fullName ?? ''} · ${capitalize(today.format('dddd, DD/MM/YYYY'))}`}
       extra={
-        <Space size={8}>
-          {canOps && <Segmented size="middle" options={PERIODS} value={months} onChange={(v) => setMonths(Number(v))} />}
+        <Space size={10}>
+          {canOps && (
+            <Segmented
+              size="middle"
+              options={PERIODS}
+              value={months}
+              onChange={(v) => setMonths(Number(v))}
+            />
+          )}
           <CreateMenu />
         </Space>
       }
     >
-      <Flex vertical gap={16} style={{ paddingBottom: 24 }}>
+      <Flex vertical gap={20} style={{ paddingBottom: 24 }}>
         {canOps && (
           <>
-            <SectionTitle>Hoạt động kiểm soát</SectionTitle>
+            <SectionTitle>Chỉ số hoạt động & Xu hướng kiểm soát vận hành</SectionTitle>
             <OperationsSection months={months} />
           </>
         )}
-        <SectionTitle>Danh mục</SectionTitle>
+        <SectionTitle>Danh mục & Cấu hình kiểm soát</SectionTitle>
         <CatalogSection />
       </Flex>
     </PageContainer>

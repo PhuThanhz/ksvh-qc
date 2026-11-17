@@ -1,7 +1,6 @@
-import { CloudUploadOutlined, FileExcelOutlined } from '@ant-design/icons'
+import { CloudUploadOutlined, DownloadOutlined, FileExcelOutlined } from '@ant-design/icons'
 import { Button, Space, Tooltip } from 'antd'
 import { useState } from 'react'
-import { EXCEL_GREEN } from '@/components/excel/excel.constants'
 import { ExcelImportModal } from '@/components/excel/ExcelImportModal'
 import { useNotify } from '@/components/feedback/useNotify'
 import type { ImportResult } from '@/types/api.generated'
@@ -20,11 +19,12 @@ export interface ExcelActionsProps {
   errorMessage: (err: unknown) => string
 }
 
-/** Cặp nút "Nhập Excel" / "Xuất Excel" dùng chung cho các danh mục. */
+/** Nhóm nút Excel dùng chung cho các danh mục: Nhập Excel, File mẫu (tải file mẫu nhập), Xuất Excel. */
 export function ExcelActions(props: ExcelActionsProps) {
   const { importTitle, sheets, onExport, onDownloadTemplate, onUpload, onImported, canImport, errorMessage } = props
   const notify = useNotify()
   const [exporting, setExporting] = useState(false)
+  const [downloadingTemplate, setDownloadingTemplate] = useState(false)
   const [importOpen, setImportOpen] = useState(false)
 
   const exportFile = async () => {
@@ -39,18 +39,37 @@ export function ExcelActions(props: ExcelActionsProps) {
     }
   }
 
+  const downloadTemplate = async () => {
+    setDownloadingTemplate(true)
+    try {
+      await onDownloadTemplate()
+      notify.success('Đã tải file mẫu nhập Excel')
+    } catch (err) {
+      notify.error(errorMessage(err))
+    } finally {
+      setDownloadingTemplate(false)
+    }
+  }
+
   return (
     <>
       <Space size={8}>
         {canImport && (
           <Tooltip title="Thêm / cập nhật hàng loạt từ file Excel">
-            <Button icon={<CloudUploadOutlined />} onClick={() => setImportOpen(true)}>
+            <Button className="btn-tint-excel" icon={<CloudUploadOutlined />} onClick={() => setImportOpen(true)}>
               Nhập Excel
             </Button>
           </Tooltip>
         )}
+        {canImport && (
+          <Tooltip title="Tải file Excel mẫu đúng cột để điền rồi nhập">
+            <Button icon={<DownloadOutlined />} loading={downloadingTemplate} onClick={() => void downloadTemplate()}>
+              File mẫu
+            </Button>
+          </Tooltip>
+        )}
         <Tooltip title="Tải toàn bộ dữ liệu ra file Excel (.xlsx)">
-          <Button icon={<FileExcelOutlined style={{ color: EXCEL_GREEN }} />} loading={exporting} onClick={() => void exportFile()}>
+          <Button className="btn-tint-excel" icon={<FileExcelOutlined />} loading={exporting} onClick={() => void exportFile()}>
             Xuất Excel
           </Button>
         </Tooltip>

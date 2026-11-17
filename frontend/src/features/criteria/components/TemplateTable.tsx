@@ -60,7 +60,7 @@ export function TemplateTable({ onView, onEdit, onDelete, ...props }: TemplateTa
           width: 170,
           render: (companyName: string | null | undefined) =>
             companyName ? (
-              <Tag color="blue">{companyName}</Tag>
+              <Tag>{companyName}</Tag>
             ) : (
               <Tag color="default">Dùng chung toàn hệ thống</Tag>
             ),

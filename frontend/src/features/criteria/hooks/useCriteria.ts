@@ -43,6 +43,17 @@ export function useSaveCriterion() {
   })
 }
 
+export function useBatchSaveCriteria() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (body: CriterionPayload[]) => criteriaApi.createBatch(body),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: criteriaKeys.criteria() })
+      void qc.invalidateQueries({ queryKey: criteriaKeys.groups() })
+    },
+  })
+}
+
 export function useDeleteCriterion() {
   const qc = useQueryClient()
   return useMutation({

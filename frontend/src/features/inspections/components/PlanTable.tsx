@@ -1,5 +1,5 @@
 import { CheckOutlined, CloseOutlined, DeleteOutlined, EditOutlined, EyeOutlined, SendOutlined } from '@ant-design/icons'
-import { Button, Space, Table, Tag, Tooltip, Typography } from 'antd'
+import { Space, Table, Tag, Tooltip, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { PlanResponse, PlanStatus } from '@/features/inspections/inspection.types'
 import { formatDate } from '@/utils/format-date'
@@ -74,7 +74,7 @@ export function PlanTable({
             <div style={{ fontWeight: 500 }}>{t}</div>
           )}
           {r.rejectionReason && (
-            <div style={{ fontSize: 12, color: '#cf1322', marginTop: 4 }}>
+            <div style={{ fontSize: 12, color: 'var(--app-danger)', marginTop: 4 }}>
               Lý do từ chối: {r.rejectionReason}
             </div>
           )}
@@ -93,6 +93,14 @@ export function PlanTable({
       key: 'status',
       width: 130,
       render: (st: PlanStatus) => <Tag color={STATUS_TAG[st]?.color}>{STATUS_TAG[st]?.label}</Tag>,
+    },
+    {
+      title: 'Số phân công',
+      dataIndex: 'assignmentCount',
+      key: 'assignmentCount',
+      width: 120,
+      align: 'center',
+      render: (c?: number) => c ?? 0,
     },
     {
       title: 'Người tạo',
@@ -114,23 +122,51 @@ export function PlanTable({
       width: 150,
       align: 'center',
       render: (_, r) => (
-        <Space size="small">
+        <Space size={6}>
           {onView && (
             <Tooltip title="Xem chi tiết kế hoạch">
-              <Button type="text" icon={<EyeOutlined />} onClick={() => onView(r)} />
+              <button
+                type="button"
+                className="action-btn action-btn-view"
+                aria-label="Xem chi tiết kế hoạch"
+                onClick={() => onView(r)}
+              >
+                <EyeOutlined />
+              </button>
             </Tooltip>
           )}
 
           {(r.status === 'DRAFT' || r.status === 'REJECTED') && canCreate && (
             <>
               <Tooltip title="Gửi duyệt">
-                <Button type="text" icon={<SendOutlined style={{ color: '#1677ff' }} />} onClick={() => onSubmit(r)} />
+                <button
+                  type="button"
+                  className="action-btn action-btn-add"
+                  aria-label="Gửi duyệt kế hoạch"
+                  onClick={() => onSubmit(r)}
+                >
+                  <SendOutlined />
+                </button>
               </Tooltip>
               <Tooltip title="Chỉnh sửa">
-                <Button type="text" icon={<EditOutlined />} onClick={() => onEdit(r)} />
+                <button
+                  type="button"
+                  className="action-btn action-btn-edit"
+                  aria-label="Chỉnh sửa kế hoạch"
+                  onClick={() => onEdit(r)}
+                >
+                  <EditOutlined />
+                </button>
               </Tooltip>
               <Tooltip title="Xoá">
-                <Button type="text" danger icon={<DeleteOutlined />} onClick={() => onDelete(r)} />
+                <button
+                  type="button"
+                  className="action-btn action-btn-delete"
+                  aria-label="Xoá kế hoạch"
+                  onClick={() => onDelete(r)}
+                >
+                  <DeleteOutlined />
+                </button>
               </Tooltip>
             </>
           )}
@@ -138,10 +174,24 @@ export function PlanTable({
           {r.status === 'PENDING_APPROVAL' && canApprove && (
             <>
               <Tooltip title="Phê duyệt">
-                <Button type="text" icon={<CheckOutlined style={{ color: '#52c41a' }} />} onClick={() => onApprove(r)} />
+                <button
+                  type="button"
+                  className="action-btn action-btn-add"
+                  aria-label="Phê duyệt kế hoạch"
+                  onClick={() => onApprove(r)}
+                >
+                  <CheckOutlined />
+                </button>
               </Tooltip>
               <Tooltip title="Từ chối">
-                <Button type="text" danger icon={<CloseOutlined />} onClick={() => onReject(r)} />
+                <button
+                  type="button"
+                  className="action-btn action-btn-delete"
+                  aria-label="Từ chối kế hoạch"
+                  onClick={() => onReject(r)}
+                >
+                  <CloseOutlined />
+                </button>
               </Tooltip>
             </>
           )}

@@ -37,6 +37,8 @@ public record InspectionResponse(
         Instant checkinAt,
         Instant submittedAt,
         Instant completedAt,
+        /** CHT xác nhận đã xem phiếu không có lỗi; null nếu chưa / không cần. */
+        @Schema(nullable = true) Instant acknowledgedAt,
         int totalCriteria,
         int passedCriteria,
         int failedCriteria,
@@ -95,6 +97,7 @@ public record InspectionResponse(
                 i.getCheckinAt(),
                 i.getSubmittedAt(),
                 i.getCompletedAt(),
+                i.getAcknowledgedAt(),
                 i.getItems().size(),
                 (int) pass,
                 (int) fail,

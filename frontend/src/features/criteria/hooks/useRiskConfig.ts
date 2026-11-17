@@ -19,7 +19,6 @@ export function useSaveRiskLevelVersion() {
     mutationFn: (body: RiskLevelVersionPayload) => riskConfigApi.saveRiskLevelVersion(body),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: criteriaKeys.riskLevels() })
-      void qc.invalidateQueries({ queryKey: [...criteriaKeys.all, 'risk-preview'] })
     },
   })
 }
@@ -30,7 +29,6 @@ export function useDeleteRiskLevelVersion() {
     mutationFn: (effectiveFrom: string) => riskConfigApi.deleteRiskLevelVersion(effectiveFrom),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: criteriaKeys.riskLevels() })
-      void qc.invalidateQueries({ queryKey: [...criteriaKeys.all, 'risk-preview'] })
     },
   })
 }
@@ -49,7 +47,6 @@ export function useCreateFrequency() {
     mutationFn: (body: FrequencyConfigPayload) => riskConfigApi.createFrequency(body),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: criteriaKeys.frequency() })
-      void qc.invalidateQueries({ queryKey: [...criteriaKeys.all, 'risk-preview'] })
     },
   })
 }
@@ -60,7 +57,6 @@ export function useDeleteFrequency() {
     mutationFn: (id: Id) => riskConfigApi.deleteFrequency(id),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: criteriaKeys.frequency() })
-      void qc.invalidateQueries({ queryKey: [...criteriaKeys.all, 'risk-preview'] })
     },
   })
 }
@@ -71,7 +67,6 @@ export function useCreateEscalation() {
     mutationFn: (body: EscalationRulePayload) => riskConfigApi.createEscalation(body),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: criteriaKeys.escalation() })
-      void qc.invalidateQueries({ queryKey: [...criteriaKeys.all, 'risk-preview'] })
     },
   })
 }
@@ -82,7 +77,6 @@ export function useDeleteEscalation() {
     mutationFn: (id: Id) => riskConfigApi.deleteEscalation(id),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: criteriaKeys.escalation() })
-      void qc.invalidateQueries({ queryKey: [...criteriaKeys.all, 'risk-preview'] })
     },
   })
 }

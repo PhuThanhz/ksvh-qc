@@ -1,65 +1,93 @@
-# KSVH QC – Phần mềm Kiểm soát vận hành
+# KSVH QC – Phần mềm Kiểm soát Vận hành & Quản trị Chất lượng
 
-Chấm điểm QC: quản lý trên **dashboard web**, nhân viên **đi chấm bằng điện thoại qua trình duyệt** (GPS check-in, chụp ảnh bằng chứng có đóng dấu, xuất Excel/PDF).
+Hệ thống số hoá và chuẩn hoá toàn diện quy trình Kiểm soát Vận hành (KSVH QC): quản lý trên **dashboard web máy tính**, nhân viên **chấm điểm hiện trường bằng điện thoại di động** (GPS check-in, chụp ảnh đóng dấu vị trí thời gian thực, lưu nháp ngoại tuyến, quy trình khiếu nại hội đồng thẩm định, nghiệm thu kết quả khắc phục, xuất Excel & PDF).
 
-| Thư mục | Nội dung |
+---
+
+## Cấu trúc Dự án
+| Thư mục / Tệp | Nội dung |
 |---|---|
-| `backend/` | Java 21 + Spring Boot 4 (Maven) – API, JWT, Flyway |
-| `frontend/` | React + TypeScript + Vite – `/admin` (dashboard) và `/qc` (mobile) |
-| `docs/` | Tech stack, tài liệu nghiệp vụ |
+| `backend/` | Java 21 + Spring Boot 4 (Spring Modulith, Maven, PostgreSQL 17, Flyway, MinIO S3, OpenPDF, Apache POI) |
+| `frontend/` | React 19 + TypeScript + Vite + Ant Design (Web Desktop) & Ant Design Mobile (Web Responsive) |
+| `docs/` | Tài liệu kiến trúc, nghiệp vụ, lộ trình phát triển và sổ tay người dùng |
+| `scripts/` | Script sao lưu (`backup.sh`) và phục hồi dữ liệu (`restore.sh`) tự động |
+| `docker-compose.yml` | Khởi chạy toàn bộ hệ thống bằng Docker chỉ với 1 lệnh |
 
-Chi tiết công nghệ: [docs/TECH_STACK.md](docs/TECH_STACK.md).
+---
 
-## Yêu cầu
-- Java 21, Node 20+, PostgreSQL 17 (Homebrew: `brew services start postgresql@17`)
-- MinIO (lưu ảnh) – chỉ cần khi test chụp ảnh: `docker compose up -d minio minio-init` hoặc `brew install minio/stable/minio`
+## Tài liệu Dự án
+- [Sổ tay Hướng dẫn Sử dụng (8 vai trò)](docs/USER_MANUAL.md)
+- [Hướng dẫn Triển khai Production (Docker & Bảo mật)](docs/DEPLOYMENT_GUIDE.md)
+- [Lộ trình Hoàn thiện & Trạng thái Tính năng](docs/ROADMAP.md)
+- [Đặc tả Nghiệp vụ KSVH](docs/DOMAIN_SPEC.md)
+- [Công nghệ & Tech Stack](docs/TECH_STACK.md)
 
-## Chạy lần đầu
+---
+
+## Triển khai Nhanh bằng Docker Compose (Khuyên dùng)
 ```bash
-# 1. Tạo database (một lần)
-psql -h localhost -d postgres -c "CREATE DATABASE ksvh_qc;"
+# 1. Sao chép file cấu hình môi trường
+cp .env.example .env
 
-# 2. Backend – http://localhost:8088 (Flyway tự tạo bảng)
+# 2. Khởi chạy toàn bộ hệ thống (PostgreSQL, MinIO, Backend, Frontend Nginx)
+docker compose up -d --build
+
+# 3. Truy cập ứng dụng:
+# - Giao diện Web: http://localhost (hoặc domain cấu hình)
+# - API Backend: http://localhost:8088
+# - MinIO S3 Console: http://localhost:9001
+```
+
+---
+
+## Chạy Môi trường Phát triển (Dev)
+### Yêu cầu
+- Java 21 (JDK), Node.js 20+, PostgreSQL 17.
+- MinIO (chụp ảnh): `docker compose up -d minio minio-init`.
+
+### Khởi động
+```bash
+# 1. Tạo database (chỉ cần chạy một lần)
+psql -h localhost -U postgres -d postgres -c "CREATE DATABASE ksvh_qc;"
+
+# 2. Khởi động Backend – cổng 8088 (Flyway tự động chạy migration)
 cd backend && ./mvnw spring-boot:run
 
-# 3. Frontend – terminal khác
-cd frontend && npm install && npm run dev:http   # http://localhost:5273
+# 3. Khởi động Frontend – cổng 5273
+cd frontend && npm install && npm run dev:http
 ```
 
-Tài khoản dev – mỗi vai trò một tài khoản (admin, bizadmin, lead, manager, inspector, store, obm, executive) – được tạo tự động ở profile `dev`, xem `app.seed.users` trong
-[backend/src/main/resources/application-dev.yml](backend/src/main/resources/application-dev.yml).
+### 8 Tài khoản Thử nghiệm (Môi trường Dev)
+Mật khẩu mặc định: `<TênVaiTrò>@123` (ví dụ `Admin@123`, `Lead@123`, `Inspector@123`).
+| Username | Vai trò | Chức năng chính |
+|---|---|---|
+| `admin` | SYSTEM_ADMIN | Quản trị tài khoản, phân quyền, xem nhật ký kiểm toán |
+| `bizadmin` | BUSINESS_ADMIN | Quản lý danh mục công ty, nhà hàng, nhân viên |
+| `lead` | KSVH_LEAD | Lập kế hoạch kiểm tra tháng, phân công, danh mục tiêu chí |
+| `manager` | KSVH_MANAGER | Duyệt kế hoạch, chủ trì họp khiếu nại, giám sát hồ sơ rủi ro |
+| `inspector` | KSVH_INSPECTOR | Check-in GPS, chấm điểm hiện trường, nghiệm thu khắc phục |
+| `store` | STORE_MANAGER | Ký biên bản, khiếu nại lỗi (24h), nộp bằng chứng khắc phục |
+| `obm` | OBM | Tham gia hội đồng khiếu nại, đôn đốc khu vực |
+| `executive` | EXECUTIVE | Bảng điều hành tổng hợp, nhận cảnh báo M4, phân tích Pareto |
 
-## Địa chỉ hữu ích
-| | |
-|---|---|
-| App (máy tính) | http://localhost:5273 |
-| Swagger UI | http://localhost:8088/swagger-ui.html |
-| Health | http://localhost:8088/actuator/health |
-| MinIO console | http://localhost:9001 |
+---
 
-## Test trên điện thoại (GPS + camera)
-Trình duyệt điện thoại chỉ cho dùng GPS/camera qua **HTTPS**.
-1. Điện thoại và máy tính cùng Wi-Fi.
-2. `cd frontend && npm run dev` → Vite in ra `https://<IP-máy-tính>:5273`.
-3. Chạy backend với `S3_PUBLIC_ENDPOINT=https://<IP-máy-tính>:5273 ./mvnw spring-boot:run` để upload ảnh đi qua proxy HTTPS của Vite.
-4. Mở địa chỉ đó trên điện thoại, chấp nhận cảnh báo chứng chỉ tự ký, vào **Thử GPS & ảnh**.
-
-## Biến môi trường backend
-| Biến | Mặc định (dev) |
-|---|---|
-| `DB_URL` / `DB_USERNAME` / `DB_PASSWORD` | `jdbc:postgresql://localhost:5432/ksvh_qc` / `postgres` / `postgres` |
-| `JWT_SECRET` | giá trị dev; **bắt buộc đặt** ở môi trường thật (≥ 32 ký tự) |
-| `AUTH_ALLOWED_ORIGINS` | rỗng (dev); môi trường thật đặt domain, vd `https://qc.ksvh.vn` |
-| `S3_PUBLIC_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY` | `https://localhost:5273`, `ksvh-qc`, `minioadmin`, `minioadmin` |
-| `SPRING_PROFILES_ACTIVE` | `dev` |
-
-## Sau khi đổi API backend
+## Sao lưu & Phục hồi Dữ liệu
 ```bash
-cd frontend && npm run api:types   # backend phải đang chạy
+# Sao lưu cơ sở dữ liệu PostgreSQL và MinIO Media
+./scripts/backup.sh
+
+# Phục hồi dữ liệu từ bản sao lưu
+./scripts/restore.sh ./backups/ksvh_qc_db_YYYYMMDD_HHMMSS.sql.gz ./backups/minio_media_YYYYMMDD_HHMMSS.tar.gz
 ```
 
-## Lệnh kiểm tra
+---
+
+## Kiểm tra Chất lượng Mã nguồn (CI/CD)
 ```bash
-cd backend && ./mvnw verify          # build + test (cần Postgres đang chạy)
+# 1. Kiểm tra Backend (100 tests pass + Spring Modulith compliant)
+cd backend && ./mvnw test
+
+# 2. Kiểm tra Frontend (TypeScript typecheck + Oxlint + Vite build)
 cd frontend && npm run typecheck && npm run lint && npm run build
 ```

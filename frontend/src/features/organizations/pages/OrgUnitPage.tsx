@@ -1,4 +1,3 @@
-import { Card } from 'antd'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { OrgUnitTab } from '@/features/organizations/components/OrgUnitTab'
 
@@ -8,9 +7,7 @@ export function OrgUnitPage() {
       title="Đơn vị trực thuộc"
       subtitle="Quản lý toàn bộ danh sách nhà hàng và phòng ban trực thuộc các công ty"
     >
-      <Card>
-        <OrgUnitTab />
-      </Card>
+      <OrgUnitTab />
     </PageContainer>
   )
 }

@@ -31,7 +31,7 @@ export function UserDetailModal({ open, user, roleName, onClose, onEdit, onReset
       value: (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
           {user.roles.map((r) => (
-            <Tag key={r} color="blue">{roleName(r)}</Tag>
+            <Tag key={r}>{roleName(r)}</Tag>
           ))}
         </div>
       ),

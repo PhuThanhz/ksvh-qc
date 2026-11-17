@@ -1,10 +1,12 @@
 package vn.ksvh.qc.inspection.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public record PlanCreateRequest(
         @NotBlank(message = "Vui lòng nhập mã kế hoạch")
@@ -22,6 +24,10 @@ public record PlanCreateRequest(
         LocalDate endDate,
 
         @Size(max = 1000, message = "Ghi chú tối đa 1000 ký tự")
-        String notes
+        String notes,
+
+        /** Danh sách phân công; bắt buộc có ít nhất 1 dòng khi gửi duyệt. Trống = chưa phân công. */
+        @Size(max = 200, message = "Tối đa 200 dòng phân công trong một kế hoạch")
+        List<@Valid PlanAssignmentRequest> assignments
 ) {
 }

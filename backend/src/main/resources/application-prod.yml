@@ -1,0 +1,35 @@
+# Cấu hình môi trường Production (Chạy thật)
+# Kích hoạt bằng biến môi trường: SPRING_PROFILES_ACTIVE=prod
+
+spring:
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: validate
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+server:
+  error:
+    include-stacktrace: never
+    include-message: never
+
+app:
+  seed:
+    sample-data: false
+  auth:
+    cookie:
+      secure: true
+      same-site: Strict
+
+logging:
+  level:
+    root: WARN
+    vn.ksvh.qc: INFO
+    org.springframework.web: WARN
+    org.springframework.security: WARN
+    org.hibernate: WARN

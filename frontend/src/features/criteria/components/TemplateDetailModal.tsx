@@ -60,7 +60,7 @@ export function TemplateDetailModal({ open, template, onClose, onEdit }: Templat
           {fullTemplate?.criteria && fullTemplate.criteria.length > 5 && (
             <Input
               size="small"
-              prefix={<SearchOutlined style={{ color: '#8c8c8c' }} />}
+              prefix={<SearchOutlined style={{ color: 'var(--app-text-secondary)' }} />}
               placeholder="Tìm nhanh tiêu chí..."
               value={filterText}
               onChange={(e) => setFilterText(e.target.value)}
@@ -89,10 +89,10 @@ export function TemplateDetailModal({ open, template, onClose, onEdit }: Templat
               <List.Item.Meta
                 title={
                   <Flex align="center" gap={8} wrap="wrap">
-                    <Badge count={index + 1} style={{ backgroundColor: '#1677ff' }} />
+                    <Badge count={index + 1} style={{ backgroundColor: 'var(--app-text-secondary)' }} />
                     <Typography.Text strong code>[{c.code}]</Typography.Text>
                     <span>{c.name}</span>
-                    {c.groupName && <Tag color="blue" style={{ fontSize: 11 }}>{c.groupName}</Tag>}
+                    {c.groupName && <Tag style={{ fontSize: 11 }}>{c.groupName}</Tag>}
                   </Flex>
                 }
               />

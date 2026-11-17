@@ -5,6 +5,7 @@ import { AdminShell, MobileShell } from '@/app/router/shells'
 import { ErrorState } from '@/components/feedback/ErrorState'
 import { RouteErrorBoundary } from '@/components/feedback/RouteErrorBoundary'
 import { inspectionsAdminRoutes, inspectionsMobileRoutes } from '@/features/inspections'
+import { reportsAdminRoutes } from '@/features/reports'
 import { authRoutes } from '@/features/auth'
 import { dashboardRoutes } from '@/features/dashboard'
 import { criteriaAdminRoutes } from '@/features/criteria'
@@ -12,6 +13,7 @@ import { employeesAdminRoutes } from '@/features/employees'
 import { organizationsAdminRoutes } from '@/features/organizations'
 import { permissionsAdminRoutes, rolesAdminRoutes } from '@/features/roles'
 import { usersAdminRoutes } from '@/features/users'
+import { auditAdminRoutes } from '@/features/audit/audit.routes'
 import { AREA_ACCESS } from '@/permissions'
 
 /**
@@ -22,6 +24,7 @@ const adminRoutes = [
   ...dashboardRoutes,
   // Nhóm "Vận hành kiểm soát"
   ...inspectionsAdminRoutes,
+  ...reportsAdminRoutes,
   // Nhóm "Danh mục thiết lập"
   ...organizationsAdminRoutes,
   ...criteriaAdminRoutes,
@@ -30,6 +33,7 @@ const adminRoutes = [
   ...rolesAdminRoutes,
   ...usersAdminRoutes,
   ...employeesAdminRoutes,
+  ...auditAdminRoutes,
 ]
 const qcRoutes = [...inspectionsMobileRoutes]
 

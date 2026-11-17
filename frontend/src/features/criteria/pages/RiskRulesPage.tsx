@@ -7,8 +7,8 @@ import { FrequencyCard } from '@/features/criteria/components/FrequencyCard'
 export function RiskRulesPage() {
   return (
     <PageContainer
-      title="Tần suất & nâng mức"
-      subtitle="Mỗi thay đổi là một phiên bản mới có ngày hiệu lực; phiên bản đã áp dụng không sửa được"
+      title="Tần suất & nâng mức ảnh hưởng"
+      subtitle="Kỳ đếm số lần lỗi của cùng tiêu chí tại cùng nhà hàng, và quy tắc nâng mức ảnh hưởng khi tái phạm"
     >
       <Flex vertical gap={16}>
         <FrequencyCard />

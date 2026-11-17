@@ -1,6 +1,7 @@
 import { Table, type TableProps } from 'antd'
 import type { SorterResult } from 'antd/es/table/interface'
 import { EmptyState } from '@/components/data-display/EmptyState'
+import { TableCard } from '@/components/data-display/TableCard'
 import { ErrorState } from '@/components/feedback/ErrorState'
 import { PAGE_SIZE_OPTIONS } from '@/constants/app.constants'
 import type { PageParams, PageResponse } from '@/types/common.types'
@@ -36,18 +37,7 @@ export function DataTable<T extends object>(props: DataTableProps<T>) {
   }
 
   return (
-    <div
-      style={{
-        background: 'rgba(255, 255, 255, 0.82)',
-        backdropFilter: 'blur(20px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-        borderRadius: 14,
-        border: '1px solid rgba(255, 255, 255, 0.65)',
-        boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.02)',
-        padding: '6px 14px 14px 14px',
-        overflow: 'hidden',
-      }}
-    >
+    <TableCard>
       <Table<T>
         rowKey={rowKey}
         columns={columns}
@@ -65,6 +55,6 @@ export function DataTable<T extends object>(props: DataTableProps<T>) {
           showTotal: (total) => `Tổng ${total}`,
         }}
       />
-    </div>
+    </TableCard>
   )
 }

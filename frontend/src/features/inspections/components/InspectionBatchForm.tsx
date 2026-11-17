@@ -5,11 +5,7 @@ import { useSession } from '@/features/auth'
 import { useCriterionGroups } from '@/features/criteria/hooks/useCriteria'
 import { useTemplates } from '@/features/criteria/hooks/useTemplates'
 import { useInspectionMutations, usePlans } from '@/features/inspections/hooks/useInspectionData'
-import {
-  INSPECTION_KIND_LABEL,
-  INSPECTION_MODE_LABEL,
-  type InspectionBatchCreateRequest,
-} from '@/features/inspections/inspection.types'
+import { INSPECTION_KIND_LABEL, INSPECTION_MODE_LABEL, type InspectionBatchCreateRequest } from '@/features/inspections/inspection.types'
 import { useOrgUnits } from '@/features/organizations/hooks/useOrganizations'
 import { useUsers } from '@/features/users/hooks/useUsers'
 import { useNotify } from '@/hooks/useNotify'
@@ -112,7 +108,11 @@ export function InspectionBatchForm({ onSuccess, onCancel }: Props) {
         <Input placeholder="VD: KT-202611" />
       </Form.Item>
 
-      <Form.Item name="planId" label="Kế hoạch kiểm tra (tuỳ chọn)">
+      <Form.Item
+        name="planId"
+        label={isPeriodic ? 'Kế hoạch kiểm tra (bắt buộc với định kỳ)' : 'Kế hoạch kiểm tra (tuỳ chọn)'}
+        rules={isPeriodic ? [{ required: true, message: 'Kiểm tra định kỳ bắt buộc chọn kế hoạch đã duyệt' }] : []}
+      >
         <Select
           allowClear
           placeholder="Chọn kế hoạch đã duyệt..."

@@ -44,6 +44,16 @@ class UserAccountService implements UserAccountApi {
                         u -> new UserSummary(u.getId(), u.getUsername(), u.getFullName(), u.isActive(), u.roleCodes())));
     }
 
+    @Override
+    public java.util.List<UserSummary> findActiveUsersByRoleIn(Collection<String> roleCodes) {
+        if (roleCodes == null || roleCodes.isEmpty()) {
+            return java.util.List.of();
+        }
+        return userRepository.findActiveWithRoleIn(roleCodes).stream()
+                .map(u -> new UserSummary(u.getId(), u.getUsername(), u.getFullName(), u.isActive(), u.roleCodes()))
+                .toList();
+    }
+
     private static UserAccount toAccount(User u) {
         return new UserAccount(u.getId(), u.getUsername(), u.getFullName(), u.getPasswordHash(), u.isActive(),
                 u.roleCodes(), u.permissionCodes());

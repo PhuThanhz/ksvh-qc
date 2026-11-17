@@ -1,5 +1,5 @@
 import { DownloadOutlined } from '@ant-design/icons'
-import { Button, Card, Flex, Segmented, Select } from 'antd'
+import { Button, Flex, Segmented, Select } from 'antd'
 import dayjs from 'dayjs'
 import { useCallback, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router'
@@ -8,7 +8,7 @@ import { PageContainer } from '@/components/layout/PageContainer'
 import { FindingActionModal, type FindingActionType } from '@/features/inspections/components/FindingActionModal'
 import { FindingDetailModal } from '@/features/inspections/components/FindingDetailModal'
 import { FindingTable } from '@/features/inspections/components/FindingTable'
-import { useFindings } from '@/features/inspections/hooks/useInspectionData'
+import { useFindings, usePendingReviews } from '@/features/inspections/hooks/useInspectionData'
 import type { FindingResponse, FindingStatus } from '@/features/inspections/inspection.types'
 import { useOrgUnits } from '@/features/organizations/hooks/useOrganizations'
 import { useListParams } from '@/hooks/useListParams'
@@ -18,17 +18,8 @@ import { formatDate } from '@/utils/format-date'
 interface Filters extends Record<string, unknown> {
   keyword?: string
   restaurantId?: number
-  status?: FindingStatus
+  status?: FindingStatus | 'PENDING_REVIEW'
 }
-
-const STATUS_TABS: { value: string; label: string }[] = [
-  { value: 'ALL', label: 'Tất cả' },
-  { value: 'OPEN', label: 'Chờ phản hồi' },
-  { value: 'APPEALED', label: 'Đang khiếu nại' },
-  { value: 'REMEDIATING', label: 'Đang khắc phục' },
-  { value: 'PENDING_VERIFICATION', label: 'Chờ nghiệm thu' },
-  { value: 'CLOSED', label: 'Đã đóng' },
-]
 
 export function FindingListPage() {
   const [searchParams] = useSearchParams()
@@ -40,8 +31,34 @@ export function FindingListPage() {
 
   const { params, filters, setFilter, onTableChange, resetFilters, activeFilterCount } =
     useListParams<Filters>(initialFilters)
-  const findings = useFindings(params)
+
+  const isPendingReviewTab = filters.status === 'PENDING_REVIEW'
+  const queryParams = useMemo(
+    () => ({ ...params, status: isPendingReviewTab ? undefined : (params.status as FindingStatus) }),
+    [params, isPendingReviewTab],
+  )
+  const findings = useFindings(queryParams)
+  const pendingReviews = usePendingReviews()
   const restaurants = useOrgUnits({ unitType: 'RESTAURANT', page: 0, size: 200, active: true })
+
+  const statusTabs = useMemo(
+    () => [
+      { value: 'ALL', label: 'Tất cả' },
+      {
+        value: 'PENDING_REVIEW',
+        label: pendingReviews.data?.length
+          ? `Chờ tôi thẩm định (${pendingReviews.data.length})`
+          : 'Chờ tôi thẩm định',
+      },
+      { value: 'OPEN', label: 'Chờ phản hồi' },
+      { value: 'APPEALED', label: 'Đang khiếu nại' },
+      { value: 'APPEAL_MEETING', label: 'Họp khiếu nại' },
+      { value: 'REMEDIATING', label: 'Đang khắc phục' },
+      { value: 'PENDING_VERIFICATION', label: 'Chờ nghiệm thu' },
+      { value: 'CLOSED', label: 'Đã đóng' },
+    ],
+    [pendingReviews.data],
+  )
 
   const [selectedFindingId, setSelectedFindingId] = useState<number | undefined>()
   const [actionState, setActionState] = useState<{
@@ -100,66 +117,65 @@ export function FindingListPage() {
         </Button>
       }
     >
-      <Card styles={{ body: { padding: '16px 20px' } }}>
-        <Flex vertical gap={16}>
-          {/* Thanh chuyển tab trạng thái nhanh (1-click lọc) */}
-          <Segmented
-            options={STATUS_TABS}
-            value={activeTab}
-            onChange={(val) => setFilter('status', val === 'ALL' ? undefined : (val as FindingStatus))}
-            style={{ width: 'fit-content', background: '#f1f5f9', padding: 3, borderRadius: 8 }}
+      <Flex vertical gap={16}>
+        <AdvancedFilter
+          top={
+            <Segmented
+              options={statusTabs}
+              value={activeTab}
+              onChange={(val) => setFilter('status', val === 'ALL' ? undefined : (val as FindingStatus))}
+              style={{ width: 'fit-content', background: 'var(--app-surface-sunken)', padding: 3, borderRadius: 8 }}
+            />
+          }
+          search={{
+            placeholder: 'Tìm kiếm mô tả lỗi, khiếu nại, khắc phục...',
+            value: filters.keyword,
+            onSearch,
+          }}
+          activeCount={activeFilterCount}
+          onReset={resetFilters}
+        >
+          <Select
+            placeholder="Nhà hàng"
+            allowClear
+            showSearch
+            value={filters.restaurantId}
+            onChange={(v) => setFilter('restaurantId', v)}
+            style={{ width: 240 }}
+            filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
+            options={restaurants.data?.items.map((r) => ({ value: r.id, label: `${r.code} - ${r.name}` }))}
           />
 
-          <AdvancedFilter
-            search={{
-              placeholder: 'Tìm kiếm mô tả lỗi, khiếu nại, khắc phục...',
-              value: filters.keyword,
-              onSearch,
-            }}
-            activeCount={activeFilterCount}
-            onReset={resetFilters}
-          >
-            <Select
-              placeholder="Nhà hàng"
-              allowClear
-              showSearch
-              value={filters.restaurantId}
-              onChange={(v) => setFilter('restaurantId', v)}
-              style={{ width: 240 }}
-              filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
-              options={restaurants.data?.items.map((r) => ({ value: r.id, label: `${r.code} - ${r.name}` }))}
-            />
-
-            <Select
-              placeholder="Trạng thái chi tiết"
-              allowClear
-              value={filters.status}
-              onChange={(v) => setFilter('status', v)}
-              style={{ width: 190 }}
-              options={[
-                { value: 'OPEN', label: 'Chờ phản hồi' },
-                { value: 'CONFIRMED', label: 'Đã xác nhận' },
-                { value: 'APPEALED', label: 'Đang khiếu nại' },
-                { value: 'REMEDIATING', label: 'Đang khắc phục' },
-                { value: 'PENDING_VERIFICATION', label: 'Chờ nghiệm thu' },
-                { value: 'CLOSED', label: 'Đã đóng (Đạt)' },
-                { value: 'DISMISSED', label: 'Đã huỷ bỏ' },
-              ]}
-            />
-          </AdvancedFilter>
-
-          <FindingTable
-            data={findings.data?.items}
-            loading={findings.isLoading}
-            currentPage={params.page}
-            pageSize={params.size}
-            totalItems={findings.data?.totalItems}
-            onPageChange={(p, s) => onTableChange({ page: p - 1, size: s })}
-            onAction={onTriggerAction}
-            onView={onViewDetail}
+          <Select
+            placeholder="Trạng thái chi tiết"
+            allowClear
+            value={filters.status}
+            onChange={(v) => setFilter('status', v)}
+            style={{ width: 190 }}
+            options={[
+              { value: 'OPEN', label: 'Chờ phản hồi' },
+              { value: 'CONFIRMED', label: 'Đã xác nhận' },
+              { value: 'APPEALED', label: 'Đang khiếu nại' },
+              { value: 'APPEAL_MEETING', label: 'Họp khiếu nại' },
+              { value: 'REMEDIATING', label: 'Đang khắc phục' },
+              { value: 'PENDING_VERIFICATION', label: 'Chờ nghiệm thu' },
+              { value: 'CLOSED', label: 'Đã đóng (Đạt)' },
+              { value: 'DISMISSED', label: 'Đã huỷ bỏ' },
+            ]}
           />
-        </Flex>
-      </Card>
+        </AdvancedFilter>
+
+        <FindingTable
+          data={isPendingReviewTab ? pendingReviews.data : findings.data?.items}
+          loading={isPendingReviewTab ? pendingReviews.isLoading : findings.isLoading}
+          currentPage={isPendingReviewTab ? 0 : params.page}
+          pageSize={isPendingReviewTab ? (pendingReviews.data?.length || 20) : params.size}
+          totalItems={isPendingReviewTab ? pendingReviews.data?.length : findings.data?.totalItems}
+          onPageChange={(p, s) => onTableChange({ page: p - 1, size: s })}
+          onAction={onTriggerAction}
+          onView={onViewDetail}
+        />
+      </Flex>
 
       <FindingActionModal
         open={actionState.open}

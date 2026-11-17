@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { PageContainer } from '@/components/layout/PageContainer'
+import { useNotify } from '@/components/feedback/useNotify'
+import { BatchCriterionModal } from '@/features/criteria/components/BatchCriterionModal'
+import { CriteriaExcelActions } from '@/features/criteria/components/CriteriaExcelActions'
 import { CriterionFormModal } from '@/features/criteria/components/CriterionFormModal'
 import { CriterionTab } from '@/features/criteria/components/CriterionTab'
-import type { Criterion } from '@/features/criteria/criteria.types'
+import type { Criterion, CriterionGroup } from '@/features/criteria/criteria.types'
 import { useCriterionGroups } from '@/features/criteria/hooks/useCriteria'
-import { CriteriaExcelActions } from '@/features/criteria/components/CriteriaExcelActions'
 
 export function CriteriaPage() {
+  const notify = useNotify()
   const [searchParams] = useSearchParams()
   const groupIdParam = searchParams.get('groupId')
   const initialGroupId = groupIdParam ? Number(groupIdParam) : undefined
@@ -18,7 +21,22 @@ export function CriteriaPage() {
     defaultGroupId?: number
   }>({ open: false })
 
+  const [batchModal, setBatchModal] = useState<{
+    open: boolean
+    group?: CriterionGroup
+  }>({ open: false })
+
   const groups = useCriterionGroups()
+
+  const handleOpenBatch = (groupId?: number) => {
+    const list = groups.data ?? []
+    if (list.length === 0) {
+      notify.warning('Chưa có nhóm tiêu chí nào. Vui lòng tạo nhóm tiêu chí trước!')
+      return
+    }
+    const targetGroup = (groupId ? list.find((g) => g.id === groupId) : undefined) ?? list[0]
+    setBatchModal({ open: true, group: targetGroup })
+  }
 
   return (
     <PageContainer
@@ -30,6 +48,7 @@ export function CriteriaPage() {
         key={`tab-${initialGroupId ?? 'all'}`}
         initialGroupId={initialGroupId}
         onCreateCriterion={(defaultGroupId) => setCriterionModal({ open: true, defaultGroupId })}
+        onBatchCreateCriterion={handleOpenBatch}
         onEditCriterion={(criterion) => setCriterionModal({ open: true, criterion })}
       />
       <CriterionFormModal
@@ -38,6 +57,12 @@ export function CriteriaPage() {
         groups={groups.data ?? []}
         defaultGroupId={criterionModal.defaultGroupId}
         onClose={() => setCriterionModal({ open: false })}
+      />
+      <BatchCriterionModal
+        open={batchModal.open}
+        group={batchModal.group}
+        groups={groups.data}
+        onClose={() => setBatchModal({ open: false, group: undefined })}
       />
     </PageContainer>
   )

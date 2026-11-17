@@ -59,12 +59,10 @@ export function OrgUnitTable({ onView, onEdit, onDelete, onFilterType, fixedUnit
             sorter: true,
             width: 170,
             render: (t: OrgUnitType) => {
-              const isRest = t === 'RESTAURANT'
               return (
                 <Space size={4} wrap>
                   <Tooltip title={onFilterType ? `Nhấp để lọc riêng ${ORG_UNIT_TYPE_LABEL[t]}` : undefined}>
                     <Tag
-                      color={isRest ? 'blue' : 'purple'}
                       style={{ cursor: onFilterType ? 'pointer' : 'default', fontWeight: 500 }}
                       onClick={onFilterType ? () => onFilterType(t) : undefined}
                     >

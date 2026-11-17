@@ -36,10 +36,13 @@ export interface AdvancedFilterProps {
 
   /** Trạng thái mở mặc định của panel nâng cao */
   defaultExpanded?: boolean
+
+  /** Nội dung đặt trên thanh chính, vd thanh chuyển tab trạng thái (Segmented) */
+  top?: ReactNode
 }
 
 /**
- * Component bộ lọc nâng cao dùng chung toàn hệ thống.
+ * Component bộ lọc nâng cao dùng chung toàn hệ thống — một khối riêng, đặt phía trên khối bảng (TableCard/DataTable).
  * Tích hợp tìm kiếm nhanh, bộ lọc mở rộng (collapsible panel), đếm số lượng bộ lọc (Badge),
  * và danh sách chip tag điều kiện lọc có thể xoá nhanh từng mục.
  */
@@ -53,24 +56,16 @@ export function AdvancedFilter({
   activeTags = [],
   extra,
   defaultExpanded = false,
+  top,
 }: AdvancedFilterProps) {
   const [expanded, setExpanded] = useState(defaultExpanded)
   const showReset = Boolean(onReset && activeCount > 0)
   const hasAdvanced = Boolean(advancedFilters)
 
   return (
-    <div
-      style={{
-        background: 'rgba(255, 255, 255, 0.82)',
-        backdropFilter: 'blur(20px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-        borderRadius: 14,
-        border: '1px solid rgba(255, 255, 255, 0.65)',
-        boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.02)',
-        padding: '14px 18px',
-      }}
-    >
+    <div className="glass-panel" style={{ padding: '14px 18px' }}>
       <Flex vertical gap={12}>
+        {top}
         {/* Thanh chính */}
       <Flex justify="space-between" align="center" gap={12} wrap>
         <Flex align="center" gap={8} wrap style={{ flex: 1, minWidth: 260 }}>
@@ -107,7 +102,7 @@ export function AdvancedFilter({
       {hasAdvanced && expanded && (
         <Card
           size="small"
-          styles={{ body: { padding: '12px 16px', backgroundColor: 'rgba(248, 250, 252, 0.7)', borderRadius: 8 } }}
+          styles={{ body: { padding: '12px 16px', backgroundColor: 'var(--app-surface-muted)', borderRadius: 8 } }}
         >
           <Flex vertical gap={12}>
             <Flex justify="space-between" align="center">
@@ -140,7 +135,6 @@ export function AdvancedFilter({
               closable
               onClose={tag.onClose}
               closeIcon={<CloseCircleOutlined />}
-              color="blue"
               style={{ borderRadius: 12, padding: '2px 8px' }}
             >
               {tag.label}

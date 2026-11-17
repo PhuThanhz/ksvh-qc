@@ -37,14 +37,22 @@ public final class RiskCalculator {
 
         boolean escalated = false;
         LocalDate last = null;
+        LocalDate resetCutoff = null;
         int countAtLast = 0;
         for (int i = 0; i < dates.size(); i++) {
             LocalDate d = dates.get(i);
             if (escalation != null && escalated && last != null
                     && cleanMonthsBetween(last, d) >= escalation.resetPeriodMonths()) {
                 escalated = false; // đủ kỳ hạ liên tục không lỗi → về mức gốc
+                resetCutoff = d;
             }
-            countAtLast = countInPeriod(dates.subList(0, i + 1), d, frequency);
+            LocalDate start = periodStart(d, frequency);
+            if (resetCutoff != null && resetCutoff.isAfter(start)) {
+                start = resetCutoff;
+            }
+            final LocalDate effectiveStart = start;
+            countAtLast = (int) dates.subList(0, i + 1).stream()
+                    .filter(dt -> !dt.isBefore(effectiveStart) && !dt.isAfter(d)).count();
             if (escalation != null && countAtLast >= escalation.thresholdCount()) {
                 escalated = true;
             }
@@ -56,18 +64,79 @@ public final class RiskCalculator {
             effective = Math.max(baseImpact, Math.min(baseImpact + escalation.stepIncrease(), escalation.maxImpact()));
         }
         int score = effective * countAtLast;
-        RiskBand band = bands.stream().filter(b -> b.contains(score)).findFirst().orElse(null);
+        RiskBand band = bands != null ? bands.stream().filter(b -> b.contains(score)).findFirst().orElse(null) : null;
         return new RiskAssessment(countAtLast, baseImpact, effective, escalated && effective > baseImpact, score, band,
                 periodStart(at, frequency));
     }
 
-    private static int countInPeriod(List<LocalDate> datesUpTo, LocalDate at, FrequencyRule rule) {
-        LocalDate start = periodStart(at, rule);
-        return (int) datesUpTo.stream().filter(d -> !d.isBefore(start) && !d.isAfter(at)).count();
+    /**
+     * Đánh giá mức rủi ro hiệu lực hiện tại của cặp (nhà hàng, tiêu chí) tính đến ngày {@code asOfDate}.
+     * Không thêm lần lỗi mới tại {@code asOfDate}.
+     */
+    public static CurrentCriterionRisk evaluateCurrentRisk(int baseImpact, List<LocalDate> occurrences, LocalDate asOfDate,
+                                                           FrequencyRule frequency, EscalationRule escalation, List<RiskBand> bands) {
+        List<LocalDate> dates = occurrences.stream().filter(d -> !d.isAfter(asOfDate)).sorted().toList();
+        LocalDate periodStart = periodStart(asOfDate, frequency);
+        if (dates.isEmpty()) {
+            RiskBand band = bands != null ? bands.stream().filter(b -> b.contains(baseImpact)).findFirst().orElse(null) : null;
+            return new CurrentCriterionRisk(baseImpact, baseImpact, false, 0, periodStart, null, null, 0, baseImpact, band);
+        }
+
+        boolean escalated = false;
+        LocalDate last = null;
+        LocalDate resetCutoff = null;
+        int countAtLast = 0;
+        for (int i = 0; i < dates.size(); i++) {
+            LocalDate d = dates.get(i);
+            if (escalation != null && escalated && last != null
+                    && cleanMonthsBetween(last, d) >= escalation.resetPeriodMonths()) {
+                escalated = false;
+                resetCutoff = d;
+            }
+            LocalDate start = periodStart(d, frequency);
+            if (resetCutoff != null && resetCutoff.isAfter(start)) {
+                start = resetCutoff;
+            }
+            final LocalDate effectiveStart = start;
+            countAtLast = (int) dates.subList(0, i + 1).stream()
+                    .filter(dt -> !dt.isBefore(effectiveStart) && !dt.isAfter(d)).count();
+            if (escalation != null && countAtLast >= escalation.thresholdCount()) {
+                escalated = true;
+            }
+            last = d;
+        }
+
+        long cleanMonths = last != null ? Math.max(0, cleanMonthsBetween(last, asOfDate)) : 0;
+        LocalDate expectedResetDate = null;
+        if (escalation != null && escalated && last != null) {
+            if (cleanMonths >= escalation.resetPeriodMonths()) {
+                escalated = false; // đã qua đủ số tháng sạch tính đến asOfDate
+                resetCutoff = asOfDate;
+            } else {
+                expectedResetDate = YearMonth.from(last).plusMonths(escalation.resetPeriodMonths() + 1L).atDay(1);
+            }
+        }
+
+        LocalDate effectiveStart = periodStart;
+        if (resetCutoff != null && resetCutoff.isAfter(effectiveStart)) {
+            effectiveStart = resetCutoff;
+        }
+        final LocalDate startCutoff = effectiveStart;
+        int frequencyInPeriod = (int) dates.stream().filter(d -> !d.isBefore(startCutoff) && !d.isAfter(asOfDate)).count();
+
+        int effective = baseImpact;
+        if (escalated && escalation != null) {
+            effective = Math.max(baseImpact, Math.min(baseImpact + escalation.stepIncrease(), escalation.maxImpact()));
+        }
+        int projectedScore = effective * (frequencyInPeriod > 0 ? frequencyInPeriod : 1);
+        RiskBand band = bands != null ? bands.stream().filter(b -> b.contains(projectedScore)).findFirst().orElse(null) : null;
+
+        return new CurrentCriterionRisk(baseImpact, effective, escalated && effective > baseImpact,
+                frequencyInPeriod, periodStart, last, expectedResetDate, cleanMonths, projectedScore, band);
     }
 
     /** Số tháng dương lịch trọn vẹn nằm giữa tháng của {@code from} và tháng của {@code to} (không tính hai đầu). */
-    static long cleanMonthsBetween(LocalDate from, LocalDate to) {
+    public static long cleanMonthsBetween(LocalDate from, LocalDate to) {
         return ChronoUnit.MONTHS.between(YearMonth.from(from), YearMonth.from(to)) - 1;
     }
 }

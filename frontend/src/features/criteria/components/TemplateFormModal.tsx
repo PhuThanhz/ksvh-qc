@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Button, Col, Flex, Form, Modal, Row, Select, Space, Spin, Transfer } from 'antd'
+import { Button, Col, Flex, Form, Modal, Row, Select, Space, Spin, Tag, Transfer } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { FormField } from '@/components/data-entry/FormField'
@@ -89,9 +89,18 @@ export function TemplateFormModal({ open, templateId, onClose }: TemplateFormMod
   )
 
   const groupOptions = useMemo(() => {
+    const counts = new Map<number, number>()
     const map = new Map<number, string>()
-    for (const c of all) if (c.groupId && c.groupName && !map.has(c.groupId)) map.set(c.groupId, c.groupName)
-    return Array.from(map.entries()).map(([value, label]) => ({ value, label }))
+    for (const c of all) {
+      if (c.groupId) {
+        counts.set(c.groupId, (counts.get(c.groupId) ?? 0) + 1)
+        if (c.groupName && !map.has(c.groupId)) map.set(c.groupId, c.groupName)
+      }
+    }
+    return Array.from(map.entries()).map(([value, label]) => ({
+      value,
+      label: `${label} (${counts.get(value) ?? 0} tiêu chí)`,
+    }))
   }, [all])
 
   const onSubmit = handleSubmit((v) => {
@@ -140,12 +149,8 @@ export function TemplateFormModal({ open, templateId, onClose }: TemplateFormMod
           {/* Nút submit ẩn: nhấn Enter trong ô nhập sẽ lưu (nút Lưu nằm ở footer, ngoài form). */}
           <button type="submit" hidden />
           <Row gutter={16}>
-            <Col xs={24} md={6}>
-              <FormInput control={control} name="code" label="Mã" required maxLength={30} />
-            </Col>
-            <Col xs={24} md={18}>
-              <FormInput control={control} name="name" label="Tên mẫu phiếu" required maxLength={200} />
-            </Col>
+            <Col xs={24} md={6}><FormInput control={control} name="code" label="Mã" required maxLength={30} /></Col>
+            <Col xs={24} md={18}><FormInput control={control} name="name" label="Tên mẫu phiếu" required maxLength={200} /></Col>
             <Col xs={24} md={12}>
               <FormSelect
                 control={control}
@@ -153,20 +158,15 @@ export function TemplateFormModal({ open, templateId, onClose }: TemplateFormMod
                 label="Công ty áp dụng"
                 placeholder="Dùng chung toàn hệ thống (mọi công ty)"
                 allowClear
+                showSearch={{ optionFilterProp: 'label' }}
                 options={companyOptions}
                 loading={companies.isLoading}
                 extra="Để trống nếu mẫu phiếu dùng chung cho toàn bộ các công ty"
               />
             </Col>
-            <Col xs={24} md={6}>
-              <FormInput control={control} name="inspectionType" label="Loại kiểm tra" maxLength={100} placeholder="VD: Định kỳ, Đột xuất" />
-            </Col>
-            <Col xs={24} md={18}>
-              <FormInput control={control} name="description" label="Mô tả" maxLength={500} />
-            </Col>
-            <Col xs={24} md={6}>
-              <FormSwitch control={control} name="active" label="Đang dùng" />
-            </Col>
+            <Col xs={24} md={6}><FormInput control={control} name="inspectionType" label="Loại kiểm tra" maxLength={100} placeholder="VD: Định kỳ, Đột xuất" /></Col>
+            <Col xs={24} md={18}><FormInput control={control} name="description" label="Mô tả" maxLength={500} /></Col>
+            <Col xs={24} md={6}><FormSwitch control={control} name="active" label="Đang dùng" /></Col>
             <Col span={24}>
               <FormField
                 control={control}
@@ -189,16 +189,21 @@ export function TemplateFormModal({ open, templateId, onClose }: TemplateFormMod
                   return (
                     <Flex vertical gap={8}>
                       <Flex align="center" justify="space-between" wrap="wrap" gap={8}>
-                        <Flex align="center" gap={8}>
-                          <span style={{ fontSize: 13, color: '#595959' }}>Lọc nhanh theo nhóm:</span>
+                        <Flex align="center" gap={8} wrap="wrap">
+                          <span style={{ fontSize: 13, color: 'var(--app-text-body)' }}>Lọc nhanh theo nhóm:</span>
                           <Select
                             placeholder="Tất cả nhóm"
                             allowClear
-                            style={{ width: 220 }}
+                            showSearch
+                            optionFilterProp="label"
+                            style={{ width: 260 }}
                             value={filterGroupId}
                             onChange={setFilterGroupId}
                             options={groupOptions}
                           />
+                          <Tag color={targetKeys.length > 0 ? 'blue' : 'default'} style={{ fontWeight: 600 }}>
+                            Đã chọn: {targetKeys.length} / {items.length} tiêu chí
+                          </Tag>
                         </Flex>
                         {filterGroupId && (
                           <Space size={8}>

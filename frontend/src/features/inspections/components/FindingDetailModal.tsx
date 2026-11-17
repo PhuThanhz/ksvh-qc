@@ -1,16 +1,12 @@
-import {
-  AuditOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  ExclamationCircleOutlined,
-  FileDoneOutlined,
-  FormOutlined,
-  RollbackOutlined,
-} from '@ant-design/icons'
-import { Card, Descriptions, Empty, Flex, Image, Modal, Space, Spin, Tag, Timeline, Typography } from 'antd'
-import type { ReactNode } from 'react'
+import { FilePdfOutlined } from '@ant-design/icons'
+import { Button, Card, Descriptions, Empty, Flex, Image, Modal, Space, Spin, Tag, Typography } from 'antd'
+import { useState } from 'react'
+import { FindingAppealReviewsCard } from '@/features/inspections/components/FindingAppealReviewsCard'
+import { FindingTimeline } from '@/features/inspections/components/FindingTimeline'
+import { FINDING_STATUS_TAG } from '@/features/inspections/finding.types'
 import { useFinding } from '@/features/inspections/hooks/useInspectionData'
-import type { FindingEventAction, FindingEventResponse, FindingStatus } from '@/features/inspections/inspection.types'
+import { reportApi } from '@/features/reports/api/report.api'
+import { useNotify } from '@/hooks/useNotify'
 import { formatDate } from '@/utils/format-date'
 import { parseMediaUrls, toMediaUrl } from '@/utils/media-url'
 
@@ -18,28 +14,6 @@ interface Props {
   open: boolean
   findingId?: number
   onClose: () => void
-}
-
-const STATUS_TAG: Record<FindingStatus, { color: string; label: string }> = {
-  OPEN: { color: 'warning', label: 'Chờ phản hồi' },
-  CONFIRMED: { color: 'blue', label: 'Đã xác nhận' },
-  APPEALED: { color: 'purple', label: 'Đang khiếu nại' },
-  REMEDIATING: { color: 'orange', label: 'Đang khắc phục' },
-  PENDING_VERIFICATION: { color: 'cyan', label: 'Chờ nghiệm thu' },
-  CLOSED: { color: 'success', label: 'Đã đóng' },
-  DISMISSED: { color: 'default', label: 'Đã huỷ bỏ' },
-}
-
-const ACTION_META: Record<FindingEventAction, { color: string; icon: ReactNode; label: string }> = {
-  CREATED: { color: 'blue', icon: <ExclamationCircleOutlined />, label: 'Phát hiện lỗi vi phạm' },
-  CONFIRMED: { color: 'blue', icon: <CheckCircleOutlined />, label: 'Xác nhận nhận lỗi' },
-  APPEALED: { color: 'purple', icon: <RollbackOutlined />, label: 'Gửi khiếu nại' },
-  APPEAL_UPHELD: { color: 'volcano', icon: <AuditOutlined />, label: 'Bác khiếu nại (Giữ nguyên lỗi)' },
-  APPEAL_DISMISSED: { color: 'green', icon: <CheckCircleOutlined />, label: 'Chấp nhận khiếu nại (Huỷ lỗi)' },
-  REMEDIATION_PLANNED: { color: 'orange', icon: <FormOutlined />, label: 'Lập kế hoạch khắc phục' },
-  REMEDIATION_SUBMITTED: { color: 'cyan', icon: <FileDoneOutlined />, label: 'Nộp bằng chứng khắc phục' },
-  VERIFY_PASSED: { color: 'green', icon: <CheckCircleOutlined />, label: 'Nghiệm thu đạt (Đóng lỗi)' },
-  VERIFY_FAILED: { color: 'red', icon: <CloseCircleOutlined />, label: 'Nghiệm thu không đạt' },
 }
 
 function EvidenceGallery({ urls, title }: { urls?: string | null; title: string }) {
@@ -61,7 +35,7 @@ function EvidenceGallery({ urls, title }: { urls?: string | null; title: string 
               loading="lazy"
               width={72}
               height={72}
-              style={{ objectFit: 'cover', borderRadius: 4, border: '1px solid #d9d9d9' }}
+              style={{ objectFit: 'cover', borderRadius: 4, border: '1px solid var(--app-border)' }}
             />
           ))}
         </Space>
@@ -72,51 +46,47 @@ function EvidenceGallery({ urls, title }: { urls?: string | null; title: string 
 
 export function FindingDetailModal({ open, findingId, onClose }: Props) {
   const { data: finding, isLoading } = useFinding(findingId)
+  const [downloadingPdf, setDownloadingPdf] = useState(false)
+  const notify = useNotify()
 
-  const renderTimeline = (history?: FindingEventResponse[]) => {
-    if (!history || history.length === 0) {
-      return <Empty description="Chưa có lịch sử thao tác" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+  const handleExportM4Pdf = async () => {
+    if (!finding?.id) return
+    setDownloadingPdf(true)
+    try {
+      const name = await reportApi.exportM4FindingPdf(finding.id)
+      notify.success(`Đã xuất biên bản ${name}`)
+    } catch {
+      notify.error('Không thể xuất biên bản vi phạm M4')
+    } finally {
+      setDownloadingPdf(false)
     }
-
-    return (
-      <Timeline
-        mode="left"
-        style={{ marginTop: 16 }}
-        items={history.map((e) => {
-          const meta = ACTION_META[e.action] || { color: 'gray', icon: null, label: e.action }
-          return {
-            color: meta.color,
-            dot: meta.icon,
-            children: (
-              <div style={{ marginBottom: 8 }}>
-                <Flex align="center" gap={8} wrap="wrap">
-                  <Typography.Text strong style={{ fontSize: 13 }}>{meta.label}</Typography.Text>
-                  {e.toStatus && <Tag color={STATUS_TAG[e.toStatus]?.color} style={{ margin: 0, fontSize: 11 }}>{STATUS_TAG[e.toStatus]?.label}</Tag>}
-                </Flex>
-                <div style={{ fontSize: 12, color: '#8c8c8c', marginTop: 2 }}>
-                  {formatDate(e.createdAt)} · {e.actorName || 'Hệ thống'}
-                </div>
-                {e.note && (
-                  <div style={{ fontSize: 12, color: '#434343', marginTop: 4, background: '#fafafa', padding: '4px 8px', borderRadius: 4 }}>
-                    {e.note}
-                  </div>
-                )}
-              </div>
-            ),
-          }
-        })}
-      />
-    )
   }
 
   return (
     <Modal
       open={open}
       title={
-        <Space>
-          <span>Chi tiết lỗi vi phạm #{finding?.id}</span>
-          {finding?.status && <Tag color={STATUS_TAG[finding.status]?.color}>{STATUS_TAG[finding.status]?.label}</Tag>}
-        </Space>
+        <Flex justify="space-between" align="center" style={{ paddingRight: 32 }}>
+          <Space>
+            <span>Chi tiết lỗi vi phạm #{finding?.id}</span>
+            {finding?.status && (
+              <Tag color={FINDING_STATUS_TAG[finding.status]?.color}>
+                {FINDING_STATUS_TAG[finding.status]?.label}
+              </Tag>
+            )}
+          </Space>
+          {finding?.riskLevelCode === 'M4' && (
+            <Button
+              danger
+              size="small"
+              icon={<FilePdfOutlined />}
+              loading={downloadingPdf}
+              onClick={handleExportM4Pdf}
+            >
+              Biên bản M4 (PDF)
+            </Button>
+          )}
+        </Flex>
       }
       onCancel={onClose}
       footer={null}
@@ -135,13 +105,13 @@ export function FindingDetailModal({ open, findingId, onClose }: Props) {
             <Descriptions.Item label="Tiêu chí" span={2}>
               <div>
                 <b>{finding.criterionName}</b>
-                <span style={{ color: '#8c8c8c', marginLeft: 8 }}>({finding.criterionCode})</span>
+                <span style={{ color: 'var(--app-text-secondary)', marginLeft: 8 }}>({finding.criterionCode})</span>
               </div>
             </Descriptions.Item>
             <Descriptions.Item label="Mức độ ảnh hưởng">
               Mức {finding.baseImpact}/5
               {finding.effectiveImpact != null && finding.effectiveImpact > finding.baseImpact && (
-                <Tag color="orange" style={{ marginLeft: 6 }}>
+                <Tag color="warning" style={{ marginLeft: 6 }}>
                   ▲ Nâng lên mức {finding.effectiveImpact}
                 </Tag>
               )}
@@ -188,6 +158,8 @@ export function FindingDetailModal({ open, findingId, onClose }: Props) {
             </Card>
           )}
 
+          <FindingAppealReviewsCard finding={finding} />
+
           {(finding.remediationPlan || finding.remediationEvidenceUrls) && (
             <Card size="small" title="Kế hoạch & Bằng chứng khắc phục">
               <Descriptions size="small" column={2}>
@@ -203,7 +175,7 @@ export function FindingDetailModal({ open, findingId, onClose }: Props) {
           )}
 
           <Card size="small" title="Lịch sử xử lý & Nhật ký chu trình">
-            {renderTimeline(finding.history)}
+            <FindingTimeline history={finding.history} />
           </Card>
         </Flex>
       ) : (

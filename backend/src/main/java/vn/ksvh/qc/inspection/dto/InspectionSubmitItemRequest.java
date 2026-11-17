@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotNull;
 import vn.ksvh.qc.inspection.domain.ItemResult;
 
 public record InspectionSubmitItemRequest(
+        Long itemId,
+
         @NotNull(message = "Thiếu ID tiêu chí")
         Long criterionId,
 
@@ -12,6 +14,11 @@ public record InspectionSubmitItemRequest(
 
         String comment,
 
-        String evidenceUrls
+        String evidenceUrls,
+
+        Long findingId
 ) {
+    public InspectionSubmitItemRequest(Long criterionId, ItemResult result, String comment, String evidenceUrls) {
+        this(null, criterionId, result, comment, evidenceUrls, null);
+    }
 }

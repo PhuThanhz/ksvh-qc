@@ -16,6 +16,7 @@ import vn.ksvh.qc.inspection.dto.PlanCreateRequest;
 import vn.ksvh.qc.inspection.dto.PlanRejectRequest;
 import vn.ksvh.qc.inspection.dto.PlanResponse;
 import vn.ksvh.qc.inspection.dto.PlanUpdateRequest;
+import vn.ksvh.qc.inspection.dto.PriorFindingsWarning;
 import vn.ksvh.qc.inspection.service.InspectionPlanService;
 import vn.ksvh.qc.security.CurrentUser;
 import vn.ksvh.qc.security.permission.PermissionCodes;
@@ -42,6 +43,14 @@ public class InspectionPlanController {
     @PreAuthorize("hasAnyAuthority('" + PermissionCodes.PLAN_READ + "')")
     public PlanResponse get(@PathVariable Long id) {
         return service.get(id);
+    }
+
+    @GetMapping("/restaurant-warnings")
+    @PreAuthorize("hasAnyAuthority('" + PermissionCodes.PLAN_READ + "', '" + PermissionCodes.PLAN_CREATE + "')")
+    public PriorFindingsWarning getRestaurantWarning(
+            @RequestParam Long restaurantId,
+            @RequestParam(required = false) java.time.LocalDate beforeDate) {
+        return service.getRestaurantWarning(restaurantId, beforeDate);
     }
 
     @PostMapping

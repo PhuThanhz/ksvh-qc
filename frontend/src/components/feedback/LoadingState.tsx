@@ -10,7 +10,7 @@ export function LoadingState({ tip = 'Đang tải…', fullScreen = false }: Loa
   return (
     <Flex vertical align="center" justify="center" gap={12} style={{ minHeight: fullScreen ? '100vh' : 240 }}>
       <Spin size="large" />
-      <span style={{ color: 'rgba(0,0,0,0.45)' }}>{tip}</span>
+      <span style={{ color: 'var(--app-text-secondary)' }}>{tip}</span>
     </Flex>
   )
 }

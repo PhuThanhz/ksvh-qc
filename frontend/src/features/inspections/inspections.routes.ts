@@ -31,6 +31,17 @@ export const inspectionsAdminRoutes: AppRoute[] = [
     lazy: () =>
       import('@/features/inspections/pages/admin/FindingListPage').then((m) => ({ Component: m.FindingListPage })),
   },
+  {
+    path: ROUTES.admin.riskProfiles,
+    handle: {
+      access: { anyOf: [PERMISSIONS.INSPECTION.READ_ALL, PERMISSIONS.INSPECTION.READ_OWN, PERMISSIONS.REPORT.READ] },
+      menu: { label: 'Hồ sơ rủi ro nhà hàng', icon: 'riskProfiles', group: 'operations' },
+    },
+    lazy: () =>
+      import('@/features/inspections/pages/admin/RestaurantRiskProfilePage').then((m) => ({
+        Component: m.RestaurantRiskProfilePage,
+      })),
+  },
 ]
 
 /** Màn hình điện thoại (/qc) của module phiếu chấm (inspection). */

@@ -1,4 +1,3 @@
-import { Card } from 'antd'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { CompanyTab } from '@/features/organizations/components/CompanyTab'
 
@@ -9,9 +8,7 @@ export function CompanyPage() {
       title="Công ty"
       subtitle="Danh mục công ty pháp nhân trong hệ thống"
     >
-      <Card>
-        <CompanyTab />
-      </Card>
+      <CompanyTab />
     </PageContainer>
   )
 }

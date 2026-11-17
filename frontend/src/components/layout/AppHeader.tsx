@@ -5,6 +5,8 @@ import {
 import { Button, Flex } from 'antd'
 import { useLocation } from 'react-router'
 import type { MenuEntry } from '@/components/layout/menu.types'
+import { CreateMenu } from '@/features/dashboard/components/CreateMenu'
+import { NotificationBell } from '@/features/notifications'
 
 export interface AppHeaderProps {
   collapsed?: boolean
@@ -27,9 +29,9 @@ export function AppHeader({ collapsed, onToggleSidebar, menu }: AppHeaderProps) 
             type="text"
             icon={
               collapsed ? (
-                <MenuUnfoldOutlined style={{ color: '#1d1d1f', fontSize: 16 }} />
+                <MenuUnfoldOutlined style={{ color: 'var(--app-on-dark)', fontSize: 16 }} />
               ) : (
-                <MenuFoldOutlined style={{ color: '#1d1d1f', fontSize: 16 }} />
+                <MenuFoldOutlined style={{ color: 'var(--app-on-dark)', fontSize: 16 }} />
               )
             }
             onClick={onToggleSidebar}
@@ -38,9 +40,9 @@ export function AppHeader({ collapsed, onToggleSidebar, menu }: AppHeaderProps) 
               width: 32,
               height: 32,
               borderRadius: 8,
-              background: 'rgba(255, 255, 255, 0.5)',
+              background: 'var(--app-on-dark-glass)',
               backdropFilter: 'blur(8px)',
-              border: '1px solid rgba(255, 255, 255, 0.7)',
+              border: '1px solid var(--app-on-dark-glass-border)',
             }}
           />
         )}
@@ -49,15 +51,20 @@ export function AppHeader({ collapsed, onToggleSidebar, menu }: AppHeaderProps) 
           <Flex align="center" gap={6} style={{ fontSize: 13.5, userSelect: 'none' }}>
             {activeEntry.group && (
               <>
-                <span style={{ color: 'rgba(29, 29, 31, 0.65)', fontWeight: 500 }}>{activeEntry.group}</span>
-                <span style={{ color: 'rgba(29, 29, 31, 0.35)' }}>/</span>
+                <span style={{ color: 'var(--app-on-dark-secondary)', fontWeight: 500 }}>{activeEntry.group}</span>
+                <span style={{ color: 'var(--app-on-dark-faint)' }}>/</span>
               </>
             )}
-            <span style={{ color: '#1d1d1f', fontWeight: 600 }}>
+            <span style={{ color: 'var(--app-on-dark)', fontWeight: 600 }}>
               {activeEntry.label}
             </span>
           </Flex>
         )}
+      </Flex>
+
+      <Flex align="center" gap={10}>
+        <NotificationBell />
+        <CreateMenu />
       </Flex>
     </Flex>
   )

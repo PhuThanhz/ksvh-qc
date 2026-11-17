@@ -105,20 +105,20 @@ public class DashboardService {
     private List<MonthPoint> trend(LocalDate periodStart, LocalDate monthStart) {
         Map<String, Long> inspMap = new HashMap<>();
         jdbc.query("""
-                SELECT DATE_FORMAT(submitted_at, '%Y-%m') AS ym, COUNT(*) AS cnt
+                SELECT to_char(submitted_at, 'YYYY-MM') AS ym, COUNT(*) AS cnt
                 FROM inspections
                 WHERE DATE(submitted_at) >= ?
-                GROUP BY DATE_FORMAT(submitted_at, '%Y-%m')
+                GROUP BY to_char(submitted_at, 'YYYY-MM')
                 """, rs -> {
             inspMap.put(rs.getString("ym"), rs.getLong("cnt"));
         }, Date.valueOf(periodStart));
 
         Map<String, Long> findMap = new HashMap<>();
         jdbc.query("""
-                SELECT DATE_FORMAT(created_at, '%Y-%m') AS ym, COUNT(*) AS cnt
+                SELECT to_char(created_at, 'YYYY-MM') AS ym, COUNT(*) AS cnt
                 FROM findings
                 WHERE DATE(created_at) >= ?
-                GROUP BY DATE_FORMAT(created_at, '%Y-%m')
+                GROUP BY to_char(created_at, 'YYYY-MM')
                 """, rs -> {
             findMap.put(rs.getString("ym"), rs.getLong("cnt"));
         }, Date.valueOf(periodStart));
@@ -183,7 +183,7 @@ public class DashboardService {
                     COALESCE(SUM(CASE WHEN ii.result = 'PASS' THEN ii.base_impact ELSE 0 END), 0) AS pass_weight,
                     COALESCE(SUM(CASE WHEN ii.result = 'FAIL' THEN ii.base_impact ELSE 0 END), 0) AS fail_weight
                 FROM org_units u
-                LEFT JOIN inspections i ON i.restaurant_id = u.id AND i.status = 'COMPLETED' AND DATE(i.submitted_at) >= ?
+                LEFT JOIN inspections i ON i.restaurant_id = u.id AND i.status IN ('COMPLETED', 'AWAITING_ACK') AND DATE(i.submitted_at) >= ?
                 LEFT JOIN inspection_items ii ON ii.inspection_id = i.id
                 WHERE u.unit_type = 'RESTAURANT' AND u.active = true
                 GROUP BY u.id, u.code, u.name

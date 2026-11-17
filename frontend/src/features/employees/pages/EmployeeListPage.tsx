@@ -1,5 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons'
-import { Button, Card, Flex, Space } from 'antd'
+import { Button, Flex, Space } from 'antd'
 import { useCallback, useMemo, useState } from 'react'
 import { AdvancedFilter, type FilterTagItem } from '@/components/data-entry/AdvancedFilter'
 import { ActiveFilter } from '@/components/data-entry/ActiveFilter'
@@ -88,40 +88,38 @@ export function EmployeeListPage() {
         </Space>
       }
     >
-      <Card>
-        <Flex vertical gap={16}>
-          <AdvancedFilter
-            search={{ value: filters.keyword ?? '', placeholder: 'Tìm theo mã, họ tên, SĐT, email', onSearch }}
-            activeCount={activeFilterCount}
-            onReset={resetFilters}
-            activeTags={activeTags}
-          >
-            <OrgUnitPicker
-              style={{ minWidth: 240 }}
-              value={filters.orgUnitId}
-              onChange={(v) => setFilter('orgUnitId', v ?? undefined)}
-              includeInactive
-            />
-            <ActiveFilter
-              value={filters.active}
-              onChange={(v) => setFilter('active', v)}
-              activeLabel="Đang làm việc"
-              inactiveLabel="Nghỉ việc"
-            />
-          </AdvancedFilter>
-          <EmployeeTable
-            data={employees.data}
-            loading={employees.isFetching}
-            error={employees.error}
-            onRetry={() => void employees.refetch()}
-            params={params}
-            onParamsChange={onTableChange}
-            onView={setViewing}
-            onEdit={(employee) => setEditing({ open: true, employee })}
-            onDelete={onDelete}
+      <Flex vertical gap={16}>
+        <AdvancedFilter
+          search={{ value: filters.keyword ?? '', placeholder: 'Tìm theo mã, họ tên, SĐT, email', onSearch }}
+          activeCount={activeFilterCount}
+          onReset={resetFilters}
+          activeTags={activeTags}
+        >
+          <OrgUnitPicker
+            style={{ minWidth: 240 }}
+            value={filters.orgUnitId}
+            onChange={(v) => setFilter('orgUnitId', v ?? undefined)}
+            includeInactive
           />
-        </Flex>
-      </Card>
+          <ActiveFilter
+            value={filters.active}
+            onChange={(v) => setFilter('active', v)}
+            activeLabel="Đang làm việc"
+            inactiveLabel="Nghỉ việc"
+          />
+        </AdvancedFilter>
+        <EmployeeTable
+          data={employees.data}
+          loading={employees.isFetching}
+          error={employees.error}
+          onRetry={() => void employees.refetch()}
+          params={params}
+          onParamsChange={onTableChange}
+          onView={setViewing}
+          onEdit={(employee) => setEditing({ open: true, employee })}
+          onDelete={onDelete}
+        />
+      </Flex>
       <EmployeeFormModal open={editing.open} employee={editing.employee} onClose={() => setEditing({ open: false })} />
       <EmployeeDetailModal
         open={Boolean(viewing)}

@@ -13,4 +13,7 @@ public interface FrequencyConfigRepository extends JpaRepository<FrequencyConfig
     boolean existsByEffectiveFrom(LocalDate date);
 
     Optional<FrequencyConfig> findFirstByEffectiveFromLessThanEqualOrderByEffectiveFromDesc(LocalDate date);
+
+    /** Phiên bản có hiệu lực ngay trước ngày date (không tính bản đúng ngày date). */
+    Optional<FrequencyConfig> findFirstByEffectiveFromLessThanOrderByEffectiveFromDesc(LocalDate date);
 }

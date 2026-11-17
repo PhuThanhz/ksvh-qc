@@ -31,7 +31,6 @@ export type TemplatePayload = Omit<Schemas['TemplateRequest'], 'companyId'> & {
 }
 export type TemplateOption = Schemas['TemplateOption']
 export type RiskLevel = Schemas['RiskLevelItem']
-export type RiskPreview = Schemas['RiskPreviewResponse']
 export type RiskLevelVersion = Schemas['RiskLevelVersionResponse']
 export type RiskLevelVersionPayload = Schemas['RiskLevelVersionRequest']
 export type FrequencyConfig = Schemas['FrequencyConfigResponse']

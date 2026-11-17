@@ -48,11 +48,11 @@ export function LoginPage() {
           })
         }
       />
-      <div style={{ marginTop: 20, padding: '12px 14px', background: '#f8fafc', borderRadius: 10, border: '1px solid #e2e8f0', fontSize: 13 }}>
+      <div style={{ marginTop: 20, padding: '12px 14px', background: 'var(--app-surface-muted)', borderRadius: 10, border: '1px solid var(--app-border)', fontSize: 13 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-          <span style={{ fontWeight: 600, color: '#1e293b' }}>Chọn tài khoản để đăng nhập nhanh:</span>
-          <span style={{ fontSize: 11, color: '#10b981', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
+          <span style={{ fontWeight: 600, color: 'var(--app-text)' }}>Chọn tài khoản để đăng nhập nhanh:</span>
+          <span style={{ fontSize: 11, color: 'var(--app-success)', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--app-success)', display: 'inline-block' }} />
             MySQL 8.4
           </span>
         </div>
@@ -65,8 +65,8 @@ export function LoginPage() {
             onClick={() => handleQuickLogin('admin', 'Admin@123')}
             style={{ textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: 8, height: 38 }}
           >
-            <span><strong style={{ color: '#0f172a' }}>Quản trị hệ thống</strong> <span style={{ color: '#64748b', fontSize: 12 }}>(admin)</span></span>
-            <span style={{ color: '#94a3b8', fontSize: 12, fontFamily: 'monospace' }}>Admin@123</span>
+            <span><strong style={{ color: 'var(--app-text)' }}>Quản trị hệ thống</strong> <span style={{ color: 'var(--app-text-secondary)', fontSize: 12 }}>(admin)</span></span>
+            <span style={{ color: 'var(--app-text-muted)', fontSize: 12, fontFamily: 'monospace' }}>Admin@123</span>
           </Button>
           <Button
             size="middle"
@@ -76,8 +76,8 @@ export function LoginPage() {
             onClick={() => handleQuickLogin('inspector', 'Inspector@123')}
             style={{ textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: 8, height: 38 }}
           >
-            <span><strong style={{ color: '#10b981' }}>Chuyên viên KSVH</strong> <span style={{ color: '#64748b', fontSize: 12 }}>(inspector)</span></span>
-            <span style={{ color: '#94a3b8', fontSize: 12, fontFamily: 'monospace' }}>Inspector@123</span>
+            <span><strong style={{ color: 'var(--app-success)' }}>Chuyên viên KSVH</strong> <span style={{ color: 'var(--app-text-secondary)', fontSize: 12 }}>(inspector)</span></span>
+            <span style={{ color: 'var(--app-text-muted)', fontSize: 12, fontFamily: 'monospace' }}>Inspector@123</span>
           </Button>
           <Button
             size="middle"
@@ -87,8 +87,8 @@ export function LoginPage() {
             onClick={() => handleQuickLogin('store', 'Store@123')}
             style={{ textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: 8, height: 38 }}
           >
-            <span><strong style={{ color: '#f59e0b' }}>Cửa hàng trưởng</strong> <span style={{ color: '#64748b', fontSize: 12 }}>(store)</span></span>
-            <span style={{ color: '#94a3b8', fontSize: 12, fontFamily: 'monospace' }}>Store@123</span>
+            <span><strong style={{ color: 'var(--app-warning)' }}>Cửa hàng trưởng</strong> <span style={{ color: 'var(--app-text-secondary)', fontSize: 12 }}>(store)</span></span>
+            <span style={{ color: 'var(--app-text-muted)', fontSize: 12, fontFamily: 'monospace' }}>Store@123</span>
           </Button>
         </div>
       </div>

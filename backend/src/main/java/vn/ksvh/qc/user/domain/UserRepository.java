@@ -17,4 +17,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     /** Số tài khoản đang hoạt động có vai trò roleCode. */
     @Query("select count(distinct u) from User u join u.roles r where u.active = true and r.code = :roleCode")
     long countActiveWithRole(String roleCode);
+
+    @Query("select distinct u from User u join u.roles r where u.active = true and r.code in :roleCodes")
+    java.util.List<User> findActiveWithRoleIn(@org.springframework.data.repository.query.Param("roleCodes") java.util.Collection<String> roleCodes);
 }

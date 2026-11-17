@@ -1,4 +1,4 @@
-import { Card, Tabs } from 'antd'
+import { Tabs } from 'antd'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { CompanyTab } from '@/features/organizations/components/CompanyTab'
 import { OrgUnitTab } from '@/features/organizations/components/OrgUnitTab'
@@ -12,29 +12,27 @@ export function OrganizationPage() {
       subtitle="Quản lý danh mục nhà hàng, phòng ban và công ty trực thuộc"
       extra={<OrganizationExcelActions />}
     >
-      <Card>
-        <Tabs
-          defaultActiveKey="restaurants"
-          destroyOnHidden
-          items={[
-            {
-              key: 'restaurants',
-              label: 'Nhà hàng',
-              children: <OrgUnitTab fixedUnitType="RESTAURANT" />,
-            },
-            {
-              key: 'departments',
-              label: 'Phòng ban',
-              children: <OrgUnitTab fixedUnitType="DEPARTMENT" />,
-            },
-            {
-              key: 'companies',
-              label: 'Công ty',
-              children: <CompanyTab />,
-            },
-          ]}
-        />
-      </Card>
+      <Tabs
+        defaultActiveKey="restaurants"
+        destroyOnHidden
+        items={[
+          {
+            key: 'restaurants',
+            label: 'Nhà hàng',
+            children: <OrgUnitTab fixedUnitType="RESTAURANT" />,
+          },
+          {
+            key: 'departments',
+            label: 'Phòng ban',
+            children: <OrgUnitTab fixedUnitType="DEPARTMENT" />,
+          },
+          {
+            key: 'companies',
+            label: 'Công ty',
+            children: <CompanyTab />,
+          },
+        ]}
+      />
     </PageContainer>
   )
 }

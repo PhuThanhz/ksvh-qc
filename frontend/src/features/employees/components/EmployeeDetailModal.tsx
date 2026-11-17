@@ -29,7 +29,7 @@ export function EmployeeDetailModal({ open, employee, onClose, onEdit }: Employe
     { label: 'Email', value: employee.email ?? '—' },
     {
       label: 'Tài khoản người dùng',
-      value: employee.username ? <Tag color="blue">{employee.username}</Tag> : 'Chưa liên kết',
+      value: employee.username ? <Tag>{employee.username}</Tag> : 'Chưa liên kết',
     },
     {
       label: 'Trạng thái',

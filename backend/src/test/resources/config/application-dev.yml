@@ -1,0 +1,5 @@
+# Chỉ có trên classpath khi chạy test; ghi đè application-dev.yml của ứng dụng.
+# Test tự tạo dữ liệu của mình, không nạp dữ liệu mẫu dev (db/dev-seed/sample_data.sql).
+app:
+  seed:
+    sample-data: false

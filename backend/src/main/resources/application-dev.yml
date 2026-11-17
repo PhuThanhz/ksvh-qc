@@ -17,6 +17,8 @@ app:
         - http://localhost:5273
         - https://localhost:5273
   seed:
+    # Nạp dữ liệu mẫu (công ty, nhà hàng, nhân viên, nhóm/tiêu chí ví dụ) khi DB còn trống. Test tắt mục này.
+    sample-data: true
     users:
       # Mỗi vai trò một tài khoản thử (docs/DOMAIN_SPEC.md §2). Chỉ tạo nếu username chưa tồn tại.
       - { username: admin, password: Admin@123, full-name: Quản trị hệ thống Demo, roles: [SYSTEM_ADMIN] }

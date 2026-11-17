@@ -4,8 +4,9 @@ import { useNavigate } from 'react-router'
 import { useSession } from '@/features/auth'
 import { FindingActionModal, type FindingActionType } from '@/features/inspections/components/FindingActionModal'
 import { InspectionFormModal } from '@/features/inspections/components/InspectionFormModal'
+import { AckInspectionList } from '@/features/inspections/components/mobile/AckInspectionList'
 import { MobileFindingCard } from '@/features/inspections/components/mobile/MobileFindingCard'
-import { useFindings, useMyTasks } from '@/features/inspections/hooks/useInspectionData'
+import { useFindings, useMyTasks, usePendingReviews } from '@/features/inspections/hooks/useInspectionData'
 import type { FindingResponse } from '@/features/inspections/inspection.types'
 import { INSPECTION_KIND_LABEL, INSPECTION_MODE_LABEL } from '@/features/inspections/inspection.types'
 import { PERMISSIONS, usePermission } from '@/permissions'
@@ -26,6 +27,7 @@ export function InspectionHomePage() {
 
   const { data: tasks, isLoading: loadingTasks, refetch: refetchTasks } = useMyTasks()
   const { data: findingsPage, isLoading: loadingFindings, refetch: refetchFindings } = useFindings({ page: 0, size: 50 })
+  const { data: pendingReviews, refetch: refetchReviews } = usePendingReviews()
 
   const [createModal, setCreateModal] = useState(false)
   const [actionState, setActionState] = useState<{ open: boolean; action?: FindingActionType; finding?: FindingResponse }>({ open: false })
@@ -39,13 +41,14 @@ export function InspectionHomePage() {
   const handleRefresh = () => {
     void refetchTasks()
     void refetchFindings()
+    void refetchReviews()
   }
 
   return (
     <Space direction="vertical" block style={{ padding: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <div style={{ fontSize: 13, color: '#8c8c8c' }}>{roleTitle}</div>
+          <div style={{ fontSize: 13, color: 'var(--app-text-secondary)' }}>{roleTitle}</div>
           <div style={{ fontSize: 18, fontWeight: 700 }}>{user?.fullName}</div>
         </div>
         <Button size="small" fill="outline" onClick={handleRefresh}>Làm mới</Button>
@@ -60,6 +63,39 @@ export function InspectionHomePage() {
             { label: `Lỗi xử lý (${findingsPage?.totalItems ?? 0})`, value: 'findings' },
           ]}
         />
+      )}
+
+      {pendingReviews && pendingReviews.length > 0 && (
+        <Card style={{ borderRadius: 12, background: 'var(--app-warning-bg)', border: '1px solid var(--app-border-warning)' }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--app-warning)' }}>
+            Yêu cầu thẩm định khiếu nại ({pendingReviews.length})
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+            {pendingReviews.map((f) => (
+              <div key={f.id} style={{ background: 'var(--app-surface)', padding: 10, borderRadius: 8 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: 600, fontSize: 13 }}>#{f.id} · {f.restaurantName}</span>
+                  <Tag color="warning">Chờ thẩm định</Tag>
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--app-text)', marginTop: 2 }}>{f.criterionName}</div>
+                {f.appealReason && (
+                  <div style={{ fontSize: 11, color: 'var(--app-text-secondary)', marginTop: 4 }}>
+                    Khiếu nại: {f.appealReason}
+                  </div>
+                )}
+                <Button
+                  block
+                  color="warning"
+                  size="small"
+                  style={{ marginTop: 8 }}
+                  onClick={() => onOpenAction(f, 'SUBMIT_REVIEW')}
+                >
+                  Thẩm định khiếu nại
+                </Button>
+              </div>
+            ))}
+          </div>
+        </Card>
       )}
 
       {tab === 'tasks' && (
@@ -83,12 +119,12 @@ export function InspectionHomePage() {
                     {t.status === 'IN_PROGRESS' ? 'Đang chấm' : 'Được giao'}
                   </Tag>
                 </div>
-                <div style={{ fontSize: 14, fontWeight: 500, color: '#262626' }}>{t.restaurantName}</div>
-                <div style={{ fontSize: 12, color: '#8c8c8c', marginTop: 4 }}>
+                <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--app-text)' }}>{t.restaurantName}</div>
+                <div style={{ fontSize: 12, color: 'var(--app-text-secondary)', marginTop: 4 }}>
                   {INSPECTION_KIND_LABEL[t.inspectionType]} · {INSPECTION_MODE_LABEL[t.inspectionMode]}
                   {t.topicNames.length > 0 ? ` · ${t.topicNames.join(', ')}` : t.templateName ? ` · ${t.templateName}` : ''}
                 </div>
-                <div style={{ fontSize: 12, color: '#8c8c8c', marginTop: 2 }}>
+                <div style={{ fontSize: 12, color: 'var(--app-text-secondary)', marginTop: 2 }}>
                   Ngày tạo: {formatDate(t.createdAt)}
                 </div>
                 <Button
@@ -112,6 +148,7 @@ export function InspectionHomePage() {
 
       {tab === 'findings' && (
         <>
+          {canRespond && <AckInspectionList />}
           <div style={{ fontSize: 15, fontWeight: 600 }}>
             Lỗi vi phạm tại nhà hàng ({findingsPage?.totalItems ?? 0})
           </div>

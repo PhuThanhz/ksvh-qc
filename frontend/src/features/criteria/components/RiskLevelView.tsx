@@ -1,40 +1,30 @@
 import { Table, Typography } from 'antd'
-import { SeverityTag } from '@/components/data-display/SeverityTag'
 import type { RiskLevel } from '@/features/criteria/criteria.types'
 
 const fmt = (n: number) => n.toLocaleString('vi-VN')
 
-/** Bảng mức rủi ro chỉ xem: mức (theo độ nghiêm trọng), khoảng điểm, hạn khắc phục, hành động. */
+/** Bảng mức rủi ro (chỉ xem): khoảng điểm [min, max), hạn khắc phục, hành động bắt buộc. */
 export function RiskLevelView({ levels }: { levels: readonly RiskLevel[] }) {
   return (
     <Table<RiskLevel>
       rowKey="code"
-      size="middle"
+      size="small"
       pagination={false}
       dataSource={[...levels]}
       columns={[
-        {
-          title: 'Mức rủi ro',
-          key: 'level',
-          width: 220,
-          render: (_, l, i) => <SeverityTag code={l.code} name={l.name} index={i} total={levels.length} />,
-        },
+        { title: 'Mã', dataIndex: 'code', width: 80, render: (c: string) => <strong>{c}</strong> },
+        { title: 'Mức rủi ro', dataIndex: 'name', width: 160 },
         {
           title: 'Khoảng điểm',
           key: 'range',
-          width: 180,
-          render: (_, l) =>
-            l.maxScore == null ? (
-              <span>từ <b>{fmt(l.minScore)}</b> trở lên</span>
-            ) : (
-              <span>từ <b>{fmt(l.minScore)}</b> đến dưới <b>{fmt(l.maxScore)}</b></span>
-            ),
+          width: 200,
+          render: (_, l) => (l.maxScore == null ? `Từ ${fmt(l.minScore)} trở lên` : `${fmt(l.minScore)} – dưới ${fmt(l.maxScore)}`),
         },
         {
           title: 'Hạn khắc phục',
           dataIndex: 'remediationDays',
           width: 140,
-          render: (d: number) => <b>{d} ngày</b>,
+          render: (d: number) => (d === 0 ? 'Xử lý ngay' : `${d} ngày`),
         },
         {
           title: 'Hành động bắt buộc',

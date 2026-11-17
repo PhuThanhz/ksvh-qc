@@ -18,6 +18,8 @@ import vn.ksvh.qc.security.permission.PermissionCodes;
 import vn.ksvh.qc.shared.web.ApiPaths;
 import vn.ksvh.qc.shared.web.PageResponse;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(ApiPaths.V1 + "/findings")
 @RequiredArgsConstructor
@@ -37,10 +39,30 @@ public class FindingController {
         return service.search(keyword, restaurantId, inspectionId, status, pageable, CurrentUser.from(jwt));
     }
 
+    @GetMapping("/pending-reviews")
+    @PreAuthorize("hasAnyAuthority('" + PermissionCodes.FINDING_REVIEW_APPEAL + "')")
+    public List<FindingResponse> getPendingReviews(@AuthenticationPrincipal Jwt jwt) {
+        return service.getPendingReviews(CurrentUser.from(jwt));
+    }
+
+    @GetMapping("/verification-candidates")
+    @PreAuthorize("hasAnyAuthority('" + PermissionCodes.PLAN_CREATE + "', '" + PermissionCodes.INSPECTION_PERFORM + "', '" + PermissionCodes.INSPECTION_READ_ALL + "', '" + PermissionCodes.INSPECTION_READ_OWN + "', '" + PermissionCodes.FINDING_VERIFY + "')")
+    public List<CandidateFindingResponse> getVerificationCandidates(@RequestParam Long restaurantId,
+                                                                   @AuthenticationPrincipal Jwt jwt) {
+        return service.listCandidatesForVerification(restaurantId, CurrentUser.from(jwt));
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('" + PermissionCodes.INSPECTION_READ_ALL + "', '" + PermissionCodes.INSPECTION_READ_OWN + "', '" + PermissionCodes.FINDING_RESPOND + "', '" + PermissionCodes.FINDING_VERIFY + "')")
     public FindingResponse get(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
         return service.get(id, CurrentUser.from(jwt));
+    }
+
+    @GetMapping("/{id}/candidate-reviewers")
+    @PreAuthorize("hasAnyAuthority('" + PermissionCodes.FINDING_RESPOND + "', '" + PermissionCodes.INSPECTION_READ_ALL + "', '" + PermissionCodes.INSPECTION_READ_OWN + "')")
+    public List<CandidateReviewerResponse> getCandidateReviewers(@PathVariable Long id,
+                                                                 @AuthenticationPrincipal Jwt jwt) {
+        return service.getCandidateReviewers(id, CurrentUser.from(jwt));
     }
 
     @PostMapping("/{id}/confirm")
@@ -54,6 +76,13 @@ public class FindingController {
     public FindingResponse appeal(@PathVariable Long id, @Valid @RequestBody FindingAppealRequest req,
                                   @AuthenticationPrincipal Jwt jwt) {
         return service.appeal(id, req, CurrentUser.from(jwt));
+    }
+
+    @PostMapping("/{id}/appeal-reviews")
+    @PreAuthorize("hasAnyAuthority('" + PermissionCodes.FINDING_REVIEW_APPEAL + "')")
+    public FindingResponse submitAppealReview(@PathVariable Long id, @Valid @RequestBody AppealReviewRequest req,
+                                              @AuthenticationPrincipal Jwt jwt) {
+        return service.submitAppealReview(id, req, CurrentUser.from(jwt));
     }
 
     @PostMapping("/{id}/conclude-appeal")

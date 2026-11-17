@@ -67,6 +67,7 @@ export function TableActions({
       <span>
         <Button
           type="text"
+          className="action-btn action-btn-edit"
           icon={<EditOutlined />}
           aria-label={aria(editLabel)}
           disabled={isEditDisabled}
@@ -81,7 +82,7 @@ export function TableActions({
       <span>
         <Button
           type="text"
-          danger
+          className="action-btn action-btn-delete"
           icon={<DeleteOutlined />}
           aria-label={aria(deleteLabel)}
           disabled={isDeleteDisabled}
@@ -91,19 +92,25 @@ export function TableActions({
     </Tooltip>
   )
 
+  const renderViewBtn = () => (
+    <Tooltip title={viewLabel}>
+      <Button
+        type="text"
+        className="action-btn action-btn-view"
+        icon={<EyeOutlined />}
+        aria-label={aria(viewLabel)}
+        onClick={onView}
+      />
+    </Tooltip>
+  )
+
   return (
-    <Space size={4} wrap={false}>
+    <Space size={6} wrap={false}>
       {onView &&
         (viewAccess ? (
-          <ProtectedAction access={viewAccess}>
-            <Tooltip title={viewLabel}>
-              <Button type="text" icon={<EyeOutlined />} aria-label={aria(viewLabel)} onClick={onView} />
-            </Tooltip>
-          </ProtectedAction>
+          <ProtectedAction access={viewAccess}>{renderViewBtn()}</ProtectedAction>
         ) : (
-          <Tooltip title={viewLabel}>
-            <Button type="text" icon={<EyeOutlined />} aria-label={aria(viewLabel)} onClick={onView} />
-          </Tooltip>
+          renderViewBtn()
         ))}
 
       {onEdit &&

@@ -1,4 +1,7 @@
 import type {
+  AppealReviewRequest,
+  CandidateFindingResponse,
+  CandidateReviewerResponse,
   FindingAppealRequest,
   FindingConcludeAppealRequest,
   FindingPageResponse,
@@ -22,6 +25,8 @@ import type {
   PlanResponse,
   PlanStatus,
   PlanUpdateRequest,
+  PriorFindingsWarning,
+  SurpriseInspectionSuggestion,
 } from '@/features/inspections/inspection.types'
 import { api } from '@/lib/http'
 import type { Id } from '@/types/common.types'
@@ -38,6 +43,8 @@ export const plansApi = {
   approve: (id: Id) => api.post<PlanResponse>(`/inspection-plans/${id}/approve`).then(data),
   reject: (id: Id, body: PlanRejectRequest) => api.post<PlanResponse>(`/inspection-plans/${id}/reject`, body).then(data),
   delete: (id: Id) => api.delete<void>(`/inspection-plans/${id}`).then(() => undefined),
+  restaurantWarning: (restaurantId: number, beforeDate?: string) =>
+    api.get<PriorFindingsWarning>('/inspection-plans/restaurant-warnings', { params: { restaurantId, beforeDate } }).then(data),
 }
 
 export const inspectionsApi = {
@@ -51,6 +58,9 @@ export const inspectionsApi = {
   checkin: (id: Id, body: InspectionCheckinRequest) => api.post<InspectionResponse>(`/inspections/${id}/checkin`, body).then(data),
   submit: (id: Id, body: InspectionSubmitRequest) => api.post<InspectionResponse>(`/inspections/${id}/submit`, body).then(data),
   cancel: (id: Id, body: InspectionCancelRequest) => api.post<InspectionResponse>(`/inspections/${id}/cancel`, body).then(data),
+  /** CHT xác nhận đã xem phiếu không có lỗi (AWAITING_ACK → COMPLETED). */
+  acknowledge: (id: Id) => api.post<InspectionResponse>(`/inspections/${id}/acknowledge`).then(data),
+  surpriseSuggestions: () => api.get<SurpriseInspectionSuggestion[]>('/inspections/surprise-suggestions').then(data),
 }
 
 export const findingsApi = {
@@ -59,6 +69,11 @@ export const findingsApi = {
   get: (id: Id) => api.get<FindingResponse>(`/findings/${id}`).then(data),
   confirm: (id: Id) => api.post<FindingResponse>(`/findings/${id}/confirm`).then(data),
   appeal: (id: Id, body: FindingAppealRequest) => api.post<FindingResponse>(`/findings/${id}/appeal`, body).then(data),
+  submitReview: (id: Id, body: AppealReviewRequest) =>
+    api.post<FindingResponse>(`/findings/${id}/appeal-reviews`, body).then(data),
+  candidateReviewers: (id: Id) =>
+    api.get<CandidateReviewerResponse[]>(`/findings/${id}/candidate-reviewers`).then(data),
+  pendingReviews: () => api.get<FindingResponse[]>('/findings/pending-reviews').then(data),
   concludeAppeal: (id: Id, body: FindingConcludeAppealRequest) =>
     api.post<FindingResponse>(`/findings/${id}/conclude-appeal`, body).then(data),
   remediationPlan: (id: Id, body: FindingRemediationPlanRequest) =>
@@ -66,4 +81,6 @@ export const findingsApi = {
   submitRemediation: (id: Id, body: FindingSubmitRemediationRequest) =>
     api.post<FindingResponse>(`/findings/${id}/submit-remediation`, body).then(data),
   verify: (id: Id, body: FindingVerifyRequest) => api.post<FindingResponse>(`/findings/${id}/verify`, body).then(data),
+  verificationCandidates: (restaurantId: number) =>
+    api.get<CandidateFindingResponse[]>('/findings/verification-candidates', { params: { restaurantId } }).then(data),
 }

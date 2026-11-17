@@ -43,7 +43,6 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
           render: (groupName: string, c: Criterion) => (
             <Tooltip title={onFilterGroup ? `Nhấp để lọc nhóm: ${groupName}` : undefined}>
               <Tag
-                color="cyan"
                 style={{ cursor: onFilterGroup ? 'pointer' : 'default', fontWeight: 500 }}
                 onClick={onFilterGroup ? () => onFilterGroup(c.groupId) : undefined}
               >
@@ -83,7 +82,6 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
                 {templates.map((t) => (
                   <Tooltip key={t.id} title={`Nhấp để lọc mẫu: ${t.name}`}>
                     <Tag
-                      color="geekblue"
                       style={{ cursor: onFilterTemplate ? 'pointer' : 'default' }}
                       onClick={onFilterTemplate ? () => onFilterTemplate(t.id) : undefined}
                     >

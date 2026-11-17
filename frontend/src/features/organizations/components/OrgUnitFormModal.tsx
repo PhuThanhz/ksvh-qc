@@ -159,6 +159,7 @@ export function OrgUnitFormModal({ open, unit, fixedUnitType, onClose }: OrgUnit
                 label={isRestaurant ? 'Mã nhà hàng' : 'Mã phòng ban'}
                 required
                 maxLength={30}
+                placeholder={isRestaurant ? 'VD: NH-Q1-01' : 'VD: PB-QC'}
               />
             </Col>
             <Col span={24}>
@@ -168,6 +169,7 @@ export function OrgUnitFormModal({ open, unit, fixedUnitType, onClose }: OrgUnit
                 label={isRestaurant ? 'Tên nhà hàng' : 'Tên phòng ban'}
                 required
                 maxLength={200}
+                placeholder={isRestaurant ? 'VD: Nhà hàng Chi nhánh Quận 1' : 'VD: Phòng Kiểm soát chất lượng'}
               />
             </Col>
             <Col span={24}>
@@ -176,6 +178,7 @@ export function OrgUnitFormModal({ open, unit, fixedUnitType, onClose }: OrgUnit
                 name="address"
                 label={isRestaurant ? 'Địa chỉ' : 'Địa chỉ / Vị trí'}
                 maxLength={500}
+                placeholder={isRestaurant ? 'VD: 123 Nguyễn Huệ, P. Bến Nghé, Q.1, TP.HCM' : 'VD: Tầng 4, Toà nhà Lotus Group'}
               />
             </Col>
           </Row>

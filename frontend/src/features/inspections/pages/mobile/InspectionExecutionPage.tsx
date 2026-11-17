@@ -147,22 +147,22 @@ export function InspectionExecutionPage() {
   const gpsString = geoFix ? `GPS ${geoFix.lat.toFixed(6)}, ${geoFix.lng.toFixed(6)}` : undefined
 
   return (
-    <div style={{ paddingBottom: 80, minHeight: '100vh', background: '#f5f5f5' }}>
+    <div style={{ paddingBottom: 80, minHeight: '100vh', background: 'var(--app-surface-sunken)' }}>
       <NavBar onBack={() => navigate('/qc')}>{ins.code}</NavBar>
 
       <div style={{ padding: 12 }}>
         <Card style={{ marginBottom: 12, borderRadius: 10 }}>
           <div style={{ fontWeight: 600, fontSize: 16 }}>{ins.restaurantName}</div>
-          <div style={{ fontSize: 13, color: '#8c8c8c', marginTop: 4 }}>
+          <div style={{ fontSize: 13, color: 'var(--app-text-secondary)', marginTop: 4 }}>
             {INSPECTION_KIND_LABEL[ins.inspectionType]} · {INSPECTION_MODE_LABEL[ins.inspectionMode]}
             {ins.templateName ? ` · Mẫu: ${ins.templateName}` : ''}
             {ins.topicNames.length > 0 ? ` · Chuyên đề: ${ins.topicNames.join(', ')}` : ''}
           </div>
           {ins.status === 'IN_PROGRESS' && totalCriteria > 0 && (
             <div style={{ marginTop: 10 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#595959', marginBottom: 4 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--app-text-body)', marginBottom: 4 }}>
                 <span>Tiến độ: <b>{ratedCount}/{totalCriteria}</b> ({progressPercent}%)</span>
-                <span>{passCount} Đạt · <span style={{ color: '#ff4d4f' }}>{failCount} Lỗi</span> · {naCount} N/A</span>
+                <span>{passCount} Đạt · <span style={{ color: 'var(--app-danger)' }}>{failCount} Lỗi</span> · {naCount} N/A</span>
               </div>
               <ProgressBar percent={progressPercent} />
               {ratedCount < totalCriteria && (
@@ -190,12 +190,12 @@ export function InspectionExecutionPage() {
             </p>
             {ins.inspectionMode !== 'REMOTE' && (
               geoFix ? (
-                <div style={{ background: '#f6ffed', border: '1px solid #b7eb8f', padding: 10, borderRadius: 8, marginBottom: 12 }}>
+                <div style={{ background: 'var(--app-success-bg)', border: '1px solid var(--app-success-border)', padding: 10, borderRadius: 8, marginBottom: 12 }}>
                   <div>Toạ độ: {geoFix.lat.toFixed(6)}, {geoFix.lng.toFixed(6)}</div>
-                  <div style={{ fontSize: 12, color: '#52c41a' }}>Độ chính xác: ±{Math.round(geoFix.accuracy)}m</div>
+                  <div style={{ fontSize: 12, color: 'var(--app-success)' }}>Độ chính xác: ±{Math.round(geoFix.accuracy)}m</div>
                 </div>
               ) : (
-                <div style={{ color: '#8c8c8c', marginBottom: 12 }}>
+                <div style={{ color: 'var(--app-text-secondary)', marginBottom: 12 }}>
                   {geoStatus === 'denied' || geoStatus === 'unavailable' || geoStatus === 'insecure' ? 'Không lấy được vị trí – vẫn có thể bắt đầu, phiếu sẽ ghi "chưa xác minh vị trí".' : 'Đang lấy vị trí…'}
                 </div>
               )
@@ -207,9 +207,10 @@ export function InspectionExecutionPage() {
         ) : (
           <Space direction="vertical" block>
             {ins.status !== 'IN_PROGRESS' && (
-              <Card style={{ borderRadius: 10, background: ins.status === 'CANCELLED' ? '#fff1f0' : '#f6ffed', border: `1px solid ${ins.status === 'CANCELLED' ? '#ffa39e' : '#b7eb8f'}` }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: ins.status === 'CANCELLED' ? '#cf1322' : '#389e0d' }}>
+              <Card style={{ borderRadius: 10, background: ins.status === 'CANCELLED' ? 'var(--app-danger-bg)' : 'var(--app-success-bg)', border: `1px solid ${ins.status === 'CANCELLED' ? 'var(--app-danger-border)' : 'var(--app-success-border)'}` }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: ins.status === 'CANCELLED' ? 'var(--app-danger)' : 'var(--app-success)' }}>
                   {ins.status === 'SUBMITTED' && 'Phiếu chấm đã được nộp. Đang trong quy trình xử lý và khắc phục lỗi vi phạm.'}
+                  {ins.status === 'AWAITING_ACK' && 'Phiếu không có lỗi. Đang chờ Cửa hàng trưởng xác nhận đã xem.'}
                   {ins.status === 'COMPLETED' && 'Phiếu chấm đã hoàn thành toàn diện.'}
                   {ins.status === 'CANCELLED' && `Phiếu chấm đã bị huỷ${ins.cancelReason ? `: ${ins.cancelReason}` : ''}.`}
                 </div>
@@ -235,7 +236,7 @@ export function InspectionExecutionPage() {
       </div>
 
       {ins.status === 'IN_PROGRESS' && (
-        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#fff', padding: '10px 16px', borderTop: '1px solid #e8e8e8', zIndex: 100 }}>
+        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'var(--app-surface)', padding: '10px 16px', borderTop: '1px solid var(--app-border)', zIndex: 100 }}>
           <Button block color="primary" size="large" loading={submit.isPending} onClick={onSubmitAll}>
             Hoàn thành & Nộp phiếu chấm ({ratedCount}/{totalCriteria})
           </Button>

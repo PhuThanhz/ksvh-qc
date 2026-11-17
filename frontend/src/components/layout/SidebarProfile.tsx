@@ -36,7 +36,7 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
           <Typography.Text strong>{user?.fullName ?? 'Người dùng'}</Typography.Text>
           <Flex gap={4} wrap>
             {user?.roles.map((r) => (
-              <Tag key={r} style={{ margin: 0, borderRadius: 4, background: '#f1f5f9', color: '#334155', border: '1px solid #e2e8f0' }}>
+              <Tag key={r} style={{ margin: 0, borderRadius: 4, background: 'var(--app-surface-sunken)', color: 'var(--app-text-body)', border: '1px solid var(--app-border)' }}>
                 {roleLabel(r)}
               </Tag>
             ))}
@@ -66,7 +66,7 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
       size={collapsed ? 36 : 34}
       style={{
         background: 'rgba(255, 255, 255, 0.85)',
-        color: '#0f172a',
+        color: 'var(--app-text)',
         fontWeight: 700,
         fontSize: 14,
         flexShrink: 0,
@@ -82,7 +82,7 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
     <div
       style={{
         padding: collapsed ? '12px 0' : '10px 12px',
-        borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+        borderTop: '1px solid var(--app-on-dark-border)',
         marginTop: 'auto',
         background: 'transparent',
       }}
@@ -110,14 +110,14 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
             <Flex align="center" gap={10} style={{ width: '100%', overflow: 'hidden' }}>
               {avatar}
               <Flex vertical style={{ flex: 1, minWidth: 0, lineHeight: 1.25 }}>
-                <Typography.Text strong ellipsis style={{ fontSize: 13, color: '#0f172a' }}>
+                <Typography.Text strong ellipsis style={{ fontSize: 13, color: 'var(--app-on-dark)' }}>
                   {user?.fullName ?? 'Người dùng'}
                 </Typography.Text>
-                <Typography.Text ellipsis style={{ fontSize: 11, color: '#64748b' }}>
+                <Typography.Text ellipsis style={{ fontSize: 11, color: 'var(--app-on-dark-secondary)' }}>
                   {user?.roles.map(roleLabel).join(', ')}
                 </Typography.Text>
               </Flex>
-              <DownOutlined style={{ fontSize: 10, color: '#94a3b8', flexShrink: 0 }} />
+              <DownOutlined style={{ fontSize: 10, color: 'var(--app-on-dark-muted)', flexShrink: 0 }} />
             </Flex>
           </Button>
         )}

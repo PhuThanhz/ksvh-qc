@@ -1,3 +1,66 @@
+/* ==========================================================================
+   BIẾN MÀU DÙNG CHUNG — đổi màu toàn hệ thống chỉ cần sửa ở đây.
+   Màu nhấn dạng "R, G, B" để dùng được với rgba(var(--x), độ trong).
+   ========================================================================== */
+:root {
+  /* Chữ trên nền sáng */
+  --app-text: #0f172a;
+  --app-text-body: #475569;
+  --app-text-secondary: #64748b;
+  --app-text-muted: #94a3b8;
+
+  /* Nền & viền trên vùng sáng */
+  --app-surface: #ffffff;
+  --app-surface-muted: #f8fafc;
+  --app-surface-sunken: #f1f5f9;
+  --app-border: #e2e8f0;
+  --app-border-strong: #cbd5e1;
+  --app-focus-border: #94a3b8;
+  --app-focus-ring: rgba(100, 116, 139, 0.15);
+
+  /* Chữ & viền trên khung tối (sidebar, header, logo) */
+  /* Nền khung tối đặc (trang đăng nhập, khung mobile) */
+  --app-chrome-solid: #0f172a;
+  --app-chrome-solid-light: #1e293b;
+  --app-chrome-solid-mid: #334155;
+
+  --app-on-dark: #ffffff;
+  --app-on-dark-secondary: rgba(255, 255, 255, 0.65);
+  --app-on-dark-muted: rgba(255, 255, 255, 0.45);
+  --app-on-dark-faint: rgba(255, 255, 255, 0.35);
+  --app-on-dark-border: rgba(255, 255, 255, 0.08);
+  --app-on-dark-glass: rgba(255, 255, 255, 0.14);
+  --app-on-dark-glass-border: rgba(255, 255, 255, 0.28);
+
+  /* Màu trạng thái (chữ / nền nhạt / viền) */
+  --app-success: #16a34a;
+  --app-success-bg: #f0fdf4;
+  --app-success-border: #bbf7d0;
+  --app-warning: #d97706;
+  --app-warning-bg: #fffbeb;
+  --app-warning-border: #fde68a;
+  --app-danger: #dc2626;
+  --app-danger-bg: #fef2f2;
+  --app-danger-border: #fecaca;
+  --app-info: #2563eb;
+  --app-info-bg: #eff6ff;
+  --app-info-border: #bfdbfe;
+  --app-excel: #1d6f42;
+
+  /* Kính */
+  --app-glass-bg: rgba(255, 255, 255, 0.86);
+  --app-glass-border: rgba(255, 255, 255, 0.65);
+  --app-chrome-bg: rgba(12, 12, 14, 0.5); /* sidebar + header trên ảnh nền */
+
+  /* Màu nhấn theo ý nghĩa */
+  --tint-neutral: 15, 23, 42;
+  --tint-view: 37, 99, 235;
+  --tint-add: 22, 163, 74;
+  --tint-edit: 217, 119, 6;
+  --tint-delete: 220, 38, 38;
+  --tint-excel: 16, 124, 65;
+}
+
 * { box-sizing: border-box; }
 html, body, #root { margin: 0; min-height: 100%; }
 
@@ -115,28 +178,28 @@ body {
 
 .apple-frosted-sidebar .ant-menu-sub { background: transparent !important; }
 
-/* Thẻ Card nội dung: Chuẩn Apple Frosted Glass */
+/* Thẻ Card nội dung: Nền trắng phẳng, sắc nét, không mờ kính 3D */
 .ant-card:not(.ant-card-bordered-none) {
-  background: rgba(255, 255, 255, 0.82) !important;
-  backdrop-filter: blur(20px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.65) !important;
-  border-radius: 14px !important;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.02) !important;
+  background: #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 
-/* Bảng dữ liệu chuẩn xác, thanh thoát trên nền kính mờ */
+/* Bảng dữ liệu: Trắng phẳng, rõ nét, dễ đọc */
 .ant-table-wrapper .ant-table {
-  background: rgba(255, 255, 255, 0.82) !important;
-  backdrop-filter: blur(16px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
-  border-radius: 12px !important;
+  background: #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-radius: 10px !important;
 }
 
 .ant-table-wrapper .ant-table-thead > tr > th {
-  background: rgba(248, 250, 252, 0.82) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
+  background: #f8fafc !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   color: #475569 !important;
   font-size: 12px !important;
   font-weight: 600 !important;
@@ -170,22 +233,42 @@ body {
 }
 
 .ant-input:focus, .ant-input-focused, .ant-select-focused .ant-select-selector {
-  border-color: #0f172a !important;
-  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.12) !important;
+  border-color: var(--app-focus-border) !important;
+  box-shadow: 0 0 0 3px var(--app-focus-ring) !important;
 }
 
-/* Nút bấm chuẩn Apple Obsidian / Dark Slate */
-.ant-btn-primary {
-  background: #0f172a !important;
-  border-color: #0f172a !important;
-  border-radius: 8px !important;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2) !important;
-  font-weight: 500 !important;
-  color: #ffffff !important;
+/* Nút chính: kính trắng trong, viền xám mảnh, chữ đen (trên nền trắng của thẻ/bảng/modal) */
+.ant-btn-primary:not(:disabled) {
+  background: rgba(255, 255, 255, 0.72) !important;
+  border: 1px solid rgba(15, 23, 42, 0.14) !important;
+  color: #0f172a !important;
+  border-radius: 999px !important;
+  backdrop-filter: blur(12px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(160%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 3px rgba(15, 23, 42, 0.08), 0 4px 12px -4px rgba(15, 23, 42, 0.12) !important;
+  font-weight: 600 !important;
 }
-.ant-btn-primary:hover {
-  background: #334155 !important;
-  border-color: #334155 !important;
+.ant-btn-primary:not(:disabled):hover {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(15, 23, 42, 0.24) !important;
+  color: #0f172a !important;
+}
+.ant-btn-primary.ant-btn-dangerous:not(:disabled) {
+  background: rgba(220, 38, 38, 0.1) !important;
+  border-color: rgba(220, 38, 38, 0.3) !important;
+  color: #b91c1c !important;
+}
+
+/* Nút chính trên header tối: kính trắng trong mờ */
+.bitrix-frosted-header .ant-btn-primary:not(:disabled) {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  color: #ffffff !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+.bitrix-frosted-header .ant-btn-primary:not(:disabled):hover {
+  background: rgba(255, 255, 255, 0.26) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
   color: #ffffff !important;
 }
 
@@ -238,3 +321,207 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.6); }
 .apple-frosted-sidebar ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.25); }
 .apple-frosted-sidebar ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.45); }
+
+/* ==========================================================================
+   KHUNG ADMIN: sidebar + header kính mờ trung tính (đen trong), hợp mọi ảnh nền
+   ========================================================================== */
+
+.bitrix-frosted-sidebar {
+  background: var(--app-chrome-bg) !important;
+  backdrop-filter: blur(20px) saturate(110%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(110%) !important;
+  border-inline-end: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: none !important;
+}
+
+.bitrix-frosted-sidebar .ant-menu {
+  background: transparent !important;
+  border-inline-end: none !important;
+}
+
+.bitrix-frosted-sidebar .ant-menu-item,
+.bitrix-frosted-sidebar .ant-menu-submenu-title {
+  color: rgba(255, 255, 255, 0.75) !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  border-radius: 6px !important;
+  margin-inline: 8px !important;
+  margin-block: 2px !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transition: all 0.15s ease !important;
+}
+
+.bitrix-frosted-sidebar .ant-menu-item .ant-menu-item-icon,
+.bitrix-frosted-sidebar .ant-menu-submenu-title .ant-menu-item-icon {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-size: 16px !important;
+}
+
+.bitrix-frosted-sidebar .ant-menu-item:hover,
+.bitrix-frosted-sidebar .ant-menu-submenu-title:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+.bitrix-frosted-sidebar .ant-menu-item:hover .ant-menu-item-icon,
+.bitrix-frosted-sidebar .ant-menu-submenu-title:hover .ant-menu-item-icon {
+  color: #ffffff !important;
+}
+
+/* Selected: Phẳng, trong suốt nhẹ nhàng, không viền và không bóng 3D */
+.bitrix-frosted-sidebar .ant-menu-item-selected {
+  background: rgba(255, 255, 255, 0.16) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.bitrix-frosted-sidebar .ant-menu-item-selected .ant-menu-item-icon,
+.bitrix-frosted-sidebar .ant-menu-item-selected a,
+.bitrix-frosted-sidebar .ant-menu-item-selected .ant-menu-title-content {
+  color: #ffffff !important;
+}
+
+.bitrix-frosted-header {
+  background: var(--app-chrome-bg) !important;
+  backdrop-filter: blur(24px) saturate(110%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(110%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+.bitrix-badge-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 1px 5px;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  box-shadow: 0 1px 4px rgba(239, 68, 68, 0.5);
+  margin-left: 6px;
+}
+
+.bitrix-stream-card {
+  background: #ffffff !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bitrix-stream-card:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12) !important;
+}
+
+.bitrix-right-widget {
+  background: #ffffff !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.07) !important;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+}
+
+.bitrix-date-badge {
+  display: flex;
+  flex-direction: column;
+  width: 44px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.bitrix-date-badge-top {
+  background: #00bcd4;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  padding: 2px 0;
+  text-transform: uppercase;
+}
+
+.bitrix-date-badge-bottom {
+  background: #f8fafc;
+  color: #0f172a;
+  font-size: 18px;
+  font-weight: 800;
+  text-align: center;
+  padding: 2px 0 4px;
+  border: 1px solid #e2e8f0;
+  border-top: none;
+}
+
+/* ==========================================================================
+   NÚT THAO TÁC CÓ MÀU TOÀN BỘ PHẦN MỀM (XEM - SỬA - XOÁ - THÊM)
+   ========================================================================== */
+
+.action-btn {
+  width: 30px !important;
+  height: 30px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  transition: all 0.15s ease !important;
+}
+
+/* Nút kính trong pha màu: một khuôn dùng chung, đổi màu bằng biến --tint (R, G, B).
+   Nút thao tác trong bảng: Xem / Thêm / Sửa / Xoá; nút Excel: .btn-tint-excel. */
+.action-btn-view, .table-action-view { --tint: var(--tint-view); }
+.action-btn-add, .table-action-add { --tint: var(--tint-add); }
+.action-btn-edit, .table-action-edit { --tint: var(--tint-edit); }
+.action-btn-delete, .table-action-delete { --tint: var(--tint-delete); }
+.btn-tint-excel { --tint: var(--tint-excel); }
+
+.action-btn-view, .table-action-view,
+.action-btn-add, .table-action-add,
+.action-btn-edit, .table-action-edit,
+.action-btn-delete, .table-action-delete,
+.ant-btn.btn-tint-excel:not(:disabled) {
+  color: rgb(var(--tint)) !important;
+  background: rgba(var(--tint), 0.08) !important;
+  border: 1px solid rgba(var(--tint), 0.22) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+.action-btn-view:hover:not(:disabled), .table-action-view:hover:not(:disabled),
+.action-btn-add:hover:not(:disabled), .table-action-add:hover:not(:disabled),
+.action-btn-edit:hover:not(:disabled), .table-action-edit:hover:not(:disabled),
+.action-btn-delete:hover:not(:disabled), .table-action-delete:hover:not(:disabled),
+.ant-btn.btn-tint-excel:not(:disabled):hover {
+  color: rgb(var(--tint)) !important;
+  background: rgba(var(--tint), 0.16) !important;
+  border-color: rgba(var(--tint), 0.4) !important;
+}
+
+
+/* Khối kính trắng dùng chung cho vùng Bộ lọc (AdvancedFilter) và vùng Bảng (TableCard): mỗi vùng một khối riêng. */
+.glass-panel {
+  background: var(--app-glass-bg);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border-radius: 14px;
+  border: 1px solid var(--app-glass-border);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+}

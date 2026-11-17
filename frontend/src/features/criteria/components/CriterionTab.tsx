@@ -1,5 +1,5 @@
-import { PlusOutlined } from '@ant-design/icons'
-import { Button, Card, Flex, Space } from 'antd'
+import { AppstoreAddOutlined, PlusOutlined } from '@ant-design/icons'
+import { Button, Flex, Space } from 'antd'
 import { useCallback, useMemo, useState } from 'react'
 import { ActiveFilter } from '@/components/data-entry/ActiveFilter'
 import { AdvancedFilter, type FilterTagItem } from '@/components/data-entry/AdvancedFilter'
@@ -31,10 +31,16 @@ const ASSIGNED_OPTIONS: { value: AssignedStatus; label: string }[] = [
 export interface CriterionTabProps {
   initialGroupId?: number
   onCreateCriterion: (defaultGroupId?: number) => void
+  onBatchCreateCriterion?: (defaultGroupId?: number) => void
   onEditCriterion: (criterion: Criterion) => void
 }
 
-export function CriterionTab({ initialGroupId, onCreateCriterion, onEditCriterion }: CriterionTabProps) {
+export function CriterionTab({
+  initialGroupId,
+  onCreateCriterion,
+  onBatchCreateCriterion,
+  onEditCriterion,
+}: CriterionTabProps) {
   const groups = useCriterionGroups()
   const templates = useTemplates({ page: 0, size: 100 })
   const defaultFilters = useMemo(() => (initialGroupId ? { groupId: initialGroupId } : undefined), [initialGroupId])
@@ -90,8 +96,7 @@ export function CriterionTab({ initialGroupId, onCreateCriterion, onEditCriterio
   }, [filters, groups.data, setFilter, templates.data?.items])
 
   return (
-    <Card styles={{ body: { padding: 16 } }}>
-      <Flex vertical gap={16}>
+    <Flex vertical gap={16}>
         <AdvancedFilter
           search={{ value: filters.keyword ?? '', placeholder: 'Tìm theo mã hoặc tên tiêu chí', onSearch }}
           activeCount={activeFilterCount}
@@ -108,6 +113,16 @@ export function CriterionTab({ initialGroupId, onCreateCriterion, onEditCriterio
                   Thêm tiêu chí
                 </Button>
               </ProtectedAction>
+              {onBatchCreateCriterion && (
+                <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
+                  <Button
+                    icon={<AppstoreAddOutlined />}
+                    onClick={() => onBatchCreateCriterion(filters.groupId)}
+                  >
+                    Thêm nhanh nhiều tiêu chí
+                  </Button>
+                </ProtectedAction>
+              )}
             </Space>
           }
         >
@@ -152,7 +167,6 @@ export function CriterionTab({ initialGroupId, onCreateCriterion, onEditCriterio
           onFilterGroup={(groupId) => setFilter('groupId', groupId)}
           onFilterTemplate={(templateId) => setFilter('templateId', templateId)}
         />
-      </Flex>
       <CriterionDetailModal
         open={Boolean(viewingCriterion)}
         criterion={viewingCriterion}
@@ -162,6 +176,6 @@ export function CriterionTab({ initialGroupId, onCreateCriterion, onEditCriterio
           onEditCriterion(criterion)
         }}
       />
-    </Card>
+    </Flex>
   )
 }

@@ -21,7 +21,7 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
         display: 'grid',
         placeItems: 'center',
         padding: '24px 16px',
-        background: 'radial-gradient(ellipse at top, #1e293b 0%, #0f172a 100%)',
+        background: 'radial-gradient(ellipse at top, var(--app-chrome-solid-light) 0%, var(--app-chrome-solid) 100%)',
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -49,7 +49,7 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
           background: 'rgba(255, 255, 255, 0.96)',
           backdropFilter: 'blur(20px)',
           boxShadow: '0 20px 45px rgba(0, 0, 0, 0.25), 0 0 1px rgba(255, 255, 255, 0.4) inset',
-          border: '1px solid rgba(255, 255, 255, 0.3)',
+          border: '1px solid var(--app-on-dark-glass-border)',
           position: 'relative',
           zIndex: 1,
         }}
@@ -63,19 +63,19 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
               width: 44,
               height: 44,
               borderRadius: 12,
-              background: 'linear-gradient(135deg, #334155 0%, #0f172a 100%)',
-              color: '#ffffff',
+              background: 'linear-gradient(135deg, var(--app-chrome-solid-mid) 0%, var(--app-chrome-solid) 100%)',
+              color: 'var(--app-on-dark)',
               fontSize: 24,
               boxShadow: '0 4px 12px rgba(15, 23, 42, 0.35)',
             }}
           >
             <SafetyCertificateFilled />
           </Flex>
-          <Typography.Title level={3} style={{ margin: 0, fontWeight: 700, letterSpacing: -0.3, color: '#0f172a' }}>
+          <Typography.Title level={3} style={{ margin: 0, fontWeight: 700, letterSpacing: -0.3, color: 'var(--app-text)' }}>
             {title}
           </Typography.Title>
           {subtitle && (
-            <Typography.Text type="secondary" style={{ fontSize: 13, color: '#64748b' }}>
+            <Typography.Text type="secondary" style={{ fontSize: 13, color: 'var(--app-text-secondary)' }}>
               {subtitle}
             </Typography.Text>
           )}

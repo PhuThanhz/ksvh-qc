@@ -11,8 +11,8 @@ export interface ImportResultPanelProps {
 
 const STATS = [
   { key: 'totalRows', label: 'Tổng số dòng', color: undefined },
-  { key: 'created', label: 'Thêm mới', color: '#1D6F42' },
-  { key: 'updated', label: 'Cập nhật', color: '#1677FF' },
+  { key: 'created', label: 'Thêm mới', color: 'var(--app-excel)' },
+  { key: 'updated', label: 'Cập nhật', color: 'var(--app-info)' },
 ] as const
 
 /** Bước 2 của nhập Excel: thống kê và danh sách lỗi theo sheet / dòng / cột. */
@@ -47,7 +47,7 @@ export function ImportResultPanel({ result, fileName }: ImportResultPanelProps) 
             <Statistic
               title="Dòng có lỗi"
               value={errorRows}
-              styles={{ content: { color: errorRows > 0 ? '#CF1322' : '#1D6F42', fontWeight: 600 } }}
+              styles={{ content: { color: errorRows > 0 ? 'var(--app-danger)' : 'var(--app-excel)', fontWeight: 600 } }}
             />
           </Card>
         </Col>

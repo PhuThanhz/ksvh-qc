@@ -19,6 +19,9 @@ export const ROUTES = {
     plans: '/admin/plans',
     inspections: '/admin/inspections',
     findings: '/admin/findings',
+    riskProfiles: '/admin/risk-profiles',
+    reports: '/admin/reports',
+    auditLogs: '/admin/audit-logs',
   },
   qc: {
     root: '/qc',

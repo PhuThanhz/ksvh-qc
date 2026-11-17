@@ -12,6 +12,7 @@ import java.util.List;
  * Tạo phiếu kiểm tra.
  * - PERIODIC (định kỳ tháng): bắt buộc templateId, luôn thực tế tại nhà hàng, chấm đủ mọi tiêu chí của mẫu.
  * - SURPRISE (đột xuất): bắt buộc topicGroupIds (chuyên đề = nhóm tiêu chí), thực tế hoặc từ xa.
+ * - VERIFICATION (kết quả khắc phục): gom các lỗi chờ nghiệm thu vào một phiếu, thực tế hoặc từ xa.
  */
 public record InspectionCreateRequest(
         @NotBlank(message = "Vui lòng nhập mã phiếu chấm")
@@ -40,6 +41,15 @@ public record InspectionCreateRequest(
         List<Long> topicGroupIds,
 
         @Size(max = 1000, message = "Ghi chú tối đa 1000 ký tự")
-        String notes
+        String notes,
+
+        /** Danh sách ID lỗi cần nghiệm thu (dùng cho loại VERIFICATION). Trống = tự động gom tất cả lỗi chờ nghiệm thu. */
+        List<Long> findingIds
 ) {
+    public InspectionCreateRequest(
+            String code, Long planId, Long restaurantId, Long templateId,
+            Long inspectorId, InspectionKind inspectionType, InspectionMode inspectionMode,
+            List<Long> topicGroupIds, String notes) {
+        this(code, planId, restaurantId, templateId, inspectorId, inspectionType, inspectionMode, topicGroupIds, notes, List.of());
+    }
 }

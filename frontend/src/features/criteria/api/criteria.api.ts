@@ -10,7 +10,6 @@ import type {
   FrequencyConfigPayload,
   RiskLevel,
   RiskLevelVersion,
-  RiskPreview,
   RiskLevelVersionPayload,
   Template,
   TemplateListParams,
@@ -36,7 +35,6 @@ const PATH = {
   templateOptions: '/inspection-templates/options',
   template: (id: Id) => `/inspection-templates/${id}`,
   riskLevels: '/risk-levels',
-  riskPreview: '/risk/preview',
   riskLevelVersions: '/risk-levels/versions',
   riskLevelVersion: (effectiveFrom: string) => `/risk-levels/versions/${effectiveFrom}`,
   frequency: '/frequency-configs',
@@ -57,6 +55,7 @@ export const criteriaApi = {
     api.get<PageResponse<Criterion>>(PATH.criteria, { params: { ...rest, keyword: keyword || undefined } }).then(data),
   options: () => api.get<Criterion[]>(PATH.criterionOptions).then(data),
   create: (body: CriterionPayload) => api.post<Criterion>(PATH.criteria, body).then(data),
+  createBatch: (body: CriterionPayload[]) => api.post<Criterion[]>(`${PATH.criteria}/batch`, body).then(data),
   update: (id: Id, body: CriterionPayload) => api.put<Criterion>(PATH.criterion(id), body).then(data),
   delete: (id: Id) => api.delete<void>(PATH.criterion(id)).then(() => undefined),
 }
@@ -72,8 +71,6 @@ export const templatesApi = {
 }
 
 export const riskConfigApi = {
-  preview: (params: { baseImpact: number; violations: number }) =>
-    api.get<RiskPreview>(PATH.riskPreview, { params }).then(data),
   riskLevels: () => api.get<RiskLevel[]>(PATH.riskLevels).then(data),
   riskLevelVersions: () => api.get<RiskLevelVersion[]>(PATH.riskLevelVersions).then(data),
   saveRiskLevelVersion: (body: RiskLevelVersionPayload) => api.put<RiskLevelVersion>(PATH.riskLevels, body).then(data),
