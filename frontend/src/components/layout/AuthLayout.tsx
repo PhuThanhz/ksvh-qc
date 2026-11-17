@@ -3,7 +3,7 @@ import {
   CheckCircleOutlined,
   LineChartOutlined,
   SafetyCertificateFilled,
-  ShieldCheckOutlined,
+  SafetyCertificateOutlined,
 } from '@ant-design/icons'
 import { Flex, Tag, Typography } from 'antd'
 import { useEffect, type ReactNode } from 'react'
@@ -16,7 +16,7 @@ export interface AuthLayoutProps {
 
 const HERO_FEATURES = [
   {
-    icon: <ShieldCheckOutlined style={{ fontSize: 18, color: '#38bdf8' }} />,
+    icon: <SafetyCertificateOutlined style={{ fontSize: 18, color: '#38bdf8' }} />,
     title: 'Kiểm soát tuân thủ thời gian thực',
     desc: 'Lập kế hoạch, chấm điểm phiếu định kỳ & đột xuất theo chuẩn VSATTP',
   },
