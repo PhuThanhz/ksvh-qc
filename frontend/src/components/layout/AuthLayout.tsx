@@ -32,7 +32,7 @@ const HERO_FEATURES = [
   },
 ]
 
-/** Khung trang đăng nhập Enterprise chuẩn Split-Screen với kính mờ sang trọng. */
+/** Khung trang đăng nhập Enterprise chuẩn Apple Frosted Glass sáng trong, sang trọng. */
 export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
   useEffect(() => {
     document.title = `Đăng nhập · ${title}`
@@ -43,38 +43,17 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
       style={{
         minHeight: '100vh',
         display: 'flex',
-        background: '#090d16',
+        background: 'radial-gradient(ellipse at 20% 20%, #e0f2fe 0%, #f1f5f9 45%, #f8fafc 100%)',
         position: 'relative',
         overflow: 'hidden',
       }}
     >
-      {/* Vòng sáng phát quang nền */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '-20%',
-          left: '10%',
-          width: 700,
-          height: 700,
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(56, 189, 248, 0.08) 0%, rgba(0, 0, 0, 0) 70%)',
-          pointerEvents: 'none',
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          bottom: '-15%',
-          right: '30%',
-          width: 600,
-          height: 600,
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(99, 102, 241, 0.06) 0%, rgba(0, 0, 0, 0) 70%)',
-          pointerEvents: 'none',
-        }}
-      />
+      {/* Các quầng sáng màu pastel phong cách Apple Keynote */}
+      <div style={{ position: 'absolute', top: '-15%', left: '5%', width: 650, height: 650, borderRadius: '50%', background: 'radial-gradient(circle, rgba(186, 230, 253, 0.7) 0%, rgba(255, 255, 255, 0) 70%)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', bottom: '-20%', left: '30%', width: 700, height: 700, borderRadius: '50%', background: 'radial-gradient(circle, rgba(254, 215, 170, 0.5) 0%, rgba(255, 255, 255, 0) 70%)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', top: '20%', right: '-10%', width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(233, 213, 255, 0.5) 0%, rgba(255, 255, 255, 0) 70%)', pointerEvents: 'none' }} />
 
-      {/* CỘT TRÁI: Enterprise Brand & Feature Showcase (Ẩn trên màn hình nhỏ) */}
+      {/* CỘT TRÁI: Enterprise Brand & Feature Showcase (Kính mờ sáng Apple) */}
       <div
         style={{
           flex: '1 1 55%',
@@ -84,34 +63,36 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
           padding: '48px 56px',
           position: 'relative',
           zIndex: 1,
-          borderRight: '1px solid rgba(255, 255, 255, 0.08)',
-          background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(9, 13, 22, 0.95) 100%)',
+          borderRight: '1px solid rgba(255, 255, 255, 0.7)',
+          background: 'rgba(255, 255, 255, 0.35)',
+          backdropFilter: 'blur(30px) saturate(190%)',
+          WebkitBackdropFilter: 'blur(30px) saturate(190%)',
         }}
         className="auth-hero-pane"
       >
         <div>
           {/* Brand Tag Header */}
-          <Flex align="center" gap={10} style={{ marginBottom: 40 }}>
+          <Flex align="center" gap={10} style={{ marginBottom: 36 }}>
             <Flex
               align="center"
               justify="center"
               style={{
-                width: 38,
-                height: 38,
+                width: 40,
+                height: 40,
                 borderRadius: 10,
-                background: 'rgba(255, 255, 255, 0.1)',
-                color: '#ffffff',
+                background: 'rgba(255, 255, 255, 0.85)',
+                color: '#0f172a',
                 fontSize: 20,
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+                border: '1px solid rgba(255, 255, 255, 0.95)',
               }}
             >
               <SafetyCertificateFilled />
             </Flex>
-            <Typography.Text strong style={{ fontSize: 20, color: '#ffffff', letterSpacing: -0.3 }}>
+            <Typography.Text strong style={{ fontSize: 20, color: '#0f172a', letterSpacing: -0.3 }}>
               KSVH QC
             </Typography.Text>
-            <Tag style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.3)', borderRadius: 4, fontWeight: 600, fontSize: 11 }}>
+            <Tag style={{ background: 'rgba(255, 255, 255, 0.75)', color: '#475569', border: '1px solid rgba(0, 0, 0, 0.08)', borderRadius: 4, fontWeight: 600, fontSize: 11 }}>
               ENTERPRISE PRO
             </Tag>
           </Flex>
@@ -121,7 +102,7 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
             <Typography.Title
               level={2}
               style={{
-                color: '#ffffff',
+                color: '#0f172a',
                 fontSize: 32,
                 fontWeight: 700,
                 lineHeight: 1.25,
@@ -133,11 +114,11 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
             </Typography.Title>
             <Typography.Paragraph
               style={{
-                color: '#94a3b8',
+                color: '#475569',
                 fontSize: 15,
                 lineHeight: 1.6,
                 marginTop: 14,
-                marginBottom: 36,
+                marginBottom: 32,
               }}
             >
               Nền tảng số hóa toàn diện quy trình kiểm tra chất lượng, giám sát an toàn vệ sinh thực phẩm và phân loại rủi ro cho chuỗi nhà hàng ẩm thực F&B.
@@ -145,25 +126,26 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
           </div>
 
           {/* Value Pillars List */}
-          <Flex vertical gap={18} style={{ maxWidth: 520 }}>
+          <Flex vertical gap={14} style={{ maxWidth: 520 }}>
             {HERO_FEATURES.map((item, idx) => (
               <Flex
                 key={idx}
                 align="flex-start"
                 gap={14}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.04)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  background: 'rgba(255, 255, 255, 0.65)',
+                  border: '1px solid rgba(255, 255, 255, 0.85)',
                   borderRadius: 12,
                   padding: '12px 16px',
-                  backdropFilter: 'blur(8px)',
+                  backdropFilter: 'blur(16px)',
+                  boxShadow: '0 4px 16px -2px rgba(0, 0, 0, 0.03)',
                 }}
               >
-                <div style={{ padding: 4, background: 'rgba(255, 255, 255, 0.06)', borderRadius: 8, display: 'flex' }}>
+                <div style={{ padding: 4, background: 'rgba(255, 255, 255, 0.85)', borderRadius: 8, display: 'flex', border: '1px solid rgba(255, 255, 255, 0.9)' }}>
                   {item.icon}
                 </div>
                 <div>
-                  <Typography.Text strong style={{ color: '#f8fafc', fontSize: 14, display: 'block' }}>
+                  <Typography.Text strong style={{ color: '#0f172a', fontSize: 14, display: 'block' }}>
                     {item.title}
                   </Typography.Text>
                   <Typography.Text style={{ color: '#64748b', fontSize: 12.5, marginTop: 2, display: 'block' }}>
@@ -176,14 +158,14 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
         </div>
 
         {/* Footer Trust Bar */}
-        <Flex align="center" justify="space-between" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: 20 }}>
+        <Flex align="center" justify="space-between" style={{ borderTop: '1px solid rgba(0, 0, 0, 0.06)', paddingTop: 18 }}>
           <Flex align="center" gap={6}>
-            <CheckCircleOutlined style={{ color: '#10b981', fontSize: 13 }} />
-            <Typography.Text style={{ color: '#64748b', fontSize: 12 }}>
+            <CheckCircleOutlined style={{ color: '#10b981', fontSize: 14 }} />
+            <Typography.Text style={{ color: '#475569', fontSize: 12.5, fontWeight: 500 }}>
               Tiêu chuẩn ISO 22000 & HACCP Compliant
             </Typography.Text>
           </Flex>
-          <Typography.Text style={{ color: '#475569', fontSize: 12 }}>
+          <Typography.Text style={{ color: '#64748b', fontSize: 12 }}>
             Phiên bản 2.4 · KSVH Enterprise
           </Typography.Text>
         </Flex>
@@ -195,13 +177,13 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
           style={{
             width: '100%',
             maxWidth: 440,
-            background: 'rgba(255, 255, 255, 0.96)',
-            backdropFilter: 'blur(24px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-            borderRadius: 18,
+            background: 'rgba(255, 255, 255, 0.82)',
+            backdropFilter: 'blur(30px) saturate(190%)',
+            WebkitBackdropFilter: 'blur(30px) saturate(190%)',
+            borderRadius: 20,
             padding: '36px 32px',
-            boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.6) inset',
-            border: '1px solid rgba(255, 255, 255, 0.8)',
+            boxShadow: '0 20px 50px -10px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.02)',
+            border: '1px solid rgba(255, 255, 255, 0.9)',
           }}
         >
           {/* Header trong thẻ đăng nhập */}
@@ -213,11 +195,12 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
                 width: 44,
                 height: 44,
                 borderRadius: 12,
-                background: '#0f172a',
-                color: '#ffffff',
+                background: 'rgba(255, 255, 255, 0.9)',
+                color: '#0f172a',
                 fontSize: 22,
                 margin: '0 auto 14px',
-                boxShadow: '0 4px 14px rgba(15, 23, 42, 0.25)',
+                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.06)',
+                border: '1px solid rgba(255, 255, 255, 0.95)',
               }}
             >
               <SafetyCertificateFilled />
