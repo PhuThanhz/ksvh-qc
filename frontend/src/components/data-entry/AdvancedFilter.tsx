@@ -61,10 +61,12 @@ export function AdvancedFilter({
   return (
     <div
       style={{
-        background: '#ffffff',
+        background: 'rgba(255, 255, 255, 0.82)',
+        backdropFilter: 'blur(20px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
         borderRadius: 14,
-        border: '1px solid rgba(0, 0, 0, 0.06)',
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 16px -2px rgba(0, 0, 0, 0.04)',
+        border: '1px solid rgba(255, 255, 255, 0.65)',
+        boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.02)',
         padding: '14px 18px',
       }}
     >
@@ -105,7 +107,7 @@ export function AdvancedFilter({
       {hasAdvanced && expanded && (
         <Card
           size="small"
-          styles={{ body: { padding: '12px 16px', backgroundColor: '#fafafa', borderRadius: 8 } }}
+          styles={{ body: { padding: '12px 16px', backgroundColor: 'rgba(248, 250, 252, 0.7)', borderRadius: 8 } }}
         >
           <Flex vertical gap={12}>
             <Flex justify="space-between" align="center">

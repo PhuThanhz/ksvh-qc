@@ -38,10 +38,12 @@ export function DataTable<T extends object>(props: DataTableProps<T>) {
   return (
     <div
       style={{
-        background: '#ffffff',
+        background: 'rgba(255, 255, 255, 0.82)',
+        backdropFilter: 'blur(20px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
         borderRadius: 14,
-        border: '1px solid rgba(0, 0, 0, 0.06)',
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 16px -2px rgba(0, 0, 0, 0.04)',
+        border: '1px solid rgba(255, 255, 255, 0.65)',
+        boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.02)',
         padding: '6px 14px 14px 14px',
         overflow: 'hidden',
       }}

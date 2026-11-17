@@ -13,19 +13,19 @@ body {
 
 /* Sidebar kính mờ Apple (macOS Frosted Glass Sidebar) */
 .apple-frosted-sidebar {
-  background: rgba(255, 255, 255, 0.82) !important;
+  background: rgba(255, 255, 255, 0.76) !important;
   backdrop-filter: blur(24px) saturate(180%) !important;
   -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-  border-inline-end: 1px solid rgba(0, 0, 0, 0.08) !important;
-  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.04) !important;
+  border-inline-end: 1px solid rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.04) !important;
 }
 
 .apple-frosted-header {
-  background: rgba(255, 255, 255, 0.82) !important;
+  background: rgba(255, 255, 255, 0.76) !important;
   backdrop-filter: blur(24px) saturate(180%) !important;
   -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.03) !important;
 }
 
 .apple-frosted-sidebar .ant-menu {
@@ -112,33 +112,39 @@ body {
 
 .apple-frosted-sidebar .ant-menu-sub { background: transparent !important; }
 
-/* Thẻ Card nội dung: Nền trắng tinh khiết, viền mảnh Slate 200, đổ bóng sắc nét */
+/* Thẻ Card nội dung: Chuẩn Apple Frosted Glass */
 .ant-card:not(.ant-card-bordered-none) {
-  background: #ffffff !important;
-  border: 1px solid #e2e8f0 !important;
-  border-radius: 12px !important;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04) !important;
+  background: rgba(255, 255, 255, 0.82) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.65) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.02) !important;
 }
 
-/* Bảng dữ liệu chuẩn xác, thanh thoát, dễ đọc */
+/* Bảng dữ liệu chuẩn xác, thanh thoát trên nền kính mờ */
 .ant-table-wrapper .ant-table {
-  background: #ffffff !important;
-  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.82) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+  border-radius: 12px !important;
 }
 
 .ant-table-wrapper .ant-table-thead > tr > th {
-  background: #f8fafc !important;
+  background: rgba(248, 250, 252, 0.82) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
   color: #475569 !important;
   font-size: 12px !important;
   font-weight: 600 !important;
   text-transform: uppercase !important;
   letter-spacing: 0.03em !important;
-  border-bottom: 1px solid #e2e8f0 !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
   padding: 10px 14px !important;
 }
 
 .ant-table-wrapper .ant-table-tbody > tr > td {
-  border-bottom: 1px solid #f1f5f9 !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
   padding: 11px 14px !important;
   font-size: 13.5px !important;
   color: #0f172a !important;
@@ -150,87 +156,74 @@ body {
 }
 
 .ant-table-wrapper .ant-table-tbody > tr:hover > td {
-  background: #f8fafc !important;
+  background: rgba(0, 113, 227, 0.05) !important;
 }
 
-/* Ô nhập liệu chuẩn xác */
+/* Ô nhập liệu kính mờ */
 .ant-input, .ant-select-selector {
   border-radius: 8px !important;
-  border-color: #cbd5e1 !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  background: rgba(255, 255, 255, 0.75) !important;
 }
 
 .ant-input:focus, .ant-input-focused, .ant-select-focused .ant-select-selector {
-  border-color: #0284c7 !important;
-  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15) !important;
+  border-color: #0071e3 !important;
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.14) !important;
 }
 
-/* Nút bấm chuẩn Enterprise */
+/* Nút bấm chuẩn Apple */
 .ant-btn-primary {
-  background: #0284c7 !important;
-  border-color: #0284c7 !important;
+  background: #0071e3 !important;
+  border-color: #0071e3 !important;
   border-radius: 8px !important;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+  box-shadow: 0 2px 6px rgba(0, 113, 227, 0.25) !important;
   font-weight: 500 !important;
 }
 .ant-btn-primary:hover {
-  background: #0369a1 !important;
-  border-color: #0369a1 !important;
+  background: #0077ed !important;
+  border-color: #0077ed !important;
 }
 
-/* Modal & Dialog chuẩn sắc */
+/* Modal & Toast kính mờ chuẩn sắc */
 .ant-modal-content {
-  border-radius: 14px !important;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
-  border: 1px solid #e2e8f0 !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 24px 50px -12px rgba(0, 0, 0, 0.18), 0 0 1px rgba(0, 0, 0, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
   padding: 24px !important;
 }
-.ant-modal-title {
-  font-size: 16px !important;
-  font-weight: 600 !important;
-  letter-spacing: -0.01em !important;
-  color: #0f172a !important;
-}
+.ant-modal-title { font-size: 16px !important; font-weight: 600 !important; letter-spacing: -0.01em !important; color: #0f172a !important; }
 
-/* Toast Notification góc trên */
 .ant-notification-notice {
-  background: #ffffff !important;
-  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border-radius: 14px !important;
   padding: 16px 20px !important;
-  border: 1px solid #e2e8f0 !important;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.15) !important;
 }
-.ant-notification-notice-message, .ant-notification-notice-title {
-  font-size: 14.5px !important;
-  font-weight: 600 !important;
-  color: #0f172a !important;
-}
+.ant-notification-notice-message, .ant-notification-notice-title { font-size: 14.5px !important; font-weight: 600 !important; color: #0f172a !important; }
 .ant-notification-notice-icon { font-size: 18px !important; margin-top: 2px !important; }
 
-/* Tabs điều hướng */
+/* Tabs điều hướng kính mờ */
 .ant-tabs-nav {
-  background: #ffffff !important;
-  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.82) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border-radius: 12px !important;
   padding: 4px 6px !important;
   margin-bottom: 12px !important;
-  border: 1px solid #e2e8f0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.65) !important;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.04) !important;
 }
 .ant-tabs-nav::before { display: none !important; }
-.ant-tabs-tab {
-  font-size: 13.5px !important;
-  font-weight: 500 !important;
-  padding: 6px 14px !important;
-  color: #64748b !important;
-  border-radius: 6px !important;
-  transition: all 0.15s ease !important;
-}
-.ant-tabs-tab:hover { color: #0284c7 !important; }
-.ant-tabs-tab-active {
-  background: #f1f5f9 !important;
-}
-.ant-tabs-tab-active .ant-tabs-tab-btn {
-  font-weight: 600 !important;
-  color: #0284c7 !important;
-}
+.ant-tabs-tab { font-size: 13.5px !important; font-weight: 500 !important; padding: 6px 14px !important; color: #64748b !important; border-radius: 8px !important; transition: all 0.15s ease !important; }
+.ant-tabs-tab:hover { color: #0071e3 !important; }
+.ant-tabs-tab-active { background: #ffffff !important; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important; }
+.ant-tabs-tab-active .ant-tabs-tab-btn { font-weight: 600 !important; color: #0071e3 !important; }
 .ant-tabs-ink-bar { display: none !important; }
 
 /* Thin Smooth Scrollbar */
