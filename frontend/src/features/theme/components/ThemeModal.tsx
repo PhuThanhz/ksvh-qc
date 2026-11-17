@@ -54,13 +54,13 @@ export function ThemeModal({ open, onClose }: ThemeModalProps) {
       open={open}
       onCancel={onClose}
       footer={null}
-      width={720}
+      width={780}
       centered
       styles={{ body: { paddingBlock: 8 } }}
     >
       <Flex justify="space-between" align="center" style={{ marginBottom: 12 }}>
         <Typography.Paragraph type="secondary" style={{ fontSize: 13, margin: 0 }}>
-          Chọn một hình nền từ bộ sưu tập hoặc tải ảnh riêng từ máy tính:
+          Chọn một hình nền từ bộ sưu tập 18 kiệt tác hoặc tải ảnh riêng từ máy tính:
         </Typography.Paragraph>
         <Button
           type="text"
@@ -78,7 +78,10 @@ export function ThemeModal({ open, onClose }: ThemeModalProps) {
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
           gap: 12,
-          marginBottom: 18,
+          maxHeight: 390,
+          overflowY: 'auto',
+          paddingRight: 4,
+          marginBottom: 16,
         }}
       >
         {AMBIENT_PRESETS.map((preset) => {
@@ -96,8 +99,8 @@ export function ThemeModal({ open, onClose }: ThemeModalProps) {
                 borderRadius: 10,
                 overflow: 'hidden',
                 cursor: 'pointer',
-                border: isSelected ? '2px solid #0284c7' : '1px solid #e2e8f0',
-                boxShadow: isSelected ? '0 0 0 3px rgba(2, 132, 199, 0.2)' : undefined,
+                border: isSelected ? '2px solid #0071e3' : '1px solid #e2e8f0',
+                boxShadow: isSelected ? '0 0 0 3px rgba(0, 113, 227, 0.2)' : undefined,
                 transition: 'all 0.2s ease',
               }}
               styles={{ body: { padding: '8px 6px' } }}
@@ -117,7 +120,7 @@ export function ThemeModal({ open, onClose }: ThemeModalProps) {
                         position: 'absolute',
                         top: 6,
                         right: 6,
-                        color: '#0284c7',
+                        color: '#0071e3',
                         fontSize: 18,
                         background: '#ffffff',
                         borderRadius: '50%',
