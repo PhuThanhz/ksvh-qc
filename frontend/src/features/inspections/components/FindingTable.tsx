@@ -9,6 +9,8 @@ import {
 import { Button, Space, Table, Tag, Tooltip } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
+import { StatusBadge } from '@/components/data-display/StatusBadge'
+import { FINDING_STATUS_META } from '../constants/status'
 import type { FindingActionType } from '@/features/inspections/components/FindingActionModal'
 import type { FindingResponse, FindingStatus } from '@/features/inspections/inspection.types'
 import { formatDate } from '@/utils/format-date'
@@ -23,17 +25,6 @@ interface Props {
   onPageChange?: (page: number, pageSize: number) => void
   onAction: (finding: FindingResponse, action: FindingActionType) => void
   onView?: (finding: FindingResponse) => void
-}
-
-const STATUS_TAG: Record<FindingStatus, { color: string; label: string }> = {
-  OPEN: { color: 'warning', label: 'Chờ phản hồi' },
-  CONFIRMED: { color: 'processing', label: 'Đã xác nhận' },
-  APPEALED: { color: 'warning', label: 'Đang khiếu nại' },
-  APPEAL_MEETING: { color: 'magenta', label: 'Họp khiếu nại' },
-  REMEDIATING: { color: 'processing', label: 'Đang khắc phục' },
-  PENDING_VERIFICATION: { color: 'warning', label: 'Chờ nghiệm thu' },
-  CLOSED: { color: 'success', label: 'Đã đóng' },
-  DISMISSED: { color: 'default', label: 'Đã huỷ bỏ' },
 }
 
 export function FindingTable({
@@ -135,7 +126,7 @@ export function FindingTable({
       dataIndex: 'status',
       key: 'status',
       width: 130,
-      render: (st: FindingStatus) => <Tag color={STATUS_TAG[st]?.color}>{STATUS_TAG[st]?.label}</Tag>,
+      render: (st: FindingStatus) => <StatusBadge status={st} meta={FINDING_STATUS_META} />,
     },
     {
       title: 'Thao tác',

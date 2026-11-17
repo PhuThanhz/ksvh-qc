@@ -1,7 +1,8 @@
 import { Button, Card, Tag } from 'antd-mobile'
 import dayjs from 'dayjs'
+import { FINDING_STATUS_META } from '../../constants/status'
 import type { FindingActionType } from '@/features/inspections/components/FindingActionModal'
-import type { FindingResponse, FindingStatus } from '@/features/inspections/inspection.types'
+import type { FindingResponse } from '@/features/inspections/inspection.types'
 import { formatDate } from '@/utils/format-date'
 
 interface Props {
@@ -11,20 +12,11 @@ interface Props {
   onAction: (finding: FindingResponse, action: FindingActionType) => void
 }
 
-const STATUS_TAG: Record<FindingStatus, { color: string; label: string }> = {
-  OPEN: { color: 'warning', label: 'Chờ phản hồi' },
-  CONFIRMED: { color: 'primary', label: 'Đã xác nhận' },
-  APPEALED: { color: 'warning', label: 'Đang khiếu nại' },
-  APPEAL_MEETING: { color: 'warning', label: 'Họp khiếu nại' },
-  REMEDIATING: { color: 'primary', label: 'Đang khắc phục' },
-  PENDING_VERIFICATION: { color: 'warning', label: 'Chờ nghiệm thu' },
-  CLOSED: { color: 'success', label: 'Đã đóng' },
-  DISMISSED: { color: 'default', label: 'Đã huỷ' },
-}
-
 export function MobileFindingCard({ finding: f, canRespond, canRemediate, onAction }: Props) {
   const isOverdue = f.deadlineDate && dayjs(f.deadlineDate).isBefore(dayjs(), 'day') && f.status !== 'CLOSED' && f.status !== 'DISMISSED'
-  const tag = STATUS_TAG[f.status] ?? { color: 'default', label: f.status }
+  const meta = FINDING_STATUS_META[f.status]
+  const tagColor = meta ? (meta.tone === 'processing' ? 'primary' : meta.tone) : 'default'
+  const tagLabel = meta ? meta.label : f.status
 
   return (
     <Card style={{ borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
@@ -36,7 +28,7 @@ export function MobileFindingCard({ finding: f, canRespond, canRemediate, onActi
           <Tag color={f.riskLevelCode === 'M4' ? 'danger' : f.riskLevelCode === 'M3' ? 'warning' : 'primary'}>
             {f.riskLevelCode} - {f.riskLevelName}
           </Tag>
-          <Tag color={tag.color}>{tag.label}</Tag>
+          <Tag color={tagColor}>{tagLabel}</Tag>
         </div>
       </div>
 

@@ -2,15 +2,14 @@ import {
   AlertOutlined,
   CalendarOutlined,
   CheckCircleOutlined,
-  EyeOutlined,
   FireOutlined,
 } from '@ant-design/icons'
-import { Button, Card, Col, DatePicker, Flex, Row, Select, Table, Tag, Tooltip, Typography } from 'antd'
-import type { ColumnsType } from 'antd/es/table'
+import { Card, Col, DatePicker, Flex, Row, Select, Typography } from 'antd'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { KpiCard } from '@/components/data-display/KpiCard'
 import { TableCard } from '@/components/data-display/TableCard'
+import { CriterionRiskTable } from '@/features/inspections/components/risk-profile/CriterionRiskTable'
 import { OccurrenceHistoryModal } from '@/features/inspections/components/risk-profile/OccurrenceHistoryModal'
 import { useRestaurantRiskProfile } from '@/features/inspections/hooks/useRiskProfile'
 import type { CriterionRiskProfileItem } from '@/features/inspections/risk-profile.types'
@@ -33,100 +32,6 @@ export function RestaurantRiskProfileTab({ initialRestaurantId }: RestaurantRisk
 
   const activeRestId = restaurantId ?? restList[0]?.id
   const { data, isLoading } = useRestaurantRiskProfile(activeRestId, asOfDate)
-
-  const columns: ColumnsType<CriterionRiskProfileItem> = [
-    {
-      title: 'Mã tiêu chí',
-      dataIndex: 'criterionCode',
-      key: 'criterionCode',
-      width: 120,
-      render: (v) => <b>{v}</b>,
-    },
-    {
-      title: 'Tên tiêu chí',
-      dataIndex: 'criterionName',
-      key: 'criterionName',
-      ellipsis: true,
-      render: (v, r) => (
-        <div>
-          <div>{v}</div>
-          <div style={{ fontSize: 12, color: 'var(--app-text-secondary)' }}>Nhóm: {r.groupName || 'Chung'}</div>
-        </div>
-      ),
-    },
-    {
-      title: 'Mức ảnh hưởng',
-      key: 'impact',
-      width: 160,
-      render: (_, r) => (
-        <Flex align="center" gap={6}>
-          <Tag>Gốc: Mức {r.baseImpact}</Tag>
-          {r.isEscalated ? (
-            <Tag color="error">▲ Hiệu lực: Mức {r.effectiveImpact}</Tag>
-          ) : (
-            <Tag color="success">Hiệu lực: Mức {r.effectiveImpact}</Tag>
-          )}
-        </Flex>
-      ),
-    },
-    {
-      title: 'Tần suất kỳ',
-      dataIndex: 'frequencyInPeriod',
-      key: 'frequencyInPeriod',
-      width: 105,
-      align: 'right',
-      render: (v: number) => (v > 0 ? <b style={{ color: v >= 3 ? '#ff4d4f' : '#fa8c16' }}>{v} lần</b> : '0'),
-    },
-    {
-      title: 'Lần lỗi gần nhất',
-      dataIndex: 'lastViolationDate',
-      key: 'lastViolationDate',
-      width: 130,
-      render: (v?: string) => (v ? formatDate(v) : 'Chưa có lỗi'),
-    },
-    {
-      title: 'Dự kiến hạ mức',
-      key: 'reset',
-      width: 210,
-      render: (_, r) => {
-        if (!r.isEscalated) {
-          return <Tag color="default">Đang ở mức gốc</Tag>
-        }
-        return (
-          <Tooltip title={`Đã có ${r.cleanMonthsCount}/${data?.resetPeriodMonths ?? 6} tháng sạch liên tục`}>
-            <Tag color="warning">
-              Về mức {r.baseImpact} từ {formatDate(r.expectedResetDate)}
-            </Tag>
-          </Tooltip>
-        )
-      },
-    },
-    {
-      title: 'Lỗi đang mở',
-      dataIndex: 'openFindingsCount',
-      key: 'openFindingsCount',
-      width: 110,
-      align: 'right',
-      render: (v: number) => (v > 0 ? <b style={{ color: '#ff4d4f' }}>{v}</b> : 0),
-    },
-    {
-      title: 'Lịch sử',
-      key: 'actions',
-      width: 80,
-      align: 'center',
-      render: (_, r) => (
-        <Tooltip title="Xem lịch sử các lần vi phạm">
-          <Button
-            size="small"
-            type="text"
-            icon={<EyeOutlined />}
-            onClick={() => setSelectedCriterion(r)}
-            disabled={!r.occurrences?.length}
-          />
-        </Tooltip>
-      ),
-    },
-  ]
 
   return (
     <Flex vertical gap={16}>
@@ -155,7 +60,7 @@ export function RestaurantRiskProfileTab({ initialRestaurantId }: RestaurantRisk
           </Flex>
 
           {data && (
-            <div style={{ fontSize: 13, color: 'var(--app-text-secondary)' }}>
+            <div className="app-secondary-text">
               Công ty: <b>{data.companyName || '—'}</b> · CHT: <b>{data.storeManagerName || '—'}</b>
             </div>
           )}
@@ -210,19 +115,16 @@ export function RestaurantRiskProfileTab({ initialRestaurantId }: RestaurantRisk
           <Typography.Title level={5} style={{ margin: 0 }}>
             Hồ sơ rủi ro chi tiết theo từng tiêu chí tại {data?.restaurantName || 'nhà hàng'}
           </Typography.Title>
-          <span style={{ fontSize: 13, color: 'var(--app-text-secondary)' }}>
+          <span className="app-secondary-text">
             Tổng số: <b>{data?.criteria.length ?? 0}</b> tiêu chí từng ghi nhận vi phạm
           </span>
         </Flex>
 
-        <Table
-          rowKey="criterionId"
-          dataSource={data?.criteria ?? []}
-          columns={columns}
-          loading={isLoading}
-          pagination={{ pageSize: 15, showSizeChanger: true }}
-          size="middle"
-          scroll={{ x: 950 }}
+        <CriterionRiskTable
+          criteria={data?.criteria ?? []}
+          isLoading={isLoading}
+          resetPeriodMonths={data?.resetPeriodMonths}
+          onSelectCriterion={setSelectedCriterion}
         />
       </TableCard>
 

@@ -25,9 +25,13 @@ export function FindingAppealReviewsCard({ finding }: Props) {
       render: (name: string, r) => (
         <div>
           <span style={{ fontWeight: 600 }}>{name || `Người dùng #${r.reviewerId}`}</span>
-          {r.reviewerRoles && (
+          {r.ksvhRep ? (
             <Tag color="blue" style={{ marginLeft: 6, fontSize: 11 }}>
-              {r.reviewerRoles}
+              Đại diện KSVH
+            </Tag>
+          ) : (
+            <Tag color="cyan" style={{ marginLeft: 6, fontSize: 11 }}>
+              OBM / Vận hành
             </Tag>
           )}
         </div>

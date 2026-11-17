@@ -4,8 +4,8 @@ import { useEffect, useMemo } from 'react'
 import { useSession } from '@/features/auth'
 import { useCriterionGroups } from '@/features/criteria/hooks/useCriteria'
 import { useTemplates } from '@/features/criteria/hooks/useTemplates'
+import { InspectionScopeSelector } from '@/features/inspections/components/InspectionScopeSelector'
 import { useInspectionMutations, usePlans } from '@/features/inspections/hooks/useInspectionData'
-import { VerificationCandidateSelector } from '@/features/inspections/components/VerificationCandidateSelector'
 import {
   INSPECTION_KIND_LABEL,
   INSPECTION_MODE_LABEL,
@@ -143,51 +143,15 @@ export function InspectionSingleForm({ onSuccess, onCancel, initialValues }: Pro
         />
       </Form.Item>
 
-      {isPeriodic && (
-        <Form.Item
-          name="templateId"
-          label="Mẫu phiếu chấm"
-          rules={[{ required: true, message: 'Vui lòng chọn mẫu phiếu' }]}
-          extra={selectedRestaurant?.companyName ? `Lọc mẫu áp dụng cho: ${selectedRestaurant.companyName}` : undefined}
-        >
-          <Select
-            showSearch
-            placeholder={selectedRestaurant ? 'Chọn mẫu phiếu đánh giá...' : 'Chọn nhà hàng trước để lọc mẫu phù hợp'}
-            filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
-            options={filteredTemplates.map((t) => ({
-              value: t.id,
-              label: `${t.code} - ${t.name} (${t.criterionCount} tiêu chí)`,
-            }))}
-          />
-        </Form.Item>
-      )}
-
-      {kind === 'SURPRISE' && (
-        <Form.Item
-          name="topicGroupIds"
-          label="Chuyên đề kiểm tra"
-          rules={[{ required: true, message: 'Chọn ít nhất một chuyên đề' }]}
-        >
-          <Select
-            mode="multiple"
-            placeholder="Chọn chuyên đề..."
-            options={filteredGroups.map((g) => ({
-              value: g.id,
-              label: `${g.name} (${g.criterionCount} tiêu chí)`,
-            }))}
-          />
-        </Form.Item>
-      )}
-
-      {isVerification && (
-        <Form.Item name="findingIds">
-          <VerificationCandidateSelector
-            restaurantId={restaurantId}
-            value={findingIds}
-            onChange={(ids) => form.setFieldValue('findingIds', ids)}
-          />
-        </Form.Item>
-      )}
+      <InspectionScopeSelector
+        kind={kind}
+        selectedRestaurant={selectedRestaurant}
+        restaurantId={restaurantId}
+        filteredTemplates={filteredTemplates}
+        filteredGroups={filteredGroups}
+        findingIds={findingIds}
+        onChangeFindingIds={(ids) => form.setFieldValue('findingIds', ids)}
+      />
 
       {!isPeriodic && (
         <Form.Item name="inspectionMode" label="Hình thức" rules={[{ required: true }]}>

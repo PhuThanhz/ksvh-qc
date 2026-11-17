@@ -68,6 +68,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/notifications/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lấy cấu hình kênh nhận thông báo của người dùng hiện tại */
+        get: operations["getPreferences"];
+        /** Cập nhật cấu hình kênh nhận thông báo của người dùng hiện tại */
+        put: operations["updatePreferences"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/inspection-templates/{id}": {
         parameters: {
             query?: never;
@@ -1743,6 +1761,23 @@ export interface components {
             username: string;
             fullName: string;
         };
+        NotificationPreferenceRequest: {
+            emailEnabled: boolean;
+            zaloEnabled: boolean;
+            /** Format: email */
+            customEmail: string;
+            customPhone: string;
+        };
+        NotificationPreferenceResponse: {
+            /** Format: int64 */
+            userId: number;
+            emailEnabled: boolean;
+            zaloEnabled: boolean;
+            customEmail: string;
+            customPhone: string;
+            resolvedEmail: string;
+            resolvedPhone: string;
+        };
         TemplateRequest: {
             code: string;
             name: string;
@@ -2932,6 +2967,8 @@ export type RiskLevelVersionResponse = components['schemas']['RiskLevelVersionRe
 export type OrgUnitRequest = components['schemas']['OrgUnitRequest'];
 export type OrgUnitResponse = components['schemas']['OrgUnitResponse'];
 export type UserRef = components['schemas']['UserRef'];
+export type NotificationPreferenceRequest = components['schemas']['NotificationPreferenceRequest'];
+export type NotificationPreferenceResponse = components['schemas']['NotificationPreferenceResponse'];
 export type TemplateRequest = components['schemas']['TemplateRequest'];
 export type CriterionResponse = components['schemas']['CriterionResponse'];
 export type CriterionTemplateRef = components['schemas']['CriterionTemplateRef'];
@@ -3272,6 +3309,50 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    getPreferences: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["NotificationPreferenceResponse"];
+                };
+            };
+        };
+    };
+    updatePreferences: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NotificationPreferenceRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["NotificationPreferenceResponse"];
+                };
             };
         };
     };

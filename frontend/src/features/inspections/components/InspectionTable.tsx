@@ -1,6 +1,8 @@
 import { CloseCircleOutlined, EyeOutlined } from '@ant-design/icons'
 import { Button, Space, Table, Tag, Tooltip } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
+import { StatusBadge } from '@/components/data-display/StatusBadge'
+import { INSPECTION_STATUS_META } from '../constants/status'
 import type { InspectionResponse, InspectionStatus } from '@/features/inspections/inspection.types'
 import { formatDate } from '@/utils/format-date'
 import { INSPECTION_KIND_LABEL, INSPECTION_MODE_LABEL, type InspectionKind } from '@/features/inspections/inspection.types'
@@ -16,15 +18,6 @@ interface Props {
   onPageChange?: (page: number, pageSize: number) => void
   onView: (ins: InspectionResponse) => void
   onCancel: (ins: InspectionResponse) => void
-}
-
-const STATUS_TAG: Record<InspectionStatus, { color: string; label: string }> = {
-  ASSIGNED: { color: 'default', label: 'Đã phân công' },
-  IN_PROGRESS: { color: 'processing', label: 'Đang chấm' },
-  SUBMITTED: { color: 'warning', label: 'Đã nộp' },
-  AWAITING_ACK: { color: 'warning', label: 'Chờ CHT xác nhận' },
-  COMPLETED: { color: 'success', label: 'Hoàn thành' },
-  CANCELLED: { color: 'default', label: 'Đã huỷ' },
 }
 
 export function InspectionTable({
@@ -145,7 +138,7 @@ export function InspectionTable({
       dataIndex: 'status',
       key: 'status',
       width: 130,
-      render: (st: InspectionStatus) => <Tag color={STATUS_TAG[st]?.color}>{STATUS_TAG[st]?.label}</Tag>,
+      render: (st: InspectionStatus) => <StatusBadge status={st} meta={INSPECTION_STATUS_META} />,
     },
     {
       title: 'Thời gian',

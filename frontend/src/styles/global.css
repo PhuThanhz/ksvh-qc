@@ -525,3 +525,39 @@ body {
   border: 1px solid var(--app-glass-border);
   box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.02);
 }
+
+/* Các lớp tiện ích chuẩn hoá style lặp (Plan O2.5) */
+.app-subtext,
+.app-caption {
+  font-size: 12px !important;
+  color: var(--app-text-secondary) !important;
+  line-height: 1.4 !important;
+}
+
+.app-secondary-text {
+  font-size: 13px !important;
+  color: var(--app-text-secondary) !important;
+}
+
+.app-danger-text {
+  color: var(--app-danger) !important;
+}
+
+.app-warning-text {
+  color: var(--app-warning) !important;
+}
+
+.app-success-text {
+  color: var(--app-success) !important;
+}
+
+.app-mobile-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: all 0.15s ease;
+}
+

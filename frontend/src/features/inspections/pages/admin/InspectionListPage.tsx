@@ -1,12 +1,13 @@
 import { DownloadOutlined, PlusOutlined, ThunderboltOutlined } from '@ant-design/icons'
-import { Badge, Button, Flex, Input, Modal, Segmented, Select, Space } from 'antd'
+import { Badge, Button, Flex, Space } from 'antd'
 import dayjs from 'dayjs'
 import { useCallback, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router'
-import { AdvancedFilter } from '@/components/data-entry/AdvancedFilter'
 import { PageContainer } from '@/components/layout/PageContainer'
+import { CancelInspectionModal } from '@/features/inspections/components/CancelInspectionModal'
 import { InspectionDetailModal } from '@/features/inspections/components/InspectionDetailModal'
 import { InspectionFormModal } from '@/features/inspections/components/InspectionFormModal'
+import { InspectionListFilterBar } from '@/features/inspections/components/InspectionListFilterBar'
 import { InspectionTable } from '@/features/inspections/components/InspectionTable'
 import { SurpriseSuggestionsModal } from '@/features/inspections/components/SurpriseSuggestionsModal'
 import { useInspectionMutations, useInspections } from '@/features/inspections/hooks/useInspectionData'
@@ -31,16 +32,6 @@ interface Filters extends Record<string, unknown> {
   restaurantId?: number
   status?: InspectionStatus
 }
-
-const STATUS_TABS: { value: string; label: string }[] = [
-  { value: 'ALL', label: 'Tất cả' },
-  { value: 'ASSIGNED', label: 'Đã phân công' },
-  { value: 'IN_PROGRESS', label: 'Đang chấm' },
-  { value: 'SUBMITTED', label: 'Đã nộp' },
-  { value: 'AWAITING_ACK', label: 'Chờ CHT' },
-  { value: 'COMPLETED', label: 'Hoàn thành' },
-  { value: 'CANCELLED', label: 'Đã huỷ' },
-]
 
 export function InspectionListPage() {
   const [searchParams] = useSearchParams()
@@ -142,47 +133,18 @@ export function InspectionListPage() {
       }
     >
       <Flex vertical gap={16}>
-        <AdvancedFilter
-          top={
-            <Segmented
-              options={STATUS_TABS}
-              value={activeTab}
-              onChange={(val) => setFilter('status', val === 'ALL' ? undefined : (val as InspectionStatus))}
-              style={{ width: 'fit-content', background: 'var(--app-surface-sunken)', padding: 3, borderRadius: 8 }}
-            />
-          }
-          search={{
-            placeholder: 'Tìm theo mã phiếu, loại kiểm tra...',
-            value: filters.keyword,
-            onSearch,
-          }}
-          activeCount={activeFilterCount}
+        <InspectionListFilterBar
+          activeTab={activeTab}
+          keyword={filters.keyword}
+          restaurantId={filters.restaurantId}
+          status={filters.status}
+          activeFilterCount={activeFilterCount}
+          restaurants={restaurants.data?.items ?? []}
+          onSearch={onSearch}
+          onFilterStatus={(val) => setFilter('status', val)}
+          onFilterRestaurant={(val) => setFilter('restaurantId', val)}
           onReset={resetFilters}
-        >
-          <Select
-            placeholder="Nhà hàng"
-            allowClear
-            showSearch
-            value={filters.restaurantId}
-            onChange={(v) => setFilter('restaurantId', v)}
-            style={{ width: 220 }}
-            filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
-            options={restaurants.data?.items.map((r) => ({ value: r.id, label: `${r.code} - ${r.name}` }))}
-          />
-
-          <Select
-            placeholder="Trạng thái"
-            allowClear
-            value={filters.status}
-            onChange={(v) => setFilter('status', v)}
-            style={{ width: 160 }}
-            options={[
-              { value: 'ASSIGNED', label: 'Đã phân công' }, { value: 'IN_PROGRESS', label: 'Đang chấm' },
-              { value: 'SUBMITTED', label: 'Đã nộp' }, { value: 'AWAITING_ACK', label: 'Chờ CHT xác nhận' },
-              { value: 'COMPLETED', label: 'Hoàn thành' }, { value: 'CANCELLED', label: 'Đã huỷ' },
-            ]}
-          />
-        </AdvancedFilter>
+        />
 
         <InspectionTable
           data={inspections.data?.items}
@@ -222,23 +184,14 @@ export function InspectionListPage() {
         onClose={() => setDetailModal({ open: false })}
       />
 
-      <Modal
-        title="Xác nhận huỷ phiếu kiểm tra"
+      <CancelInspectionModal
         open={cancelDialog.open}
+        reason={cancelDialog.reason}
+        loading={cancel.isPending}
+        onChangeReason={(val) => setCancelDialog((prev) => ({ ...prev, reason: val }))}
+        onConfirm={onConfirmCancel}
         onCancel={() => setCancelDialog({ open: false, reason: '' })}
-        onOk={onConfirmCancel}
-        okText="Huỷ phiếu"
-        okButtonProps={{ danger: true, loading: cancel.isPending }}
-        centered
-      >
-        <p style={{ marginTop: 12 }}>Bạn có chắc chắn muốn huỷ phiếu kiểm tra này? Thao tác sẽ huỷ toàn bộ dữ liệu.</p>
-        <Input.TextArea
-          rows={3}
-          placeholder="Nhập lý do huỷ phiếu bắt buộc..."
-          value={cancelDialog.reason}
-          onChange={(e) => setCancelDialog((prev) => ({ ...prev, reason: e.target.value }))}
-        />
-      </Modal>
+      />
     </PageContainer>
   )
 }

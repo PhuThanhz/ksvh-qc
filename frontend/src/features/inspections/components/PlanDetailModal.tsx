@@ -1,30 +1,16 @@
 import { Descriptions, Flex, Modal, Spin, Table, Tag, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
+import { StatusBadge } from '@/components/data-display/StatusBadge'
+import { INSPECTION_STATUS_META, PLAN_STATUS_META } from '../constants/status'
 import { RestaurantPriorWarningTag } from '@/features/inspections/components/RestaurantPriorWarningTag'
 import { usePlan } from '@/features/inspections/hooks/useInspectionData'
-import type { InspectionStatus, PlanAssignmentResponse, PlanStatus } from '@/features/inspections/inspection.types'
+import type { PlanAssignmentResponse } from '@/features/inspections/inspection.types'
 import { formatDate } from '@/utils/format-date'
 
 interface Props {
   planId?: number
   open: boolean
   onClose: () => void
-}
-
-const STATUS_TAG: Record<PlanStatus, { color: string; label: string }> = {
-  DRAFT: { color: 'default', label: 'Bản nháp' },
-  PENDING_APPROVAL: { color: 'warning', label: 'Chờ duyệt' },
-  APPROVED: { color: 'success', label: 'Đã duyệt' },
-  REJECTED: { color: 'error', label: 'Từ chối' },
-}
-
-const INSPECTION_STATUS_TAG: Record<InspectionStatus, { color: string; label: string }> = {
-  ASSIGNED: { color: 'blue', label: 'Chưa bắt đầu' },
-  IN_PROGRESS: { color: 'processing', label: 'Đang kiểm tra' },
-  SUBMITTED: { color: 'gold', label: 'Đã nộp' },
-  AWAITING_ACK: { color: 'orange', label: 'Chờ CHT xác nhận' },
-  COMPLETED: { color: 'green', label: 'Hoàn thành' },
-  CANCELLED: { color: 'red', label: 'Đã huỷ' },
 }
 
 export function PlanDetailModal({ planId, open, onClose }: Props) {
@@ -83,13 +69,12 @@ export function PlanDetailModal({ planId, open, onClose }: Props) {
         if (!r.inspectionId) {
           return <Tag color="default">Chưa tạo (tạo khi duyệt)</Tag>
         }
-        const stMeta = r.inspectionStatus ? INSPECTION_STATUS_TAG[r.inspectionStatus] : undefined
         return (
           <Flex gap={6} align="center">
             <Typography.Text strong style={{ fontFamily: 'monospace' }}>
               {r.inspectionCode}
             </Typography.Text>
-            {stMeta && <Tag color={stMeta.color}>{stMeta.label}</Tag>}
+            {r.inspectionStatus && <StatusBadge status={r.inspectionStatus} meta={INSPECTION_STATUS_META} />}
           </Flex>
         )
       },
@@ -112,7 +97,7 @@ export function PlanDetailModal({ planId, open, onClose }: Props) {
               <Descriptions.Item label="Mã kế hoạch">{plan.planCode}</Descriptions.Item>
               <Descriptions.Item label="Tiêu đề">{plan.title}</Descriptions.Item>
               <Descriptions.Item label="Trạng thái">
-                <Tag color={STATUS_TAG[plan.status]?.color}>{STATUS_TAG[plan.status]?.label}</Tag>
+                <StatusBadge status={plan.status} meta={PLAN_STATUS_META} />
               </Descriptions.Item>
               <Descriptions.Item label="Thời gian thực hiện">
                 {`${formatDate(plan.startDate)} - ${formatDate(plan.endDate)}`}

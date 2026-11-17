@@ -5,15 +5,16 @@ Nguyên tắc chung: **không đổi hành vi nghiệp vụ** (trừ Plan O4 –
 `cd backend && ./mvnw -q verify` + `cd frontend && npm run typecheck && npm run lint && npm run build`. Không thêm thư viện lớn khi chưa hỏi người dùng.
 
 ## Số đo hiện tại (để so sánh khi xong)
-| Chỉ số | Hiện tại | Mục tiêu |
-|---|---|---|
-| `vendor-antd` (gzip) | 1.457 kB (461 kB) | < 900 kB (< 300 kB) |
-| `vendor-echarts` (gzip) | 516 kB (172 kB) | < 250 kB (< 90 kB), chỉ tải ở trang có biểu đồ |
-| `InspectionService.java` / `FindingService.java` | 873 / 693 dòng | mỗi lớp < 300 dòng |
-| `ReportService` / `PdfExportService` / `InspectionPlanService` | 519 / 485 / 429 dòng | < 300 dòng |
-| File frontend sát giới hạn 250 dòng | 10 file (≥ 230 dòng) | không file nào > 200 dòng |
-| Bảng trạng thái (`STATUS_TAG`/`STATUS_TABS`/`ACTION_META`) chép lại | 7 file | 1 chỗ |
-| Kiểu dữ liệu viết tay `inspection.types.ts` | 21 export | lấy từ `api.generated.ts` |
+| Chỉ số | Hiện tại | Mục tiêu | Trạng thái |
+|---|---|---|---|
+| `vendor-antd` (gzip) | 1.457 kB (461 kB) | < 900 kB (< 300 kB) | Chờ Plan O5 |
+| `vendor-echarts` (gzip) | 516 kB (172 kB) | < 250 kB (< 90 kB), chỉ tải ở trang có biểu đồ | Chờ Plan O5 |
+| `InspectionService.java` / `FindingService.java` | 873 / 693 dòng | mỗi lớp < 300 dòng | Chờ Plan O1 |
+| `ReportService` / `PdfExportService` / `InspectionPlanService` | 519 / 485 / 429 dòng | < 300 dòng | Chờ Plan O1 |
+| File frontend sát giới hạn 250 dòng | 0 file ≥ 200 dòng trong số 10 file mục tiêu | không file nào > 200 dòng | **ĐÃ XONG (O2.3)** |
+| Bảng trạng thái (`STATUS_TAG`/`STATUS_TABS`/`ACTION_META`) chép lại | 1 chỗ (`constants/status.ts`) | 1 chỗ | **ĐÃ XONG (O2.1)** |
+| Kiểu dữ liệu viết tay `inspection.types.ts` | Alias từ `api.generated.ts` | lấy từ `api.generated.ts` | **ĐÃ XONG (O2.2)** |
+| API layer URL rải rác | 1 hằng `PATH` tập trung | tập trung 1 chỗ | **ĐÃ XONG (O2.4)** |
 
 ---
 
@@ -94,3 +95,48 @@ Nguyên tắc chung: **không đổi hành vi nghiệp vụ** (trừ Plan O4 –
 ## Thứ tự đề xuất
 O2.1–O2.2 (nhanh, giảm lỗi) → O1 (tách service, dễ bảo trì) → O5 (hiệu năng, có số đo) → O3 (giao diện) → O4 (luồng – cần người dùng duyệt từng mục).
 Mỗi plan xong: cập nhật bảng "Số đo hiện tại" ở đầu file với số mới.
+
+---
+
+## Plan O0 – Sửa trước khi tối ưu (bổ sung 17/11/2026 sau khi rà commit `297008f`) · Ưu tiên CAO, làm TRƯỚC O1–O5
+Rà lại: 104/104 test backend qua, frontend build qua. Còn 2 lỗi nhỏ + 1 chỗ tài liệu sai.
+
+### O0.1 – Service worker giữ bản cũ sau khi triển khai (LỖI)
+- File: `frontend/public/sw.js`, `frontend/index.html`.
+- Hiện tượng: `STATIC_ASSETS` chứa `'/'` và `'/index.html'` → nhánh cache-first chạy **trước** nhánh `navigate`, nên mở `/` luôn nhận `index.html` cũ;
+  tên cache cố định `ksvh-qc-static-v1` không đổi theo bản build → người dùng kẹt ở bản cũ sau mỗi lần triển khai cho tới khi tự xoá cache.
+  Service worker còn được đăng ký cả khi chạy dev (`npm run dev` / localhost) gây khó hiểu khi code.
+- Sửa:
+  1. Bỏ `'/'`, `'/index.html'` khỏi danh sách cache-first. Mọi yêu cầu `mode === 'navigate'` (và `index.html`) dùng **network-first**,
+     chỉ lấy cache khi mất mạng; khi tải mạng thành công thì cập nhật bản `index.html` trong cache để dùng lúc offline.
+  2. `/assets/*` (tên file có hash) giữ cache-first như cũ.
+  3. Tên cache gắn phiên bản build: sinh `sw.js` lúc build hoặc chèn `__BUILD_ID__` (vd hash/ thời điểm build qua plugin nhỏ trong `vite.config.ts`);
+     `activate` xoá cache cũ (đã có).
+  4. Không đăng ký service worker ở dev: chỉ đăng ký khi `import.meta.env.PROD` (chuyển đoạn đăng ký sang `src/main.tsx` hoặc file
+     `public/register-sw.js` – xem O0.2 vì CSP chặn script inline).
+- Kiểm tra: build 2 lần liên tiếp có thay đổi code → mở `/` lần 2 nhận bản mới (DevTools → Application → Service Workers / Cache);
+  tắt mạng → điều hướng `/qc` vẫn mở được giao diện.
+
+### O0.2 – CSP chưa áp cho trang web thật (BẢO MẬT)
+- Hiện tượng: CSP chỉ đặt trong `backend/.../security/SecurityConfig.java` → chỉ gắn vào phản hồi API JSON. Trang HTML do nginx phục vụ
+  (`frontend/nginx.conf`) chỉ có `X-Frame-Options`, `X-Content-Type-Options`, `X-XSS-Protection` – **không có CSP**.
+- Sửa:
+  1. Thêm vào `frontend/nginx.conf` (khối phục vụ SPA, `always`):
+     `Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; media-src 'self' blob: https:; font-src 'self' data:; connect-src 'self' https:; worker-src 'self'; manifest-src 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'"`
+     (`style-src 'unsafe-inline'` cần cho antd/style inline; `img-src https:` cho ảnh nền Unsplash và ảnh MinIO; `media-src` cho video bằng chứng).
+     Nếu MinIO/ảnh dùng domain cụ thể, thay `https:` bằng domain đó.
+  2. Thêm `Referrer-Policy "strict-origin-when-cross-origin"` và `Strict-Transport-Security` (khi chạy HTTPS) vào nginx; bỏ `X-XSS-Protection` (đã lỗi thời).
+  3. Script đăng ký service worker đang **inline** trong `index.html` → bị `script-src 'self'` chặn: chuyển sang `src/main.tsx` (chỉ khi PROD) theo O0.1.
+- Kiểm tra: chạy bản build qua docker-compose/nginx, mở `/admin` và `/qc`: không có lỗi CSP trong console (ảnh nền, ảnh/video bằng chứng,
+  xuất PDF/Excel, đăng nhập, chuông thông báo đều chạy); `curl -I` trang chủ thấy header CSP.
+
+### O0.3 – Tài liệu tài khoản thử
+- Báo cáo trước ghi sai tài khoản (`lead / Admin@123`, `auditor1`, `store1`). Tài khoản đúng theo `backend/src/main/resources/application-dev.yml`:
+  `admin / Admin@123` (đa vai trò trên máy dev), `bizadmin / Bizadmin@123`, `lead / Lead@123`, `manager / Manager@123`,
+  `inspector / Inspector@123`, `store / Store@123`, `obm / Obm@123`, `executive / Executive@123`.
+- Sửa mọi tài liệu có nhắc tài khoản (README, `docs/UAT_CHECKLIST.md`, …) cho khớp. Lưu ý: tài khoản dev chỉ tạo khi username chưa tồn tại,
+  nên đổi vai trò trong yml không tự cập nhật user đã có trong DB – ghi chú điều này trong README.
+
+### Hoàn thành O0 khi
+`cd backend && ./mvnw -q verify` + `cd frontend && npm run typecheck && npm run lint && npm run build` qua; kiểm tra thủ công O0.1/O0.2 như trên;
+commit riêng: `fix(pwa): network-first app shell and versioned cache`, `fix(security): add CSP and security headers to nginx`, `docs: correct dev test accounts`.

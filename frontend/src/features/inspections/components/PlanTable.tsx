@@ -1,6 +1,8 @@
 import { CheckOutlined, CloseOutlined, DeleteOutlined, EditOutlined, EyeOutlined, SendOutlined } from '@ant-design/icons'
-import { Space, Table, Tag, Tooltip, Typography } from 'antd'
+import { Space, Table, Tooltip, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
+import { StatusBadge } from '@/components/data-display/StatusBadge'
+import { PLAN_STATUS_META } from '../constants/status'
 import type { PlanResponse, PlanStatus } from '@/features/inspections/inspection.types'
 import { formatDate } from '@/utils/format-date'
 import { PERMISSIONS, usePermission } from '@/permissions'
@@ -18,13 +20,6 @@ interface Props {
   onApprove: (plan: PlanResponse) => void
   onReject: (plan: PlanResponse) => void
   onDelete: (plan: PlanResponse) => void
-}
-
-const STATUS_TAG: Record<PlanStatus, { color: string; label: string }> = {
-  DRAFT: { color: 'default', label: 'Bản nháp' },
-  PENDING_APPROVAL: { color: 'warning', label: 'Chờ duyệt' },
-  APPROVED: { color: 'success', label: 'Đã duyệt' },
-  REJECTED: { color: 'error', label: 'Từ chối' },
 }
 
 export function PlanTable({
@@ -92,7 +87,7 @@ export function PlanTable({
       dataIndex: 'status',
       key: 'status',
       width: 130,
-      render: (st: PlanStatus) => <Tag color={STATUS_TAG[st]?.color}>{STATUS_TAG[st]?.label}</Tag>,
+      render: (st: PlanStatus) => <StatusBadge status={st} meta={PLAN_STATUS_META} />,
     },
     {
       title: 'Số phân công',
