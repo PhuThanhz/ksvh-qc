@@ -22,7 +22,8 @@ public record InspectionItemResponse(
         String findingDescription,
         String findingEvidenceUrls,
         String remediationPlan,
-        String remediationEvidenceUrls
+        String remediationEvidenceUrls,
+        String findingStatus
 ) {
     public static InspectionItemResponse from(InspectionItem item) {
         return from(item, null);
@@ -41,11 +42,12 @@ public record InspectionItemResponse(
                 item.getEvidenceUrls(),
                 item.getSortOrder(),
                 item.getEvaluatedAt(),
-                item.getFindingId(),
+                item.getFindingId() != null ? item.getFindingId() : (finding != null ? finding.getId() : null),
                 finding != null ? finding.getDescription() : null,
                 finding != null ? finding.getEvidenceUrls() : null,
                 finding != null ? finding.getRemediationPlan() : null,
-                finding != null ? finding.getRemediationEvidenceUrls() : null
+                finding != null ? finding.getRemediationEvidenceUrls() : null,
+                finding != null && finding.getStatus() != null ? finding.getStatus().name() : null
         );
     }
 }

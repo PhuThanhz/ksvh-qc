@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import vn.ksvh.qc.employee.api.EmployeeContactInfo;
 import vn.ksvh.qc.employee.api.EmployeeLookupApi;
@@ -32,7 +33,7 @@ public class NotificationDispatchService {
     private final EmployeeLookupApi employeeLookupApi;
 
     @Async
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void dispatchAsync(Long userId, Long notificationId, String title, String body, String link) {
         dispatchSync(userId, notificationId, title, body, link);
     }

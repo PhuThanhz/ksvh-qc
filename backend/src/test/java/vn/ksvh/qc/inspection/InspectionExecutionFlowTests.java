@@ -584,6 +584,8 @@ class InspectionExecutionFlowTests extends ApiTestSupport {
 
         assertThat(jdbc.queryForObject("SELECT count(*) FROM finding_occurrences WHERE finding_id = ? AND source = 'APPEAL_UPHELD'",
                 Integer.class, f1)).isEqualTo(1);
+        LocalDate f1Deadline = jdbc.queryForObject("SELECT deadline_date FROM findings WHERE id = ?", LocalDate.class, f1);
+        assertThat(f1Deadline).isAfterOrEqualTo(LocalDate.now());
 
         // 4. Ca đồng thuận DISMISSED (bỏ lỗi -> DISMISSED, không +1) trên f2
         mvc.perform(withJson(post("/api/v1/findings/" + f2 + "/appeal"),
@@ -601,10 +603,15 @@ class InspectionExecutionFlowTests extends ApiTestSupport {
                 .andExpect(jsonPath("$.status").value(FindingStatus.DISMISSED.name()))
                 .andExpect(jsonPath("$.appealConclusion").value(AppealConclusion.DISMISSED.name()));
 
-        // Tiêu chí f2 trên phiếu chấm được chuyển thành PASS
+        // Bỏ lỗi không tạo finding_occurrences
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM finding_occurrences WHERE finding_id = ?",
+                Integer.class, f2)).isEqualTo(0);
+
+        // Kết quả chấm gốc của Chuyên viên giữ nguyên là FAIL (bất biến), nhưng findingStatus hiển thị DISMISSED
         mvc.perform(get("/api/v1/inspections/" + insId + "/items").with(as(inspector, QC_PERMS)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[1].result").value("PASS"));
+                .andExpect(jsonPath("$[1].result").value("FAIL"))
+                .andExpect(jsonPath("$[1].findingStatus").value("DISMISSED"));
     }
 
     private long createApprovedPlanWithAssignment(long storeId, long inspectorId, long templateId, LocalDate date) throws Exception {

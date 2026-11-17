@@ -62,6 +62,7 @@ import vn.ksvh.qc.user.api.UserSummary;
 
 import java.time.Clock;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -94,6 +95,8 @@ public class FindingService {
     private final RiskAssessor riskAssessor;
     private final Clock clock;
     private final ApplicationEventPublisher eventPublisher;
+
+    private static final DateTimeFormatter DATE_VN = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public PageResponse<FindingResponse> search(String keyword, Long restaurantId, Long inspectionId, FindingStatus status,
                                                 Pageable pageable, CurrentUser user) {
@@ -299,12 +302,6 @@ public class FindingService {
                 f.setAppealConcludedBy(null);
                 transition(f, FindingStatus.DISMISSED, FindingEventAction.APPEAL_DISMISSED, null,
                         "Hội đồng thẩm định đồng thuận bỏ lỗi (khiếu nại đúng)");
-                itemRepository.findById(f.getInspectionItemId()).ifPresent(item -> {
-                    item.setResult(ItemResult.PASS);
-                    String itemNote = "Khiếu nại được chấp thuận: Lỗi đã được huỷ bỏ";
-                    item.setComment(item.getComment() != null ? item.getComment() + " (" + itemNote + ")" : itemNote);
-                    itemRepository.save(item);
-                });
                 completeInspectionIfDone(f.getInspectionId());
                 FindingResponse finalRes = save(f);
                 eventPublisher.publishEvent(new FindingAppealConcludedEvent(
@@ -315,8 +312,12 @@ public class FindingService {
             } else if (allValid) {
                 f.setAppealConclusion(AppealConclusion.UPHELD);
                 f.setAppealConcludedBy(null);
+                LocalDate today = BusinessDates.today(clock);
+                LocalDate newDeadline = today.plusDays(f.getRemediationDays());
+                f.setDeadlineDate(newDeadline);
+                String deadlineNote = "Hạn khắc phục mới: " + newDeadline.format(DATE_VN);
                 transition(f, FindingStatus.CONFIRMED, FindingEventAction.APPEAL_UPHELD, null,
-                        "Hội đồng thẩm định đồng thuận giữ lỗi (khiếu nại sai)");
+                        "Hội đồng thẩm định đồng thuận giữ lỗi (khiếu nại sai). " + deadlineNote);
                 addOccurrence(f, OccurrenceSource.APPEAL_UPHELD);
                 completeInspectionIfDone(f.getInspectionId());
                 FindingResponse finalRes = save(f);
@@ -348,16 +349,15 @@ public class FindingService {
 
         String note = StringUtils.hasText(req.meetingNotes()) ? req.meetingNotes().trim() : null;
         if (req.conclusion() == AppealConclusion.UPHELD) {
-            transition(f, FindingStatus.CONFIRMED, FindingEventAction.APPEAL_UPHELD, user, note);
+            LocalDate today = BusinessDates.today(clock);
+            LocalDate newDeadline = today.plusDays(f.getRemediationDays());
+            f.setDeadlineDate(newDeadline);
+            String deadlineNote = "Hạn khắc phục mới: " + newDeadline.format(DATE_VN);
+            String fullNote = (note != null ? note + ". " : "") + deadlineNote;
+            transition(f, FindingStatus.CONFIRMED, FindingEventAction.APPEAL_UPHELD, user, fullNote);
             addOccurrence(f, OccurrenceSource.APPEAL_UPHELD);
         } else {
             transition(f, FindingStatus.DISMISSED, FindingEventAction.APPEAL_DISMISSED, user, note);
-            itemRepository.findById(f.getInspectionItemId()).ifPresent(item -> {
-                item.setResult(ItemResult.PASS);
-                String itemNote = "Khiếu nại được chấp thuận: Lỗi đã được huỷ bỏ";
-                item.setComment(item.getComment() != null ? item.getComment() + " (" + itemNote + ")" : itemNote);
-                itemRepository.save(item);
-            });
         }
         FindingResponse res = save(f);
         completeInspectionIfDone(f.getInspectionId());
@@ -506,7 +506,7 @@ public class FindingService {
 
     public List<CandidateFindingResponse> listCandidatesForVerification(Long restaurantId, CurrentUser user) {
         List<Finding> list = findingRepository.findByRestaurantIdAndStatusIn(restaurantId,
-                List.of(FindingStatus.PENDING_VERIFICATION, FindingStatus.REMEDIATING));
+                List.of(FindingStatus.PENDING_VERIFICATION));
         if (list.isEmpty()) {
             return List.of();
         }

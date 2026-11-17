@@ -87,8 +87,18 @@ export function InspectionDetailModal({ open, inspectionId, onClose }: Props) {
       title: 'Kết quả',
       dataIndex: 'result',
       key: 'result',
-      width: 110,
-      render: (res: ItemResult) => <Tag color={RESULT_TAG[res]?.color}>{RESULT_TAG[res]?.label}</Tag>,
+      width: 140,
+      render: (res: ItemResult, record: InspectionItemResponse) => {
+        if (record.findingStatus === 'DISMISSED' || (record.result === 'FAIL' && record.findingStatus === 'DISMISSED')) {
+          return (
+            <Space direction="vertical" size={2}>
+              <Tag color="error">Không đạt</Tag>
+              <Tag color="cyan" style={{ fontSize: 11 }}>Lỗi đã bỏ do khiếu nại</Tag>
+            </Space>
+          )
+        }
+        return <Tag color={RESULT_TAG[res]?.color}>{RESULT_TAG[res]?.label}</Tag>
+      },
     },
   ]
 
@@ -145,6 +155,9 @@ export function InspectionDetailModal({ open, inspectionId, onClose }: Props) {
               ) : (
                 <Space wrap>
                   <b>{ins.complianceScore.toLocaleString('vi-VN')}%</b>
+                  {ins.adjustedComplianceScore != null && ins.adjustedComplianceScore !== ins.complianceScore && (
+                    <Tag color="cyan">Sau khiếu nại: {ins.adjustedComplianceScore.toLocaleString('vi-VN')}%</Tag>
+                  )}
                   <Tag color={grade.color}>{grade.label}</Tag>
                 </Space>
               )}

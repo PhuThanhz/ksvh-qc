@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import vn.ksvh.qc.notification.domain.Notification;
 import vn.ksvh.qc.notification.domain.NotificationRepository;
 import vn.ksvh.qc.notification.domain.NotificationType;
@@ -34,7 +36,7 @@ public class NotificationService {
         }
         Notification n = new Notification(userId, type, title, body, link);
         n = repository.save(n);
-        dispatchService.dispatchAsync(userId, n.getId(), title, body, link);
+        dispatchAfterCommit(userId, n.getId(), title, body, link);
         return n;
     }
 
@@ -51,8 +53,21 @@ public class NotificationService {
         if (!list.isEmpty()) {
             List<Notification> saved = repository.saveAll(list);
             for (Notification n : saved) {
-                dispatchService.dispatchAsync(n.getUserId(), n.getId(), title, body, link);
+                dispatchAfterCommit(n.getUserId(), n.getId(), title, body, link);
             }
+        }
+    }
+
+    private void dispatchAfterCommit(Long userId, Long notificationId, String title, String body, String link) {
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    dispatchService.dispatchAsync(userId, notificationId, title, body, link);
+                }
+            });
+        } else {
+            dispatchService.dispatchAsync(userId, notificationId, title, body, link);
         }
     }
 

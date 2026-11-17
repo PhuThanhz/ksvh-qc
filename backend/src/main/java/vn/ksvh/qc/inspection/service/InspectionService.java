@@ -173,7 +173,13 @@ public class InspectionService {
         Map<Long, CriterionGroupRef> topicGroups = criteriaLookupApi.findGroups(i.getTopicGroupIds());
         List<String> topicNames = i.getTopicGroupIds().stream().map(topicGroups::get).filter(Objects::nonNull).map(CriterionGroupRef::name).toList();
 
-        List<Finding> findings = findingRepository.findByInspectionId(id).stream()
+        List<Finding> allFindings = findingRepository.findByInspectionId(id);
+        Set<Long> dismissedItemIds = allFindings.stream()
+                .filter(f -> f.getStatus() == FindingStatus.DISMISSED)
+                .map(Finding::getInspectionItemId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        List<Finding> findings = allFindings.stream()
                 .filter(f -> f.getStatus() != FindingStatus.DISMISSED)
                 .toList();
         int totalRisk = findings.stream().mapToInt(Finding::getCalculatedScore).sum();
@@ -188,22 +194,33 @@ public class InspectionService {
                 ins != null ? ins.fullName() : null,
                 totalRisk,
                 maxRisk,
-                topicNames
+                topicNames,
+                true,
+                dismissedItemIds
         );
     }
 
     public List<InspectionItemResponse> listItems(Long id, CurrentUser user) {
         Inspection inspection = load(id);
         access.requireRead(inspection, user);
-        List<Long> findingIds = inspection.getItems().stream()
+        List<Finding> findings = findingRepository.findByInspectionId(id);
+        Map<Long, Finding> byItemId = findings.stream()
+                .filter(f -> f.getInspectionItemId() != null)
+                .collect(Collectors.toMap(Finding::getInspectionItemId, Function.identity(), (a, b) -> a));
+
+        List<Long> explicitFindingIds = inspection.getItems().stream()
                 .map(InspectionItem::getFindingId)
                 .filter(Objects::nonNull)
                 .toList();
-        Map<Long, Finding> findingMap = findingIds.isEmpty() ? Map.of()
-                : findingRepository.findAllById(findingIds).stream()
+        Map<Long, Finding> byFindingId = explicitFindingIds.isEmpty() ? Map.of()
+                : findingRepository.findAllById(explicitFindingIds).stream()
                 .collect(Collectors.toMap(Finding::getId, Function.identity()));
+
         return inspection.getItems().stream()
-                .map(item -> InspectionItemResponse.from(item, item.getFindingId() != null ? findingMap.get(item.getFindingId()) : null))
+                .map(item -> {
+                    Finding f = item.getFindingId() != null ? byFindingId.get(item.getFindingId()) : byItemId.get(item.getId());
+                    return InspectionItemResponse.from(item, f);
+                })
                 .toList();
     }
 
@@ -307,15 +324,17 @@ public class InspectionService {
                     if (!Objects.equals(f.getRestaurantId(), req.restaurantId())) {
                         throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Lỗi #" + f.getId() + " không thuộc nhà hàng đã chọn");
                     }
-                    if (f.getStatus() != FindingStatus.PENDING_VERIFICATION && f.getStatus() != FindingStatus.REMEDIATING) {
+                    if (f.getStatus() != FindingStatus.PENDING_VERIFICATION) {
+                        var crit = criteriaLookupApi.findCriteria(List.of(f.getCriterionId())).get(f.getCriterionId());
+                        String critName = crit != null ? crit.name() : ("#" + f.getId());
                         throw new BusinessException(ErrorCode.VALIDATION_FAILED,
-                                "Lỗi #" + f.getId() + " đang ở trạng thái " + f.getStatus() + ", không thể nghiệm thu");
+                                "Lỗi '%s' chưa gửi bằng chứng khắc phục, chưa thể kiểm tra kết quả".formatted(critName));
                     }
                 }
             } else {
                 verificationFindings = findingRepository.findByRestaurantIdAndStatusIn(
                         req.restaurantId(),
-                        List.of(FindingStatus.PENDING_VERIFICATION, FindingStatus.REMEDIATING)
+                        List.of(FindingStatus.PENDING_VERIFICATION)
                 );
                 if (verificationFindings.isEmpty()) {
                     throw new BusinessException(ErrorCode.VALIDATION_FAILED,

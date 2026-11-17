@@ -144,7 +144,9 @@ flowchart LR
 3. Tất cả thống nhất → chốt kết luận. Không thống nhất → **họp để thống nhất** (Quản lý KSVH chủ trì [PDF s.6]) → chốt.
 4. Kết luận:
    - **Khiếu nại đúng → bỏ lỗi**: lỗi bị loại, **không cộng tần suất, không phải khắc phục**.
+     - **Đã làm (17/11/2026):** Giữ nguyên kết quả chấm gốc của Chuyên viên (`FAIL` là bất biến, tuân thủ Quy tắc số 4 – dữ liệu lịch sử không bị sửa). Đổi trạng thái finding thành `DISMISSED`. Tiêu chí có lỗi `DISMISSED` được tính tương đương đạt khi tính `adjustedComplianceScore` (Điểm tuân thủ sau khiếu nại) phục vụ dashboard và báo cáo. Giao diện chi tiết phiếu hiển thị tag "Không đạt – lỗi đã bỏ do khiếu nại".
    - **Khiếu nại sai → giữ lỗi**: lỗi giữ nguyên, **tần suất +1**, phải khắc phục.
+     - **Đã làm (17/11/2026):** Khi giữ lỗi sau khiếu nại (`UPHELD`), hạn khắc phục được tính lại từ ngày chốt (`hôm nay + số ngày khắc phục theo mức rủi ro`) để nhà hàng có đủ thời gian khắc phục và tránh bị job quá hạn phạt +1 oan. Ghi chú vào lịch sử xử lý lỗi và quy định: **(chờ KSVH xác nhận)**.
    - **[ĐỀ XUẤT]** "Lỗi bị xoá" = đổi trạng thái DISMISSED, **không xoá dòng** (giữ lịch sử).
 
 ### Bước 5 – Khắc phục & nghiệm thu [PDF s.13]
@@ -163,14 +165,14 @@ flowchart LR
 |---|---|---|---|
 | Định kỳ tháng (`PERIODIC`) | Theo kế hoạch tháng đã duyệt | Đủ mọi tiêu chí của mẫu phiếu (vd 70 điểm), không ngoại lệ | Thực tế tại nhà hàng |
 | Đột xuất (`SURPRISE`) | Rủi ro cao / dấu hiệu bất thường | Chỉ **chuyên đề** được kích hoạt = các **nhóm tiêu chí** được chọn | Thực tế hoặc từ xa |
-| Kiểm tra kết quả khắc phục (`VERIFICATION`) | Sau khi nhà hàng gửi bằng chứng / lỗi chờ nghiệm thu | Các lỗi cần xác minh | Thực tế hoặc từ xa — **Đã làm Plan 5 (17/11/2026)**: gom các lỗi của nhà hàng vào 1 phiếu; kết quả Đạt đóng lỗi `CLOSED`, Chưa đạt phạt +1 `CONFIRMED` mở chu kỳ mới |
+| Kiểm tra kết quả khắc phục (`VERIFICATION`) | Sau khi nhà hàng gửi bằng chứng / lỗi chờ nghiệm thu | Các lỗi cần xác minh | Thực tế hoặc từ xa — **Đã làm (17/11/2026)**: gom các lỗi của nhà hàng vào 1 phiếu; chỉ nhận lỗi `PENDING_VERIFICATION` (đã gửi bằng chứng khắc phục, chờ KSVH xác nhận); kết quả Đạt đóng lỗi `CLOSED`, Chưa đạt phạt +1 `CONFIRMED` mở chu kỳ mới |
 
 - **Bỏ "loại nhà hàng"**; mẫu phiếu chỉ còn giới hạn theo công ty.
 - **GPS chưa bắt buộc:** nhà hàng không bắt buộc khai toạ độ; khi bắt đầu kiểm tra hệ thống chỉ **ghi nhận** vị trí (`VERIFIED` / `OUTSIDE_RADIUS` / `UNVERIFIED` / `REMOTE`), không chặn.
 - **Điểm tuân thủ** (NT03) = tổng trọng số tiêu chí Đạt / tổng trọng số Đạt + Không đạt × 100, N/A không tính; trọng số = mức ảnh hưởng gốc 1–5. Khác và không thay thế điểm rủi ro.
 - **Công thức rủi ro giữ theo PDF** (§6); các số trong Word (ngưỡng 1/6/12/20, hạ mức sau 2 kỳ, hệ số tái phạm 1,0–2,0, Phó/Trưởng phòng phê duyệt mức rủi ro) chỉ là minh hoạ — chưa áp dụng.
 - **Đã làm Plan 5 (17/11/2026):**
-  - **Phiếu kiểm tra kết quả khắc phục (`VERIFICATION`):** Gom các lỗi chờ nghiệm thu (`PENDING_VERIFICATION`, `REMEDIATING`) của nhà hàng vào một phiếu kiểm tra (thực tế hoặc từ xa). Chuyên viên chấm: Đạt (`PASS` → `CLOSED`), Chưa đạt (`FAIL` → `CONFIRMED` +1 vi phạm mở vòng mới).
+  - **Phiếu kiểm tra kết quả khắc phục (`VERIFICATION`):** Gom các lỗi chờ nghiệm thu của nhà hàng vào một phiếu kiểm tra (thực tế hoặc từ xa). **Quy định (chờ KSVH xác nhận):** Chỉ nhận lỗi ở trạng thái `PENDING_VERIFICATION` (nhà hàng đã gửi bằng chứng), từ chối lỗi `REMEDIATING` (chưa gửi bằng chứng). Chuyên viên chấm: Đạt (`PASS` → `CLOSED`), Chưa đạt (`FAIL` → `CONFIRMED` +1 vi phạm mở vòng mới).
   - **Đề xuất kiểm tra đột xuất (`SurpriseInspectionSuggestion`):** Hệ thống tự động phân tích điểm rủi ro, phát hiện nhà hàng có lỗi M4/M3 chưa khắc phục hoặc tiêu chí bị nâng mức, gợi ý các chuyên đề vi phạm cần kiểm tra. Nút "Gợi ý đột xuất" kèm Badge trên trang Danh sách phiếu kiểm tra cho phép 1 chạm tạo phiếu.
   - **Cảnh báo kế hoạch (`PriorFindingsWarning`):** Tự động phát hiện nhà hàng còn lỗi vi phạm chưa nghiệm thu từ tháng trước. Cảnh báo trực quan hiển thị trong chi tiết kế hoạch và form phân công khi lập kế hoạch tháng.
 - Chưa làm (theo Word): xử lý giải trình nhiều cấp (cấp vận hành → OBM/Phó/Trưởng phòng → BGĐ, có "yêu cầu bổ sung"), kế hoạch khắc phục chi tiết (nguyên nhân gốc, biện pháp, người phụ trách), trạng thái "mở lại".

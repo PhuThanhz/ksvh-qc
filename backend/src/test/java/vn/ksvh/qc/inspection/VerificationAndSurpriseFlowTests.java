@@ -89,13 +89,23 @@ class VerificationAndSurpriseFlowTests extends ApiTestSupport {
         f2.setRemediationEvidenceUrls("evidence_c2.jpg");
         findingRepository.saveAndFlush(f2);
 
-        // 3. Candidate findings API
+        // 3. Candidate findings API (chỉ trả về các lỗi PENDING_VERIFICATION)
         mvc.perform(get("/api/v1/findings/verification-candidates")
                         .param("restaurantId", String.valueOf(storeId))
                         .with(as(qcUser, QC_PERMS)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].remediationPlan").isNotEmpty());
+
+        // 3b. Tạo lỗi REMEDIATING (chưa nộp bằng chứng) -> không thể đưa vào phiếu VERIFICATION
+        Finding fRem = createFindingDirectly(origInsId, origItems.get(0).getId(), storeId, c1, (short) 2, "M2", FindingStatus.REMEDIATING);
+        InspectionCreateRequest badReq = new InspectionCreateRequest(
+                "VER-BAD-" + suffix, null, storeId, null, qcUser,
+                InspectionKind.VERIFICATION, InspectionMode.REMOTE, null, "Test", List.of(fRem.getId())
+        );
+        mvc.perform(withJson(post("/api/v1/inspections"), badReq).with(as(qcUser, QC_PERMS)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("chưa gửi bằng chứng khắc phục")));
 
         // 4. Tạo phiếu kiểm tra khắc phục (VERIFICATION)
         InspectionCreateRequest createReq = new InspectionCreateRequest(

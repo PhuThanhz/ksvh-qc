@@ -45,6 +45,8 @@ public record InspectionResponse(
         int naCriteria,
         /** % tuân thủ = tổng trọng số Đạt / tổng trọng số Đạt + Không đạt (N/A không tính); null khi chưa chấm. */
         @Schema(nullable = true) BigDecimal complianceScore,
+        /** % tuân thủ sau khiếu nại = tính như cũ nhưng coi các tiêu chí có lỗi DISMISSED là Đạt. */
+        @Schema(nullable = true) BigDecimal adjustedComplianceScore,
         int totalRiskScore,
         String maxRiskLevel,
         String notes,
@@ -53,20 +55,36 @@ public record InspectionResponse(
 ) {
     public static InspectionResponse from(Inspection i, String restaurantName, String templateName, String inspectorName,
                                           int totalRiskScore, String maxRiskLevel) {
-        return from(i, restaurantName, templateName, inspectorName, totalRiskScore, maxRiskLevel, List.of(), false);
+        return from(i, restaurantName, templateName, inspectorName, totalRiskScore, maxRiskLevel, List.of(), false, java.util.Set.of());
     }
 
     public static InspectionResponse from(Inspection i, String restaurantName, String templateName, String inspectorName,
                                           int totalRiskScore, String maxRiskLevel, List<String> topicNames) {
-        return from(i, restaurantName, templateName, inspectorName, totalRiskScore, maxRiskLevel, topicNames, true);
+        return from(i, restaurantName, templateName, inspectorName, totalRiskScore, maxRiskLevel, topicNames, true, java.util.Set.of());
     }
 
     public static InspectionResponse from(Inspection i, String restaurantName, String templateName, String inspectorName,
                                           int totalRiskScore, String maxRiskLevel, List<String> topicNames, boolean includeItems) {
+        return from(i, restaurantName, templateName, inspectorName, totalRiskScore, maxRiskLevel, topicNames, includeItems, java.util.Set.of());
+    }
+
+    public static InspectionResponse from(Inspection i, String restaurantName, String templateName, String inspectorName,
+                                          int totalRiskScore, String maxRiskLevel, List<String> topicNames, boolean includeItems,
+                                          java.util.Set<Long> dismissedFindingItemIds) {
         int passWeight = i.getItems().stream().filter(it -> it.getResult() == ItemResult.PASS).mapToInt(InspectionItem::getBaseImpact).sum();
         int failWeight = i.getItems().stream().filter(it -> it.getResult() == ItemResult.FAIL).mapToInt(InspectionItem::getBaseImpact).sum();
         BigDecimal compliance = passWeight + failWeight == 0 ? null
                 : BigDecimal.valueOf(passWeight * 100.0 / (passWeight + failWeight)).setScale(2, RoundingMode.HALF_UP);
+
+        int adjPassWeight = i.getItems().stream()
+                .filter(it -> it.getResult() == ItemResult.PASS || (dismissedFindingItemIds != null && dismissedFindingItemIds.contains(it.getId())))
+                .mapToInt(InspectionItem::getBaseImpact).sum();
+        int adjFailWeight = i.getItems().stream()
+                .filter(it -> it.getResult() == ItemResult.FAIL && (dismissedFindingItemIds == null || !dismissedFindingItemIds.contains(it.getId())))
+                .mapToInt(InspectionItem::getBaseImpact).sum();
+        BigDecimal adjCompliance = adjPassWeight + adjFailWeight == 0 ? null
+                : BigDecimal.valueOf(adjPassWeight * 100.0 / (adjPassWeight + adjFailWeight)).setScale(2, RoundingMode.HALF_UP);
+
         long pass = i.getItems().stream().filter(it -> it.getResult() == vn.ksvh.qc.inspection.domain.ItemResult.PASS).count();
         long fail = i.getItems().stream().filter(it -> it.getResult() == vn.ksvh.qc.inspection.domain.ItemResult.FAIL).count();
         long na = i.getItems().stream().filter(it -> it.getResult() == vn.ksvh.qc.inspection.domain.ItemResult.NA).count();
@@ -103,6 +121,7 @@ public record InspectionResponse(
                 (int) fail,
                 (int) na,
                 compliance,
+                adjCompliance,
                 totalRiskScore,
                 maxRiskLevel,
                 i.getNotes(),

@@ -22,6 +22,7 @@ export interface InspectionItemResponse {
   findingEvidenceUrls?: string
   remediationPlan?: string
   remediationEvidenceUrls?: string
+  findingStatus?: string
 }
 
 /** Loại kiểm tra: định kỳ tháng (đủ mẫu phiếu, thực tế) / đột xuất (theo chuyên đề) / kiểm tra khắc phục. */
@@ -59,6 +60,7 @@ export interface InspectionResponse {
   locationStatus?: LocationStatus | null
   topicNames: string[]
   complianceScore?: number | null
+  adjustedComplianceScore?: number | null
   status: import('./plan.types').InspectionStatus
   cancelReason?: string
   checkinLat?: number

@@ -97,6 +97,52 @@ class ExternalNotificationFlowTests extends ApiTestSupport {
     }
 
     @Test
+    void testDispatchCreatedAfterCommit() throws Exception {
+        org.springframework.transaction.PlatformTransactionManager tm = context.getBean(org.springframework.transaction.PlatformTransactionManager.class);
+        org.springframework.transaction.support.TransactionTemplate tx = new org.springframework.transaction.support.TransactionTemplate(
+                tm, new org.springframework.transaction.support.DefaultTransactionDefinition(org.springframework.transaction.TransactionDefinition.PROPAGATION_REQUIRES_NEW));
+
+        long[] ids = new long[2];
+        tx.executeWithoutResult(status -> {
+            long uid = insertUser("commit_notif_user_" + System.currentTimeMillis(), RoleCodes.STORE_MANAGER);
+            var n = notificationService.create(
+                    uid,
+                    NotificationType.FINDING_M4_ALERT,
+                    "CẢNH BÁO M4 COMMIT",
+                    "Chi tiết cảnh báo sau commit",
+                    "/admin/inspections/findings?id=123"
+            );
+            ids[0] = uid;
+            ids[1] = n.getId();
+        });
+
+        long userId = ids[0];
+        long notifId = ids[1];
+        assertThat(notifId).isPositive();
+
+        boolean found = false;
+        for (int i = 0; i < 30; i++) {
+            List<NotificationDispatch> dispatches = dispatchRepository.findAll().stream()
+                    .filter(d -> d.getNotificationId().equals(notifId))
+                    .toList();
+            if (!dispatches.isEmpty()) {
+                found = true;
+                assertThat(dispatches).anyMatch(d -> "EMAIL".equals(d.getChannel()) && "SENT".equals(d.getStatus()));
+                break;
+            }
+            Thread.sleep(100);
+        }
+        assertThat(found).isTrue();
+
+        tx.executeWithoutResult(status -> {
+            jdbc.update("DELETE FROM notification_dispatches WHERE notification_id = ?", notifId);
+            jdbc.update("DELETE FROM notifications WHERE id = ?", notifId);
+            jdbc.update("DELETE FROM user_roles WHERE user_id = ?", userId);
+            jdbc.update("DELETE FROM users WHERE id = ?", userId);
+        });
+    }
+
+    @Test
     void testRetryFailedDispatches() {
         long userId = insertUser("retry_user", RoleCodes.KSVH_MANAGER);
 
