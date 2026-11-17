@@ -71,4 +71,12 @@ class DashboardApiTests extends ApiTestSupport {
         mvc.perform(get("/api/v1/reports/dashboard").with(as(1L, PermissionCodes.INSPECTION_READ_ALL)))
                 .andExpect(jsonPath("$.kpis").exists());
     }
+
+    @Test
+    void approvalQueueReturnsPendingPlansAndAppealMeetings() throws Exception {
+        mvc.perform(get("/api/v1/reports/approval-queue").with(as(1L, PermissionCodes.REPORT_READ)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.pendingPlans").isArray())
+                .andExpect(jsonPath("$.appealMeetings").isArray());
+    }
 }

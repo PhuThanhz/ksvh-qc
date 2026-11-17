@@ -59,6 +59,25 @@ public class FindingResponseService {
     }
 
     @Transactional
+    public int batchConfirm(List<Long> ids, String note, CurrentUser user) {
+        if (ids == null || ids.isEmpty()) {
+            return 0;
+        }
+        int count = 0;
+        for (Long id : ids) {
+            Finding f = lifecycle.load(id);
+            access.requireStoreManager(f.getRestaurantId(), user);
+            if (f.getStatus() == FindingStatus.OPEN) {
+                lifecycle.transition(f, FindingStatus.CONFIRMED, FindingEventAction.CONFIRMED, user, note);
+                lifecycle.addOccurrence(f, OccurrenceSource.CONFIRMED);
+                lifecycle.save(f);
+                count++;
+            }
+        }
+        return count;
+    }
+
+    @Transactional
     public FindingResponse appeal(Long id, FindingAppealRequest req, CurrentUser user) {
         Finding f = lifecycle.load(id);
         access.requireStoreManager(f.getRestaurantId(), user);

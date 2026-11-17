@@ -38,6 +38,10 @@ public class FindingService {
         return responseService.confirm(id, user);
     }
 
+    public int batchConfirm(BatchFindingConfirmRequest req, CurrentUser user) {
+        return responseService.batchConfirm(req.findingIds(), req.note(), user);
+    }
+
     public FindingResponse appeal(Long id, FindingAppealRequest req, CurrentUser user) {
         return responseService.appeal(id, req, user);
     }
@@ -62,12 +66,20 @@ public class FindingService {
         return remediationService.setRemediationPlan(id, req, user);
     }
 
+    public int batchSetRemediationPlan(BatchRemediationPlanRequest req, CurrentUser user) {
+        return remediationService.batchSetRemediationPlan(req, user);
+    }
+
     public FindingResponse submitRemediation(Long id, FindingSubmitRemediationRequest req, CurrentUser user) {
         return remediationService.submitRemediation(id, req, user);
     }
 
     public FindingResponse verify(Long id, FindingVerifyRequest req, CurrentUser user) {
         return remediationService.verify(id, req, user);
+    }
+
+    public int batchVerify(BatchFindingVerifyRequest req, CurrentUser user) {
+        return remediationService.batchVerify(req, user);
     }
 
     public FindingResponse verifyInternal(Finding f, boolean passed, String comment, Long actorId, String actorUsername) {

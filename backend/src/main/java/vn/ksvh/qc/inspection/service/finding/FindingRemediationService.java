@@ -11,6 +11,8 @@ import vn.ksvh.qc.inspection.api.event.FindingReminderDueEvent;
 import vn.ksvh.qc.inspection.api.event.FindingVerifiedEvent;
 import vn.ksvh.qc.inspection.api.event.RemediationSubmittedEvent;
 import vn.ksvh.qc.inspection.domain.*;
+import vn.ksvh.qc.inspection.dto.BatchFindingVerifyRequest;
+import vn.ksvh.qc.inspection.dto.BatchRemediationPlanRequest;
 import vn.ksvh.qc.inspection.dto.FindingRemediationPlanRequest;
 import vn.ksvh.qc.inspection.dto.FindingResponse;
 import vn.ksvh.qc.inspection.dto.FindingSubmitRemediationRequest;
@@ -81,6 +83,20 @@ public class FindingRemediationService {
     }
 
     @Transactional
+    public int batchSetRemediationPlan(BatchRemediationPlanRequest req, CurrentUser user) {
+        if (req.findingIds() == null || req.findingIds().isEmpty()) {
+            return 0;
+        }
+        int count = 0;
+        var subReq = new FindingRemediationPlanRequest(req.remediationPlan(), req.remediationDeadline());
+        for (Long id : req.findingIds()) {
+            setRemediationPlan(id, subReq, user);
+            count++;
+        }
+        return count;
+    }
+
+    @Transactional
     public FindingResponse submitRemediation(Long id, FindingSubmitRemediationRequest req, CurrentUser user) {
         Finding f = lifecycle.load(id);
         access.requireStoreManager(f.getRestaurantId(), user);
@@ -106,6 +122,19 @@ public class FindingRemediationService {
         access.requireVerifier(lifecycle.inspectionOf(f), user);
         lifecycle.requireStatus(f, "Lỗi này chưa gửi bằng chứng khắc phục để nghiệm thu", FindingStatus.PENDING_VERIFICATION);
         return verifyInternal(f, Boolean.TRUE.equals(req.passed()), req.comment(), user.id(), user.username());
+    }
+
+    @Transactional
+    public int batchVerify(BatchFindingVerifyRequest req, CurrentUser user) {
+        if (req.items() == null || req.items().isEmpty()) {
+            return 0;
+        }
+        int count = 0;
+        for (var item : req.items()) {
+            verify(item.findingId(), new FindingVerifyRequest(item.passed(), item.comment()), user);
+            count++;
+        }
+        return count;
     }
 
     @Transactional

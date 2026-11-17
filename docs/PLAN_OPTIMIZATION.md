@@ -18,6 +18,7 @@ Nguyên tắc chung: **không đổi hành vi nghiệp vụ** (trừ Plan O4 –
 | TanStack Query staleTime danh mục | 5 phút (`STALE_CATALOG_MS`) | 5 phút | **ĐÃ XONG (O5.4)** |
 | Composite DB Index báo cáo | 3 index (`idx_findings_res_created`, `idx_findings_crit_created`, `idx_inspections_status_submitted`) | index cho báo cáo | **ĐÃ XONG (O5.7)** |
 | Giao diện nhất quán & mobile 375px | DataTable mobileRender, AppHeader co giãn, bảng cuộn ngang, modal $\le 200$ dòng | mượt mà trên 375px | **ĐÃ XONG (O3.1-O3.5)** |
+| Luồng nghiệp vụ hàng loạt & duyệt (Plan O4) | Đã hoàn tất 5/5 mục: thao tác gộp lỗi, sao chép kế hoạch, hàng chờ duyệt, gộp thông báo | Giảm thao tác lặp | **ĐÃ XONG (O4.1-O4.6)** |
 
 ---
 

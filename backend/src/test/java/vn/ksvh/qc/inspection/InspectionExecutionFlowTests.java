@@ -11,6 +11,9 @@ import vn.ksvh.qc.inspection.domain.InspectionStatus;
 import vn.ksvh.qc.inspection.domain.ItemResult;
 import vn.ksvh.qc.inspection.domain.PlanStatus;
 import vn.ksvh.qc.inspection.dto.AppealReviewRequest;
+import vn.ksvh.qc.inspection.dto.BatchFindingConfirmRequest;
+import vn.ksvh.qc.inspection.dto.BatchFindingVerifyRequest;
+import vn.ksvh.qc.inspection.dto.BatchRemediationPlanRequest;
 import vn.ksvh.qc.inspection.dto.FindingAppealRequest;
 import vn.ksvh.qc.inspection.dto.FindingConcludeAppealRequest;
 import vn.ksvh.qc.inspection.dto.FindingRemediationPlanRequest;
@@ -716,6 +719,56 @@ class InspectionExecutionFlowTests extends ApiTestSupport {
         String appRes = mvc.perform(post("/api/v1/inspection-plans/" + pId + "/approve").with(as(2L, PLAN_PERMS)))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         return jsonMapper.readTree(appRes).get("assignments").get(0).get("inspectionId").asLong();
+    }
+
+    @Test
+    void testBatchFindingOperations() throws Exception {
+        long qcUser = insertUser("qc_batch", RoleCodes.KSVH_INSPECTOR);
+        long chtUser = insertUser("cht_batch", RoleCodes.STORE_MANAGER);
+        long companyId = createCompany("CP-BATCH-" + suffix);
+        long storeId = createStore(companyId, "ST-BATCH-" + suffix, 10.7769, 106.7009, 100, chtUser);
+        long groupId = createCriterionGroup("GRP-BATCH-" + suffix);
+        long critId1 = createCriterion(groupId, "CRIT-B1-" + suffix, 2);
+        long critId2 = createCriterion(groupId, "CRIT-B2-" + suffix, 3);
+        long templateId = createTemplate("TPL-BATCH-" + suffix, List.of(critId1, critId2));
+
+        long insId = jdbc.queryForObject("""
+                INSERT INTO inspections(code, restaurant_id, template_id, inspector_id, status, submitted_at)
+                VALUES (?, ?, ?, ?, 'SUBMITTED', now()) RETURNING id""", Long.class, "INS-B-" + suffix, storeId, templateId, qcUser);
+        long item1 = jdbc.queryForObject("""
+                INSERT INTO inspection_items(inspection_id, criterion_id, criterion_code, criterion_name, base_impact, result)
+                VALUES (?, ?, 'CRIT-B1', 'Tiêu chí B1', 2, 'FAIL') RETURNING id""", Long.class, insId, critId1);
+        long item2 = jdbc.queryForObject("""
+                INSERT INTO inspection_items(inspection_id, criterion_id, criterion_code, criterion_name, base_impact, result)
+                VALUES (?, ?, 'CRIT-B2', 'Tiêu chí B2', 3, 'FAIL') RETURNING id""", Long.class, insId, critId2);
+        long f1 = jdbc.queryForObject("""
+                INSERT INTO findings(inspection_id, inspection_item_id, restaurant_id, criterion_id, base_impact, effective_impact, violation_count,
+                                     calculated_score, risk_level_code, risk_level_name, deadline_date, status, description)
+                VALUES (?, ?, ?, ?, 2, 2, 1, 2, 'M1', 'Thấp', current_date + 7, 'OPEN', 'Lỗi B1') RETURNING id""",
+                Long.class, insId, item1, storeId, critId1);
+        long f2 = jdbc.queryForObject("""
+                INSERT INTO findings(inspection_id, inspection_item_id, restaurant_id, criterion_id, base_impact, effective_impact, violation_count,
+                                     calculated_score, risk_level_code, risk_level_name, deadline_date, status, description)
+                VALUES (?, ?, ?, ?, 3, 3, 1, 3, 'M2', 'Trung bình', current_date + 5, 'OPEN', 'Lỗi B2') RETURNING id""",
+                Long.class, insId, item2, storeId, critId2);
+
+        // 1. Batch Confirm
+        var batchConfirmReq = new BatchFindingConfirmRequest(List.of(f1, f2), "Xác nhận hàng loạt");
+        mvc.perform(withJson(post("/api/v1/findings/batch-confirm"), batchConfirmReq).with(as(chtUser, STORE_PERMS)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.successCount").value(2));
+
+        assertThat(jdbc.queryForObject("SELECT status FROM findings WHERE id = ?", String.class, f1)).isEqualTo("CONFIRMED");
+        assertThat(jdbc.queryForObject("SELECT status FROM findings WHERE id = ?", String.class, f2)).isEqualTo("CONFIRMED");
+
+        // 2. Batch Remediation Plan
+        var batchPlanReq = new BatchRemediationPlanRequest(List.of(f1, f2), "Kế hoạch khắc phục hàng loạt", TODAY);
+        mvc.perform(withJson(post("/api/v1/findings/batch-remediation-plan"), batchPlanReq).with(as(chtUser, STORE_PERMS)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.successCount").value(2));
+
+        assertThat(jdbc.queryForObject("SELECT status FROM findings WHERE id = ?", String.class, f1)).isEqualTo("REMEDIATING");
+        assertThat(jdbc.queryForObject("SELECT status FROM findings WHERE id = ?", String.class, f2)).isEqualTo("REMEDIATING");
     }
 
     private long insertUser(String prefix, String roleCode) {

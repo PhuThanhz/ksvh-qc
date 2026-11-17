@@ -63,6 +63,10 @@ public class InspectionPlanService {
         return queryService.get(id);
     }
 
+    public List<PlanAssignmentRequest> getCopyableAssignments(Long sourcePlanId, LocalDate targetStartDate, LocalDate targetEndDate) {
+        return queryService.getCopyableAssignments(sourcePlanId, targetStartDate, targetEndDate);
+    }
+
     @Transactional
     public PlanResponse create(PlanCreateRequest req, Long actorId) {
         String code = req.planCode().trim();

@@ -18,6 +18,9 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     Optional<Notification> findByIdAndUserId(Long id, Long userId);
 
+    Optional<Notification> findFirstByUserIdAndTypeAndReadAtIsNullAndCreatedAtAfterOrderByCreatedAtDesc(
+            Long userId, NotificationType type, Instant after);
+
     @Modifying
     @Query("UPDATE Notification n SET n.readAt = :now WHERE n.userId = :userId AND n.readAt IS NULL")
     int markAllAsRead(@Param("userId") Long userId, @Param("now") Instant now);

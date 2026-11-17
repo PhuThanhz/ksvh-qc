@@ -113,6 +113,19 @@ class NotificationFlowTests extends ApiTestSupport {
         assertThat(inspectorNotifs.get(0).getLink()).isEqualTo("/admin/inspections");
     }
 
+    @Test
+    void testNotificationAggregationWithinOneHour() {
+        long user = insertUser("notif_agg", RoleCodes.STORE_MANAGER);
+        notificationService.create(user, NotificationType.INSPECTION_SUBMITTED,
+                "Lỗi vi phạm mới", "Lỗi vi phạm #101 tại Nhà hàng A", "/qc/findings/101");
+        notificationService.create(user, NotificationType.INSPECTION_SUBMITTED,
+                "Lỗi vi phạm mới", "Lỗi vi phạm #102 tại Nhà hàng A", "/qc/findings/102");
+
+        List<Notification> list = notificationRepository.findByUserIdOrderByCreatedAtDesc(user, org.springframework.data.domain.Pageable.unpaged()).getContent();
+        assertThat(list).hasSize(1);
+        assertThat(list.get(0).getBody()).contains("101").contains("102");
+    }
+
     private long insertUser(String prefix, String roleCode) {
         Long id = jdbc.queryForObject("""
                 INSERT INTO users (username, password_hash, full_name, active) VALUES (?, '{noop}x', ?, true) RETURNING id

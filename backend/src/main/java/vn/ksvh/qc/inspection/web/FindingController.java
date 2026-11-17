@@ -112,4 +112,28 @@ public class FindingController {
                                   @AuthenticationPrincipal Jwt jwt) {
         return service.verify(id, req, CurrentUser.from(jwt));
     }
+
+    @PostMapping("/batch-confirm")
+    @PreAuthorize("hasAnyAuthority('" + PermissionCodes.FINDING_RESPOND + "')")
+    public BatchActionResultResponse batchConfirm(@Valid @RequestBody BatchFindingConfirmRequest req,
+                                                  @AuthenticationPrincipal Jwt jwt) {
+        int count = service.batchConfirm(req, CurrentUser.from(jwt));
+        return new BatchActionResultResponse(count, "Đã xác nhận thành công " + count + " lỗi");
+    }
+
+    @PostMapping("/batch-remediation-plan")
+    @PreAuthorize("hasAnyAuthority('" + PermissionCodes.FINDING_REMEDIATE + "')")
+    public BatchActionResultResponse batchSetRemediationPlan(@Valid @RequestBody BatchRemediationPlanRequest req,
+                                                            @AuthenticationPrincipal Jwt jwt) {
+        int count = service.batchSetRemediationPlan(req, CurrentUser.from(jwt));
+        return new BatchActionResultResponse(count, "Đã lập kế hoạch khắc phục thành công cho " + count + " lỗi");
+    }
+
+    @PostMapping("/batch-verify")
+    @PreAuthorize("hasAnyAuthority('" + PermissionCodes.FINDING_VERIFY + "')")
+    public BatchActionResultResponse batchVerify(@Valid @RequestBody BatchFindingVerifyRequest req,
+                                                @AuthenticationPrincipal Jwt jwt) {
+        int count = service.batchVerify(req, CurrentUser.from(jwt));
+        return new BatchActionResultResponse(count, "Đã nghiệm thu thành công " + count + " lỗi");
+    }
 }

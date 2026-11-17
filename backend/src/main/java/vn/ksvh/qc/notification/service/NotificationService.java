@@ -34,6 +34,17 @@ public class NotificationService {
         if (userId == null) {
             return null;
         }
+        Instant oneHourAgo = Instant.now().minus(java.time.Duration.ofHours(1));
+        var existing = repository.findFirstByUserIdAndTypeAndReadAtIsNullAndCreatedAtAfterOrderByCreatedAtDesc(
+                userId, type, oneHourAgo);
+        if (existing.isPresent()) {
+            Notification n = existing.get();
+            n.setBody(n.getBody() + "\n• " + body);
+            if (link != null) {
+                n.setLink(link);
+            }
+            return repository.save(n);
+        }
         Notification n = new Notification(userId, type, title, body, link);
         n = repository.save(n);
         dispatchAfterCommit(userId, n.getId(), title, body, link);
@@ -45,15 +56,9 @@ public class NotificationService {
         if (userIds == null || userIds.isEmpty()) {
             return;
         }
-        List<Notification> list = userIds.stream()
-                .filter(Objects::nonNull)
-                .distinct()
-                .map(uid -> new Notification(uid, type, title, body, link))
-                .toList();
-        if (!list.isEmpty()) {
-            List<Notification> saved = repository.saveAll(list);
-            for (Notification n : saved) {
-                dispatchAfterCommit(n.getUserId(), n.getId(), title, body, link);
+        for (Long uid : userIds) {
+            if (uid != null) {
+                create(uid, type, title, body, link);
             }
         }
     }

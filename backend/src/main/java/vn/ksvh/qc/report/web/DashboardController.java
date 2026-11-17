@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import vn.ksvh.qc.report.dto.ApprovalQueueResponse;
 import vn.ksvh.qc.report.dto.DashboardResponse;
 import vn.ksvh.qc.report.service.DashboardService;
 import vn.ksvh.qc.security.permission.PermissionCodes;
@@ -28,5 +29,11 @@ public class DashboardController {
     public DashboardResponse dashboard(
             @RequestParam(defaultValue = "6") @Min(value = 3, message = "Tối thiểu 3 tháng") @Max(value = 12, message = "Tối đa 12 tháng") int months) {
         return service.summary(months);
+    }
+
+    @GetMapping("/approval-queue")
+    @PreAuthorize("hasAnyAuthority('" + PermissionCodes.REPORT_READ + "', '" + PermissionCodes.INSPECTION_READ_ALL + "', '" + PermissionCodes.PLAN_APPROVE + "', '" + PermissionCodes.FINDING_CONCLUDE_APPEAL + "')")
+    public ApprovalQueueResponse approvalQueue() {
+        return service.getApprovalQueue();
     }
 }

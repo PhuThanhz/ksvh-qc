@@ -10,6 +10,7 @@ import vn.ksvh.qc.criteria.api.CriteriaLookupApi;
 import vn.ksvh.qc.criteria.api.CriterionRef;
 import vn.ksvh.qc.criteria.api.TemplateRef;
 import vn.ksvh.qc.inspection.domain.*;
+import vn.ksvh.qc.inspection.dto.PlanAssignmentRequest;
 import vn.ksvh.qc.inspection.dto.PlanAssignmentResponse;
 import vn.ksvh.qc.inspection.dto.PlanResponse;
 import vn.ksvh.qc.inspection.dto.PriorFindingsWarning;
@@ -175,5 +176,19 @@ public class InspectionPlanQueryService {
         }).toList();
 
         return new PriorFindingsWarning(restaurantId, rCode, rName, unverified, priorFindings.size(), details);
+    }
+
+    public List<PlanAssignmentRequest> getCopyableAssignments(Long sourcePlanId, LocalDate targetStartDate, LocalDate targetEndDate) {
+        InspectionPlan sourcePlan = planRepository.findById(sourcePlanId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy kế hoạch nguồn #" + sourcePlanId));
+        List<PlanAssignment> assignments = planAssignmentRepository.findByPlanId(sourcePlanId);
+        return assignments.stream().map(a -> {
+            long offsetDays = java.time.temporal.ChronoUnit.DAYS.between(sourcePlan.getStartDate(), a.getScheduledDate());
+            LocalDate newDate = targetStartDate.plusDays(Math.max(0, offsetDays));
+            if (newDate.isAfter(targetEndDate)) {
+                newDate = targetEndDate;
+            }
+            return new PlanAssignmentRequest(a.getRestaurantId(), a.getInspectorId(), a.getTemplateId(), newDate);
+        }).toList();
     }
 }
