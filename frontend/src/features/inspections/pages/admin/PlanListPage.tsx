@@ -2,6 +2,7 @@ import { PlusOutlined } from '@ant-design/icons'
 import { Button, Card, Flex, Input, Modal, Select } from 'antd'
 import { useCallback, useState } from 'react'
 import { AdvancedFilter } from '@/components/data-entry/AdvancedFilter'
+import { DetailModal } from '@/components/feedback/DetailModal'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { PlanFormModal } from '@/features/inspections/components/PlanFormModal'
 import { PlanTable } from '@/features/inspections/components/PlanTable'
@@ -11,6 +12,7 @@ import { useConfirm } from '@/hooks/useConfirm'
 import { useListParams } from '@/hooks/useListParams'
 import { useNotify } from '@/hooks/useNotify'
 import { PERMISSIONS, ProtectedAction } from '@/permissions'
+import { formatDate } from '@/utils/format-date'
 
 interface Filters extends Record<string, unknown> {
   keyword?: string
@@ -18,13 +20,14 @@ interface Filters extends Record<string, unknown> {
 }
 
 export function PlanListPage() {
-  const { params, filters, setFilter, resetFilters, activeFilterCount } = useListParams<Filters>()
+  const { params, filters, setFilter, onTableChange, resetFilters, activeFilterCount } = useListParams<Filters>()
   const plans = usePlans(params)
   const { submit, approve, reject, remove } = usePlanActions()
   const confirm = useConfirm()
   const notify = useNotify()
 
   const [modal, setModal] = useState<{ open: boolean; plan?: PlanResponse }>({ open: false })
+  const [viewing, setViewing] = useState<PlanResponse>()
   const [rejectDialog, setRejectDialog] = useState<{ open: boolean; plan?: PlanResponse; reason: string }>({
     open: false,
     reason: '',
@@ -145,6 +148,9 @@ export function PlanListPage() {
             loading={plans.isLoading}
             currentPage={params.page}
             pageSize={params.size}
+            totalItems={plans.data?.totalItems}
+            onPageChange={(p, s) => onTableChange({ page: p - 1, size: s })}
+            onView={setViewing}
             onEdit={(plan) => setModal({ open: true, plan })}
             onSubmit={onSubmitPlan}
             onApprove={onApprovePlan}
@@ -158,6 +164,24 @@ export function PlanListPage() {
         open={modal.open}
         plan={modal.plan}
         onClose={() => setModal({ open: false })}
+      />
+
+      <DetailModal
+        open={Boolean(viewing)}
+        title={`Chi tiết kế hoạch: ${viewing?.planCode ?? ''}`}
+        onClose={() => setViewing(undefined)}
+        fields={[
+          { label: 'Mã kế hoạch', value: viewing?.planCode },
+          { label: 'Tiêu đề', value: viewing?.title },
+          { label: 'Thời gian thực hiện', value: viewing ? `${formatDate(viewing.startDate)} - ${formatDate(viewing.endDate)}` : undefined },
+          { label: 'Trạng thái', value: viewing?.status },
+          { label: 'Người tạo', value: viewing?.createdByName },
+          { label: 'Ngày tạo', value: viewing ? formatDate(viewing.createdAt) : undefined },
+          { label: 'Người duyệt', value: viewing?.approvedByName },
+          { label: 'Ngày duyệt', value: viewing?.approvedAt ? formatDate(viewing.approvedAt) : undefined },
+          ...(viewing?.rejectionReason ? [{ label: 'Lý do từ chối', value: viewing.rejectionReason, span: 2 }] : []),
+          { label: 'Ghi chú', value: viewing?.notes, span: 2 },
+        ]}
       />
 
       <Modal

@@ -7,6 +7,7 @@ import { PERMISSIONS, usePermission } from '@/permissions'
 import type { Permission } from '@/permissions/permissions'
 
 const ITEMS: { key: string; label: string; route: string; access: Permission }[] = [
+  { key: 'inspection', label: 'Phiếu chấm KSVH', route: ROUTES.admin.inspections, access: PERMISSIONS.PLAN.CREATE },
   { key: 'plan', label: 'Kế hoạch kiểm tra', route: ROUTES.admin.plans, access: PERMISSIONS.PLAN.CREATE },
   { key: 'restaurant', label: 'Nhà hàng', route: ROUTES.admin.restaurants, access: PERMISSIONS.ORGANIZATION.MANAGE },
   { key: 'criterion', label: 'Tiêu chí', route: ROUTES.admin.criteria, access: PERMISSIONS.CRITERIA.MANAGE },

@@ -2,15 +2,12 @@ import {
   BgColorsOutlined,
   DownOutlined,
   LogoutOutlined,
-  MobileOutlined,
 } from '@ant-design/icons'
 import { Avatar, Button, Dropdown, Flex, Tag, Tooltip, Typography, type MenuProps } from 'antd'
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
 import type { LayoutUser } from '@/components/layout/menu.types'
-import { ROUTES } from '@/constants/routes'
 import { ThemeModal } from '@/features/theme'
-import { AREA_ACCESS, roleLabel, usePermission } from '@/permissions'
+import { roleLabel } from '@/permissions'
 
 export interface SidebarProfileProps {
   user: LayoutUser | null
@@ -28,9 +25,6 @@ function initialsOf(fullName?: string): string {
 
 export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: SidebarProfileProps) {
   const [themeOpen, setThemeOpen] = useState(false)
-  const navigate = useNavigate()
-  const { allows } = usePermission()
-  const canAccessQc = allows(AREA_ACCESS.qc)
 
   const dropdownItems: MenuProps['items'] = [
     {
@@ -42,7 +36,7 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
           <Typography.Text strong>{user?.fullName ?? 'Người dùng'}</Typography.Text>
           <Flex gap={4} wrap>
             {user?.roles.map((r) => (
-              <Tag key={r} style={{ margin: 0, borderRadius: 4, background: 'rgba(0, 0, 0, 0.05)', color: '#3a3a3c', border: '1px solid rgba(0, 0, 0, 0.08)' }}>
+              <Tag key={r} style={{ margin: 0, borderRadius: 4, background: '#f1f5f9', color: '#334155', border: '1px solid #e2e8f0' }}>
                 {roleLabel(r)}
               </Tag>
             ))}
@@ -54,19 +48,9 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
     {
       key: 'theme',
       icon: <BgColorsOutlined />,
-      label: 'Đổi hình nền giao diện',
+      label: 'Đổi chủ đề / hình nền',
       onClick: () => setThemeOpen(true),
     },
-    ...(canAccessQc
-      ? [
-          {
-            key: 'switch-qc',
-            icon: <MobileOutlined />,
-            label: 'Giao diện chấm QC Mobile (/qc)',
-            onClick: () => navigate(ROUTES.qc.root),
-          },
-        ]
-      : []),
     {
       key: 'logout',
       icon: <LogoutOutlined />,
@@ -79,15 +63,14 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
 
   const avatar = (
     <Avatar
-      size={collapsed ? 36 : 34}
+      size={collapsed ? 36 : 32}
       style={{
-        background: 'linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%)',
-        color: '#1d1d1f',
+        background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+        color: '#ffffff',
         fontWeight: 700,
-        fontSize: 14,
+        fontSize: 13,
         flexShrink: 0,
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-        border: '1px solid rgba(255, 255, 255, 0.9)',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)',
       }}
     >
       {initialsOf(user?.fullName)}
@@ -97,10 +80,10 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
   return (
     <div
       style={{
-        padding: collapsed ? '12px 0' : '10px 12px',
-        borderTop: '1px solid rgba(0, 0, 0, 0.06)',
+        padding: collapsed ? '12px 0' : '8px 10px',
+        borderTop: '1px solid #1e293b',
         marginTop: 'auto',
-        background: 'transparent',
+        background: '#0f172a',
       }}
     >
       <Dropdown menu={{ items: dropdownItems }} trigger={['click']} placement="topRight">
@@ -125,15 +108,15 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
           >
             <Flex align="center" gap={10} style={{ width: '100%', overflow: 'hidden' }}>
               {avatar}
-              <Flex vertical style={{ flex: 1, minWidth: 0, lineHeight: 1.2 }}>
-                <Typography.Text strong ellipsis style={{ fontSize: 13, color: '#ffffff', textShadow: '0 1px 2px rgba(0, 0, 0, 0.6)' }}>
+              <Flex vertical style={{ flex: 1, minWidth: 0, lineHeight: 1.25 }}>
+                <Typography.Text strong ellipsis style={{ fontSize: 13, color: '#f8fafc' }}>
                   {user?.fullName ?? 'Người dùng'}
                 </Typography.Text>
-                <Typography.Text ellipsis style={{ fontSize: 11, color: 'rgba(255, 255, 255, 0.8)', textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)' }}>
+                <Typography.Text ellipsis style={{ fontSize: 11, color: '#94a3b8' }}>
                   {user?.roles.map(roleLabel).join(', ')}
                 </Typography.Text>
               </Flex>
-              <DownOutlined style={{ fontSize: 10, color: '#ffffff', flexShrink: 0 }} />
+              <DownOutlined style={{ fontSize: 10, color: '#64748b', flexShrink: 0 }} />
             </Flex>
           </Button>
         )}

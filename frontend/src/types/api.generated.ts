@@ -1781,8 +1781,20 @@ export interface components {
             findingsByStatus: components["schemas"]["CountItem"][];
             topRestaurants: components["schemas"]["RestaurantRisk"][];
             topCriteria: components["schemas"]["CountItem"][];
+            restaurantCompliance?: components["schemas"]["RestaurantCompliance"][];
+        };
+        RestaurantCompliance: {
+            /** Format: int64 */
+            id: number;
+            code: string;
+            name: string;
+            complianceScore: number | null;
+            attention: boolean;
         };
         Kpis: {
+            complianceRate?: number | null;
+            /** Format: int64 */
+            highRiskFindings?: number;
             /** Format: int64 */
             inspectionsThisMonth: number;
             /** Format: int64 */

@@ -65,6 +65,13 @@ public class InspectionController {
         return service.create(req, CurrentUser.from(jwt));
     }
 
+    @PostMapping("/batch")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyAuthority('" + PermissionCodes.PLAN_CREATE + "', '" + PermissionCodes.INSPECTION_PERFORM + "')")
+    public List<InspectionResponse> createBatch(@Valid @RequestBody InspectionBatchCreateRequest req, @AuthenticationPrincipal Jwt jwt) {
+        return service.createBatch(req, CurrentUser.from(jwt));
+    }
+
     @PostMapping("/{id}/checkin")
     @PreAuthorize("hasAnyAuthority('" + PermissionCodes.INSPECTION_PERFORM + "')")
     public InspectionResponse checkin(@PathVariable Long id, @Valid @RequestBody InspectionCheckinRequest req,

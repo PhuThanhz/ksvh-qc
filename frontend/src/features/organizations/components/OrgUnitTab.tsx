@@ -9,6 +9,7 @@ import { useNotify } from '@/components/feedback/useNotify'
 import { OrgUnitDetailModal } from '@/features/organizations/components/OrgUnitDetailModal'
 import { OrgUnitFormModal } from '@/features/organizations/components/OrgUnitFormModal'
 import { OrgUnitTable } from '@/features/organizations/components/OrgUnitTable'
+import { OrganizationExcelActions } from '@/features/organizations/components/OrganizationExcelActions'
 import { useCompanies, useDeleteOrgUnit, useOrgUnits } from '@/features/organizations/hooks/useOrganizations'
 import {
   ORG_UNIT_TYPE_LABEL,
@@ -145,6 +146,7 @@ export function OrgUnitTab({ fixedUnitType }: OrgUnitTabProps = {}) {
         }
         extra={
           <Space>
+            <OrganizationExcelActions />
             <ProtectedAction access={PERMISSIONS.ORGANIZATION.MANAGE}>
               <Button type="primary" icon={<PlusOutlined />} onClick={() => setEditing({ open: true })}>
                 {addButtonText}

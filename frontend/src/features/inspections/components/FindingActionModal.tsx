@@ -1,8 +1,10 @@
-import { DatePicker, Form, Input, Modal, Radio } from 'antd'
+import { UploadOutlined } from '@ant-design/icons'
+import { Button, DatePicker, Form, Input, Modal, Radio, Space } from 'antd'
 import dayjs from 'dayjs'
-import { useEffect } from 'react'
+import { type ChangeEvent, useEffect, useRef } from 'react'
 import { useFindingMutations } from '@/features/inspections/hooks/useInspectionData'
 import type { FindingResponse } from '@/features/inspections/inspection.types'
+import { usePhotoCapture } from '@/features/media'
 import { useNotify } from '@/hooks/useNotify'
 
 export type FindingActionType = 'CONFIRM' | 'APPEAL' | 'CONCLUDE_APPEAL' | 'REMEDIATION_PLAN' | 'SUBMIT_REMEDIATION' | 'VERIFY'
@@ -18,20 +20,54 @@ export function FindingActionModal({ open, action, finding, onClose }: Props) {
   const [form] = Form.useForm()
   const { confirm, appeal, concludeAppeal, remediationPlan, submitRemediation, verify } = useFindingMutations()
   const notify = useNotify()
+  const photo = usePhotoCapture()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const currentUploadFieldRef = useRef<'appealEvidenceUrls' | 'remediationEvidenceUrls'>('remediationEvidenceUrls')
+
+  const today = dayjs()
+  const remediationDays = finding?.remediationDays ?? 7
+  const initialDeadline = finding?.deadlineDate ? dayjs(finding.deadlineDate) : null
+  const maxDeadline = (!initialDeadline || initialDeadline.isBefore(today, 'day'))
+    ? today.add(remediationDays, 'day')
+    : initialDeadline
 
   useEffect(() => {
     if (open) {
       form.resetFields()
       if (action === 'REMEDIATION_PLAN') {
-        // Mặc định = hạn khắc phục server đã tính theo mức rủi ro; CHT có thể chọn sớm hơn.
-        form.setFieldValue('remediationDeadline', finding?.deadlineDate ? dayjs(finding.deadlineDate) : dayjs())
+        form.setFieldValue('remediationDeadline', maxDeadline)
       } else if (action === 'CONCLUDE_APPEAL') {
         form.setFieldValue('conclusion', 'UPHELD')
       } else if (action === 'VERIFY') {
         form.setFieldValue('passed', true)
       }
     }
-  }, [open, action, finding, form])
+  }, [open, action, finding, form, maxDeadline])
+
+  const onSelectFile = (field: 'appealEvidenceUrls' | 'remediationEvidenceUrls') => {
+    currentUploadFieldRef.current = field
+    fileInputRef.current?.click()
+  }
+
+  const onFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !finding) return
+    try {
+      const captured = await photo.process(file, [
+        finding.restaurantName || 'Nhà hàng',
+        finding.criterionCode || 'QC',
+      ])
+      if (captured) {
+        const fieldName = currentUploadFieldRef.current
+        const current = form.getFieldValue(fieldName) as string | undefined
+        const next = current ? `${current}, ${captured.objectKey}` : captured.objectKey
+        form.setFieldValue(fieldName, next)
+        notify.success('Đã tải ảnh lên kho lưu trữ thành công')
+      }
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
 
   const onSubmit = async () => {
     if (!finding || !action) return
@@ -72,12 +108,21 @@ export function FindingActionModal({ open, action, finding, onClose }: Props) {
     VERIFY: 'Nghiệm thu kết quả khắc phục',
   }
 
+  const isPending =
+    confirm.isPending ||
+    appeal.isPending ||
+    concludeAppeal.isPending ||
+    remediationPlan.isPending ||
+    submitRemediation.isPending ||
+    verify.isPending
+
   return (
     <Modal
       open={open}
       title={action ? titles[action] : ''}
       onCancel={onClose}
       onOk={onSubmit}
+      confirmLoading={isPending}
       destroyOnClose
       width={560}
     >
@@ -93,8 +138,21 @@ export function FindingActionModal({ open, action, finding, onClose }: Props) {
             <Form.Item name="appealReason" label="Lý do khiếu nại" rules={[{ required: true, message: 'Vui lòng nhập lý do' }]}>
               <Input.TextArea rows={3} placeholder="Giải trình nguyên nhân khách quan hoặc căn cứ khiếu nại..." />
             </Form.Item>
-            <Form.Item name="appealEvidenceUrls" label="Link bằng chứng chứng minh">
-              <Input placeholder="https://..." />
+            <Form.Item
+              name="appealEvidenceUrls"
+              label="Ảnh / Bằng chứng chứng minh"
+              extra="Có thể bấm Tải ảnh để chụp/chọn ảnh hoặc nhập URL"
+            >
+              <Space.Compact style={{ width: '100%' }}>
+                <Input placeholder="https://... hoặc mã ảnh" />
+                <Button
+                  icon={<UploadOutlined />}
+                  loading={photo.step === 'processing' || photo.step === 'uploading'}
+                  onClick={() => onSelectFile('appealEvidenceUrls')}
+                >
+                  Tải ảnh
+                </Button>
+              </Space.Compact>
             </Form.Item>
           </>
         )}
@@ -116,23 +174,35 @@ export function FindingActionModal({ open, action, finding, onClose }: Props) {
             <Form.Item
               name="remediationDeadline"
               label="Ngày hẹn hoàn thành"
-              extra={finding?.deadlineDate ? `Không được sau hạn ${dayjs(finding.deadlineDate).format('DD/MM/YYYY')} của mức rủi ro ${finding.riskLevelCode}` : undefined}
+              extra={`Hạn tối đa: ${maxDeadline.format('DD/MM/YYYY')} (${remediationDays} ngày - Mức ${finding?.riskLevelCode})`}
               rules={[{ required: true, message: 'Vui lòng chọn ngày hẹn' }]}
             >
               <DatePicker
                 style={{ width: '100%' }}
                 format="DD/MM/YYYY"
-                disabledDate={(d) =>
-                  d.isBefore(dayjs(), 'day') || (!!finding?.deadlineDate && d.isAfter(dayjs(finding.deadlineDate), 'day'))
-                }
+                disabledDate={(d) => d.isBefore(today, 'day') || d.isAfter(maxDeadline, 'day')}
               />
             </Form.Item>
           </>
         )}
 
         {action === 'SUBMIT_REMEDIATION' && (
-          <Form.Item name="remediationEvidenceUrls" label="Link hình ảnh/video bằng chứng sau khắc phục" rules={[{ required: true, message: 'Vui lòng cung cấp link ảnh/video' }]}>
-            <Input placeholder="https://..." />
+          <Form.Item
+            name="remediationEvidenceUrls"
+            label="Ảnh / Bằng chứng sau khắc phục"
+            extra="Có thể bấm Tải ảnh để chụp/chọn ảnh hoặc nhập URL"
+            rules={[{ required: true, message: 'Vui lòng cung cấp link hoặc tải ảnh bằng chứng' }]}
+          >
+            <Space.Compact style={{ width: '100%' }}>
+              <Input placeholder="https://... hoặc mã ảnh" />
+              <Button
+                icon={<UploadOutlined />}
+                loading={photo.step === 'processing' || photo.step === 'uploading'}
+                onClick={() => onSelectFile('remediationEvidenceUrls')}
+              >
+                Tải ảnh
+              </Button>
+            </Space.Compact>
           </Form.Item>
         )}
 
@@ -150,6 +220,13 @@ export function FindingActionModal({ open, action, finding, onClose }: Props) {
           </>
         )}
       </Form>
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={onFileChange}
+        style={{ display: 'none' }}
+        accept="image/*"
+      />
     </Modal>
   )
 }

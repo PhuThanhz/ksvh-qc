@@ -175,7 +175,7 @@ public final class ExcelWriter {
             v.setShowErrorBox(true);
             v.setErrorStyle(DataValidation.ErrorStyle.STOP);
             v.createErrorBox("Giá trị không hợp lệ", "Chọn một giá trị trong danh sách: " + String.join(", ", options));
-            v.setSuppressDropDownArrow(true);
+            v.setSuppressDropDownArrow(false);
             sh.addValidationData(v);
         }
     }

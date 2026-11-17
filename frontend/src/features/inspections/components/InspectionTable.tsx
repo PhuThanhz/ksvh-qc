@@ -4,12 +4,16 @@ import type { ColumnsType } from 'antd/es/table'
 import type { InspectionResponse, InspectionStatus } from '@/features/inspections/inspection.types'
 import { formatDate } from '@/utils/format-date'
 import { INSPECTION_KIND_LABEL, INSPECTION_MODE_LABEL, type InspectionKind } from '@/features/inspections/inspection.types'
+import { PERMISSIONS, usePermission } from '@/permissions'
+import { formatInspectionDuration, getComplianceGrade } from '@/features/inspections/utils/inspection-metrics'
 
 interface Props {
   data?: InspectionResponse[]
   loading?: boolean
   currentPage?: number
   pageSize?: number
+  totalItems?: number
+  onPageChange?: (page: number, pageSize: number) => void
   onView: (ins: InspectionResponse) => void
   onCancel: (ins: InspectionResponse) => void
 }
@@ -27,9 +31,14 @@ export function InspectionTable({
   loading,
   currentPage = 0,
   pageSize = 20,
+  totalItems,
+  onPageChange,
   onView,
   onCancel,
 }: Props) {
+  const { can } = usePermission()
+  const canCancel = can(PERMISSIONS.INSPECTION.CANCEL)
+
   const columns: ColumnsType<InspectionResponse> = [
     {
       title: '#',
@@ -99,8 +108,26 @@ export function InspectionTable({
             {r.maxRiskLevel} ({r.totalRiskScore} đ)
           </Tag>
         ) : (
-          <span style={{ color: '#8c8c8c' }}>—</span>
+          <span style={{ color: '#8c8c8c' }}>0 đ</span>
         ),
+    },
+    {
+      title: 'Điểm & Xếp loại',
+      dataIndex: 'complianceScore',
+      key: 'compliance',
+      width: 145,
+      render: (v, r) => {
+        if (v == null) return '—'
+        const grade = getComplianceGrade(v, r.maxRiskLevel)
+        return (
+          <div>
+            <div style={{ fontWeight: 600 }}>{v.toLocaleString('vi-VN')}%</div>
+            <Tag color={grade.color} style={{ fontSize: 11, margin: 0, marginTop: 2 }}>
+              {grade.label}
+            </Tag>
+          </div>
+        )
+      },
     },
     {
       title: 'Trạng thái',
@@ -110,23 +137,33 @@ export function InspectionTable({
       render: (st: InspectionStatus) => <Tag color={STATUS_TAG[st]?.color}>{STATUS_TAG[st]?.label}</Tag>,
     },
     {
-      title: 'Ngày tạo',
+      title: 'Thời gian',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      width: 110,
-      render: (v) => formatDate(v),
+      width: 150,
+      render: (v, r) => {
+        const duration = formatInspectionDuration(r.checkinAt, r.submittedAt)
+        return (
+          <div>
+            <div>{formatDate(v)}</div>
+            {duration !== '—' && (
+              <div style={{ fontSize: 11, color: '#8c8c8c' }}>Thời lượng: {duration}</div>
+            )}
+          </div>
+        )
+      },
     },
     {
       title: 'Thao tác',
       key: 'actions',
-      width: 120,
+      width: 110,
       align: 'center',
       render: (_, r) => (
         <Space size="small">
           <Tooltip title="Xem chi tiết">
             <Button type="text" icon={<EyeOutlined />} onClick={() => onView(r)} />
           </Tooltip>
-          {r.status !== 'COMPLETED' && r.status !== 'CANCELLED' && (
+          {(r.status === 'ASSIGNED' || r.status === 'IN_PROGRESS') && canCancel && (
             <Tooltip title="Huỷ phiếu">
               <Button type="text" danger icon={<CloseCircleOutlined />} onClick={() => onCancel(r)} />
             </Tooltip>
@@ -142,7 +179,18 @@ export function InspectionTable({
       dataSource={data}
       rowKey="id"
       loading={loading}
-      pagination={false}
+      pagination={
+        totalItems !== undefined
+          ? {
+              current: currentPage + 1,
+              pageSize,
+              total: totalItems,
+              showSizeChanger: true,
+              onChange: (p, s) => onPageChange?.(p, s),
+              showTotal: (total) => `Tổng ${total} phiếu`,
+            }
+          : false
+      }
       size="middle"
     />
   )

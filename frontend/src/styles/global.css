@@ -2,244 +2,220 @@
 html, body, #root { margin: 0; min-height: 100%; }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', -system-ui, Roboto, sans-serif;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
-  background-color: #eef1f6;
-  color: #1d1d1f;
+  background-color: #f8fafc;
+  color: #0f172a;
 }
 
 .compact-table-form .ant-form-item { margin-bottom: 0; }
 .compact-table-form .ant-table-cell { vertical-align: top; }
 
-/* Triệt tiêu triệt để mọi nền trắng đục ngầm của Ant Design Layout */
-.ant-layout, .ant-layout-sider, .ant-layout-sider-children, .ant-layout-sider-light,
-.ant-layout-header, .ant-menu, .ant-menu-light, .ant-menu-inline {
+/* Sidebar doanh nghiệp hiện đại: Slate 900 vững chãi, tương phản cao, không nhoè */
+.enterprise-dark-sidebar {
+  background: #0f172a !important;
+  border-inline-end: 1px solid #1e293b !important;
+  box-shadow: 1px 0 4px rgba(0, 0, 0, 0.08) !important;
+}
+
+.enterprise-dark-sidebar .ant-menu {
+  border-inline-end: none !important;
+  padding-inline: 4px !important;
   background: transparent !important;
 }
 
-/* Apple Ultra-Sheer Glass / Kính siêu trong suốt, mỏng nhẹ */
-.apple-frosted-sidebar {
-  background: rgba(255, 255, 255, 0.08) !important;
-  backdrop-filter: blur(10px) saturate(140%) !important;
-  -webkit-backdrop-filter: blur(10px) saturate(140%) !important;
-  border-inline-end: 1px solid rgba(255, 255, 255, 0.15) !important;
-  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.04) !important;
-}
-
-.apple-frosted-header {
-  background: rgba(255, 255, 255, 0.1) !important;
-  backdrop-filter: blur(10px) saturate(140%) !important;
-  -webkit-backdrop-filter: blur(10px) saturate(140%) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.04) !important;
-}
-
-.apple-frosted-sidebar .ant-menu {
-  border-inline-end: none !important;
-  padding-inline: 4px !important;
-}
-
-/* Các mục menu: Cỡ chữ chuẩn Apple macOS 13.5px, icon 16px, chiều cao 36px thanh thoát */
-.apple-frosted-sidebar .ant-menu-item,
-.apple-frosted-sidebar .ant-menu-submenu-title {
+/* Các mục menu: Cỡ chữ 13.5px, icon 16px, chiều cao 38px thanh thoát */
+.enterprise-dark-sidebar .ant-menu-item,
+.enterprise-dark-sidebar .ant-menu-submenu-title {
   border-radius: 8px !important;
   margin-inline: 6px !important;
   margin-block: 3px !important;
-  height: 36px !important;
-  line-height: 36px !important;
+  height: 38px !important;
+  line-height: 38px !important;
   font-size: 13.5px !important;
   font-weight: 500 !important;
-  color: #ffffff !important;
+  color: #94a3b8 !important;
   letter-spacing: -0.01em !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
-  transition: background 0.15s ease, color 0.15s ease !important;
+  transition: all 0.15s ease !important;
   border: none !important;
   box-shadow: none !important;
 }
 
-/* Toàn bộ chữ và icon trên Sidebar luôn là màu trắng sắc nét */
-.apple-frosted-sidebar .ant-menu-title-content,
-.apple-frosted-sidebar .ant-menu-item a,
-.apple-frosted-sidebar .ant-menu-item .ant-menu-item-icon,
-.apple-frosted-sidebar .ant-menu-submenu-title .ant-menu-item-icon,
-.apple-frosted-sidebar .ant-menu-submenu-arrow {
-  color: #ffffff !important;
+.enterprise-dark-sidebar .ant-menu-title-content,
+.enterprise-dark-sidebar .ant-menu-item a,
+.enterprise-dark-sidebar .ant-menu-item .ant-menu-item-icon,
+.enterprise-dark-sidebar .ant-menu-submenu-title .ant-menu-item-icon,
+.enterprise-dark-sidebar .ant-menu-submenu-arrow {
+  color: inherit !important;
   font-size: inherit;
   transition: color 0.15s ease !important;
 }
 
-.apple-frosted-sidebar .ant-menu-item .ant-menu-item-icon,
-.apple-frosted-sidebar .ant-menu-submenu-title .ant-menu-item-icon {
+.enterprise-dark-sidebar .ant-menu-item .ant-menu-item-icon,
+.enterprise-dark-sidebar .ant-menu-submenu-title .ant-menu-item-icon {
   font-size: 16px !important;
-  margin-right: 9px !important;
+  margin-right: 10px !important;
+  color: #64748b !important;
 }
 
-.apple-frosted-sidebar .ant-menu-submenu-arrow {
-  color: rgba(255, 255, 255, 0.85) !important;
+.enterprise-dark-sidebar .ant-menu-submenu-arrow {
+  color: #64748b !important;
   font-size: 11px !important;
 }
 
-/* Hover: Lớp nhám phẳng mờ dịu mắt, tuyệt đối không viền, không bóng */
-.apple-frosted-sidebar .ant-menu-item:hover,
-.apple-frosted-sidebar .ant-menu-submenu-title:hover {
-  background: rgba(255, 255, 255, 0.1) !important;
-  border: none !important;
-  box-shadow: none !important;
-  color: #ffffff !important;
+/* Hover: Slate 800 nhẹ nhàng */
+.enterprise-dark-sidebar .ant-menu-item:hover,
+.enterprise-dark-sidebar .ant-menu-submenu-title:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #f8fafc !important;
 }
 
-/* Khi nhấn chuột: Phẳng êm ái, không bóng lóa */
-.apple-frosted-sidebar .ant-menu-item:active,
-.apple-frosted-sidebar .ant-menu-submenu-title:active {
-  background: rgba(255, 255, 255, 0.22) !important;
-  border: none !important;
-  box-shadow: none !important;
+.enterprise-dark-sidebar .ant-menu-item:hover .ant-menu-item-icon,
+.enterprise-dark-sidebar .ant-menu-submenu-title:hover .ant-menu-item-icon {
+  color: #f8fafc !important;
 }
 
-/* Selected: Nền nhám phẳng mờ mịn màng (Matte Frosted), không viền, không bóng loáng */
-.apple-frosted-sidebar .ant-menu-item-selected {
-  background: rgba(255, 255, 255, 0.18) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-  border: none !important;
-  box-shadow: none !important;
+/* Selected: Nền Brand Blue hoặc Indigo sáng rõ, chữ trắng tuyệt đối */
+.enterprise-dark-sidebar .ant-menu-item-selected {
+  background: #0284c7 !important;
   color: #ffffff !important;
   font-weight: 600 !important;
-  text-shadow: none !important;
+  box-shadow: 0 1px 3px rgba(2, 132, 199, 0.4) !important;
 }
 
-.apple-frosted-sidebar .ant-menu-item-selected .ant-menu-item-icon,
-.apple-frosted-sidebar .ant-menu-item-selected a,
-.apple-frosted-sidebar .ant-menu-item-selected .ant-menu-title-content {
+.enterprise-dark-sidebar .ant-menu-item-selected .ant-menu-item-icon,
+.enterprise-dark-sidebar .ant-menu-item-selected a,
+.enterprise-dark-sidebar .ant-menu-item-selected .ant-menu-title-content {
   color: #ffffff !important;
-  text-shadow: none !important;
 }
 
-.apple-frosted-sidebar .ant-menu-sub { background: transparent !important; }
+.enterprise-dark-sidebar .ant-menu-sub { background: transparent !important; }
 
-/* Thẻ Card nội dung chuẩn Apple (Crisp White Surface trên nền Ambient) */
+/* Thẻ Card nội dung: Nền trắng tinh khiết, viền mảnh Slate 200, đổ bóng sắc nét */
 .ant-card:not(.ant-card-bordered-none) {
   background: #ffffff !important;
-  border: 1px solid rgba(0, 0, 0, 0.06) !important;
-  border-radius: 14px !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02), 0 4px 16px -2px rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04) !important;
 }
 
-/* Bảng dữ liệu chuẩn xác, sạch sẽ, dễ đọc */
+/* Bảng dữ liệu chuẩn xác, thanh thoát, dễ đọc */
 .ant-table-wrapper .ant-table {
   background: #ffffff !important;
-  border-radius: 12px !important;
+  border-radius: 10px !important;
 }
 
 .ant-table-wrapper .ant-table-thead > tr > th {
-  background: #fafafc !important;
-  color: #6e6e73 !important;
-  font-size: 12.5px !important;
+  background: #f8fafc !important;
+  color: #475569 !important;
+  font-size: 12px !important;
   font-weight: 600 !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
-  padding: 12px 16px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.03em !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  padding: 10px 14px !important;
 }
 
 .ant-table-wrapper .ant-table-tbody > tr > td {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
-  padding: 13px 16px !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  padding: 11px 14px !important;
   font-size: 13.5px !important;
-  color: #1d1d1f !important;
+  color: #0f172a !important;
 }
 
-/* Dòng đo kích thước cột (bảng có scroll.x) phải giữ chiều cao 0, không nhận padding / viền chung ở trên. */
 .ant-table-wrapper .ant-table-tbody > tr.ant-table-measure-row > td {
   padding: 0 !important;
   border: 0 !important;
 }
 
 .ant-table-wrapper .ant-table-tbody > tr:hover > td {
-  background: rgba(0, 0, 0, 0.02) !important;
+  background: #f8fafc !important;
 }
 
-/* Apple Squircle Inputs */
+/* Ô nhập liệu chuẩn xác */
 .ant-input, .ant-select-selector {
   border-radius: 8px !important;
-  border-color: rgba(0, 0, 0, 0.12) !important;
+  border-color: #cbd5e1 !important;
 }
 
 .ant-input:focus, .ant-input-focused, .ant-select-focused .ant-select-selector {
-  border-color: #0071e3 !important;
-  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.14) !important;
+  border-color: #0284c7 !important;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15) !important;
 }
 
-/* Nút Apple Primary */
+/* Nút bấm chuẩn Enterprise */
 .ant-btn-primary {
-  background: #0071e3 !important;
+  background: #0284c7 !important;
+  border-color: #0284c7 !important;
   border-radius: 8px !important;
-  box-shadow: 0 2px 6px rgba(0, 113, 227, 0.24) !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+  font-weight: 500 !important;
 }
-.ant-btn-primary:hover { background: #0077ed !important; }
+.ant-btn-primary:hover {
+  background: #0369a1 !important;
+  border-color: #0369a1 !important;
+}
 
-/* Apple Native Modal & Dialog */
+/* Modal & Dialog chuẩn sắc */
 .ant-modal-content {
-  border-radius: 16px !important;
-  box-shadow: 0 24px 50px -12px rgba(0, 0, 0, 0.22), 0 0 1px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid #e2e8f0 !important;
   padding: 24px !important;
 }
 .ant-modal-title {
-  font-size: 16.5px !important;
+  font-size: 16px !important;
   font-weight: 600 !important;
-  letter-spacing: -0.015em !important;
+  letter-spacing: -0.01em !important;
+  color: #0f172a !important;
 }
 
-/* Apple macOS Toast Notification (Góc trên bên phải, to đẹp sang xịn mịn) */
+/* Toast Notification góc trên */
 .ant-notification-notice {
-  background: rgba(255, 255, 255, 0.94) !important;
-  backdrop-filter: blur(24px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-  border-radius: 16px !important;
+  background: #ffffff !important;
+  border-radius: 12px !important;
   padding: 16px 20px !important;
-  border: 1px solid rgba(255, 255, 255, 0.8) !important;
-  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.16), 0 0 1px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1) !important;
 }
 .ant-notification-notice-message, .ant-notification-notice-title {
-  font-size: 15px !important;
+  font-size: 14.5px !important;
   font-weight: 600 !important;
-  color: #1d1d1f !important;
+  color: #0f172a !important;
 }
-.ant-notification-notice-icon { font-size: 20px !important; margin-top: 2px !important; }
+.ant-notification-notice-icon { font-size: 18px !important; margin-top: 2px !important; }
 
-/* Apple Segmented Tabs (Nổi bật, rõ nét trên mọi nền ảnh) */
+/* Tabs điều hướng */
 .ant-tabs-nav {
-  background: rgba(255, 255, 255, 0.88) !important;
-  backdrop-filter: blur(20px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-  border-radius: 12px !important;
+  background: #ffffff !important;
+  border-radius: 10px !important;
   padding: 4px 6px !important;
   margin-bottom: 12px !important;
-  border: 1px solid rgba(255, 255, 255, 0.7) !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03), 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid #e2e8f0 !important;
 }
 .ant-tabs-nav::before { display: none !important; }
 .ant-tabs-tab {
   font-size: 13.5px !important;
   font-weight: 500 !important;
   padding: 6px 14px !important;
-  color: #6e6e73 !important;
-  border-radius: 8px !important;
+  color: #64748b !important;
+  border-radius: 6px !important;
   transition: all 0.15s ease !important;
 }
-.ant-tabs-tab:hover { color: #0071e3 !important; }
+.ant-tabs-tab:hover { color: #0284c7 !important; }
 .ant-tabs-tab-active {
-  background: #ffffff !important;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+  background: #f1f5f9 !important;
 }
 .ant-tabs-tab-active .ant-tabs-tab-btn {
   font-weight: 600 !important;
-  color: #0071e3 !important;
+  color: #0284c7 !important;
 }
 .ant-tabs-ink-bar { display: none !important; }
 
-/* macOS Thin Smooth Scrollbar */
+/* Thin Smooth Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.16); border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.28); }
-.apple-frosted-sidebar ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.25); }
-.apple-frosted-sidebar ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.45); }
+::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.6); }
+.enterprise-dark-sidebar ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); }
+.enterprise-dark-sidebar ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.35); }

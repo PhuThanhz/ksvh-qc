@@ -1,23 +1,31 @@
-import { Card, Flex, Select } from 'antd'
+import { DownloadOutlined } from '@ant-design/icons'
+import { Button, Card, Flex, Select } from 'antd'
+import dayjs from 'dayjs'
 import { useCallback, useState } from 'react'
 import { AdvancedFilter } from '@/components/data-entry/AdvancedFilter'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { FindingActionModal, type FindingActionType } from '@/features/inspections/components/FindingActionModal'
+import { FindingDetailModal } from '@/features/inspections/components/FindingDetailModal'
 import { FindingTable } from '@/features/inspections/components/FindingTable'
 import { useFindings } from '@/features/inspections/hooks/useInspectionData'
 import type { FindingResponse, FindingStatus } from '@/features/inspections/inspection.types'
 import { useOrgUnits } from '@/features/organizations/hooks/useOrganizations'
 import { useListParams } from '@/hooks/useListParams'
+import { exportToCsv } from '@/utils/export-csv'
+import { formatDate } from '@/utils/format-date'
 
 interface Filters extends Record<string, unknown> {
+  keyword?: string
   restaurantId?: number
   status?: FindingStatus
 }
 
 export function FindingListPage() {
-  const { params, filters, setFilter, resetFilters, activeFilterCount } = useListParams<Filters>()
+  const { params, filters, setFilter, onTableChange, resetFilters, activeFilterCount } = useListParams<Filters>()
   const findings = useFindings(params)
   const restaurants = useOrgUnits({ unitType: 'RESTAURANT', page: 0, size: 200, active: true })
+
+  const [selectedFindingId, setSelectedFindingId] = useState<number | undefined>()
 
   const [actionState, setActionState] = useState<{
     open: boolean
@@ -25,18 +33,62 @@ export function FindingListPage() {
     finding?: FindingResponse
   }>({ open: false })
 
+  const onSearch = useCallback((kw: string) => setFilter('keyword', kw || undefined), [setFilter])
+
   const onTriggerAction = useCallback((finding: FindingResponse, action: FindingActionType) => {
     setActionState({ open: true, action, finding })
   }, [])
+
+  const onViewDetail = useCallback((finding: FindingResponse) => {
+    setSelectedFindingId(finding.id)
+  }, [])
+
+  const onExportFindings = () => {
+    const list = findings.data?.items ?? []
+    if (list.length === 0) return
+    exportToCsv(
+      `danh-sach-loi-khac-phuc-${dayjs().format('YYYYMMDD')}`,
+      [
+        { header: 'Mã lỗi', accessor: (f) => `#${f.id}` },
+        { header: 'Mã phiếu', accessor: (f) => f.inspectionCode },
+        { header: 'Nhà hàng', accessor: (f) => f.restaurantName },
+        { header: 'Mã tiêu chí', accessor: (f) => f.criterionCode },
+        { header: 'Tiêu chí', accessor: (f) => f.criterionName },
+        { header: 'Trọng số gốc', accessor: (f) => f.baseImpact },
+        { header: 'Ảnh hưởng hiệu lực', accessor: (f) => f.effectiveImpact },
+        { header: 'Lần vi phạm', accessor: (f) => f.violationCount },
+        { header: 'Điểm rủi ro', accessor: (f) => f.calculatedScore },
+        { header: 'Mức rủi ro', accessor: (f) => f.riskLevelCode },
+        { header: 'Trạng thái', accessor: (f) => f.status },
+        { header: 'Hạn khắc phục', accessor: (f) => formatDate(f.deadlineDate) },
+        { header: 'Hẹn hoàn thành', accessor: (f) => formatDate(f.remediationTargetDate) },
+      ],
+      list,
+    )
+  }
 
   return (
     <PageContainer
       title="Quản lý lỗi & Khắc phục"
       subtitle="Theo dõi chu trình xử lý lỗi vi phạm từ xác nhận, khiếu nại, khắc phục đến nghiệm thu đóng lỗi"
+      extra={
+        <Button
+          icon={<DownloadOutlined />}
+          onClick={onExportFindings}
+          disabled={!findings.data?.items?.length}
+        >
+          Xuất CSV
+        </Button>
+      }
     >
       <Card>
         <Flex vertical gap={16}>
           <AdvancedFilter
+            search={{
+              placeholder: 'Tìm kiếm mô tả lỗi, khiếu nại, khắc phục...',
+              value: filters.keyword,
+              onSearch,
+            }}
             activeCount={activeFilterCount}
             onReset={resetFilters}
           >
@@ -74,7 +126,10 @@ export function FindingListPage() {
             loading={findings.isLoading}
             currentPage={params.page}
             pageSize={params.size}
+            totalItems={findings.data?.totalItems}
+            onPageChange={(p, s) => onTableChange({ page: p - 1, size: s })}
             onAction={onTriggerAction}
+            onView={onViewDetail}
           />
         </Flex>
       </Card>
@@ -84,6 +139,12 @@ export function FindingListPage() {
         action={actionState.action}
         finding={actionState.finding}
         onClose={() => setActionState({ open: false })}
+      />
+
+      <FindingDetailModal
+        open={!!selectedFindingId}
+        findingId={selectedFindingId}
+        onClose={() => setSelectedFindingId(undefined)}
       />
     </PageContainer>
   )

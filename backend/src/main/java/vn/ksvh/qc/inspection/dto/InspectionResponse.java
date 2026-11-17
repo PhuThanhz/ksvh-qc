@@ -51,11 +51,16 @@ public record InspectionResponse(
 ) {
     public static InspectionResponse from(Inspection i, String restaurantName, String templateName, String inspectorName,
                                           int totalRiskScore, String maxRiskLevel) {
-        return from(i, restaurantName, templateName, inspectorName, totalRiskScore, maxRiskLevel, List.of());
+        return from(i, restaurantName, templateName, inspectorName, totalRiskScore, maxRiskLevel, List.of(), false);
     }
 
     public static InspectionResponse from(Inspection i, String restaurantName, String templateName, String inspectorName,
                                           int totalRiskScore, String maxRiskLevel, List<String> topicNames) {
+        return from(i, restaurantName, templateName, inspectorName, totalRiskScore, maxRiskLevel, topicNames, true);
+    }
+
+    public static InspectionResponse from(Inspection i, String restaurantName, String templateName, String inspectorName,
+                                          int totalRiskScore, String maxRiskLevel, List<String> topicNames, boolean includeItems) {
         int passWeight = i.getItems().stream().filter(it -> it.getResult() == ItemResult.PASS).mapToInt(InspectionItem::getBaseImpact).sum();
         int failWeight = i.getItems().stream().filter(it -> it.getResult() == ItemResult.FAIL).mapToInt(InspectionItem::getBaseImpact).sum();
         BigDecimal compliance = passWeight + failWeight == 0 ? null
@@ -64,9 +69,9 @@ public record InspectionResponse(
         long fail = i.getItems().stream().filter(it -> it.getResult() == vn.ksvh.qc.inspection.domain.ItemResult.FAIL).count();
         long na = i.getItems().stream().filter(it -> it.getResult() == vn.ksvh.qc.inspection.domain.ItemResult.NA).count();
 
-        List<InspectionItemResponse> items = i.getItems().stream()
+        List<InspectionItemResponse> items = includeItems ? i.getItems().stream()
                 .map(InspectionItemResponse::from)
-                .toList();
+                .toList() : List.of();
 
         return new InspectionResponse(
                 i.getId(),

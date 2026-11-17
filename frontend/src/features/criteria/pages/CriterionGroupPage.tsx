@@ -2,11 +2,11 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { ROUTES } from '@/constants/routes'
+import { CriteriaExcelActions } from '@/features/criteria/components/CriteriaExcelActions'
 import { CriterionFormModal } from '@/features/criteria/components/CriterionFormModal'
 import { GroupTab } from '@/features/criteria/components/GroupTab'
-import type { CriterionGroup } from '@/features/criteria/criteria.types'
+import type { Criterion, CriterionGroup } from '@/features/criteria/criteria.types'
 import { useCriterionGroups } from '@/features/criteria/hooks/useCriteria'
-import { CriteriaExcelActions } from '@/features/criteria/components/CriteriaExcelActions'
 
 export function CriterionGroupPage() {
   const navigate = useNavigate()
@@ -14,6 +14,7 @@ export function CriterionGroupPage() {
   const [criterionModal, setCriterionModal] = useState<{
     open: boolean
     defaultGroupId?: number
+    criterion?: Criterion
   }>({ open: false })
 
   const handleSelectGroup = (groupId: number) => {
@@ -21,7 +22,11 @@ export function CriterionGroupPage() {
   }
 
   const handleAddCriterionToGroup = (group: CriterionGroup) => {
-    setCriterionModal({ open: true, defaultGroupId: group.id })
+    setCriterionModal({ open: true, defaultGroupId: group.id, criterion: undefined })
+  }
+
+  const handleEditCriterion = (criterion: Criterion) => {
+    setCriterionModal({ open: true, defaultGroupId: criterion.groupId, criterion })
   }
 
   return (
@@ -33,14 +38,15 @@ export function CriterionGroupPage() {
       <GroupTab
         onSelectGroup={handleSelectGroup}
         onAddCriterionToGroup={handleAddCriterionToGroup}
+        onEditCriterion={handleEditCriterion}
       />
       <CriterionFormModal
         open={criterionModal.open}
+        criterion={criterionModal.criterion}
         groups={groups.data ?? []}
         defaultGroupId={criterionModal.defaultGroupId}
-        onClose={() => setCriterionModal({ open: false })}
+        onClose={() => setCriterionModal({ open: false, criterion: undefined })}
       />
     </PageContainer>
   )
 }
-

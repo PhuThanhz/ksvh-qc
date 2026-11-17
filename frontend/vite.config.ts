@@ -6,10 +6,10 @@ import { defineConfig } from 'vite'
 // HTTPS bắt buộc để điện thoại cho phép dùng GPS và camera.
 // Chạy `npm run dev` rồi mở https://<IP-máy-tính>:5273 trên điện thoại cùng mạng Wi-Fi.
 // Chỉ dev trên máy tính: `npm run dev:http` (localhost vẫn được dùng GPS/camera, không cần HTTPS).
-const useHttps = process.env.DEV_HTTP !== '1'
-
-export default defineConfig({
-  plugins: [react(), ...(useHttps ? [basicSsl()] : [])],
+export default defineConfig(({ mode }) => {
+  const useHttps = process.env.DEV_HTTP !== '1' && mode !== 'http'
+  return {
+    plugins: [react(), ...(useHttps ? [basicSsl()] : [])],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
@@ -34,8 +34,14 @@ export default defineConfig({
             if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
               return 'vendor-react'
             }
+            if (id.includes('antd-mobile') || id.includes('antd-mobile-icons')) {
+              return 'vendor-antd-mobile'
+            }
             if (id.includes('antd') || id.includes('@ant-design')) {
               return 'vendor-antd'
+            }
+            if (id.includes('echarts') || id.includes('zrender')) {
+              return 'vendor-echarts'
             }
             if (id.includes('@tanstack/react-query')) {
               return 'vendor-query'
@@ -45,4 +51,4 @@ export default defineConfig({
       },
     },
   },
-})
+}})

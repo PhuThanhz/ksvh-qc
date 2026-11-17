@@ -38,6 +38,7 @@ public class FindingService {
     private final FindingRepository findingRepository;
     private final FindingOccurrenceRepository occurrenceRepository;
     private final InspectionRepository inspectionRepository;
+    private final InspectionItemRepository itemRepository;
     private final CriteriaLookupApi criteriaLookupApi;
     private final OrgUnitLookupApi orgUnitLookupApi;
     private final FindingEventRepository eventRepository;
@@ -46,13 +47,22 @@ public class FindingService {
     private final RiskAssessor riskAssessor;
     private final Clock clock;
 
-    public PageResponse<FindingResponse> search(Long restaurantId, Long inspectionId, FindingStatus status,
+    public PageResponse<FindingResponse> search(String keyword, Long restaurantId, Long inspectionId, FindingStatus status,
                                                 Pageable pageable, CurrentUser user) {
         Specification<Finding> spec = Specification.unrestricted();
         Specification<Finding> scope = access.canReadAll(user) ? null
                 : access.findingScope(user, inspectionRepository.findIdsByInspectorId(user.id()));
         if (scope != null) {
             spec = spec.and(scope);
+        }
+        if (StringUtils.hasText(keyword)) {
+            String kw = "%" + keyword.trim().toLowerCase(Locale.ROOT) + "%";
+            spec = spec.and((root, q, cb) -> cb.or(
+                    cb.like(cb.lower(root.get("description")), kw),
+                    cb.like(cb.lower(root.get("riskLevelCode")), kw),
+                    cb.like(cb.lower(root.get("appealReason")), kw),
+                    cb.like(cb.lower(root.get("remediationPlan")), kw)
+            ));
         }
         if (restaurantId != null) {
             spec = spec.and((root, q, cb) -> cb.equal(root.get("restaurantId"), restaurantId));
@@ -136,6 +146,12 @@ public class FindingService {
             addOccurrence(f, OccurrenceSource.APPEAL_UPHELD);
         } else {
             transition(f, FindingStatus.DISMISSED, FindingEventAction.APPEAL_DISMISSED, user, null);
+            itemRepository.findById(f.getInspectionItemId()).ifPresent(item -> {
+                item.setResult(ItemResult.PASS);
+                String note = "Khiếu nại được chấp thuận: Lỗi đã được huỷ bỏ";
+                item.setComment(item.getComment() != null ? item.getComment() + " (" + note + ")" : note);
+                itemRepository.save(item);
+            });
         }
         FindingResponse res = save(f);
         completeInspectionIfDone(f.getInspectionId());
@@ -149,14 +165,21 @@ public class FindingService {
         requireStatus(f, "Chỉ có thể lập kế hoạch khắc phục cho lỗi đã xác nhận", FindingStatus.CONFIRMED);
 
         // Ngày hẹn do CHT chọn nhưng không được vượt hạn khắc phục server đã tính theo mức rủi ro.
+        // Nếu hạn cũ đã quá ngày hôm nay (vòng lặp lại hoặc quá hạn), hạn tối đa tính từ hôm nay.
         LocalDate today = BusinessDates.today(clock);
         LocalDate target = req.remediationDeadline();
         if (target.isBefore(today)) {
             throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Ngày hẹn khắc phục không được ở quá khứ");
         }
-        if (f.getDeadlineDate() != null && target.isAfter(f.getDeadlineDate())) {
+        LocalDate maxDeadline = (f.getDeadlineDate() == null || f.getDeadlineDate().isBefore(today))
+                ? today.plusDays(f.getRemediationDays())
+                : f.getDeadlineDate();
+        if (target.isAfter(maxDeadline)) {
             throw new BusinessException(ErrorCode.VALIDATION_FAILED,
-                    "Ngày hẹn khắc phục không được sau hạn %s của mức rủi ro %s".formatted(f.getDeadlineDate(), f.getRiskLevelCode()));
+                    "Ngày hẹn khắc phục không được sau hạn %s của mức rủi ro %s".formatted(maxDeadline, f.getRiskLevelCode()));
+        }
+        if (f.getDeadlineDate() == null || f.getDeadlineDate().isBefore(today)) {
+            f.setDeadlineDate(maxDeadline);
         }
         f.setRemediationPlan(req.remediationPlan().trim());
         f.setRemediationTargetDate(target);

@@ -1,18 +1,15 @@
 import type { AmbientPreset } from './ambient.types'
 
 export const DEFAULT_AURA_GRADIENT = `
-  radial-gradient(at 0% 0%, rgba(0, 113, 227, 0.22) 0px, transparent 55%),
-  radial-gradient(at 0% 100%, rgba(99, 102, 241, 0.2) 0px, transparent 50%),
-  radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.16) 0px, transparent 50%),
-  radial-gradient(at 50% 40%, rgba(56, 189, 248, 0.15) 0px, transparent 60%),
-  radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.2) 0px, transparent 55%),
-  #eef1f6
+  radial-gradient(at 0% 0%, rgba(2, 132, 199, 0.04) 0px, transparent 50%),
+  radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.03) 0px, transparent 50%),
+  #f8fafc
 `
 
 export const AMBIENT_PRESETS: readonly AmbientPreset[] = [
   {
     id: 'sequoia',
-    name: 'Apple Sequoia Aura (Mặc định)',
+    name: 'Doanh nghiệp chuẩn (Mặc định)',
     category: 'aura',
     thumbnail: 'https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=400&q=75',
     gradient: DEFAULT_AURA_GRADIENT,

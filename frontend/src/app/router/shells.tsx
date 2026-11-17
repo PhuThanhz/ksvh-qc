@@ -53,7 +53,7 @@ export function MobileShell({ tabs }: { tabs: readonly MenuEntry[] }) {
       rootPath={ROUTES.qc.root}
       tabs={tabs}
       headerRight={
-        <span role="button" onClick={handleLogout}>
+        <span role="button" onClick={handleLogout} style={{ cursor: 'pointer', color: '#8c8c8c', fontSize: 13 }}>
           Thoát
         </span>
       }

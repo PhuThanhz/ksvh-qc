@@ -24,6 +24,10 @@ export function GroupTable({ groups, loading, onEdit, onAddCriterion, onViewCrit
       loading={loading}
       dataSource={groups as CriterionGroup[]}
       pagination={false}
+      onRow={(record) => ({
+        onDoubleClick: () => onViewCriteria(record),
+        style: { cursor: 'pointer' },
+      })}
       columns={[
         {
           title: '#',
@@ -32,15 +36,29 @@ export function GroupTable({ groups, loading, onEdit, onAddCriterion, onViewCrit
           align: 'center',
           render: (_: unknown, __: unknown, index: number) => index + 1,
         },
-        { title: 'Mã nhóm', dataIndex: 'code', key: 'code', width: 140 },
+        {
+          title: 'Mã nhóm',
+          dataIndex: 'code',
+          key: 'code',
+          width: 130,
+          render: (code: string) => <Typography.Text code strong>{code}</Typography.Text>,
+        },
         {
           title: 'Tên nhóm tiêu chí',
           dataIndex: 'name',
           key: 'name',
           render: (name: string, g: CriterionGroup) => (
-            <Typography.Text strong={g.active} delete={!g.active}>
-              {name}
-            </Typography.Text>
+            <Tooltip title="Nhấp để xem chi tiết nhóm và các tiêu chí con">
+              <Typography.Link
+                onClick={() => onViewCriteria(g)}
+                style={{
+                  fontWeight: g.active ? 600 : 400,
+                  textDecoration: g.active ? 'none' : 'line-through',
+                }}
+              >
+                {name}
+              </Typography.Link>
+            </Tooltip>
           ),
         },
         {
@@ -59,7 +77,7 @@ export function GroupTable({ groups, loading, onEdit, onAddCriterion, onViewCrit
           title: 'Số tiêu chí con',
           dataIndex: 'criterionCount',
           key: 'criterionCount',
-          width: 160,
+          width: 170,
           render: (count: number, g: CriterionGroup) => (
             <Space>
               <Badge count={count} showZero color="blue" />
@@ -69,7 +87,7 @@ export function GroupTable({ groups, loading, onEdit, onAddCriterion, onViewCrit
                 icon={<EyeOutlined />}
                 onClick={() => onViewCriteria(g)}
               >
-                Xem tiêu chí
+                Xem tiêu chí con
               </Button>
             </Space>
           ),
@@ -77,16 +95,24 @@ export function GroupTable({ groups, loading, onEdit, onAddCriterion, onViewCrit
         {
           title: 'Trạng thái',
           dataIndex: 'active',
-          width: 120,
+          width: 110,
           render: (a: boolean) => <StatusBadge status={a ? 'active' : 'inactive'} meta={ACTIVE_META} />,
         },
         {
           title: 'Thao tác',
           key: 'actions',
-          width: 160,
+          width: 150,
           fixed: 'right',
           render: (_: unknown, g: CriterionGroup) => (
             <Space size={4}>
+              <Tooltip title="Xem chi tiết nhóm & tiêu chí con">
+                <Button
+                  type="text"
+                  icon={<EyeOutlined />}
+                  aria-label={`Xem chi tiết nhóm ${g.name}`}
+                  onClick={() => onViewCriteria(g)}
+                />
+              </Tooltip>
               <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
                 <Tooltip title="Thêm tiêu chí con vào nhóm này">
                   <Button

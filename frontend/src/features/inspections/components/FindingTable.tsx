@@ -1,22 +1,28 @@
 import {
   AuditOutlined,
   CheckCircleOutlined,
+  EyeOutlined,
   FileDoneOutlined,
   FormOutlined,
   RollbackOutlined,
 } from '@ant-design/icons'
 import { Button, Space, Table, Tag, Tooltip } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
+import dayjs from 'dayjs'
 import type { FindingActionType } from '@/features/inspections/components/FindingActionModal'
 import type { FindingResponse, FindingStatus } from '@/features/inspections/inspection.types'
 import { formatDate } from '@/utils/format-date'
+import { PERMISSIONS, usePermission } from '@/permissions'
 
 interface Props {
   data?: FindingResponse[]
   loading?: boolean
   currentPage?: number
   pageSize?: number
+  totalItems?: number
+  onPageChange?: (page: number, pageSize: number) => void
   onAction: (finding: FindingResponse, action: FindingActionType) => void
+  onView?: (finding: FindingResponse) => void
 }
 
 const STATUS_TAG: Record<FindingStatus, { color: string; label: string }> = {
@@ -34,8 +40,17 @@ export function FindingTable({
   loading,
   currentPage = 0,
   pageSize = 20,
+  totalItems,
+  onPageChange,
   onAction,
+  onView,
 }: Props) {
+  const { can } = usePermission()
+  const canRespond = can(PERMISSIONS.FINDING.RESPOND)
+  const canConclude = can(PERMISSIONS.FINDING.CONCLUDE_APPEAL)
+  const canRemediate = can(PERMISSIONS.FINDING.REMEDIATE)
+  const canVerify = can(PERMISSIONS.FINDING.VERIFY)
+
   const columns: ColumnsType<FindingResponse> = [
     {
       title: '#',
@@ -73,12 +88,19 @@ export function FindingTable({
     {
       title: 'Mức rủi ro',
       key: 'risk',
-      width: 140,
+      width: 150,
       render: (_, r) => (
         <div>
           <Tag color={r.riskLevelCode === 'M4' ? 'error' : r.riskLevelCode === 'M3' ? 'warning' : 'blue'}>
             {r.riskLevelCode} - {r.riskLevelName}
           </Tag>
+          {r.effectiveImpact != null && r.effectiveImpact > r.baseImpact && (
+            <div>
+              <Tag color="orange" style={{ margin: '2px 0 0', fontSize: 11 }}>
+                ▲ Nâng mức {r.baseImpact}→{r.effectiveImpact}
+              </Tag>
+            </div>
+          )}
           <div style={{ fontSize: 12, color: '#8c8c8c', marginTop: 2 }}>
             Điểm: {r.calculatedScore} (lặp lại {r.violationCount} lần)
           </div>
@@ -89,8 +111,23 @@ export function FindingTable({
       title: 'Hạn khắc phục',
       dataIndex: 'deadlineDate',
       key: 'deadline',
-      width: 115,
-      render: (v) => formatDate(v),
+      width: 125,
+      render: (v, r) => {
+        if (!v) return '—'
+        const isOverdue =
+          (r.status === 'OPEN' || r.status === 'CONFIRMED' || r.status === 'REMEDIATING') &&
+          dayjs(v).isBefore(dayjs(), 'day')
+        return (
+          <div>
+            <div>{formatDate(v)}</div>
+            {isOverdue && (
+              <Tag color="error" style={{ margin: '2px 0 0', fontSize: 10 }}>
+                Quá hạn
+              </Tag>
+            )}
+          </div>
+        )
+      },
     },
     {
       title: 'Trạng thái',
@@ -102,11 +139,21 @@ export function FindingTable({
     {
       title: 'Thao tác',
       key: 'actions',
-      width: 160,
+      width: 170,
       align: 'center',
       render: (_, r) => (
         <Space size="small">
-          {r.status === 'OPEN' && (
+          {onView && (
+            <Tooltip title="Xem chi tiết & lịch sử">
+              <Button
+                type="text"
+                icon={<EyeOutlined />}
+                onClick={() => onView(r)}
+              />
+            </Tooltip>
+          )}
+
+          {r.status === 'OPEN' && canRespond && (
             <>
               <Tooltip title="Xác nhận nhận lỗi">
                 <Button
@@ -125,7 +172,7 @@ export function FindingTable({
             </>
           )}
 
-          {r.status === 'APPEALED' && (
+          {r.status === 'APPEALED' && canConclude && (
             <Tooltip title="Thẩm định khiếu nại">
               <Button
                 type="text"
@@ -135,7 +182,7 @@ export function FindingTable({
             </Tooltip>
           )}
 
-          {r.status === 'CONFIRMED' && (
+          {r.status === 'CONFIRMED' && canRemediate && (
             <Tooltip title="Lập kế hoạch khắc phục">
               <Button
                 type="text"
@@ -145,7 +192,7 @@ export function FindingTable({
             </Tooltip>
           )}
 
-          {r.status === 'REMEDIATING' && (
+          {r.status === 'REMEDIATING' && canRemediate && (
             <Tooltip title="Nộp bằng chứng khắc phục">
               <Button
                 type="text"
@@ -155,7 +202,7 @@ export function FindingTable({
             </Tooltip>
           )}
 
-          {r.status === 'PENDING_VERIFICATION' && (
+          {r.status === 'PENDING_VERIFICATION' && canVerify && (
             <Tooltip title="Nghiệm thu đóng lỗi">
               <Button
                 type="text"
@@ -175,7 +222,18 @@ export function FindingTable({
       dataSource={data}
       rowKey="id"
       loading={loading}
-      pagination={false}
+      pagination={
+        totalItems !== undefined
+          ? {
+              current: currentPage + 1,
+              pageSize,
+              total: totalItems,
+              showSizeChanger: true,
+              onChange: (p, s) => onPageChange?.(p, s),
+              showTotal: (total) => `Tổng ${total} lỗi`,
+            }
+          : false
+      }
       size="middle"
     />
   )

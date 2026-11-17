@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 
 public interface FindingOccurrenceRepository extends JpaRepository<FindingOccurrence, Long> {
@@ -12,4 +13,7 @@ public interface FindingOccurrenceRepository extends JpaRepository<FindingOccurr
     /** Thời điểm mọi lần lỗi đã ghi nhận của (nhà hàng, tiêu chí) – tần suất đếm từ bảng này. */
     @Query("select o.occurredAt from FindingOccurrence o where o.restaurantId = :restaurantId and o.criterionId = :criterionId")
     List<Instant> findOccurredAt(@Param("restaurantId") Long restaurantId, @Param("criterionId") Long criterionId);
+
+    /** Lấy toàn bộ occurrence của các tiêu chí thuộc nhà hàng trong 1 lần query để tối ưu batch. */
+    List<FindingOccurrence> findByRestaurantIdAndCriterionIdIn(Long restaurantId, Collection<Long> criterionIds);
 }

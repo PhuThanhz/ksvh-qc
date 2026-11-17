@@ -1,31 +1,31 @@
 /**
- * Bảng màu biểu đồ (đã kiểm tra mù màu bằng validator của skill dataviz).
- * - SERIES: màu phân loại, gán theo thứ tự cố định, không xoay vòng.
- * - RAMP: một màu xanh từ nhạt → đậm cho dữ liệu có thứ tự (mức ảnh hưởng 1–5).
- * - STATUS: tốt / cảnh báo / nghiêm trọng / nguy cấp – chỉ dùng cho mức rủi ro, luôn kèm nhãn chữ.
+ * Bảng màu biểu đồ chuẩn Enterprise (đã kiểm tra độ tương phản và mù màu).
+ * - SERIES: màu phân loại cố định (Sky, Amber, Emerald).
+ * - RAMP: thang xanh nhạt → đậm cho mức ảnh hưởng 1–5.
+ * - STATUS: phân cấp nghiêm trọng M1–M4.
  */
 export const CHART_COLORS = {
-  series: ['#2a78d6', '#eb6834', '#1baf7a'] as const,
-  ramp: ['#86b6ef', '#5598e7', '#2a78d6', '#1c5cab', '#104281'] as const,
-  status: { good: '#0ca30c', warning: '#fab219', serious: '#ec835a', critical: '#d03b3b' },
-  text: '#0b0b0b',
-  textSecondary: '#52514e',
-  textMuted: '#8a8984',
-  grid: '#ecebe7',
-  axis: '#d9d8d3',
+  series: ['#0284c7', '#f97316', '#10b981'] as const,
+  ramp: ['#bae6fd', '#7dd3fc', '#38bdf8', '#0284c7', '#0369a1'] as const,
+  status: { good: '#16a34a', warning: '#f59e0b', serious: '#ea580c', critical: '#dc2626' },
+  text: '#0f172a',
+  textSecondary: '#475569',
+  textMuted: '#94a3b8',
+  grid: '#f1f5f9',
+  axis: '#cbd5e1',
   surface: '#ffffff',
 } as const
 
-export const CHART_FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif'
+export const CHART_FONT = 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
 
-/** Tooltip chung: nền trắng, viền mảnh, chữ màu chữ (không dùng màu series cho chữ). */
+/** Tooltip chuẩn Enterprise: nền trắng, viền mảnh slate, bóng mềm. */
 export const tooltipBase = {
   backgroundColor: '#ffffff',
-  borderColor: '#e5e4df',
+  borderColor: '#e2e8f0',
   borderWidth: 1,
   padding: [8, 12],
   textStyle: { color: CHART_COLORS.text, fontSize: 12, fontFamily: CHART_FONT },
-  extraCssText: 'box-shadow: 0 6px 20px rgba(0,0,0,0.08); border-radius: 8px;',
+  extraCssText: 'box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08); border-radius: 8px;',
 }
 
 /** Trục danh mục / giá trị nét mảnh, lưới mờ. */
@@ -40,8 +40,8 @@ export const valueAxis = {
 }
 
 /**
- * Màu theo mức nghiêm trọng của một danh sách có thứ tự (vd. mức rủi ro trong bảng phân loại hiện hành):
- * vị trí thấp nhất → tốt, cao nhất → nguy cấp. Không gắn cứng theo mã M1–M4.
+ * Màu theo mức nghiêm trọng của một danh sách có thứ tự (vd. mức rủi ro hiện hành):
+ * vị trí thấp nhất → tốt, cao nhất → nguy cấp.
  */
 export function severityColor(index: number, total: number): string {
   const s = CHART_COLORS.status

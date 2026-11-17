@@ -30,7 +30,12 @@ class RiskAssessor {
         List<LocalDate> previous = occurrences.findOccurredAt(restaurantId, criterionId).stream()
                 .map(i -> i.atZone(BusinessDates.ZONE).toLocalDate())
                 .toList();
-        RiskAssessment r = rules.assess(baseImpact, previous, at);
+        return assess(baseImpact, previous, at, rules);
+    }
+
+    /** Tính rủi ro khi đã nạp trước danh sách lần lỗi và cấu hình rules để tối ưu batch. */
+    RiskAssessment assess(int baseImpact, List<LocalDate> previousOccurrences, LocalDate at, RiskRules rules) {
+        RiskAssessment r = rules.assess(baseImpact, previousOccurrences != null ? previousOccurrences : List.of(), at);
         if (r.band() == null) {
             throw new BusinessException(ErrorCode.RISK_LEVEL_NOT_CONFIGURED,
                     "Chưa cấu hình mức rủi ro cho điểm %d, vui lòng báo Quản trị nghiệp vụ".formatted(r.score()));

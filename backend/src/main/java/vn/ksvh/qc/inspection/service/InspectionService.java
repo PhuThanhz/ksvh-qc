@@ -17,6 +17,7 @@ import vn.ksvh.qc.organization.api.OrgUnitLookupApi;
 import vn.ksvh.qc.organization.api.OrgUnitRef;
 import vn.ksvh.qc.risk.RiskAssessment;
 import vn.ksvh.qc.risk.RiskBand;
+import vn.ksvh.qc.risk.RiskRules;
 import vn.ksvh.qc.security.CurrentUser;
 import vn.ksvh.qc.security.permission.PermissionCodes;
 import vn.ksvh.qc.shared.error.BusinessException;
@@ -32,6 +33,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +42,7 @@ public class InspectionService {
 
     private final InspectionRepository inspectionRepository;
     private final InspectionItemRepository itemRepository;
+    private final InspectionPlanRepository planRepository;
     private final FindingRepository findingRepository;
     private final FindingOccurrenceRepository occurrenceRepository;
     private final CriteriaLookupApi criteriaLookupApi;
@@ -79,16 +82,41 @@ public class InspectionService {
         var restaurantIds = page.getContent().stream().map(Inspection::getRestaurantId).distinct().toList();
         var inspectorIds = page.getContent().stream().map(Inspection::getInspectorId).distinct().toList();
         var templateIds = page.getContent().stream().map(Inspection::getTemplateId).distinct().toList();
+        var inspectionIds = page.getContent().stream().map(Inspection::getId).toList();
+        var allTopicGroupIds = page.getContent().stream()
+                .flatMap(ins -> ins.getTopicGroupIds().stream())
+                .distinct()
+                .toList();
 
         Map<Long, OrgUnitRef> restaurants = orgUnitLookupApi.findRefs(restaurantIds);
         Map<Long, UserSummary> inspectors = userAccountApi.findSummaries(inspectorIds);
         Map<Long, TemplateRef> templates = criteriaLookupApi.findTemplates(templateIds);
+        Map<Long, CriterionGroupRef> topicGroups = criteriaLookupApi.findGroups(allTopicGroupIds);
+
+        Map<Long, Integer> riskScoreMap = new HashMap<>();
+        Map<Long, String> maxRiskMap = new HashMap<>();
+        if (!inspectionIds.isEmpty()) {
+            for (Object[] row : findingRepository.findRiskSummariesByInspectionIds(inspectionIds)) {
+                Long insId = ((Number) row[0]).longValue();
+                int sumScore = ((Number) row[1]).intValue();
+                String maxCode = (String) row[2];
+                riskScoreMap.put(insId, sumScore);
+                maxRiskMap.put(insId, maxCode);
+            }
+        }
 
         return PageResponse.of(page, i -> {
             String rName = restaurants.containsKey(i.getRestaurantId()) ? restaurants.get(i.getRestaurantId()).name() : null;
             String tName = i.getTemplateId() != null && templates.containsKey(i.getTemplateId()) ? templates.get(i.getTemplateId()).name() : null;
             String insName = inspectors.containsKey(i.getInspectorId()) ? inspectors.get(i.getInspectorId()).fullName() : null;
-            return InspectionResponse.from(i, rName, tName, insName, 0, null);
+            int totalRisk = riskScoreMap.getOrDefault(i.getId(), 0);
+            String maxRisk = maxRiskMap.get(i.getId());
+            List<String> tNames = i.getTopicGroupIds().stream()
+                    .map(topicGroups::get)
+                    .filter(Objects::nonNull)
+                    .map(CriterionGroupRef::name)
+                    .toList();
+            return InspectionResponse.from(i, rName, tName, insName, totalRisk, maxRisk, tNames, false);
         });
     }
 
@@ -99,16 +127,26 @@ public class InspectionService {
         );
         var restaurantIds = list.stream().map(Inspection::getRestaurantId).distinct().toList();
         var templateIds = list.stream().map(Inspection::getTemplateId).distinct().toList();
+        var allTopicGroupIds = list.stream()
+                .flatMap(ins -> ins.getTopicGroupIds().stream())
+                .distinct()
+                .toList();
 
         Map<Long, OrgUnitRef> restaurants = orgUnitLookupApi.findRefs(restaurantIds);
         Map<Long, TemplateRef> templates = criteriaLookupApi.findTemplates(templateIds);
         Map<Long, UserSummary> inspectors = userAccountApi.findSummaries(List.of(inspectorId));
+        Map<Long, CriterionGroupRef> topicGroups = criteriaLookupApi.findGroups(allTopicGroupIds);
         String insName = inspectors.containsKey(inspectorId) ? inspectors.get(inspectorId).fullName() : null;
 
         return list.stream().map(i -> {
             String rName = restaurants.containsKey(i.getRestaurantId()) ? restaurants.get(i.getRestaurantId()).name() : null;
             String tName = i.getTemplateId() != null && templates.containsKey(i.getTemplateId()) ? templates.get(i.getTemplateId()).name() : null;
-            return InspectionResponse.from(i, rName, tName, insName, 0, null);
+            List<String> tNames = i.getTopicGroupIds().stream()
+                    .map(topicGroups::get)
+                    .filter(Objects::nonNull)
+                    .map(CriterionGroupRef::name)
+                    .toList();
+            return InspectionResponse.from(i, rName, tName, insName, 0, null, tNames, false);
         }).toList();
     }
 
@@ -126,7 +164,9 @@ public class InspectionService {
         Map<Long, CriterionGroupRef> topicGroups = criteriaLookupApi.findGroups(i.getTopicGroupIds());
         List<String> topicNames = i.getTopicGroupIds().stream().map(topicGroups::get).filter(Objects::nonNull).map(CriterionGroupRef::name).toList();
 
-        List<Finding> findings = findingRepository.findByInspectionId(id);
+        List<Finding> findings = findingRepository.findByInspectionId(id).stream()
+                .filter(f -> f.getStatus() != FindingStatus.DISMISSED)
+                .toList();
         int totalRisk = findings.stream().mapToInt(Finding::getCalculatedScore).sum();
         String maxRisk = findings.stream()
                 .map(Finding::getRiskLevelCode)
@@ -156,6 +196,14 @@ public class InspectionService {
         String code = req.code().trim();
         if (inspectionRepository.existsByCodeIgnoreCase(code)) {
             throw codeTaken(code);
+        }
+        if (req.planId() != null) {
+            InspectionPlan plan = planRepository.findById(req.planId())
+                    .orElseThrow(() -> new NotFoundException("Không tìm thấy kế hoạch #" + req.planId()));
+            if (plan.getStatus() != PlanStatus.APPROVED) {
+                throw new BusinessException(ErrorCode.VALIDATION_FAILED,
+                        "Kế hoạch '%s' chưa được phê duyệt (trạng thái: %s)".formatted(plan.getTitle(), plan.getStatus()));
+            }
         }
         // Người không có quyền lập kế hoạch chỉ được tạo phiếu cho chính mình.
         if (!user.has(PermissionCodes.PLAN_CREATE) && !Objects.equals(req.inspectorId(), user.id())) {
@@ -232,6 +280,121 @@ public class InspectionService {
         } catch (DataIntegrityViolationException e) {
             throw codeTaken(code); // hai người tạo cùng mã cùng lúc: unique index chặn lại
         }
+    }
+
+    @Transactional
+    public List<InspectionResponse> createBatch(InspectionBatchCreateRequest req, CurrentUser user) {
+        if (!user.has(PermissionCodes.PLAN_CREATE) && !Objects.equals(req.inspectorId(), user.id())) {
+            throw new BusinessException(ErrorCode.ACCESS_DENIED, "Bạn chỉ được tạo phiếu chấm cho chính mình");
+        }
+        if (req.planId() != null) {
+            InspectionPlan plan = planRepository.findById(req.planId())
+                    .orElseThrow(() -> new NotFoundException("Không tìm thấy kế hoạch #" + req.planId()));
+            if (plan.getStatus() != PlanStatus.APPROVED) {
+                throw new BusinessException(ErrorCode.VALIDATION_FAILED,
+                        "Kế hoạch '%s' chưa được phê duyệt (trạng thái: %s)".formatted(plan.getTitle(), plan.getStatus()));
+            }
+        }
+        List<Long> restaurantIds = req.restaurantIds().stream().filter(Objects::nonNull).distinct().toList();
+        if (restaurantIds.isEmpty()) {
+            throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Vui lòng chọn ít nhất một nhà hàng");
+        }
+
+        Map<Long, OrgUnitRef> restaurants = orgUnitLookupApi.findRefs(restaurantIds);
+        for (Long rId : restaurantIds) {
+            OrgUnitRef r = restaurants.get(rId);
+            if (r == null || !"RESTAURANT".equals(r.unitType()) || !r.active()) {
+                throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Nhà hàng #" + rId + " không tồn tại hoặc đã ngừng hoạt động");
+            }
+        }
+
+        InspectionKind kind = req.inspectionType();
+        InspectionMode mode = req.inspectionMode() != null ? req.inspectionMode() : InspectionMode.ON_SITE;
+        List<CriterionRef> criteria;
+        Long templateId = null;
+        List<Long> topics = List.of();
+
+        if (kind == InspectionKind.PERIODIC) {
+            if (mode != InspectionMode.ON_SITE) {
+                throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Kiểm tra định kỳ tháng phải thực hiện thực tế tại nhà hàng");
+            }
+            if (req.templateId() == null) {
+                throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Kiểm tra định kỳ phải chọn mẫu phiếu chấm");
+            }
+            TemplateRef template = criteriaLookupApi.findTemplate(req.templateId())
+                    .orElseThrow(() -> new NotFoundException("Không tìm thấy mẫu phiếu #" + req.templateId()));
+            for (Long rId : restaurantIds) {
+                validateTemplateForRestaurant(template, restaurants.get(rId));
+            }
+            if (template.items().isEmpty()) {
+                throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Mẫu phiếu này không còn tiêu chí nào đang hoạt động");
+            }
+            templateId = template.id();
+            criteria = template.items();
+        } else {
+            topics = req.topicGroupIds() == null ? List.of() : req.topicGroupIds().stream().filter(Objects::nonNull).distinct().toList();
+            if (topics.isEmpty()) {
+                throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Kiểm tra đột xuất phải chọn ít nhất một chuyên đề (nhóm tiêu chí)");
+            }
+            for (Long rId : restaurantIds) {
+                validateTopics(topics, restaurants.get(rId));
+            }
+            criteria = criteriaLookupApi.findActiveCriteriaInGroups(topics);
+            if (criteria.isEmpty()) {
+                throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Các chuyên đề đã chọn chưa có tiêu chí nào đang hoạt động");
+            }
+        }
+
+        String prefix = req.codePrefix().trim().toUpperCase(Locale.ROOT);
+        List<Inspection> createdList = new ArrayList<>();
+        Set<String> allocatedCodes = new HashSet<>();
+
+        for (Long rId : restaurantIds) {
+            OrgUnitRef rest = restaurants.get(rId);
+            String storeCode = StringUtils.hasText(rest.code()) ? rest.code().trim().toUpperCase(Locale.ROOT) : ("R" + rest.id());
+            String candidateCode = prefix + "-" + storeCode;
+            int suffix = 1;
+            while (allocatedCodes.contains(candidateCode) || inspectionRepository.existsByCodeIgnoreCase(candidateCode)) {
+                candidateCode = prefix + "-" + storeCode + "-" + suffix++;
+            }
+            allocatedCodes.add(candidateCode);
+
+            Inspection inspection = new Inspection();
+            inspection.setCode(candidateCode);
+            inspection.setPlanId(req.planId());
+            inspection.setRestaurantId(rId);
+            inspection.setTemplateId(templateId);
+            inspection.setInspectorId(req.inspectorId());
+            inspection.setInspectionType(kind);
+            inspection.setInspectionMode(mode);
+            inspection.getTopicGroupIds().addAll(topics);
+            inspection.setNotes(StringUtils.hasText(req.notes()) ? req.notes().trim() : null);
+            inspection.setStatus(InspectionStatus.ASSIGNED);
+            inspection.setCreatedBy(user.id());
+
+            int order = 1;
+            for (CriterionRef c : criteria) {
+                InspectionItem item = new InspectionItem();
+                item.setInspection(inspection);
+                item.setCriterionId(c.id());
+                item.setCriterionCode(c.code());
+                item.setCriterionName(c.name());
+                item.setGroupName(c.groupName());
+                item.setBaseImpact((short) c.baseImpact());
+                item.setSortOrder(order++);
+                item.setResult(ItemResult.UNRATED);
+                inspection.getItems().add(item);
+            }
+            createdList.add(inspection);
+        }
+
+        try {
+            inspectionRepository.saveAllAndFlush(createdList);
+        } catch (DataIntegrityViolationException e) {
+            throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Lỗi trùng lặp mã phiếu hoặc dữ liệu không hợp lệ trong đợt tạo hàng loạt");
+        }
+
+        return createdList.stream().map(this::toResponse).toList();
     }
 
     /** Mẫu phải đang hoạt động và là mẫu dùng chung hoặc của đúng công ty của nhà hàng. */
@@ -312,7 +475,24 @@ public class InspectionService {
         Instant now = clock.instant();
         LocalDate today = BusinessDates.today(clock);
 
-        boolean hasFail = false;
+        List<InspectionSubmitItemRequest> failedSubs = submitMap.values().stream()
+                .filter(s -> s.result() == ItemResult.FAIL)
+                .toList();
+        boolean hasFail = !failedSubs.isEmpty();
+
+        RiskRules rules = hasFail ? RiskRules.from(criteriaLookupApi.riskConfigAt(today)) : null;
+        Map<Long, List<LocalDate>> occurrencesByCriterion = Map.of();
+        if (hasFail) {
+            List<Long> failedCritIds = failedSubs.stream().map(InspectionSubmitItemRequest::criterionId).distinct().toList();
+            occurrencesByCriterion = occurrenceRepository.findByRestaurantIdAndCriterionIdIn(inspection.getRestaurantId(), failedCritIds).stream()
+                    .collect(Collectors.groupingBy(
+                            FindingOccurrence::getCriterionId,
+                            Collectors.mapping(o -> o.getOccurredAt().atZone(BusinessDates.ZONE).toLocalDate(), Collectors.toList())
+                    ));
+        }
+
+        List<FindingEvent> eventsToSave = new ArrayList<>();
+
         for (InspectionItem item : inspection.getItems()) {
             InspectionSubmitItemRequest sub = submitMap.get(item.getCriterionId());
             item.setResult(sub.result());
@@ -323,10 +503,10 @@ public class InspectionService {
             if (sub.result() != ItemResult.FAIL) {
                 continue;
             }
-            hasFail = true;
 
             // Tần suất, nâng mức, mức rủi ro theo cấu hình đang hiệu lực (DOMAIN_SPEC §6).
-            RiskAssessment risk = riskAssessor.assessNew(inspection.getRestaurantId(), item.getCriterionId(), item.getBaseImpact(), today);
+            List<LocalDate> previous = occurrencesByCriterion.getOrDefault(item.getCriterionId(), List.of());
+            RiskAssessment risk = riskAssessor.assess(item.getBaseImpact(), previous, today, rules);
             RiskBand level = risk.band();
 
             Finding finding = new Finding();
@@ -347,8 +527,12 @@ public class InspectionService {
             finding.setEvidenceUrls(item.getEvidenceUrls());
 
             Finding saved = findingRepository.save(finding);
-            eventRepository.save(new FindingEvent(saved.getId(), FindingEventAction.CREATED, null,
+            eventsToSave.add(new FindingEvent(saved.getId(), FindingEventAction.CREATED, null,
                     FindingStatus.OPEN, user.id(), null, now));
+        }
+
+        if (!eventsToSave.isEmpty()) {
+            eventRepository.saveAll(eventsToSave);
         }
 
         inspection.setSubmittedAt(now);

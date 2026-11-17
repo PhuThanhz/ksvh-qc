@@ -13,24 +13,24 @@ type MenuItem = NonNullable<MenuProps['items']>[number]
 
 const groupKey = (label: string) => `group:${label}`
 
-/** Theme token độc quyền cho Menu trên nền kính mờ Apple */
+/** Theme token chuẩn Enterprise Dark cho Menu trên thanh điều hướng */
 const sidebarMenuTheme = {
   components: {
     Menu: {
-      itemColor: 'rgba(255, 255, 255, 0.92)',
-      itemHoverColor: '#ffffff',
-      itemHoverBg: 'rgba(255, 255, 255, 0.1)',
+      itemColor: '#94a3b8',
+      itemHoverColor: '#f8fafc',
+      itemHoverBg: 'rgba(255, 255, 255, 0.06)',
       itemSelectedColor: '#ffffff',
-      itemSelectedBg: 'rgba(255, 255, 255, 0.18)',
+      itemSelectedBg: '#0284c7',
       subMenuItemBg: 'transparent',
       itemBg: 'transparent',
       fontSize: 13.5,
       iconSize: 16,
-      itemHeight: 36,
+      itemHeight: 38,
       itemMarginBlock: 3,
       itemMarginInline: 6,
       itemBorderRadius: 8,
-      groupTitleColor: 'rgba(255, 255, 255, 0.95)',
+      groupTitleColor: '#64748b',
     },
   },
 }
@@ -77,7 +77,7 @@ export function Sidebar({ menu, onSelect }: SidebarProps) {
           navigate(e.key)
           onSelect?.()
         }}
-        style={{ borderInlineEnd: 'none', paddingInline: 6, paddingTop: 8 }}
+        style={{ borderInlineEnd: 'none', paddingInline: 4, paddingTop: 6, background: 'transparent' }}
       />
     </ConfigProvider>
   )

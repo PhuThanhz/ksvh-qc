@@ -3,14 +3,7 @@ import type { PageResponse } from '@/types/common.types'
 export type PlanStatus = 'DRAFT' | 'PENDING_APPROVAL' | 'APPROVED' | 'REJECTED'
 export type InspectionStatus = 'ASSIGNED' | 'IN_PROGRESS' | 'SUBMITTED' | 'COMPLETED' | 'CANCELLED'
 export type ItemResult = 'PASS' | 'FAIL' | 'NA' | 'UNRATED'
-export type FindingStatus =
-  | 'OPEN'
-  | 'CONFIRMED'
-  | 'APPEALED'
-  | 'REMEDIATING'
-  | 'PENDING_VERIFICATION'
-  | 'CLOSED'
-  | 'DISMISSED'
+export type FindingStatus = 'OPEN' | 'CONFIRMED' | 'APPEALED' | 'REMEDIATING' | 'PENDING_VERIFICATION' | 'CLOSED' | 'DISMISSED'
 export type AppealConclusion = 'UPHELD' | 'DISMISSED'
 
 export interface PlanResponse {
@@ -125,6 +118,18 @@ export interface InspectionCreateRequest {
   notes?: string
 }
 
+export interface InspectionBatchCreateRequest {
+  codePrefix: string
+  planId?: number
+  restaurantIds: number[]
+  templateId?: number
+  inspectorId: number
+  inspectionType: InspectionKind
+  inspectionMode?: InspectionMode
+  topicGroupIds?: number[]
+  notes?: string
+}
+
 export interface InspectionCheckinRequest {
   latitude?: number | null
   longitude?: number | null
@@ -157,6 +162,7 @@ export interface FindingResponse {
   criterionCode?: string
   criterionName?: string
   baseImpact: number
+  effectiveImpact?: number
   violationCount: number
   calculatedScore: number
   riskLevelCode: string

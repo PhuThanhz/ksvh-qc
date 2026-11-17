@@ -10,6 +10,7 @@ import type {
   InspectionCancelRequest,
   InspectionCheckinRequest,
   InspectionCreateRequest,
+  InspectionBatchCreateRequest,
   InspectionItemResponse,
   InspectionPageResponse,
   InspectionResponse,
@@ -46,13 +47,14 @@ export const inspectionsApi = {
   get: (id: Id) => api.get<InspectionResponse>(`/inspections/${id}`).then(data),
   getItems: (id: Id) => api.get<InspectionItemResponse[]>(`/inspections/${id}/items`).then(data),
   create: (body: InspectionCreateRequest) => api.post<InspectionResponse>('/inspections', body).then(data),
+  createBatch: (body: InspectionBatchCreateRequest) => api.post<InspectionResponse[]>('/inspections/batch', body).then(data),
   checkin: (id: Id, body: InspectionCheckinRequest) => api.post<InspectionResponse>(`/inspections/${id}/checkin`, body).then(data),
   submit: (id: Id, body: InspectionSubmitRequest) => api.post<InspectionResponse>(`/inspections/${id}/submit`, body).then(data),
   cancel: (id: Id, body: InspectionCancelRequest) => api.post<InspectionResponse>(`/inspections/${id}/cancel`, body).then(data),
 }
 
 export const findingsApi = {
-  list: (params?: { restaurantId?: number; inspectionId?: number; status?: FindingStatus; page?: number; size?: number }) =>
+  list: (params?: { keyword?: string; restaurantId?: number; inspectionId?: number; status?: FindingStatus; page?: number; size?: number }) =>
     api.get<FindingPageResponse>('/findings', { params }).then(data),
   get: (id: Id) => api.get<FindingResponse>(`/findings/${id}`).then(data),
   confirm: (id: Id) => api.post<FindingResponse>(`/findings/${id}/confirm`).then(data),

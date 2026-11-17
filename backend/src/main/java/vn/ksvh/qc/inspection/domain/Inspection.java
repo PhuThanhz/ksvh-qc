@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 import vn.ksvh.qc.shared.persistence.BaseEntity;
 
 import java.time.Instant;
@@ -55,6 +56,7 @@ public class Inspection extends BaseEntity {
 
     /** Chuyên đề (nhóm tiêu chí) của phiếu đột xuất. */
     @ElementCollection
+    @BatchSize(size = 50)
     @CollectionTable(name = "inspection_topics", joinColumns = @JoinColumn(name = "inspection_id"))
     @Column(name = "criterion_group_id")
     private Set<Long> topicGroupIds = new LinkedHashSet<>();
@@ -91,6 +93,7 @@ public class Inspection extends BaseEntity {
     private Long createdBy;
 
     @OneToMany(mappedBy = "inspection", cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 50)
     @OrderBy("sortOrder ASC")
     private List<InspectionItem> items = new ArrayList<>();
 }

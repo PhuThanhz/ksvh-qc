@@ -1,14 +1,18 @@
-import { CheckOutlined, CloseOutlined, DeleteOutlined, EditOutlined, SendOutlined } from '@ant-design/icons'
-import { Button, Space, Table, Tag, Tooltip } from 'antd'
+import { CheckOutlined, CloseOutlined, DeleteOutlined, EditOutlined, EyeOutlined, SendOutlined } from '@ant-design/icons'
+import { Button, Space, Table, Tag, Tooltip, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { PlanResponse, PlanStatus } from '@/features/inspections/inspection.types'
 import { formatDate } from '@/utils/format-date'
+import { PERMISSIONS, usePermission } from '@/permissions'
 
 interface Props {
   data?: PlanResponse[]
   loading?: boolean
   currentPage?: number
   pageSize?: number
+  totalItems?: number
+  onPageChange?: (page: number, pageSize: number) => void
+  onView?: (plan: PlanResponse) => void
   onEdit: (plan: PlanResponse) => void
   onSubmit: (plan: PlanResponse) => void
   onApprove: (plan: PlanResponse) => void
@@ -28,12 +32,19 @@ export function PlanTable({
   loading,
   currentPage = 0,
   pageSize = 20,
+  totalItems,
+  onPageChange,
+  onView,
   onEdit,
   onSubmit,
   onApprove,
   onReject,
   onDelete,
 }: Props) {
+  const { can } = usePermission()
+  const canCreate = can(PERMISSIONS.PLAN.CREATE)
+  const canApprove = can(PERMISSIONS.PLAN.APPROVE)
+
   const columns: ColumnsType<PlanResponse> = [
     {
       title: '#',
@@ -55,7 +66,13 @@ export function PlanTable({
       key: 'title',
       render: (t, r) => (
         <div>
-          <div style={{ fontWeight: 500 }}>{t}</div>
+          {onView ? (
+            <Typography.Link onClick={() => onView(r)} style={{ fontWeight: 500 }}>
+              {t}
+            </Typography.Link>
+          ) : (
+            <div style={{ fontWeight: 500 }}>{t}</div>
+          )}
           {r.rejectionReason && (
             <div style={{ fontSize: 12, color: '#cf1322', marginTop: 4 }}>
               Lý do từ chối: {r.rejectionReason}
@@ -94,11 +111,17 @@ export function PlanTable({
     {
       title: 'Thao tác',
       key: 'actions',
-      width: 180,
+      width: 150,
       align: 'center',
       render: (_, r) => (
         <Space size="small">
-          {(r.status === 'DRAFT' || r.status === 'REJECTED') && (
+          {onView && (
+            <Tooltip title="Xem chi tiết kế hoạch">
+              <Button type="text" icon={<EyeOutlined />} onClick={() => onView(r)} />
+            </Tooltip>
+          )}
+
+          {(r.status === 'DRAFT' || r.status === 'REJECTED') && canCreate && (
             <>
               <Tooltip title="Gửi duyệt">
                 <Button type="text" icon={<SendOutlined style={{ color: '#1677ff' }} />} onClick={() => onSubmit(r)} />
@@ -112,7 +135,7 @@ export function PlanTable({
             </>
           )}
 
-          {r.status === 'PENDING_APPROVAL' && (
+          {r.status === 'PENDING_APPROVAL' && canApprove && (
             <>
               <Tooltip title="Phê duyệt">
                 <Button type="text" icon={<CheckOutlined style={{ color: '#52c41a' }} />} onClick={() => onApprove(r)} />
@@ -133,7 +156,18 @@ export function PlanTable({
       dataSource={data}
       rowKey="id"
       loading={loading}
-      pagination={false}
+      pagination={
+        totalItems !== undefined
+          ? {
+              current: currentPage + 1,
+              pageSize,
+              total: totalItems,
+              showSizeChanger: true,
+              onChange: (p, s) => onPageChange?.(p, s),
+              showTotal: (total) => `Tổng ${total} kế hoạch`,
+            }
+          : false
+      }
       size="middle"
     />
   )

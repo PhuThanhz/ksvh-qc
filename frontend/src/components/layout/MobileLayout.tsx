@@ -26,24 +26,45 @@ export function MobileLayout({ title, rootPath, tabs, headerRight }: MobileLayou
   }, [activeLabel, title])
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#fff' }}>
-      <SafeArea position="top" />
-      <NavBar backIcon={pathname !== rootPath} onBack={() => navigate(-1)} right={headerRight}>
-        {title}
-      </NavBar>
-      <main style={{ flex: 1, overflowY: 'auto', background: '#f5f5f5' }}>
-        <Suspense fallback={<LoadingState />}>
-          <Outlet />
-        </Suspense>
-      </main>
-      {visibleTabs.length > 1 && (
-        <TabBar activeKey={active} onChange={(key) => navigate(key)}>
-          {visibleTabs.map((t) => (
-            <TabBar.Item key={t.path} icon={t.icon} title={t.label} />
-          ))}
-        </TabBar>
-      )}
-      <SafeArea position="bottom" />
+    <div
+      style={{
+        minHeight: '100vh',
+        background: '#0f172a',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'stretch',
+      }}
+    >
+      <div
+        style={{
+          width: '100%',
+          maxWidth: 440,
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          background: '#ffffff',
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.35)',
+          position: 'relative',
+        }}
+      >
+        <SafeArea position="top" />
+        <NavBar backIcon={pathname !== rootPath} onBack={() => navigate(-1)} right={headerRight}>
+          {title}
+        </NavBar>
+        <main style={{ flex: 1, overflowY: 'auto', background: '#f5f5f5' }}>
+          <Suspense fallback={<LoadingState />}>
+            <Outlet />
+          </Suspense>
+        </main>
+        {visibleTabs.length > 1 && (
+          <TabBar activeKey={active} onChange={(key) => navigate(key)}>
+            {visibleTabs.map((t) => (
+              <TabBar.Item key={t.path} icon={t.icon} title={t.label} />
+            ))}
+          </TabBar>
+        )}
+        <SafeArea position="bottom" />
+      </div>
     </div>
   )
 }

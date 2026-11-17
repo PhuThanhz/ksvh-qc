@@ -8,6 +8,7 @@ import vn.ksvh.qc.report.dto.DashboardResponse;
 import vn.ksvh.qc.report.dto.DashboardResponse.CountItem;
 import vn.ksvh.qc.report.dto.DashboardResponse.Kpis;
 import vn.ksvh.qc.report.dto.DashboardResponse.MonthPoint;
+import vn.ksvh.qc.report.dto.DashboardResponse.RestaurantCompliance;
 import vn.ksvh.qc.report.dto.DashboardResponse.RestaurantRisk;
 import vn.ksvh.qc.shared.util.BusinessDates;
 
@@ -16,11 +17,12 @@ import java.math.RoundingMode;
 import java.sql.Date;
 import java.time.Clock;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- * Thống kê cho trang Tổng quan. Chỉ đọc, tổng hợp bằng SQL (không tải từng bản ghi).
+ * Thống kê cho trang Tổng quan chuẩn PDF KSVH.
+ * Chỉ đọc, tổng hợp bằng SQL (không tải từng bản ghi).
  * Lỗi "đang mở" = chưa đóng và chưa bị bỏ (OPEN, CONFIRMED, APPEALED, REMEDIATING, PENDING_VERIFICATION).
  */
 @Service
@@ -28,7 +30,6 @@ import java.util.Map;
 @Transactional(readOnly = true)
 public class DashboardService {
 
-    private static final String TZ = "Asia/Ho_Chi_Minh";
     private static final String OPEN = "('OPEN','CONFIRMED','APPEALED','REMEDIATING','PENDING_VERIFICATION')";
     private static final Map<String, String> STATUS_LABELS = Map.of(
             "OPEN", "Chờ xác nhận", "CONFIRMED", "Đã xác nhận", "APPEALED", "Đang khiếu nại",
@@ -44,58 +45,109 @@ public class DashboardService {
         LocalDate today = BusinessDates.today(clock);
         LocalDate monthStart = today.withDayOfMonth(1);
         LocalDate periodStart = monthStart.minusMonths(months - 1L);
-        return new DashboardResponse(kpis(today, monthStart, periodStart), trend(periodStart, monthStart),
-                openByRiskLevel(), byStatus(periodStart), topRestaurants(), topCriteria(periodStart));
+        List<RestaurantCompliance> restComp = restaurantCompliance(periodStart);
+        return new DashboardResponse(
+                kpis(today, monthStart, periodStart, restComp),
+                trend(periodStart, monthStart),
+                openByRiskLevel(),
+                byStatus(periodStart),
+                topRestaurants(),
+                topCriteria(periodStart),
+                restComp
+        );
     }
 
-    private Kpis kpis(LocalDate today, LocalDate monthStart, LocalDate periodStart) {
-        String submittedDay = "(submitted_at AT TIME ZONE '" + TZ + "')::date";
-        long thisMonth = count("SELECT count(*) FROM inspections WHERE " + submittedDay + " >= ?", monthStart);
-        long lastMonth = count("SELECT count(*) FROM inspections WHERE " + submittedDay + " >= ? AND " + submittedDay + " < ?",
-                monthStart.minusMonths(1), monthStart);
-        long restaurants = count("SELECT count(DISTINCT restaurant_id) FROM inspections WHERE " + submittedDay + " >= ?", monthStart);
-        long open = count("SELECT count(*) FROM findings WHERE status IN " + OPEN);
-        long overdue = count("SELECT count(*) FROM findings WHERE status IN " + OPEN + " AND deadline_date < ?", today);
+    private Kpis kpis(LocalDate today, LocalDate monthStart, LocalDate periodStart, List<RestaurantCompliance> restComp) {
+        Map<String, Object> inspKpis = jdbc.queryForMap("""
+                SELECT
+                    SUM(CASE WHEN DATE(submitted_at) >= ? THEN 1 ELSE 0 END) AS this_month,
+                    SUM(CASE WHEN DATE(submitted_at) >= ? AND DATE(submitted_at) < ? THEN 1 ELSE 0 END) AS last_month,
+                    COUNT(DISTINCT CASE WHEN DATE(submitted_at) >= ? THEN restaurant_id END) AS restaurants
+                FROM inspections
+                """,
+                Date.valueOf(monthStart), Date.valueOf(monthStart.minusMonths(1)),
+                Date.valueOf(monthStart), Date.valueOf(monthStart));
+        long thisMonth = inspKpis.get("this_month") != null ? ((Number) inspKpis.get("this_month")).longValue() : 0L;
+        long lastMonth = inspKpis.get("last_month") != null ? ((Number) inspKpis.get("last_month")).longValue() : 0L;
+        long restaurants = inspKpis.get("restaurants") != null ? ((Number) inspKpis.get("restaurants")).longValue() : 0L;
+
+        Map<String, Object> findKpis = jdbc.queryForMap("""
+                SELECT
+                    COUNT(*) AS open_cnt,
+                    SUM(CASE WHEN risk_level_code IN ('M3', 'M4') THEN 1 ELSE 0 END) AS high_risk_cnt,
+                    SUM(CASE WHEN deadline_date < ? THEN 1 ELSE 0 END) AS overdue_cnt
+                FROM findings WHERE status IN """ + OPEN, Date.valueOf(today));
+        long open = findKpis.get("open_cnt") != null ? ((Number) findKpis.get("open_cnt")).longValue() : 0L;
+        long highRisk = findKpis.get("high_risk_cnt") != null ? ((Number) findKpis.get("high_risk_cnt")).longValue() : 0L;
+        long overdue = findKpis.get("overdue_cnt") != null ? ((Number) findKpis.get("overdue_cnt")).longValue() : 0L;
+
         Map<String, Object> closed = jdbc.queryForMap("""
-                SELECT count(*) AS total,
-                       count(*) FILTER (WHERE (verified_at AT TIME ZONE '%s')::date <= deadline_date) AS on_time
-                FROM findings WHERE status = 'CLOSED' AND (verified_at AT TIME ZONE '%s')::date >= ?
-                """.formatted(TZ, TZ), Date.valueOf(periodStart));
-        long total = ((Number) closed.get("total")).longValue();
-        BigDecimal rate = total == 0 ? null : BigDecimal.valueOf(((Number) closed.get("on_time")).longValue() * 100.0 / total)
-                .setScale(1, RoundingMode.HALF_UP);
-        return new Kpis(thisMonth, lastMonth, restaurants, open, overdue, rate);
+                SELECT
+                    COUNT(*) AS total,
+                    SUM(CASE WHEN DATE(verified_at) <= deadline_date THEN 1 ELSE 0 END) AS on_time
+                FROM findings WHERE status = 'CLOSED' AND DATE(verified_at) >= ?
+                """, Date.valueOf(periodStart));
+        long total = closed.get("total") != null ? ((Number) closed.get("total")).longValue() : 0L;
+        long onTime = closed.get("on_time") != null ? ((Number) closed.get("on_time")).longValue() : 0L;
+        BigDecimal rate = total == 0 ? null : BigDecimal.valueOf(onTime * 100.0 / total).setScale(1, RoundingMode.HALF_UP);
+
+        BigDecimal complianceAvg = restComp.stream()
+                .map(RestaurantCompliance::complianceScore)
+                .filter(Objects::nonNull)
+                .collect(Collectors.collectingAndThen(
+                        Collectors.averagingDouble(BigDecimal::doubleValue),
+                        avg -> avg.isNaN() ? null : BigDecimal.valueOf(avg).setScale(1, RoundingMode.HALF_UP)
+                ));
+
+        return new Kpis(complianceAvg, open, highRisk, thisMonth, lastMonth, restaurants, overdue, rate);
     }
 
     private List<MonthPoint> trend(LocalDate periodStart, LocalDate monthStart) {
-        return jdbc.query("""
-                SELECT to_char(m, 'YYYY-MM') AS month,
-                       (SELECT count(*) FROM inspections i
-                         WHERE date_trunc('month', i.submitted_at AT TIME ZONE '%1$s') = m) AS inspections,
-                       (SELECT count(*) FROM findings f
-                         WHERE date_trunc('month', f.created_at AT TIME ZONE '%1$s') = m) AS findings
-                FROM generate_series(?::timestamp, ?::timestamp, interval '1 month') AS m
-                ORDER BY m
-                """.formatted(TZ),
-                (rs, i) -> new MonthPoint(rs.getString("month"), rs.getLong("inspections"), rs.getLong("findings")),
-                Date.valueOf(periodStart), Date.valueOf(monthStart));
+        Map<String, Long> inspMap = new HashMap<>();
+        jdbc.query("""
+                SELECT DATE_FORMAT(submitted_at, '%Y-%m') AS ym, COUNT(*) AS cnt
+                FROM inspections
+                WHERE DATE(submitted_at) >= ?
+                GROUP BY DATE_FORMAT(submitted_at, '%Y-%m')
+                """, rs -> {
+            inspMap.put(rs.getString("ym"), rs.getLong("cnt"));
+        }, Date.valueOf(periodStart));
+
+        Map<String, Long> findMap = new HashMap<>();
+        jdbc.query("""
+                SELECT DATE_FORMAT(created_at, '%Y-%m') AS ym, COUNT(*) AS cnt
+                FROM findings
+                WHERE DATE(created_at) >= ?
+                GROUP BY DATE_FORMAT(created_at, '%Y-%m')
+                """, rs -> {
+            findMap.put(rs.getString("ym"), rs.getLong("cnt"));
+        }, Date.valueOf(periodStart));
+
+        List<MonthPoint> points = new ArrayList<>();
+        LocalDate cur = periodStart;
+        while (!cur.isAfter(monthStart)) {
+            String ym = String.format("%04d-%02d", cur.getYear(), cur.getMonthValue());
+            points.add(new MonthPoint(ym, inspMap.getOrDefault(ym, 0L), findMap.getOrDefault(ym, 0L)));
+            cur = cur.plusMonths(1);
+        }
+        return points;
     }
 
     private List<CountItem> openByRiskLevel() {
         return jdbc.query("""
-                SELECT risk_level_code AS key, max(risk_level_name) AS label, count(*) AS cnt
-                FROM findings WHERE status IN %s
+                SELECT risk_level_code AS code_key, MAX(risk_level_name) AS label, COUNT(*) AS cnt
+                FROM findings WHERE status IN """ + OPEN + """
                 GROUP BY risk_level_code ORDER BY risk_level_code
-                """.formatted(OPEN),
-                (rs, i) -> new CountItem(rs.getString("key"), rs.getString("label"), rs.getLong("cnt")));
+                """,
+                (rs, i) -> new CountItem(rs.getString("code_key"), rs.getString("label"), rs.getLong("cnt")));
     }
 
     private List<CountItem> byStatus(LocalDate periodStart) {
-        Map<String, Long> counts = new java.util.HashMap<>();
+        Map<String, Long> counts = new HashMap<>();
         jdbc.query("""
-                SELECT status, count(*) AS cnt FROM findings
-                WHERE (created_at AT TIME ZONE '%s')::date >= ? GROUP BY status
-                """.formatted(TZ), rs -> {
+                SELECT status, COUNT(*) AS cnt FROM findings
+                WHERE DATE(created_at) >= ? GROUP BY status
+                """, rs -> {
             counts.put(rs.getString("status"), rs.getLong("cnt"));
         }, Date.valueOf(periodStart));
         return STATUS_ORDER.stream().map(s -> new CountItem(s, STATUS_LABELS.get(s), counts.getOrDefault(s, 0L))).toList();
@@ -103,30 +155,47 @@ public class DashboardService {
 
     private List<RestaurantRisk> topRestaurants() {
         return jdbc.query("""
-                SELECT u.id, u.code, u.name, count(*) AS open_findings, coalesce(sum(f.calculated_score), 0) AS score
+                SELECT u.id, u.code, u.name, COUNT(*) AS open_findings, COALESCE(SUM(f.calculated_score), 0) AS score
                 FROM findings f JOIN org_units u ON u.id = f.restaurant_id
-                WHERE f.status IN %s
+                WHERE f.status IN """ + OPEN + """
                 GROUP BY u.id, u.code, u.name
                 ORDER BY score DESC, open_findings DESC, u.code LIMIT 5
-                """.formatted(OPEN),
+                """,
                 (rs, i) -> new RestaurantRisk(rs.getLong("id"), rs.getString("code"), rs.getString("name"),
                         rs.getLong("open_findings"), rs.getLong("score")));
     }
 
     private List<CountItem> topCriteria(LocalDate periodStart) {
         return jdbc.query("""
-                SELECT c.code AS key, c.name AS label, count(*) AS cnt
+                SELECT c.code AS code_key, c.name AS label, COUNT(*) AS cnt
                 FROM findings f JOIN criteria c ON c.id = f.criterion_id
-                WHERE f.status <> 'DISMISSED' AND (f.created_at AT TIME ZONE '%s')::date >= ?
+                WHERE f.status <> 'DISMISSED' AND DATE(f.created_at) >= ?
                 GROUP BY c.code, c.name ORDER BY cnt DESC, c.code LIMIT 5
-                """.formatted(TZ),
-                (rs, i) -> new CountItem(rs.getString("key"), rs.getString("label"), rs.getLong("cnt")),
+                """,
+                (rs, i) -> new CountItem(rs.getString("code_key"), rs.getString("label"), rs.getLong("cnt")),
                 Date.valueOf(periodStart));
     }
 
-    private long count(String sql, LocalDate... dates) {
-        Object[] args = java.util.Arrays.stream(dates).map(Date::valueOf).toArray();
-        Long v = jdbc.queryForObject(sql, Long.class, args);
-        return v == null ? 0 : v;
+    private List<RestaurantCompliance> restaurantCompliance(LocalDate periodStart) {
+        return jdbc.query("""
+                SELECT
+                    u.id, u.code, u.name,
+                    COALESCE(SUM(CASE WHEN ii.result = 'PASS' THEN ii.base_impact ELSE 0 END), 0) AS pass_weight,
+                    COALESCE(SUM(CASE WHEN ii.result = 'FAIL' THEN ii.base_impact ELSE 0 END), 0) AS fail_weight
+                FROM org_units u
+                LEFT JOIN inspections i ON i.restaurant_id = u.id AND i.status = 'COMPLETED' AND DATE(i.submitted_at) >= ?
+                LEFT JOIN inspection_items ii ON ii.inspection_id = i.id
+                WHERE u.unit_type = 'RESTAURANT' AND u.active = true
+                GROUP BY u.id, u.code, u.name
+                ORDER BY u.code
+                """, (rs, i) -> {
+            long passW = rs.getLong("pass_weight");
+            long failW = rs.getLong("fail_weight");
+            long totalW = passW + failW;
+            BigDecimal score = totalW == 0 ? null
+                    : BigDecimal.valueOf(passW * 100.0 / totalW).setScale(1, RoundingMode.HALF_UP);
+            boolean attention = score != null && score.compareTo(BigDecimal.valueOf(85)) < 0;
+            return new RestaurantCompliance(rs.getLong("id"), rs.getString("code"), rs.getString("name"), score, attention);
+        }, Date.valueOf(periodStart));
     }
 }

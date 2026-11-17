@@ -28,12 +28,13 @@ public class FindingController {
     @GetMapping
     @PreAuthorize("hasAnyAuthority('" + PermissionCodes.INSPECTION_READ_ALL + "', '" + PermissionCodes.INSPECTION_READ_OWN + "', '" + PermissionCodes.FINDING_RESPOND + "', '" + PermissionCodes.FINDING_VERIFY + "')")
     public PageResponse<FindingResponse> search(
+            @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Long restaurantId,
             @RequestParam(required = false) Long inspectionId,
             @RequestParam(required = false) FindingStatus status,
             @ParameterObject @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal Jwt jwt) {
-        return service.search(restaurantId, inspectionId, status, pageable, CurrentUser.from(jwt));
+        return service.search(keyword, restaurantId, inspectionId, status, pageable, CurrentUser.from(jwt));
     }
 
     @GetMapping("/{id}")

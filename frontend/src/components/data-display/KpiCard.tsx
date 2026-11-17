@@ -4,11 +4,11 @@ import type { ReactNode } from 'react'
 export type KpiTone = 'neutral' | 'blue' | 'critical' | 'good' | 'warning'
 
 const TONES: Record<KpiTone, { fg: string; bg: string }> = {
-  neutral: { fg: '#52514e', bg: '#f2f1ee' },
-  blue: { fg: '#2a78d6', bg: '#eaf2fc' },
-  critical: { fg: '#d03b3b', bg: '#fcecec' },
-  good: { fg: '#0a7f0a', bg: '#e9f6e9' },
-  warning: { fg: '#a86e00', bg: '#fff5dd' },
+  neutral: { fg: '#475569', bg: '#f1f5f9' },
+  blue: { fg: '#0284c7', bg: '#e0f2fe' },
+  critical: { fg: '#dc2626', bg: '#fee2e2' },
+  good: { fg: '#16a34a', bg: '#dcfce7' },
+  warning: { fg: '#d97706', bg: '#fef3c7' },
 }
 
 export interface KpiCardProps {
@@ -34,7 +34,7 @@ export function KpiCard({ label, value, unit, icon, tone = 'neutral', footnote, 
       styles={{ body: { padding: '16px 18px' } }}
     >
       <Flex justify="space-between" align="flex-start" gap={12}>
-        <Typography.Text style={{ fontSize: 13, color: '#52514e', fontWeight: 500 }}>{label}</Typography.Text>
+        <Typography.Text style={{ fontSize: 13, color: '#475569', fontWeight: 500 }}>{label}</Typography.Text>
         <Flex
           align="center"
           justify="center"
@@ -47,14 +47,14 @@ export function KpiCard({ label, value, unit, icon, tone = 'neutral', footnote, 
         <Skeleton.Input active size="small" style={{ marginTop: 8, width: 80 }} />
       ) : (
         <Flex align="baseline" gap={6} style={{ marginTop: 4 }}>
-          <span style={{ fontSize: 28, fontWeight: 600, color: '#0b0b0b', lineHeight: 1.2, fontVariantNumeric: 'tabular-nums' }}>
+          <span style={{ fontSize: 26, fontWeight: 700, color: '#0f172a', lineHeight: 1.2, fontVariantNumeric: 'tabular-nums' }}>
             {value}
           </span>
-          {unit && <span style={{ fontSize: 13, color: '#8a8984' }}>{unit}</span>}
+          {unit && <span style={{ fontSize: 13, color: '#64748b', fontWeight: 500 }}>{unit}</span>}
         </Flex>
       )}
       {footnote && (
-        <div style={{ marginTop: 6, fontSize: 12, color: '#8a8984', minHeight: 18 }}>{footnote}</div>
+        <div style={{ marginTop: 6, fontSize: 12, color: '#64748b', minHeight: 18 }}>{footnote}</div>
       )}
     </Card>
   )

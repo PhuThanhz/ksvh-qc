@@ -37,10 +37,16 @@ export function setupSession(queryClient: QueryClient) {
   })
 }
 
-/** Khôi phục phiên khi mở app bằng cookie refresh. Lỗi mạng được ném ra để màn khởi động hiện nút thử lại. */
+/** Khôi phục phiên khi mở app bằng cookie refresh. Nếu lỗi mạng hoặc chưa đăng nhập thì chuyển về màn đăng nhập. */
 export async function bootstrapSession(): Promise<void> {
-  const token = await refreshSession()
-  if (!token && useSessionStore.getState().status === 'bootstrapping') {
-    useSessionStore.getState().endSession('logout')
+  try {
+    const token = await refreshSession()
+    if (!token && useSessionStore.getState().status === 'bootstrapping') {
+      useSessionStore.getState().endSession('logout')
+    }
+  } catch {
+    if (useSessionStore.getState().status === 'bootstrapping') {
+      useSessionStore.getState().endSession('logout')
+    }
   }
 }

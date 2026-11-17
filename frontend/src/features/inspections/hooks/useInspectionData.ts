@@ -10,6 +10,7 @@ import type {
   InspectionCancelRequest,
   InspectionCheckinRequest,
   InspectionCreateRequest,
+  InspectionBatchCreateRequest,
   InspectionStatus,
   InspectionSubmitRequest,
   PlanCreateRequest,
@@ -120,6 +121,10 @@ export function useInspectionMutations() {
     mutationFn: (body: InspectionCreateRequest) => inspectionsApi.create(body),
     onSuccess: () => qc.invalidateQueries({ queryKey: inspectionKeys.inspections() }),
   })
+  const createBatch = useMutation({
+    mutationFn: (body: InspectionBatchCreateRequest) => inspectionsApi.createBatch(body),
+    onSuccess: () => qc.invalidateQueries({ queryKey: inspectionKeys.inspections() }),
+  })
   const checkin = useMutation({
     mutationFn: ({ id, body }: { id: Id; body: InspectionCheckinRequest }) => inspectionsApi.checkin(id, body),
     onSuccess: () => {
@@ -137,11 +142,12 @@ export function useInspectionMutations() {
     mutationFn: ({ id, body }: { id: Id; body: InspectionCancelRequest }) => inspectionsApi.cancel(id, body),
     onSuccess: () => qc.invalidateQueries({ queryKey: inspectionKeys.inspections() }),
   })
-  return { create, checkin, submit, cancel }
+  return { create, createBatch, checkin, submit, cancel }
 }
 
 // ---- Findings ----
 export function useFindings(params?: {
+  keyword?: string
   restaurantId?: number
   inspectionId?: number
   status?: FindingStatus
@@ -152,6 +158,14 @@ export function useFindings(params?: {
     queryKey: inspectionKeys.findingList(params),
     queryFn: () => findingsApi.list(params),
     placeholderData: keepPreviousData,
+  })
+}
+
+export function useFinding(id?: Id) {
+  return useQuery({
+    queryKey: inspectionKeys.finding(id!),
+    queryFn: () => findingsApi.get(id!),
+    enabled: !!id,
   })
 }
 

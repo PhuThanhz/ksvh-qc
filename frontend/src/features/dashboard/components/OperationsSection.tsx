@@ -1,4 +1,9 @@
-import { AlertOutlined, CheckCircleOutlined, ClockCircleOutlined, FileDoneOutlined } from '@ant-design/icons'
+import {
+  AlertOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  FireOutlined,
+} from '@ant-design/icons'
 import { Col, Row } from 'antd'
 import { useNavigate } from 'react-router'
 import { KpiCard } from '@/components/data-display/KpiCard'
@@ -6,17 +11,12 @@ import { ROUTES } from '@/constants/routes'
 import { useRiskLevels } from '@/features/criteria/hooks/useRiskConfig'
 import { formatNumber } from '@/features/dashboard/components/chart-utils'
 import { HorizontalBarChart } from '@/features/dashboard/components/HorizontalBarChart'
+import { RestaurantComplianceChart } from '@/features/dashboard/components/RestaurantComplianceChart'
 import { RiskLevelChart } from '@/features/dashboard/components/RiskLevelChart'
 import { TrendChart } from '@/features/dashboard/components/TrendChart'
 import { useDashboard } from '@/features/dashboard/hooks/useDashboard'
 
-function delta(current: number, previous: number) {
-  if (previous === 0) return current === 0 ? 'Bằng tháng trước' : 'Tháng trước chưa có phiếu'
-  const pct = Math.round(((current - previous) / previous) * 100)
-  return `${pct >= 0 ? '▲' : '▼'} ${Math.abs(pct)}% so với tháng trước`
-}
-
-/** Phần vận hành: chỉ số chính và biểu đồ kiểm tra / lỗi. */
+/** Phần vận hành: chỉ số chính và biểu đồ chuẩn theo Slide 1 & quy trình PDF KSVH. */
 export function OperationsSection({ months }: { months: number }) {
   const navigate = useNavigate()
   const dash = useDashboard(months, true)
@@ -30,14 +30,13 @@ export function OperationsSection({ months }: { months: number }) {
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} xl={6}>
           <KpiCard
-            label="Phiếu chấm tháng này"
-            icon={<FileDoneOutlined />}
+            label="Tỷ lệ tuân thủ"
+            icon={<CheckCircleOutlined />}
             tone="blue"
             loading={loading}
-            value={formatNumber(k?.inspectionsThisMonth ?? 0)}
-            unit="phiếu"
-            footnote={k ? `${k.restaurantsInspectedThisMonth} nhà hàng · ${delta(k.inspectionsThisMonth, k.inspectionsLastMonth)}` : undefined}
-            onClick={() => navigate(ROUTES.admin.inspections)}
+            value={k?.complianceRate == null ? '—' : `${k.complianceRate.toLocaleString('vi-VN')}`}
+            unit={k?.complianceRate == null ? undefined : '%'}
+            footnote="Bình quân toàn hệ thống (Chuẩn ≥85%)"
           />
         </Col>
         <Col xs={24} sm={12} xl={6}>
@@ -54,26 +53,35 @@ export function OperationsSection({ months }: { months: number }) {
         </Col>
         <Col xs={24} sm={12} xl={6}>
           <KpiCard
-            label="Lỗi quá hạn khắc phục"
-            icon={<ClockCircleOutlined />}
-            tone={(k?.overdueFindings ?? 0) > 0 ? 'critical' : 'neutral'}
+            label="Rủi ro cao"
+            icon={<FireOutlined />}
+            tone={(k?.highRiskFindings ?? 0) > 0 ? 'critical' : 'neutral'}
             loading={loading}
-            value={formatNumber(k?.overdueFindings ?? 0)}
+            value={formatNumber(k?.highRiskFindings ?? 0)}
             unit="lỗi"
-            footnote={(k?.overdueFindings ?? 0) > 0 ? 'Cần đôn đốc Cửa hàng trưởng' : 'Không có lỗi quá hạn'}
+            footnote="Mức M3 (7 ngày) & M4 (24 giờ khẩn cấp)"
             onClick={() => navigate(ROUTES.admin.findings)}
           />
         </Col>
         <Col xs={24} sm={12} xl={6}>
           <KpiCard
             label="Khắc phục đúng hạn"
-            icon={<CheckCircleOutlined />}
+            icon={<ClockCircleOutlined />}
             tone="good"
             loading={loading}
             value={k?.onTimeRate == null ? '—' : `${k.onTimeRate.toLocaleString('vi-VN')}`}
             unit={k?.onTimeRate == null ? undefined : '%'}
-            footnote={k?.onTimeRate == null ? 'Chưa có lỗi nào được đóng trong kỳ' : `Lỗi đã đóng trong ${months} tháng gần nhất`}
+            footnote={`Lỗi đã đóng trong ${months} tháng gần nhất`}
           />
+        </Col>
+      </Row>
+
+      <Row gutter={[16, 16]}>
+        <Col xs={24} xl={16}>
+          <RestaurantComplianceChart data={d?.restaurantCompliance} loading={loading} />
+        </Col>
+        <Col xs={24} xl={8}>
+          <RiskLevelChart data={d?.openByRiskLevel} levels={levels.data} loading={loading || levels.isLoading} />
         </Col>
       </Row>
 
@@ -82,32 +90,33 @@ export function OperationsSection({ months }: { months: number }) {
           <TrendChart data={d?.trend} loading={loading} />
         </Col>
         <Col xs={24} xl={8}>
-          <RiskLevelChart data={d?.openByRiskLevel} levels={levels.data} loading={loading || levels.isLoading} />
-        </Col>
-      </Row>
-
-      <Row gutter={[16, 16]}>
-        <Col xs={24} lg={8}>
           <HorizontalBarChart
             title="Nhà hàng rủi ro cao"
             subtitle="Tổng điểm rủi ro của lỗi đang mở"
             valueName="Điểm rủi ro"
             loading={loading}
             emptyText="Không có lỗi nào đang mở"
-            rows={(d?.topRestaurants ?? []).map((r) => ({ label: r.name, value: r.riskScore, hint: `${r.openFindings} lỗi đang mở · ${r.code}` }))}
+            rows={(d?.topRestaurants ?? []).map((r) => ({
+              label: r.name,
+              value: r.riskScore,
+              hint: `${r.openFindings} lỗi đang mở · ${r.code}`,
+            }))}
           />
         </Col>
-        <Col xs={24} lg={8}>
+      </Row>
+
+      <Row gutter={[16, 16]}>
+        <Col xs={24} lg={12}>
           <HorizontalBarChart
             title="Tiêu chí vi phạm nhiều nhất"
-            subtitle={`Số lỗi trong ${months} tháng (không tính lỗi bị bỏ)`}
+            subtitle={`Số lỗi trong ${months} tháng (không tính lỗi bị bác)`}
             valueName="Số lỗi"
             loading={loading}
             emptyText="Chưa có lỗi nào trong kỳ"
             rows={(d?.topCriteria ?? []).map((c) => ({ label: `${c.key} · ${c.label}`, value: c.count }))}
           />
         </Col>
-        <Col xs={24} lg={8}>
+        <Col xs={24} lg={12}>
           <HorizontalBarChart
             title="Tình trạng xử lý lỗi"
             subtitle={`Lỗi phát sinh trong ${months} tháng, theo bước xử lý`}
