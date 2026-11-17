@@ -48,21 +48,22 @@ export function LoginForm({ loading, onSubmit }: LoginFormProps) {
         </span>
       </Flex>
       <Button
-        type="primary"
+        type="default"
         htmlType="submit"
         size="large"
         block
         loading={loading}
-        icon={<LoginOutlined />}
+        icon={<LoginOutlined style={{ color: '#0f172a' }} />}
         style={{
-          height: 44,
+          height: 46,
           borderRadius: 10,
           fontWeight: 600,
           fontSize: 15,
           letterSpacing: -0.2,
-          background: '#0f172a',
-          borderColor: '#0f172a',
-          boxShadow: '0 4px 14px rgba(15, 23, 42, 0.25)',
+          background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
+          color: '#0f172a',
+          border: '1.5px solid #cbd5e1',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03)',
         }}
       >
         Đăng nhập hệ thống

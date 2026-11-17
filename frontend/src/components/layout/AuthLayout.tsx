@@ -43,15 +43,35 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
       style={{
         minHeight: '100vh',
         display: 'flex',
-        background: 'radial-gradient(ellipse at 20% 20%, #e0f2fe 0%, #f1f5f9 45%, #f8fafc 100%)',
+        background: '#eef2f6',
         position: 'relative',
         overflow: 'hidden',
       }}
     >
-      {/* Các quầng sáng màu pastel phong cách Apple Keynote */}
-      <div style={{ position: 'absolute', top: '-15%', left: '5%', width: 650, height: 650, borderRadius: '50%', background: 'radial-gradient(circle, rgba(186, 230, 253, 0.7) 0%, rgba(255, 255, 255, 0) 70%)', pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', bottom: '-20%', left: '30%', width: 700, height: 700, borderRadius: '50%', background: 'radial-gradient(circle, rgba(254, 215, 170, 0.5) 0%, rgba(255, 255, 255, 0) 70%)', pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', top: '20%', right: '-10%', width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(233, 213, 255, 0.5) 0%, rgba(255, 255, 255, 0) 70%)', pointerEvents: 'none' }} />
+      {/* Nền phong cảnh núi tuyết hoàng hôn được làm mờ quang học mượt mà */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: 'url("https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2400&q=85")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: 'blur(32px)',
+          transform: 'scale(1.08)',
+          pointerEvents: 'none',
+        }}
+      />
+      {/* Lớp phủ ánh sáng Apple Light Frosted (sáng trong, thanh lịch, không bị tối) */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'rgba(255, 255, 255, 0.48)',
+          backdropFilter: 'blur(16px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+          pointerEvents: 'none',
+        }}
+      />
 
       {/* CỘT TRÁI: Enterprise Brand & Feature Showcase (Kính mờ sáng Apple) */}
       <div
