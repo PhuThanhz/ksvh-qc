@@ -1,5 +1,4 @@
-import { PlusOutlined } from '@ant-design/icons'
-import { Button, Flex, Space } from 'antd'
+import { Flex } from 'antd'
 import { useCallback, useMemo, useState } from 'react'
 import { ActiveFilter } from '@/components/data-entry/ActiveFilter'
 import { AdvancedFilter, type FilterTagItem } from '@/components/data-entry/AdvancedFilter'
@@ -9,7 +8,6 @@ import { useNotify } from '@/components/feedback/useNotify'
 import { OrgUnitDetailModal } from '@/features/organizations/components/OrgUnitDetailModal'
 import { OrgUnitFormModal } from '@/features/organizations/components/OrgUnitFormModal'
 import { OrgUnitTable } from '@/features/organizations/components/OrgUnitTable'
-import { OrganizationExcelActions } from '@/features/organizations/components/OrganizationExcelActions'
 import { useCompanies, useDeleteOrgUnit, useOrgUnits } from '@/features/organizations/hooks/useOrganizations'
 import {
   ORG_UNIT_TYPE_LABEL,
@@ -18,10 +16,11 @@ import {
 } from '@/features/organizations/organizations.types'
 import { useListParams } from '@/hooks/useListParams'
 import { getErrorMessage } from '@/lib/http'
-import { PERMISSIONS, ProtectedAction } from '@/permissions'
 
 export interface OrgUnitTabProps {
   fixedUnitType?: OrgUnitType
+  createOpen?: boolean
+  onCreateClose?: () => void
 }
 
 interface OrgUnitFilters extends Record<string, unknown> {
@@ -37,7 +36,7 @@ const TYPE_OPTIONS = (Object.keys(ORG_UNIT_TYPE_LABEL) as OrgUnitType[]).map((t)
   label: ORG_UNIT_TYPE_LABEL[t],
 }))
 
-export function OrgUnitTab({ fixedUnitType }: OrgUnitTabProps = {}) {
+export function OrgUnitTab({ fixedUnitType, createOpen, onCreateClose }: OrgUnitTabProps = {}) {
   const { params, filters, setFilter, onTableChange, resetFilters, activeFilterCount } = useListParams<OrgUnitFilters>()
   const queryParams = useMemo(
     () => ({
@@ -55,6 +54,12 @@ export function OrgUnitTab({ fixedUnitType }: OrgUnitTabProps = {}) {
   const [editing, setEditing] = useState<{ open: boolean; unit?: OrgUnit }>({ open: false })
   const [viewing, setViewing] = useState<{ open: boolean; unit?: OrgUnit }>({ open: false })
 
+  const isFormOpen = createOpen || editing.open
+  const handleCloseForm = () => {
+    setEditing({ open: false })
+    onCreateClose?.()
+  }
+
   const onSearch = useCallback((keyword: string) => setFilter('keyword', keyword || undefined), [setFilter])
 
   const itemTypeLabel = fixedUnitType === 'RESTAURANT' ? 'nhà hàng' : fixedUnitType === 'DEPARTMENT' ? 'phòng ban' : 'đơn vị'
@@ -65,13 +70,6 @@ export function OrgUnitTab({ fixedUnitType }: OrgUnitTabProps = {}) {
       : fixedUnitType === 'DEPARTMENT'
         ? 'Tìm theo mã, tên phòng ban'
         : 'Tìm theo mã, tên, địa chỉ'
-
-  const addButtonText =
-    fixedUnitType === 'RESTAURANT'
-      ? 'Thêm nhà hàng'
-      : fixedUnitType === 'DEPARTMENT'
-        ? 'Thêm phòng ban'
-        : 'Thêm đơn vị'
 
 
   const activeTags = useMemo<FilterTagItem[]>(() => {
@@ -144,16 +142,6 @@ export function OrgUnitTab({ fixedUnitType }: OrgUnitTabProps = {}) {
             <ActiveFilter value={filters.active} onChange={(v) => setFilter('active', v)} width={160} />
           </>
         }
-        extra={
-          <Space>
-            <OrganizationExcelActions />
-            <ProtectedAction access={PERMISSIONS.ORGANIZATION.MANAGE}>
-              <Button type="primary" icon={<PlusOutlined />} onClick={() => setEditing({ open: true })}>
-                {addButtonText}
-              </Button>
-            </ProtectedAction>
-          </Space>
-        }
       >
         <FilterSelect<number>
           placeholder="Công ty"
@@ -180,10 +168,10 @@ export function OrgUnitTab({ fixedUnitType }: OrgUnitTabProps = {}) {
         fixedUnitType={fixedUnitType}
       />
       <OrgUnitFormModal
-        open={editing.open}
+        open={isFormOpen}
         unit={editing.unit}
         fixedUnitType={fixedUnitType}
-        onClose={() => setEditing({ open: false })}
+        onClose={handleCloseForm}
       />
       <OrgUnitDetailModal
         open={viewing.open}

@@ -1,5 +1,9 @@
 import type {
   AppealReviewRequest,
+  BatchActionResultResponse,
+  BatchFindingConfirmRequest,
+  BatchFindingVerifyRequest,
+  BatchRemediationPlanRequest,
   CandidateFindingResponse,
   CandidateReviewerResponse,
   FindingAppealRequest,
@@ -19,6 +23,7 @@ import type {
   InspectionResponse,
   InspectionStatus,
   InspectionSubmitRequest,
+  PlanAssignmentResponse,
   PlanCreateRequest,
   PlanPageResponse,
   PlanRejectRequest,
@@ -38,6 +43,7 @@ const PATH = {
   planApprove: (id: Id) => `/inspection-plans/${id}/approve`,
   planReject: (id: Id) => `/inspection-plans/${id}/reject`,
   planWarnings: '/inspection-plans/restaurant-warnings',
+  planCopyableAssignments: (id: Id) => `/inspection-plans/${id}/copyable-assignments`,
   inspections: '/inspections',
   inspection: (id: Id) => `/inspections/${id}`,
   inspectionItems: (id: Id) => `/inspections/${id}/items`,
@@ -60,6 +66,9 @@ const PATH = {
   findingSubmitRemediation: (id: Id) => `/findings/${id}/submit-remediation`,
   findingVerify: (id: Id) => `/findings/${id}/verify`,
   findingVerificationCandidates: '/findings/verification-candidates',
+  findingsBatchConfirm: '/findings/batch-confirm',
+  findingsBatchRemediationPlan: '/findings/batch-remediation-plan',
+  findingsBatchVerify: '/findings/batch-verify',
 } as const
 
 const data = <T>(r: { data: T }) => r.data
@@ -76,6 +85,8 @@ export const plansApi = {
   delete: (id: Id) => api.delete<void>(PATH.plan(id)).then(() => undefined),
   restaurantWarning: (restaurantId: number, beforeDate?: string) =>
     api.get<PriorFindingsWarning>(PATH.planWarnings, { params: { restaurantId, beforeDate } }).then(data),
+  copyableAssignments: (id: Id) =>
+    api.get<PlanAssignmentResponse[]>(PATH.planCopyableAssignments(id)).then(data),
 }
 
 export const inspectionsApi = {
@@ -129,4 +140,10 @@ export const findingsApi = {
   verify: (id: Id, body: FindingVerifyRequest) => api.post<FindingResponse>(PATH.findingVerify(id), body).then(data),
   verificationCandidates: (restaurantId: number) =>
     api.get<CandidateFindingResponse[]>(PATH.findingVerificationCandidates, { params: { restaurantId } }).then(data),
+  batchConfirm: (body: BatchFindingConfirmRequest) =>
+    api.post<BatchActionResultResponse>(PATH.findingsBatchConfirm, body).then(data),
+  batchRemediationPlan: (body: BatchRemediationPlanRequest) =>
+    api.post<BatchActionResultResponse>(PATH.findingsBatchRemediationPlan, body).then(data),
+  batchVerify: (body: BatchFindingVerifyRequest) =>
+    api.post<BatchActionResultResponse>(PATH.findingsBatchVerify, body).then(data),
 }

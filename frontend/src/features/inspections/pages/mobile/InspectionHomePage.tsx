@@ -1,16 +1,15 @@
-import { Button, Card, ErrorBlock, PullToRefresh, Segmented, Space, Tag } from 'antd-mobile'
+import { Button, ErrorBlock, PullToRefresh, Segmented, Space } from 'antd-mobile'
 import { lazy, Suspense, useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useSearchParams } from 'react-router'
 import { useSession } from '@/features/auth'
 import type { FindingActionType } from '@/features/inspections/components/FindingActionModal'
 import { AckInspectionList } from '@/features/inspections/components/mobile/AckInspectionList'
 import { MobileFindingCard } from '@/features/inspections/components/mobile/MobileFindingCard'
 import { PendingReviewsCard } from '@/features/inspections/components/mobile/PendingReviewsCard'
+import { InspectionTaskList } from '@/features/inspections/components/mobile/InspectionTaskList'
 import { useFindings, useMyTasks, usePendingReviews } from '@/features/inspections/hooks/useInspectionData'
 import type { FindingResponse } from '@/features/inspections/inspection.types'
-import { INSPECTION_KIND_LABEL, INSPECTION_MODE_LABEL } from '@/features/inspections/inspection.types'
 import { PERMISSIONS, usePermission } from '@/permissions'
-import { formatDate } from '@/utils/format-date'
 
 const FindingActionModal = lazy(() =>
   import('@/features/inspections/components/FindingActionModal').then((m) => ({ default: m.FindingActionModal })),
@@ -21,7 +20,6 @@ const InspectionFormModal = lazy(() =>
 
 export function InspectionHomePage() {
   const { user } = useSession()
-  const navigate = useNavigate()
   const { allows } = usePermission()
 
   const canPerform = allows(PERMISSIONS.INSPECTION.PERFORM)
@@ -30,7 +28,22 @@ export function InspectionHomePage() {
   const canCreate = allows(PERMISSIONS.PLAN.CREATE)
 
   const isStore = user?.roles?.includes('STORE_MANAGER') ?? false
-  const [tab, setTab] = useState<'tasks' | 'findings'>(isStore && !canPerform ? 'findings' : 'tasks')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const urlTab = searchParams.get('tab') as 'tasks' | 'findings' | null
+  const tab: 'tasks' | 'findings' = (urlTab === 'tasks' || urlTab === 'findings')
+    ? urlTab
+    : (isStore && !canPerform ? 'findings' : 'tasks')
+
+  const setTab = (newTab: 'tasks' | 'findings') => {
+    setSearchParams(
+      (prev) => {
+        prev.set('tab', newTab)
+        return prev
+      },
+      { replace: true },
+    )
+  }
+
   const [findingFilter, setFindingFilter] = useState<'urgent' | 'pending' | 'all'>('urgent')
 
   const { data: tasks, isLoading: loadingTasks, refetch: refetchTasks } = useMyTasks()
@@ -85,44 +98,7 @@ export function InspectionHomePage() {
             Việc chấm cần làm ({tasks?.length || 0})
           </div>
 
-          {tasks && tasks.length > 0 ? (
-            tasks.map((t) => (
-              <Card key={t.id} style={{ borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <span style={{ fontWeight: 600, fontSize: 15 }}>{t.code}</span>
-                  <Tag color={t.status === 'IN_PROGRESS' ? 'warning' : 'primary'}>
-                    {t.status === 'IN_PROGRESS' ? 'Đang chấm' : 'Được giao'}
-                  </Tag>
-                </div>
-                <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--app-text)' }}>{t.restaurantName}</div>
-                <div style={{ fontSize: 12, color: 'var(--app-text-secondary)', marginTop: 4 }}>
-                  {INSPECTION_KIND_LABEL[t.inspectionType]} · {INSPECTION_MODE_LABEL[t.inspectionMode]}
-                  {t.topicNames.length > 0 ? ` · ${t.topicNames.join(', ')}` : t.templateName ? ` · ${t.templateName}` : ''}
-                </div>
-                <div style={{ fontSize: 12, color: 'var(--app-text-secondary)', marginTop: 2 }}>
-                  Ngày tạo: {formatDate(t.createdAt)}
-                </div>
-                <Button
-                  block
-                  color={t.status === 'IN_PROGRESS' ? 'warning' : 'primary'}
-                  size="middle"
-                  style={{ marginTop: 12, borderRadius: 8 }}
-                  onClick={() => navigate(`/qc/execute/${t.id}`)}
-                >
-                  {t.status === 'IN_PROGRESS' ? 'Tiếp tục chấm điểm' : 'Bắt đầu kiểm tra (GPS)'}
-                </Button>
-              </Card>
-            ))
-          ) : (
-            !loadingTasks && (
-              <ErrorBlock
-                status="empty"
-                style={{ '--image-height': '80px' }}
-                title="Chưa có việc chấm"
-                description="Kéo xuống để làm mới danh sách"
-              />
-            )
-          )}
+          <InspectionTaskList tasks={tasks} loading={loadingTasks} />
         </>
       )}
 

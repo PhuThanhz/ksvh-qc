@@ -1,5 +1,4 @@
-import { PlusOutlined } from '@ant-design/icons'
-import { Button, Flex } from 'antd'
+import { Flex } from 'antd'
 import { useCallback, useMemo, useState } from 'react'
 import { ActiveFilter } from '@/components/data-entry/ActiveFilter'
 import { AdvancedFilter, type FilterTagItem } from '@/components/data-entry/AdvancedFilter'
@@ -12,14 +11,18 @@ import { useCompanies, useDeleteCompany } from '@/features/organizations/hooks/u
 import type { Company } from '@/features/organizations/organizations.types'
 import { useListParams } from '@/hooks/useListParams'
 import { getErrorMessage } from '@/lib/http'
-import { PERMISSIONS, ProtectedAction } from '@/permissions'
 
 interface CompanyFilters extends Record<string, unknown> {
   keyword?: string
   active?: boolean
 }
 
-export function CompanyTab() {
+export interface CompanyTabProps {
+  createOpen?: boolean
+  onCreateClose?: () => void
+}
+
+export function CompanyTab({ createOpen, onCreateClose }: CompanyTabProps = {}) {
   const { params, filters, setFilter, onTableChange, resetFilters, activeFilterCount } = useListParams<CompanyFilters>()
   const companies = useCompanies(params)
   const remove = useDeleteCompany()
@@ -28,6 +31,12 @@ export function CompanyTab() {
 
   const [editing, setEditing] = useState<{ open: boolean; company?: Company }>({ open: false })
   const [viewing, setViewing] = useState<{ open: boolean; company?: Company }>({ open: false })
+
+  const isFormOpen = createOpen || editing.open
+  const handleCloseForm = () => {
+    setEditing({ open: false })
+    onCreateClose?.()
+  }
 
   const onSearch = useCallback((keyword: string) => setFilter('keyword', keyword || undefined), [setFilter])
 
@@ -67,13 +76,6 @@ export function CompanyTab() {
         advancedFilters={
           <ActiveFilter value={filters.active} onChange={(v) => setFilter('active', v)} width={180} />
         }
-        extra={
-          <ProtectedAction access={PERMISSIONS.ORGANIZATION.MANAGE}>
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => setEditing({ open: true })}>
-              Thêm công ty
-            </Button>
-          </ProtectedAction>
-        }
       >
         <ActiveFilter value={filters.active} onChange={(v) => setFilter('active', v)} />
       </AdvancedFilter>
@@ -89,7 +91,7 @@ export function CompanyTab() {
         onEdit={(company) => setEditing({ open: true, company })}
         onDelete={onDelete}
       />
-      <CompanyFormModal open={editing.open} company={editing.company} onClose={() => setEditing({ open: false })} />
+      <CompanyFormModal open={isFormOpen} company={editing.company} onClose={handleCloseForm} />
       <CompanyDetailModal open={viewing.open} company={viewing.company} onClose={() => setViewing({ open: false })} />
     </Flex>
   )

@@ -28,6 +28,31 @@ export type FindingRemediationPlanRequest = Schemas['FindingRemediationPlanReque
 export type FindingConcludeAppealRequest = Schemas['FindingConcludeAppealRequest']
 export type FindingAppealRequest = Schemas['FindingAppealRequest']
 
+export interface BatchActionResultResponse {
+  total: number
+  successCount: number
+  failedCount: number
+  errors: string[]
+}
+
+export interface BatchFindingConfirmRequest {
+  findingIds: number[]
+  agreed: boolean
+  note?: string
+}
+
+export interface BatchRemediationPlanRequest {
+  findingIds: number[]
+  remediationPlan: string
+  targetDate: string
+}
+
+export interface BatchFindingVerifyRequest {
+  findingIds: number[]
+  approved: boolean
+  note?: string
+}
+
 export interface FindingFilter {
   page?: number
   size?: number

@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import { useState } from 'react'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { useSession } from '@/features/auth'
+import { ApprovalQueueSection } from '@/features/dashboard/components/ApprovalQueueSection'
 import { CatalogSection } from '@/features/dashboard/components/CatalogSection'
 import { CreateMenu } from '@/features/dashboard/components/CreateMenu'
 import { OperationsSection } from '@/features/dashboard/components/OperationsSection'
@@ -32,6 +33,7 @@ export function DashboardPage() {
   const { user } = useSession()
   const { canAny } = usePermission()
   const canOps = canAny([PERMISSIONS.REPORT.READ, PERMISSIONS.INSPECTION.READ_ALL])
+  const canApprove = canAny([PERMISSIONS.PLAN.APPROVE, PERMISSIONS.FINDING.CONCLUDE_APPEAL])
   const [months, setMonths] = useState(6)
   const today = dayjs()
 
@@ -54,6 +56,12 @@ export function DashboardPage() {
       }
     >
       <Flex vertical gap={20} style={{ paddingBottom: 24 }}>
+        {canApprove && (
+          <>
+            <SectionTitle>Hàng chờ xử lý & phê duyệt</SectionTitle>
+            <ApprovalQueueSection />
+          </>
+        )}
         {canOps && (
           <>
             <SectionTitle>Chỉ số hoạt động & Xu hướng kiểm soát vận hành</SectionTitle>

@@ -1,3 +1,5 @@
+import { AppstoreAddOutlined, PlusOutlined } from '@ant-design/icons'
+import { Button, Space } from 'antd'
 import { useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { PageContainer } from '@/components/layout/PageContainer'
@@ -8,6 +10,7 @@ import { CriterionFormModal } from '@/features/criteria/components/CriterionForm
 import { CriterionTab } from '@/features/criteria/components/CriterionTab'
 import type { Criterion, CriterionGroup } from '@/features/criteria/criteria.types'
 import { useCriterionGroups } from '@/features/criteria/hooks/useCriteria'
+import { PERMISSIONS, ProtectedAction } from '@/permissions'
 
 export function CriteriaPage() {
   const notify = useNotify()
@@ -42,7 +45,25 @@ export function CriteriaPage() {
     <PageContainer
       title="Tiêu chí đánh giá"
       subtitle="Danh sách các tiêu chí chấm điểm chi tiết, cách kiểm tra, mức ảnh hưởng 1–5 và mẫu phiếu áp dụng"
-      extra={<CriteriaExcelActions />}
+      extra={
+        <Space size={8} wrap>
+          <CriteriaExcelActions />
+          <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
+            <Button icon={<AppstoreAddOutlined />} onClick={() => handleOpenBatch(initialGroupId)}>
+              Thêm nhanh
+            </Button>
+          </ProtectedAction>
+          <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => setCriterionModal({ open: true, defaultGroupId: initialGroupId })}
+            >
+              Thêm tiêu chí
+            </Button>
+          </ProtectedAction>
+        </Space>
+      }
     >
       <CriterionTab
         key={`tab-${initialGroupId ?? 'all'}`}

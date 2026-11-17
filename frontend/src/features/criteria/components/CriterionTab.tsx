@@ -1,5 +1,4 @@
-import { AppstoreAddOutlined, PlusOutlined } from '@ant-design/icons'
-import { Button, Flex, Space } from 'antd'
+import { Flex } from 'antd'
 import { useCallback, useMemo, useState } from 'react'
 import { ActiveFilter } from '@/components/data-entry/ActiveFilter'
 import { AdvancedFilter, type FilterTagItem } from '@/components/data-entry/AdvancedFilter'
@@ -12,7 +11,6 @@ import { useTemplates } from '@/features/criteria/hooks/useTemplates'
 import { useConfirm } from '@/hooks/useConfirm'
 import { useListParams } from '@/hooks/useListParams'
 import { useNotify } from '@/hooks/useNotify'
-import { PERMISSIONS, ProtectedAction } from '@/permissions'
 
 interface Filters extends Record<string, unknown> {
   keyword?: string
@@ -30,15 +28,13 @@ const ASSIGNED_OPTIONS: { value: AssignedStatus; label: string }[] = [
 
 export interface CriterionTabProps {
   initialGroupId?: number
-  onCreateCriterion: (defaultGroupId?: number) => void
+  onCreateCriterion?: (defaultGroupId?: number) => void
   onBatchCreateCriterion?: (defaultGroupId?: number) => void
   onEditCriterion: (criterion: Criterion) => void
 }
 
 export function CriterionTab({
   initialGroupId,
-  onCreateCriterion,
-  onBatchCreateCriterion,
   onEditCriterion,
 }: CriterionTabProps) {
   const groups = useCriterionGroups()
@@ -102,29 +98,6 @@ export function CriterionTab({
           activeCount={activeFilterCount}
           onReset={resetFilters}
           activeTags={activeTags}
-          extra={
-            <Space>
-              <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  onClick={() => onCreateCriterion(filters.groupId)}
-                >
-                  Thêm tiêu chí
-                </Button>
-              </ProtectedAction>
-              {onBatchCreateCriterion && (
-                <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-                  <Button
-                    icon={<AppstoreAddOutlined />}
-                    onClick={() => onBatchCreateCriterion(filters.groupId)}
-                  >
-                    Thêm nhanh nhiều tiêu chí
-                  </Button>
-                </ProtectedAction>
-              )}
-            </Space>
-          }
         >
           <FilterSelect<number>
             placeholder="Nhóm tiêu chí"

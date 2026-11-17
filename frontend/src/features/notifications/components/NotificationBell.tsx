@@ -48,10 +48,9 @@ export function NotificationBell({ isMobile }: NotificationBellProps) {
         <Drawer
           title="Thông báo"
           placement="bottom"
-          height="75vh"
           open={open}
           onClose={() => setOpen(false)}
-          styles={{ body: { padding: 0 } }}
+          styles={{ wrapper: { height: '75vh' }, body: { padding: 0 } }}
         >
           <NotificationList onItemClick={() => setOpen(false)} />
         </Drawer>

@@ -15,6 +15,8 @@ interface Props {
   currentPage?: number
   pageSize?: number
   totalItems?: number
+  selectedRowKeys?: React.Key[]
+  onSelectRowKeys?: (keys: React.Key[]) => void
   onPageChange?: (page: number, pageSize: number) => void
   onAction: (finding: FindingResponse, action: FindingActionType) => void
   onView?: (finding: FindingResponse) => void
@@ -26,6 +28,8 @@ export function FindingTable({
   currentPage = 0,
   pageSize = 20,
   totalItems,
+  selectedRowKeys,
+  onSelectRowKeys,
   onPageChange,
   onAction,
   onView,
@@ -149,6 +153,14 @@ export function FindingTable({
       rowKey="id"
       loading={loading}
       scroll={{ x: 1100 }}
+      rowSelection={
+        onSelectRowKeys
+          ? {
+              selectedRowKeys,
+              onChange: (keys) => onSelectRowKeys(keys),
+            }
+          : undefined
+      }
       onRow={(record) => ({
         onDoubleClick: () => onView?.(record),
         style: { cursor: 'pointer' },

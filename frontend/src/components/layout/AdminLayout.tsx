@@ -1,5 +1,5 @@
-import { SafetyCertificateFilled } from '@ant-design/icons'
-import { Drawer, Flex, Grid, Layout, Typography } from 'antd'
+import { CloseOutlined, SafetyCertificateFilled } from '@ant-design/icons'
+import { Button, Drawer, Flex, Grid, Layout, Typography } from 'antd'
 import { Suspense, useState } from 'react'
 import { Outlet } from 'react-router'
 import { ContentErrorBoundary } from '@/components/feedback/ContentErrorBoundary'
@@ -17,48 +17,64 @@ export interface AdminLayoutProps {
   loggingOut?: boolean
 }
 
-function BrandHeader({ collapsed, borderColor }: { collapsed: boolean; borderColor: string }) {
+function BrandHeader({
+  collapsed,
+  borderColor,
+  onClose,
+}: {
+  collapsed: boolean
+  borderColor: string
+  onClose?: () => void
+}) {
   return (
     <Flex
       align="center"
-      justify={collapsed ? 'center' : 'flex-start'}
-      gap={12}
+      justify={collapsed ? 'center' : 'space-between'}
       style={{
         height: 56,
-        paddingInline: collapsed ? 0 : 20,
+        paddingInline: collapsed ? 0 : 16,
         borderBottom: `1px solid ${borderColor}`,
         flexShrink: 0,
       }}
     >
-      <Flex
-        align="center"
-        justify="center"
-        style={{
-          width: 32,
-          height: 32,
-          borderRadius: 8,
-          background: 'var(--app-on-dark-glass)',
-          backdropFilter: 'blur(12px)',
-          color: 'var(--app-on-dark)',
-          fontSize: 18,
-          flexShrink: 0,
-          border: '1px solid var(--app-on-dark-glass-border)',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
-        }}
-      >
-        <SafetyCertificateFilled />
-      </Flex>
-      {!collapsed && (
-        <Flex vertical style={{ lineHeight: 1.2, overflow: 'hidden' }}>
-          <Flex align="center" gap={6}>
+      <Flex align="center" gap={12}>
+        <Flex
+          align="center"
+          justify="center"
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: 8,
+            background: 'var(--app-on-dark-glass)',
+            backdropFilter: 'blur(12px)',
+            color: 'var(--app-on-dark)',
+            fontSize: 18,
+            flexShrink: 0,
+            border: '1px solid var(--app-on-dark-glass-border)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+          }}
+        >
+          <SafetyCertificateFilled />
+        </Flex>
+        {!collapsed && (
+          <Flex vertical style={{ lineHeight: 1.2, overflow: 'hidden' }}>
             <Typography.Text strong style={{ fontSize: 16, fontWeight: 800, letterSpacing: -0.2, color: 'var(--app-on-dark)' }}>
               KSVH QC
             </Typography.Text>
+            <Typography.Text style={{ fontSize: 11, whiteSpace: 'nowrap', color: 'var(--app-on-dark-secondary)' }}>
+              Kiểm soát vận hành
+            </Typography.Text>
           </Flex>
-          <Typography.Text style={{ fontSize: 11, whiteSpace: 'nowrap', color: 'var(--app-on-dark-secondary)' }}>
-            Kiểm soát vận hành
-          </Typography.Text>
-        </Flex>
+        )}
+      </Flex>
+      {onClose && (
+        <Button
+          type="text"
+          shape="circle"
+          icon={<CloseOutlined style={{ color: 'var(--app-on-dark-secondary)', fontSize: 16 }} />}
+          onClick={onClose}
+          aria-label="Đóng thanh điều hướng"
+        />
       )}
     </Flex>
   )
@@ -125,7 +141,7 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
           styles={{ body: { padding: 0 } }}
         >
           <Flex vertical style={{ height: '100%' }}>
-            <BrandHeader collapsed={false} borderColor="var(--app-on-dark-border)" />
+            <BrandHeader collapsed={false} borderColor="var(--app-on-dark-border)" onClose={() => setMobileOpen(false)} />
             <div style={{ flex: 1, overflowY: 'auto' }}>
               <Sidebar menu={menu} onSelect={() => setMobileOpen(false)} />
             </div>

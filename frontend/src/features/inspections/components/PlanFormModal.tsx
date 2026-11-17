@@ -1,7 +1,9 @@
-import { DatePicker, Form, Input, Modal, Spin } from 'antd'
+import { CopyOutlined } from '@ant-design/icons'
+import { Button, DatePicker, Flex, Form, Input, Modal, Spin } from 'antd'
 import dayjs from 'dayjs'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { PlanAssignmentEditor } from '@/features/inspections/components/PlanAssignmentEditor'
+import { PlanCopyModal } from '@/features/inspections/components/PlanCopyModal'
 import { usePlan, useSavePlan } from '@/features/inspections/hooks/useInspectionData'
 import type { PlanAssignmentRequest, PlanResponse } from '@/features/inspections/inspection.types'
 import { useNotify } from '@/hooks/useNotify'
@@ -22,6 +24,7 @@ interface FormValues {
 
 export function PlanFormModal({ open, plan, onClose }: Props) {
   const [form] = Form.useForm<FormValues>()
+  const [copyModalOpen, setCopyModalOpen] = useState(false)
   const save = useSavePlan()
   const notify = useNotify()
   const isEdit = !!plan
@@ -142,11 +145,32 @@ export function PlanFormModal({ open, plan, onClose }: Props) {
             <Input.TextArea rows={2} placeholder="Ghi chú chi tiết mục tiêu đợt kiểm tra..." />
           </Form.Item>
 
+          <Flex justify="flex-end" style={{ marginBottom: 8 }}>
+            <Button
+              size="small"
+              icon={<CopyOutlined />}
+              onClick={() => setCopyModalOpen(true)}
+            >
+              Sao chép từ kế hoạch khác
+            </Button>
+          </Flex>
+
           <Form.Item name="assignments" style={{ marginBottom: 0 }}>
             <PlanAssignmentEditor dateRange={dateRange} />
           </Form.Item>
         </Form>
       </Spin>
+
+      <PlanCopyModal
+        open={copyModalOpen}
+        currentPlanId={plan?.id}
+        defaultDate={dateRange?.[0]?.format('YYYY-MM-DD')}
+        onClose={() => setCopyModalOpen(false)}
+        onCopy={(copied) => {
+          const current = form.getFieldValue('assignments') ?? []
+          form.setFieldValue('assignments', [...current, ...copied])
+        }}
+      />
     </Modal>
   )
 }

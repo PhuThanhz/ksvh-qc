@@ -20,6 +20,7 @@ export interface DataTableProps<T extends object> {
   onParamsChange: (params: PageParams) => void
   /** Render tuỳ chỉnh từng bản ghi dạng thẻ trên màn hình điện thoại (< 768px). */
   mobileRender?: (item: T, index: number) => ReactNode
+  scroll?: TableProps<T>['scroll']
 }
 
 /**
@@ -28,7 +29,7 @@ export interface DataTableProps<T extends object> {
  * Tự động chuyển sang dạng thẻ trên điện thoại khi có prop `mobileRender`.
  */
 export function DataTable<T extends object>(props: DataTableProps<T>) {
-  const { columns, rowKey, data, loading, error, onRetry, params, onParamsChange, mobileRender } = props
+  const { columns, rowKey, data, loading, error, onRetry, params, onParamsChange, mobileRender, scroll } = props
   const isMobile = useIsMobile()
 
   if (error && !data) return <ErrorState onRetry={onRetry} />
@@ -89,7 +90,7 @@ export function DataTable<T extends object>(props: DataTableProps<T>) {
           loading={loading}
           onChange={handleChange}
           locale={{ emptyText: <EmptyState /> }}
-          scroll={{ x: 'max-content' }}
+          scroll={scroll ?? { x: 'max-content' }}
           pagination={{
             current: params.page + 1,
             pageSize: params.size,

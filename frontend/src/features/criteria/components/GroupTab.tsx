@@ -1,5 +1,4 @@
-import { PlusOutlined } from '@ant-design/icons'
-import { Badge, Button, Flex, Select, Tag } from 'antd'
+import { Badge, Flex, Select, Tag } from 'antd'
 import { useMemo, useState } from 'react'
 import { AdvancedFilter } from '@/components/data-entry/AdvancedFilter'
 import { BatchCriterionModal } from '@/features/criteria/components/BatchCriterionModal'
@@ -10,16 +9,23 @@ import { GroupTable } from '@/features/criteria/components/GroupTable'
 import type { Criterion, CriterionGroup } from '@/features/criteria/criteria.types'
 import { useCriterionGroups } from '@/features/criteria/hooks/useCriteria'
 import { useCompanies } from '@/features/organizations/hooks/useOrganizations'
-import { PERMISSIONS, ProtectedAction } from '@/permissions'
 
 export interface GroupTabProps {
   onSelectGroup: (groupId: number) => void
   onAddCriterionToGroup: (group: CriterionGroup) => void
   onBatchAddCriteriaToGroup?: (group: CriterionGroup) => void
   onEditCriterion?: (criterion: Criterion) => void
+  createOpen?: boolean
+  onCreateClose?: () => void
 }
 
-export function GroupTab({ onAddCriterionToGroup, onBatchAddCriteriaToGroup, onEditCriterion }: GroupTabProps) {
+export function GroupTab({
+  onAddCriterionToGroup,
+  onBatchAddCriteriaToGroup,
+  onEditCriterion,
+  createOpen,
+  onCreateClose,
+}: GroupTabProps) {
   const [selectedCompanyId, setSelectedCompanyId] = useState<number | undefined>(undefined)
   const [keyword, setKeyword] = useState('')
   const groups = useCriterionGroups(selectedCompanyId)
@@ -30,6 +36,13 @@ export function GroupTab({ onAddCriterionToGroup, onBatchAddCriteriaToGroup, onE
   const [detailModal, setDetailModal] = useState<{ open: boolean; group?: CriterionGroup }>({ open: false })
   const [batchModal, setBatchModal] = useState<{ open: boolean; group?: CriterionGroup }>({ open: false })
   const [viewingCriterion, setViewingCriterion] = useState<Criterion | undefined>(undefined)
+
+  const isFormOpen = createOpen || formModal.open
+
+  const handleCloseForm = () => {
+    setFormModal({ open: false })
+    onCreateClose?.()
+  }
 
   const handleOpenBatch = (group: CriterionGroup) => {
     if (onBatchAddCriteriaToGroup) {
@@ -72,13 +85,6 @@ export function GroupTab({ onAddCriterionToGroup, onBatchAddCriteriaToGroup, onE
     <Flex vertical gap={16}>
       <AdvancedFilter
         search={{ value: keyword, placeholder: 'Tìm theo mã hoặc tên nhóm...', maxWidth: 260, onSearch: setKeyword }}
-        extra={
-          <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => setFormModal({ open: true })}>
-              Thêm nhóm tiêu chí
-            </Button>
-          </ProtectedAction>
-        }
       >
         <Select
           allowClear
@@ -115,10 +121,10 @@ export function GroupTab({ onAddCriterionToGroup, onBatchAddCriteriaToGroup, onE
 
       {/* Modal tạo / sửa nhóm */}
       <GroupFormModal
-        open={formModal.open}
+        open={isFormOpen}
         group={formModal.group}
         nextOrder={nextOrder}
-        onClose={() => setFormModal({ open: false })}
+        onClose={handleCloseForm}
       />
 
       {/* Modal xem chi tiết nhóm và danh sách tiêu chí nhỏ */}

@@ -9,6 +9,60 @@ console **không có lỗi** (`ReferenceError`, cảnh báo antd deprecated). Ty
 
 ---
 
+## Tiến độ hoàn thành (Cập nhật 18/11/2026)
+
+- [x] **P0 – Lỗi chặn**
+  - [x] P0.1 Sửa lỗi `/admin/findings` sập (`Tag`, `StatusBadge` import chuẩn).
+  - [x] P0.2 Sửa lỗi `/admin/inspections` sập (`ItemResult` từ `inspection.types`).
+  - [x] P0.3 Thêm `ContentErrorBoundary` bọc `<Outlet />` trong `AdminLayout` và `MobileLayout`, giữ nguyên Header + Sidebar khi ô bảng có lỗi.
+  - [x] P0.4 Đổi tất cả props antd deprecated (`overlayInnerStyle` ➔ `styles.container`, `destroyOnClose` ➔ `destroyOnHidden`, `Alert message` ➔ `title`, `Drawer height` ➔ `styles.wrapper.height`).
+  - [x] P0.5 Thêm native Chrome CDP smoke test (`scripts/smoke_test_cdp.mjs`), tự động duyệt 10 routes × 4 viewports (1440, 1024, 768, 375), bắt ngoại lệ console (kết quả: 0 lỗi).
+
+- [x] **P1 – Bố cục & nhất quán (desktop)**
+  - [x] P1.1 Thống nhất khuôn trang danh sách: tiêu đề + mô tả ở header, nút chính `[+ Thêm...]` và nút dropdown `[ 📊 Excel ▾ ]` ở header `extra`. Bỏ nút trùng trong `AdvancedFilter`. Áp dụng đồng bộ: `CriterionGroupPage`, `CriteriaPage`, `TemplateListPage`, `UserListPage`, `EmployeeListPage`, `OrgUnitPage`, `CompanyPage`.
+  - [x] P1.2 Bảng: cột `#` cố định 56px; cột tên/tiêu đề có `minWidth: 160-260px` + `ellipsis`; hỗ trợ cuộn ngang tự động qua `DataTable` (`scroll={{ x: 'max-content' }}`).
+  - [x] P1.3 `StatusBadge` đồng bộ nhãn, màu và chiều cao thẻ.
+  - [x] P1.4 Chữ tiêu đề dùng title case nhẹ nhàng, bỏ all-caps dài.
+  - [x] P1.5 Tab Báo cáo rút gọn nhãn kèm tooltip đầy đủ, tránh cắt chữ.
+  - [x] P1.6 Tăng độ mờ nền kính `--app-glass-bg: rgba(255, 255, 255, 0.90)` đảm bảo tương phản ≥ 4.5:1 trên mọi hình nền.
+
+- [x] **P2 – Responsive `/admin` (768px và 375px)**
+  - [x] P2.1 Bảng nhóm tiêu chí tự động chuyển card view trên `< 768px` (`GroupMobileCard`), tên nhóm đậm và nổi bật.
+  - [x] P2.2 Header ẩn breadcrumb cha trên `< 768px` (`.app-header-breadcrumb-group`), chỉ hiển thị tiêu đề trang với ellipsis gọn.
+  - [x] P2.3 Nhóm nút Excel tự động thu gọn thành dropdown 1 nút trên `< 768px` (`mode="auto"`).
+  - [x] P2.4 Dòng số liệu tổng hiển thị dạng các chip `.app-stat-chip` xếp hàng tự xuống dòng.
+  - [x] P2.5 Ô tìm kiếm co dãn 100% chiều rộng trên màn hình nhỏ.
+  - [x] P2.6 Modal chiếm toàn màn hình trên điện thoại (`< 768px`), nội dung cuộn linh hoạt và các nút Lưu/Huỷ cố định đáy.
+  - [x] P2.7 Drawer sidebar màn hình nhỏ có nút đóng rõ ràng (`BrandHeader` có icon đóng), tự động đóng khi chọn mục.
+
+- [x] **P3 – Màn `/qc` (điện thoại – Chuyên viên, CHT)**
+  - [x] P3.1 Đồng bộ biến màu thương hiệu `--adm-color-primary: #1677ff`, bo góc 12px, bóng mờ, header có huy hiệu logo KSVH QC.
+  - [x] P3.2 Header có logo + chuông thông báo + avatar người dùng với ActionSheet tài khoản/đăng xuất; hiển thị đúng vai trò thực tế.
+  - [x] P3.3 Trang chủ theo vai trò: Segmented Việc chấm / Lỗi xử lý, thẻ số lượng lọc nhanh (Cần xử lý, Chờ kết quả, Tất cả), khối công việc cần thẩm định (`PendingReviewsCard`).
+  - [x] P3.4 Trạng thái rỗng nhỏ gọn kèm hướng dẫn "Kéo xuống để làm mới".
+  - [x] P3.5 Tích hợp `PullToRefresh` của antd-mobile.
+  - [x] P3.6 Màn chấm điểm (`/qc/execute/:id`): thanh tiến độ cố định trên đỉnh khi cuộn danh sách tiêu chí; nút Đạt / Không đạt / N/A kích thước chuẩn cảm ứng ≥ 44px; bộ lọc nhanh tiêu chí (Tất cả / Chưa chấm / Lỗi); thanh gửi kết quả cố định đáy báo số tiêu chí còn thiếu.
+  - [x] P3.7 Điều hướng đáy TabBar 4 mục: Việc của tôi · Lỗi vi phạm · Thông báo · Tài khoản (tự ẩn khi vào màn chấm điểm để nhường chỗ cho thanh nộp phiếu).
+
+- [x] **P4 – Form, phản hồi, trạng thái**
+  - [x] P4.1 Skeleton/spin khi tải, `EmptyState` có hướng dẫn, `ErrorState` có nút "Thử lại".
+  - [x] P4.2 Nút chính khoá khi đang gửi (`loading`), form có nhãn và gợi ý rõ.
+  - [x] P4.4 Hộp thoại xác nhận nguy hiểm `useConfirm` (đăng xuất, huỷ phiếu, xoá dữ liệu).
+  - [x] P4.5 Chuông thông báo có badge số chưa đọc, Drawer mở danh sách, đánh dấu đã đọc tất cả.
+
+- [x] **P5 – Dashboard & biểu đồ**
+  - [x] P5.1 Biểu đồ tuân thủ nhà hàng ẩn nhãn "0%" khi điểm bằng 0/null.
+  - [x] P5.2 Thẻ KPI điều hướng trực tiếp sang danh sách đã lọc.
+  - [x] P5.3 Tooltip tiếng Việt, số định dạng `vi-VN`.
+  - [x] P5.4 Bộ chọn 3/6/12 tháng cố định áp dụng cho toàn bộ khối vận hành.
+
+- [x] **P6 – Khả năng tiếp cận (Accessibility)**
+  - [x] P6.1 Nút icon có `aria-label` và `tooltip`.
+  - [x] P6.2 Viền focus bàn phím rõ nét (`:focus-visible` outline 2px primary).
+  - [x] P6.3 Trạng thái không chỉ phân biệt bằng màu (luôn kèm chữ và biểu tượng).
+
+---
+
 ## P0 – Lỗi chặn (sửa ngay, trước mọi việc khác)
 | # | Trang | Lỗi thấy được | Nguyên nhân / hướng sửa |
 |---|---|---|---|

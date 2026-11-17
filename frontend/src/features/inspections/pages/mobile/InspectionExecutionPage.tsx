@@ -1,15 +1,17 @@
-import { Card, Dialog, NavBar, Space, Toast } from 'antd-mobile'
+import { Dialog, NavBar, Space, Toast } from 'antd-mobile'
 import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router'
-import { useGeolocation } from '@/hooks/useGeolocation'
-import { useInspection, useInspectionItems, useInspectionMutations } from '@/features/inspections/hooks/useInspectionData'
-import { InspectionCriterionCard } from '@/features/inspections/components/InspectionCriterionCard'
-import type { InspectionSubmitItemRequest, ItemResult } from '@/features/inspections/inspection.types'
-import { LOCATION_STATUS_META } from '@/features/inspections/inspection.types'
-import { useInspectionDraft } from '@/features/inspections/hooks/useInspectionDraft'
 import { ExecutionCheckinCard } from '@/features/inspections/components/mobile/ExecutionCheckinCard'
+import { ExecutionCriteriaList } from '@/features/inspections/components/mobile/ExecutionCriteriaList'
 import { ExecutionHeaderCard } from '@/features/inspections/components/mobile/ExecutionHeaderCard'
+import { ExecutionStatusBanner } from '@/features/inspections/components/mobile/ExecutionStatusBanner'
+import { ExecutionStickyProgress } from '@/features/inspections/components/mobile/ExecutionStickyProgress'
 import { ExecutionSubmitBar } from '@/features/inspections/components/mobile/ExecutionSubmitBar'
+import { useInspectionDraft } from '@/features/inspections/hooks/useInspectionDraft'
+import { useInspection, useInspectionItems, useInspectionMutations } from '@/features/inspections/hooks/useInspectionData'
+import type { InspectionSubmitItemRequest } from '@/features/inspections/inspection.types'
+import { LOCATION_STATUS_META } from '@/features/inspections/inspection.types'
+import { useGeolocation } from '@/hooks/useGeolocation'
 
 export function InspectionExecutionPage() {
   const { id } = useParams<{ id: string }>()
@@ -123,13 +125,26 @@ export function InspectionExecutionPage() {
     <div style={{ paddingBottom: 80, minHeight: '100vh', background: 'var(--app-surface-sunken)' }}>
       <NavBar onBack={() => navigate('/qc')}>{ins.code}</NavBar>
 
+      {ins.status === 'IN_PROGRESS' && (
+        <ExecutionStickyProgress
+          ratedCount={ratedCount}
+          totalCriteria={totalCriteria}
+          progressPercent={progressPercent}
+          passCount={passCount}
+          failCount={failCount}
+          naCount={naCount}
+        />
+      )}
+
       <div style={{ padding: 12 }}>
-        {(!isOnline || pendingCount > 0) && (
-          <div style={{ background: '#fffbe6', border: '1px solid #ffe58f', padding: '6px 12px', borderRadius: 8, marginBottom: 8, fontSize: 12, color: '#d46b08' }}>
-            {!isOnline ? '⚠️ Đang offline. ' : ''}
-            {pendingCount > 0 ? `Còn ${pendingCount} tệp chờ tải lên.${isSyncing ? ' Đang đồng bộ...' : ''}` : 'Dữ liệu được lưu nháp an toàn.'}
-          </div>
-        )}
+        <ExecutionStatusBanner
+          isOnline={isOnline}
+          pendingCount={pendingCount}
+          isSyncing={isSyncing}
+          status={ins.status}
+          cancelReason={ins.cancelReason}
+        />
+
         <ExecutionHeaderCard
           inspection={ins}
           totalCriteria={totalCriteria}
@@ -151,32 +166,21 @@ export function InspectionExecutionPage() {
           />
         ) : (
           <Space direction="vertical" block>
-            {ins.status !== 'IN_PROGRESS' && (
-              <Card style={{ borderRadius: 10, background: ins.status === 'CANCELLED' ? 'var(--app-danger-bg)' : 'var(--app-success-bg)', border: `1px solid ${ins.status === 'CANCELLED' ? 'var(--app-danger-border)' : 'var(--app-success-border)'}` }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: ins.status === 'CANCELLED' ? 'var(--app-danger)' : 'var(--app-success)' }}>
-                  {ins.status === 'SUBMITTED' && 'Phiếu chấm đã được nộp. Đang xử lý lỗi.'}
-                  {ins.status === 'AWAITING_ACK' && 'Phiếu không có lỗi. Chờ CHT xác nhận đã xem.'}
-                  {ins.status === 'COMPLETED' && 'Phiếu chấm đã hoàn thành toàn diện.'}
-                  {ins.status === 'CANCELLED' && `Phiếu đã bị huỷ${ins.cancelReason ? `: ${ins.cancelReason}` : ''}.`}
-                </div>
-              </Card>
-            )}
-            {items?.map((it, idx) => (
-              <InspectionCriterionCard
-                key={it.id}
-                index={idx + 1}
-                item={it}
-                rating={getRating(it)}
-                onSetResult={(res: ItemResult) => setCriterionResult(it.criterionId, res)}
-                onSetComment={(comment: string) => setCriterionComment(it.criterionId, comment)}
-                onSetEvidence={(urls: string) => setCriterionEvidence(it.criterionId, urls)}
-                inspectionId={insId}
-                inspectorName={ins.inspectorName}
-                restaurantName={ins.restaurantName}
-                gpsCoords={gpsString}
-                readOnly={ins.status !== 'IN_PROGRESS'}
-              />
-            ))}
+            <ExecutionCriteriaList
+              items={items}
+              totalCriteria={totalCriteria}
+              ratedCount={ratedCount}
+              failCount={failCount}
+              insId={insId}
+              inspectorName={ins.inspectorName}
+              restaurantName={ins.restaurantName}
+              gpsCoords={gpsString}
+              readOnly={ins.status !== 'IN_PROGRESS'}
+              getRating={getRating}
+              onSetResult={setCriterionResult}
+              onSetComment={setCriterionComment}
+              onSetEvidence={setCriterionEvidence}
+            />
           </Space>
         )}
       </div>

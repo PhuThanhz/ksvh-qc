@@ -24,11 +24,12 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
     <DataTable<Criterion>
       {...props}
       rowKey="id"
+      scroll={{ x: 1000 }}
       columns={[
         {
           title: '#',
           key: 'index',
-          width: 60,
+          width: 56,
           align: 'center',
           render: (_: unknown, __: unknown, index: number) =>
             ((props.params?.page ?? 0) * (props.params?.size ?? 20)) + index + 1,
@@ -56,6 +57,7 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
           dataIndex: 'name',
           key: 'name',
           sorter: true,
+          minWidth: 220,
           render: (name: string, c: Criterion) => (
             <Flex vertical style={{ maxWidth: 360 }}>
               <Typography.Link onClick={() => onView(c)} style={{ fontWeight: 500 }}>

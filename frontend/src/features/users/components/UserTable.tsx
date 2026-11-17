@@ -26,17 +26,18 @@ export function UserTable({ roleName, onView, onEdit, onDelete, onResetPassword,
     <DataTable<User>
       {...props}
       rowKey="id"
+      scroll={{ x: 800 }}
       columns={[
         {
           title: '#',
           key: 'index',
-          width: 60,
+          width: 56,
           align: 'center',
           render: (_: unknown, __: unknown, index: number) =>
             ((props.params?.page ?? 0) * (props.params?.size ?? 20)) + index + 1,
         },
-        { title: 'Tên đăng nhập', dataIndex: 'username', key: 'username', sorter: true },
-        { title: 'Họ tên', dataIndex: 'fullName', key: 'fullName', sorter: true },
+        { title: 'Tên đăng nhập', dataIndex: 'username', key: 'username', sorter: true, minWidth: 140 },
+        { title: 'Họ tên', dataIndex: 'fullName', key: 'fullName', sorter: true, minWidth: 150 },
         {
           title: 'Vai trò',
           dataIndex: 'roles',

@@ -52,6 +52,7 @@ console.log('Target created:', target.id)
 const ws = new WebSocket(target.webSocketDebuggerUrl)
 let msgId = 1
 const callbacks = new Map()
+const consoleLogs = []
 
 ws.onmessage = (event) => {
   const msg = JSON.parse(event.data)
@@ -60,12 +61,25 @@ ws.onmessage = (event) => {
     callbacks.delete(msg.id)
     cb(msg.result, msg.error)
   }
+  if (msg.method === 'Runtime.consoleAPICalled') {
+    consoleLogs.push({ type: msg.params.type, args: msg.params.args?.map(a => a.value || a.description) })
+  }
+  if (msg.method === 'Runtime.exceptionThrown') {
+    console.error('Browser Exception:', msg.params.exceptionDetails)
+    consoleLogs.push({ type: 'exception', details: msg.params.exceptionDetails })
+  }
 }
 
 function send(method, params = {}) {
   return new Promise((resolve, reject) => {
     const id = msgId++
+    const timer = setTimeout(() => {
+      callbacks.delete(id)
+      console.warn(`CDP method ${method} timed out after 5s, continuing...`)
+      resolve(null)
+    }, 5000)
     callbacks.set(id, (res, err) => {
+      clearTimeout(timer)
       if (err) reject(new Error(err.message || JSON.stringify(err)))
       else resolve(res)
     })
@@ -78,18 +92,6 @@ console.log('WebSocket opened')
 
 await send('Page.enable')
 await send('Runtime.enable')
-
-const consoleLogs = []
-ws.addEventListener('message', (event) => {
-  const msg = JSON.parse(event.data)
-  if (msg.method === 'Runtime.consoleAPICalled') {
-    consoleLogs.push({ type: msg.params.type, args: msg.params.args?.map(a => a.value || a.description) })
-  }
-  if (msg.method === 'Runtime.exceptionThrown') {
-    console.error('Browser Exception:', msg.params.exceptionDetails)
-    consoleLogs.push({ type: 'exception', details: msg.params.exceptionDetails })
-  }
-})
 
 // Helper to take screenshot
 async function screenshot(filename, width = 1440, height = 900) {
@@ -142,9 +144,16 @@ console.log('Login action result:', loginResult.result.value)
 await new Promise((r) => setTimeout(r, 3000))
 
 const routesToTest = [
+  { path: '/admin', name: 'dashboard' },
+  { path: '/admin/plans', name: 'plans' },
   { path: '/admin/findings', name: 'findings' },
   { path: '/admin/inspections', name: 'inspections' },
   { path: '/admin/criteria-groups', name: 'criteria_groups' },
+  { path: '/admin/criteria', name: 'criteria' },
+  { path: '/admin/templates', name: 'templates' },
+  { path: '/admin/organizations', name: 'organizations' },
+  { path: '/admin/reports', name: 'reports' },
+  { path: '/qc', name: 'qc_mobile' },
 ]
 
 const viewports = [
@@ -156,8 +165,10 @@ const viewports = [
 
 for (const r of routesToTest) {
   console.log(`Navigating to ${r.path}...`)
-  await send('Page.navigate', { url: `http://localhost:5273${r.path}` })
-  await new Promise((r) => setTimeout(r, 2000))
+  await send('Runtime.evaluate', {
+    expression: `window.history.pushState(null, '', '${r.path}'); window.dispatchEvent(new PopStateEvent('popstate'));`,
+  })
+  await new Promise((r) => setTimeout(r, 1200))
 
   for (const vp of viewports) {
     await screenshot(`${r.name}_${vp.name}.png`, vp.width, vp.height)
