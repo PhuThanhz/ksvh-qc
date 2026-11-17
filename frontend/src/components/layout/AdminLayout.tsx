@@ -3,10 +3,12 @@ import { Drawer, Flex, Grid, Layout, Tag, Typography } from 'antd'
 import { Suspense, useState } from 'react'
 import { Outlet } from 'react-router'
 import { LoadingState } from '@/components/feedback/LoadingState'
+import { AmbientCanvas } from '@/components/layout/AmbientCanvas'
 import { AppHeader } from '@/components/layout/AppHeader'
 import type { LayoutUser, MenuEntry } from '@/components/layout/menu.types'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { SidebarProfile } from '@/components/layout/SidebarProfile'
+import { ThemeModal } from '@/features/theme'
 
 export interface AdminLayoutProps {
   menu: readonly MenuEntry[]
@@ -71,6 +73,7 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
 
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [themeOpen, setThemeOpen] = useState(false)
 
   const handleToggle = () => {
     if (isDesktop) {
@@ -81,7 +84,9 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
   }
 
   return (
-    <Layout style={{ minHeight: '100vh', background: '#f8fafc' }}>
+    <Layout style={{ minHeight: '100vh', background: 'transparent', position: 'relative' }}>
+      <AmbientCanvas />
+      <ThemeModal open={themeOpen} onClose={() => setThemeOpen(false)} />
       {isDesktop ? (
         <Layout.Sider
           collapsible
@@ -140,7 +145,7 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
         </Drawer>
       )}
 
-      <Layout style={{ minWidth: 0, background: '#f8fafc' }}>
+      <Layout style={{ minWidth: 0, background: 'transparent', position: 'relative', zIndex: 1 }}>
         <Layout.Header
           style={{
             paddingInline: isDesktop ? 24 : 16,
@@ -149,7 +154,9 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
             position: 'sticky',
             top: 0,
             zIndex: 10,
-            background: '#ffffff',
+            background: 'rgba(255, 255, 255, 0.92)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
             borderBottom: '1px solid #e2e8f0',
             boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.03)',
           }}
@@ -158,6 +165,7 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
             collapsed={isDesktop ? collapsed : !mobileOpen}
             onToggleSidebar={handleToggle}
             menu={menu}
+            onOpenTheme={() => setThemeOpen(true)}
           />
         </Layout.Header>
         <Layout.Content style={{ padding: isDesktop ? '16px 24px 28px' : '12px 14px 20px' }}>

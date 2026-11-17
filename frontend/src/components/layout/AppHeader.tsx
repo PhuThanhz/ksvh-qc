@@ -1,8 +1,9 @@
 import {
+  BgColorsOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from '@ant-design/icons'
-import { Button, Flex } from 'antd'
+import { Button, Flex, Tooltip } from 'antd'
 import { useLocation } from 'react-router'
 import type { MenuEntry } from '@/components/layout/menu.types'
 
@@ -10,9 +11,10 @@ export interface AppHeaderProps {
   collapsed?: boolean
   onToggleSidebar?: () => void
   menu?: readonly MenuEntry[]
+  onOpenTheme?: () => void
 }
 
-export function AppHeader({ collapsed, onToggleSidebar, menu }: AppHeaderProps) {
+export function AppHeader({ collapsed, onToggleSidebar, menu, onOpenTheme }: AppHeaderProps) {
   const { pathname } = useLocation()
 
   const activeEntry = menu
@@ -58,6 +60,32 @@ export function AppHeader({ collapsed, onToggleSidebar, menu }: AppHeaderProps) 
           </Flex>
         )}
       </Flex>
+
+      {onOpenTheme && (
+        <Tooltip title="Đổi chủ đề / hình nền giao diện">
+          <Button
+            type="text"
+            icon={<BgColorsOutlined style={{ color: '#0284c7', fontSize: 15 }} />}
+            onClick={onOpenTheme}
+            aria-label="Đổi hình nền giao diện"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              height: 32,
+              borderRadius: 6,
+              paddingInline: 10,
+              background: '#f0f9ff',
+              border: '1px solid #bae6fd',
+              color: '#0369a1',
+              fontWeight: 500,
+              fontSize: 12.5,
+            }}
+          >
+            Đổi hình nền
+          </Button>
+        </Tooltip>
+      )}
     </Flex>
   )
 }
