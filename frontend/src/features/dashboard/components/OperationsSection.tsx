@@ -16,7 +16,7 @@ import { RiskLevelChart } from '@/features/dashboard/components/RiskLevelChart'
 import { TrendChart } from '@/features/dashboard/components/TrendChart'
 import { useDashboard } from '@/features/dashboard/hooks/useDashboard'
 
-/** Phần vận hành: chỉ số chính và biểu đồ chuẩn theo Slide 1 & quy trình PDF KSVH. */
+/** Phần vận hành: chỉ số chính và biểu đồ tương tác chuẩn Slide 1 & quy trình PDF KSVH. */
 export function OperationsSection({ months }: { months: number }) {
   const navigate = useNavigate()
   const dash = useDashboard(months, true)
@@ -37,6 +37,7 @@ export function OperationsSection({ months }: { months: number }) {
             value={k?.complianceRate == null ? '—' : `${k.complianceRate.toLocaleString('vi-VN')}`}
             unit={k?.complianceRate == null ? undefined : '%'}
             footnote="Bình quân toàn hệ thống (Chuẩn ≥85%)"
+            onClick={() => navigate(ROUTES.admin.inspections)}
           />
         </Col>
         <Col xs={24} sm={12} xl={6}>
@@ -48,7 +49,7 @@ export function OperationsSection({ months }: { months: number }) {
             value={formatNumber(k?.openFindings ?? 0)}
             unit="lỗi"
             footnote="Chờ xác nhận, khiếu nại, khắc phục, nghiệm thu"
-            onClick={() => navigate(ROUTES.admin.findings)}
+            onClick={() => navigate(`${ROUTES.admin.findings}?status=OPEN`)}
           />
         </Col>
         <Col xs={24} sm={12} xl={6}>
@@ -60,7 +61,7 @@ export function OperationsSection({ months }: { months: number }) {
             value={formatNumber(k?.highRiskFindings ?? 0)}
             unit="lỗi"
             footnote="Mức M3 (7 ngày) & M4 (24 giờ khẩn cấp)"
-            onClick={() => navigate(ROUTES.admin.findings)}
+            onClick={() => navigate(`${ROUTES.admin.findings}?status=OPEN`)}
           />
         </Col>
         <Col xs={24} sm={12} xl={6}>
@@ -72,13 +73,18 @@ export function OperationsSection({ months }: { months: number }) {
             value={k?.onTimeRate == null ? '—' : `${k.onTimeRate.toLocaleString('vi-VN')}`}
             unit={k?.onTimeRate == null ? undefined : '%'}
             footnote={`Lỗi đã đóng trong ${months} tháng gần nhất`}
+            onClick={() => navigate(`${ROUTES.admin.findings}?status=CLOSED`)}
           />
         </Col>
       </Row>
 
       <Row gutter={[16, 16]}>
         <Col xs={24} xl={16}>
-          <RestaurantComplianceChart data={d?.restaurantCompliance} loading={loading} />
+          <RestaurantComplianceChart
+            data={d?.restaurantCompliance}
+            loading={loading}
+            onSelectRestaurant={(r) => navigate(`${ROUTES.admin.inspections}?restaurantId=${r.id}`)}
+          />
         </Col>
         <Col xs={24} xl={8}>
           <RiskLevelChart data={d?.openByRiskLevel} levels={levels.data} loading={loading || levels.isLoading} />
@@ -92,11 +98,13 @@ export function OperationsSection({ months }: { months: number }) {
         <Col xs={24} xl={8}>
           <HorizontalBarChart
             title="Nhà hàng rủi ro cao"
-            subtitle="Tổng điểm rủi ro của lỗi đang mở"
+            subtitle="Tổng điểm rủi ro của lỗi đang mở (nhấp để xem lỗi)"
             valueName="Điểm rủi ro"
             loading={loading}
             emptyText="Không có lỗi nào đang mở"
+            onRowClick={(row) => row.id && navigate(`${ROUTES.admin.findings}?restaurantId=${row.id}`)}
             rows={(d?.topRestaurants ?? []).map((r) => ({
+              id: r.id,
               label: r.name,
               value: r.riskScore,
               hint: `${r.openFindings} lỗi đang mở · ${r.code}`,

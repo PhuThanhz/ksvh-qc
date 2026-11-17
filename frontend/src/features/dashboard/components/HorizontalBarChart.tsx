@@ -6,6 +6,7 @@ export interface BarRow {
   value: number
   /** Dòng phụ trong tooltip. */
   hint?: string
+  id?: number | string
 }
 
 interface Props {
@@ -16,12 +17,23 @@ interface Props {
   emptyText: string
   valueName: string
   height?: number
+  onRowClick?: (row: BarRow) => void
 }
 
-/** Thanh ngang một màu, sắp theo thứ tự truyền vào; nhãn giá trị ở đầu thanh. */
-export function HorizontalBarChart({ title, subtitle, rows, loading, emptyText, valueName, height = 240 }: Props) {
+/** Thanh ngang một màu, sắp theo thứ tự truyền vào; hỗ trợ nhấp để lọc. */
+export function HorizontalBarChart({
+  title,
+  subtitle,
+  rows,
+  loading,
+  emptyText,
+  valueName,
+  height = 240,
+  onRowClick,
+}: Props) {
+  const ordered = useMemo(() => [...rows].reverse(), [rows])
+
   const option = useMemo(() => {
-    const ordered = [...rows].reverse() // ECharts vẽ từ dưới lên: đảo để mục đầu tiên nằm trên cùng
     return {
       grid: { left: 8, right: 40, top: 4, bottom: 4, containLabel: true },
       tooltip: {
@@ -48,16 +60,31 @@ export function HorizontalBarChart({ title, subtitle, rows, loading, emptyText, 
           itemStyle: { color: CHART_COLORS.series[0], borderRadius: [0, 4, 4, 0] },
           label: { show: true, position: 'right', color: CHART_COLORS.textSecondary, fontSize: 12 },
           showBackground: true,
-          backgroundStyle: { color: '#f4f3f0', borderRadius: [0, 4, 4, 0] },
+          backgroundStyle: { color: '#f1f5f9', borderRadius: [0, 4, 4, 0] },
         },
       ],
     }
-  }, [rows, valueName])
+  }, [ordered, valueName])
 
   const empty = !loading && rows.every((r) => r.value === 0)
   return (
     <ChartCard title={title} subtitle={subtitle} loading={loading} empty={empty} emptyText={emptyText} height={height}>
-      <EChart option={option} height={height} ariaLabel={`Biểu đồ thanh: ${title}`} />
+      <EChart
+        option={option}
+        height={height}
+        ariaLabel={`Biểu đồ thanh: ${title}`}
+        onEvents={
+          onRowClick
+            ? {
+                click: (p: unknown) => {
+                  const idx = (p as { dataIndex?: number })?.dataIndex ?? -1
+                  const r = ordered[idx]
+                  if (r) onRowClick(r)
+                },
+              }
+            : undefined
+        }
+      />
     </ChartCard>
   )
 }

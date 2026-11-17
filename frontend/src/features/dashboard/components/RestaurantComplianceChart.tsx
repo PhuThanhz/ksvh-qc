@@ -12,10 +12,11 @@ export interface RestaurantComplianceItem {
 interface Props {
   data?: readonly RestaurantComplianceItem[]
   loading: boolean
+  onSelectRestaurant?: (restaurant: RestaurantComplianceItem) => void
 }
 
 /** Biểu đồ cột Điểm tuân thủ theo nhà hàng (chuẩn Slide 1 PDF KSVH). */
-export function RestaurantComplianceChart({ data, loading }: Props) {
+export function RestaurantComplianceChart({ data, loading, onSelectRestaurant }: Props) {
   const option = useMemo(() => {
     const list = data ?? []
     return {
@@ -101,7 +102,22 @@ export function RestaurantComplianceChart({ data, loading }: Props) {
       emptyText="Chưa có dữ liệu kiểm tra trong kỳ"
       height={300}
     >
-      <EChart option={option} height={300} ariaLabel="Biểu đồ cột Điểm tuân thủ theo nhà hàng" />
+      <EChart
+        option={option}
+        height={300}
+        ariaLabel="Biểu đồ cột Điểm tuân thủ theo nhà hàng"
+        onEvents={
+          onSelectRestaurant
+            ? {
+                click: (p: unknown) => {
+                  const idx = (p as { dataIndex?: number })?.dataIndex ?? -1
+                  const item = (data ?? [])[idx]
+                  if (item) onSelectRestaurant(item)
+                },
+              }
+            : undefined
+        }
+      />
     </ChartCard>
   )
 }

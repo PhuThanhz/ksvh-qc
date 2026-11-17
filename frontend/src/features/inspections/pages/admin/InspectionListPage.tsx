@@ -1,7 +1,8 @@
 import { DownloadOutlined, PlusOutlined } from '@ant-design/icons'
-import { Button, Card, Flex, Input, Modal, Select, Space } from 'antd'
+import { Button, Card, Flex, Input, Modal, Segmented, Select, Space } from 'antd'
 import dayjs from 'dayjs'
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router'
 import { AdvancedFilter } from '@/components/data-entry/AdvancedFilter'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { InspectionDetailModal } from '@/features/inspections/components/InspectionDetailModal'
@@ -23,8 +24,25 @@ interface Filters extends Record<string, unknown> {
   status?: InspectionStatus
 }
 
+const STATUS_TABS: { value: string; label: string }[] = [
+  { value: 'ALL', label: 'Tất cả' },
+  { value: 'ASSIGNED', label: 'Đã phân công' },
+  { value: 'IN_PROGRESS', label: 'Đang chấm' },
+  { value: 'SUBMITTED', label: 'Đã nộp' },
+  { value: 'COMPLETED', label: 'Hoàn thành' },
+  { value: 'CANCELLED', label: 'Đã huỷ' },
+]
+
 export function InspectionListPage() {
-  const { params, filters, setFilter, onTableChange, resetFilters, activeFilterCount } = useListParams<Filters>()
+  const [searchParams] = useSearchParams()
+  const statusParam = searchParams.get('status') as InspectionStatus | null
+  const initialFilters = useMemo(
+    () => (statusParam ? { status: statusParam } : undefined),
+    [statusParam],
+  )
+
+  const { params, filters, setFilter, onTableChange, resetFilters, activeFilterCount } =
+    useListParams<Filters>(initialFilters)
   const inspections = useInspections(params)
   const restaurants = useOrgUnits({ unitType: 'RESTAURANT', page: 0, size: 200, active: true })
   const { cancel } = useInspectionMutations()
@@ -77,6 +95,8 @@ export function InspectionListPage() {
     )
   }
 
+  const activeTab = (filters.status as string) || 'ALL'
+
   return (
     <PageContainer
       title="Phiếu chấm kiểm soát"
@@ -98,8 +118,16 @@ export function InspectionListPage() {
         </Space>
       }
     >
-      <Card>
+      <Card styles={{ body: { padding: '16px 20px' } }}>
         <Flex vertical gap={16}>
+          {/* Thanh chuyển tab trạng thái nhanh (1-click lọc) */}
+          <Segmented
+            options={STATUS_TABS}
+            value={activeTab}
+            onChange={(val) => setFilter('status', val === 'ALL' ? undefined : (val as InspectionStatus))}
+            style={{ width: 'fit-content', background: '#f1f5f9', padding: 3, borderRadius: 8 }}
+          />
+
           <AdvancedFilter
             search={{
               placeholder: 'Tìm theo mã phiếu, loại kiểm tra...',
@@ -149,7 +177,13 @@ export function InspectionListPage() {
         </Flex>
       </Card>
 
-      <InspectionFormModal open={createModal} onClose={() => setCreateModal(false)} />
+      <InspectionFormModal
+        open={createModal}
+        onClose={() => {
+          setCreateModal(false)
+          inspections.refetch()
+        }}
+      />
 
       <InspectionDetailModal
         open={detailModal.open}
@@ -158,23 +192,23 @@ export function InspectionListPage() {
       />
 
       <Modal
+        title="Xác nhận huỷ phiếu kiểm tra"
         open={cancelDialog.open}
-        title="Huỷ phiếu chấm kiểm soát"
         onCancel={() => setCancelDialog({ open: false, reason: '' })}
         onOk={onConfirmCancel}
-        confirmLoading={cancel.isPending}
         okText="Huỷ phiếu"
-        okButtonProps={{ danger: true }}
+        okButtonProps={{ danger: true, loading: cancel.isPending }}
+        centered
       >
-        <div style={{ marginTop: 16 }}>
-          <p>Vui lòng nhập lý do huỷ phiếu:</p>
-          <Input.TextArea
-            rows={3}
-            value={cancelDialog.reason}
-            onChange={(e) => setCancelDialog((prev) => ({ ...prev, reason: e.target.value }))}
-            placeholder="Lý do huỷ..."
-          />
-        </div>
+        <p style={{ marginTop: 12 }}>
+          Bạn có chắc chắn muốn huỷ phiếu kiểm tra này? Thao tác này sẽ huỷ bỏ toàn bộ các mục chấm điểm và lỗi liên quan.
+        </p>
+        <Input.TextArea
+          rows={3}
+          placeholder="Nhập lý do huỷ phiếu bắt buộc..."
+          value={cancelDialog.reason}
+          onChange={(e) => setCancelDialog((prev) => ({ ...prev, reason: e.target.value }))}
+        />
       </Modal>
     </PageContainer>
   )

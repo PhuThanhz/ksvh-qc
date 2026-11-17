@@ -52,7 +52,17 @@ export function InspectionTable({
       dataIndex: 'code',
       key: 'code',
       width: 140,
-      render: (v) => <span style={{ fontWeight: 600 }}>{v}</span>,
+      render: (v, r) => (
+        <Tooltip title="Nhấp để xem chi tiết phiếu chấm">
+          <Button
+            type="link"
+            style={{ padding: 0, height: 'auto', fontWeight: 600 }}
+            onClick={() => onView(r)}
+          >
+            {v}
+          </Button>
+        </Tooltip>
+      ),
     },
     {
       title: 'Nhà hàng',
@@ -179,6 +189,10 @@ export function InspectionTable({
       dataSource={data}
       rowKey="id"
       loading={loading}
+      onRow={(r) => ({
+        onDoubleClick: () => onView(r),
+        style: { cursor: 'pointer' },
+      })}
       pagination={
         totalItems !== undefined
           ? {

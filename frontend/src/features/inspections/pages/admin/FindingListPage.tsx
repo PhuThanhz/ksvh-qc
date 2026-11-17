@@ -1,7 +1,8 @@
 import { DownloadOutlined } from '@ant-design/icons'
-import { Button, Card, Flex, Select } from 'antd'
+import { Button, Card, Flex, Segmented, Select } from 'antd'
 import dayjs from 'dayjs'
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router'
 import { AdvancedFilter } from '@/components/data-entry/AdvancedFilter'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { FindingActionModal, type FindingActionType } from '@/features/inspections/components/FindingActionModal'
@@ -20,13 +21,29 @@ interface Filters extends Record<string, unknown> {
   status?: FindingStatus
 }
 
+const STATUS_TABS: { value: string; label: string }[] = [
+  { value: 'ALL', label: 'Tất cả' },
+  { value: 'OPEN', label: 'Chờ phản hồi' },
+  { value: 'APPEALED', label: 'Đang khiếu nại' },
+  { value: 'REMEDIATING', label: 'Đang khắc phục' },
+  { value: 'PENDING_VERIFICATION', label: 'Chờ nghiệm thu' },
+  { value: 'CLOSED', label: 'Đã đóng' },
+]
+
 export function FindingListPage() {
-  const { params, filters, setFilter, onTableChange, resetFilters, activeFilterCount } = useListParams<Filters>()
+  const [searchParams] = useSearchParams()
+  const statusParam = searchParams.get('status') as FindingStatus | null
+  const initialFilters = useMemo(
+    () => (statusParam ? { status: statusParam } : undefined),
+    [statusParam],
+  )
+
+  const { params, filters, setFilter, onTableChange, resetFilters, activeFilterCount } =
+    useListParams<Filters>(initialFilters)
   const findings = useFindings(params)
   const restaurants = useOrgUnits({ unitType: 'RESTAURANT', page: 0, size: 200, active: true })
 
   const [selectedFindingId, setSelectedFindingId] = useState<number | undefined>()
-
   const [actionState, setActionState] = useState<{
     open: boolean
     action?: FindingActionType
@@ -67,6 +84,8 @@ export function FindingListPage() {
     )
   }
 
+  const activeTab = (filters.status as string) || 'ALL'
+
   return (
     <PageContainer
       title="Quản lý lỗi & Khắc phục"
@@ -81,8 +100,16 @@ export function FindingListPage() {
         </Button>
       }
     >
-      <Card>
+      <Card styles={{ body: { padding: '16px 20px' } }}>
         <Flex vertical gap={16}>
+          {/* Thanh chuyển tab trạng thái nhanh (1-click lọc) */}
+          <Segmented
+            options={STATUS_TABS}
+            value={activeTab}
+            onChange={(val) => setFilter('status', val === 'ALL' ? undefined : (val as FindingStatus))}
+            style={{ width: 'fit-content', background: '#f1f5f9', padding: 3, borderRadius: 8 }}
+          />
+
           <AdvancedFilter
             search={{
               placeholder: 'Tìm kiếm mô tả lỗi, khiếu nại, khắc phục...',
@@ -104,11 +131,11 @@ export function FindingListPage() {
             />
 
             <Select
-              placeholder="Trạng thái xử lý"
+              placeholder="Trạng thái chi tiết"
               allowClear
               value={filters.status}
               onChange={(v) => setFilter('status', v)}
-              style={{ width: 200 }}
+              style={{ width: 190 }}
               options={[
                 { value: 'OPEN', label: 'Chờ phản hồi' },
                 { value: 'CONFIRMED', label: 'Đã xác nhận' },

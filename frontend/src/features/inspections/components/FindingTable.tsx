@@ -222,6 +222,10 @@ export function FindingTable({
       dataSource={data}
       rowKey="id"
       loading={loading}
+      onRow={(record) => ({
+        onDoubleClick: () => onView?.(record),
+        style: { cursor: 'pointer' },
+      })}
       pagination={
         totalItems !== undefined
           ? {
