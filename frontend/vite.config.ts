@@ -57,14 +57,17 @@ export default defineConfig(({ mode }) => {
               if (id.includes('antd-mobile') || id.includes('antd-mobile-icons')) {
                 return 'vendor-antd-mobile'
               }
-              if (id.includes('antd') || id.includes('@ant-design')) {
-                return 'vendor-antd'
+              if (id.includes('@ant-design/icons')) {
+                return 'vendor-antd-icons'
               }
               if (id.includes('echarts') || id.includes('zrender')) {
                 return 'vendor-echarts'
               }
               if (id.includes('@tanstack/react-query')) {
                 return 'vendor-query'
+              }
+              if (id.includes('/antd/') || id.includes('\\antd\\')) {
+                return 'vendor-antd'
               }
             }
           },

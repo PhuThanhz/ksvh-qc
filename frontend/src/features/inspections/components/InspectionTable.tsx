@@ -1,5 +1,5 @@
 import { CloseCircleOutlined, EyeOutlined } from '@ant-design/icons'
-import { Button, Space, Table, Tag, Tooltip } from 'antd'
+import { Space, Table, Tag, Tooltip, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { StatusBadge } from '@/components/data-display/StatusBadge'
 import { INSPECTION_STATUS_META } from '../constants/status'
@@ -47,14 +47,10 @@ export function InspectionTable({
       key: 'code',
       width: 140,
       render: (v, r) => (
-        <Tooltip title="Nhấp để xem chi tiết phiếu chấm">
-          <Button
-            type="link"
-            style={{ padding: 0, height: 'auto', fontWeight: 600 }}
-            onClick={() => onView(r)}
-          >
+        <Tooltip title="Xem chi tiết phiếu chấm">
+          <Typography.Link style={{ fontWeight: 600 }} onClick={() => onView(r)}>
             {v}
-          </Button>
+          </Typography.Link>
         </Tooltip>
       ),
     },
@@ -94,13 +90,10 @@ export function InspectionTable({
       key: 'progress',
       width: 150,
       render: (_, r) => (
-        <div style={{ fontSize: 13 }}>
-          <span style={{ color: 'var(--app-success)', fontWeight: 600 }}>{r.passedCriteria} Đạt</span>
-          {' · '}
-          <span style={{ color: 'var(--app-danger)', fontWeight: 600 }}>{r.failedCriteria} Lỗi</span>
-          {' / '}
-          <span>{r.totalCriteria} mục</span>
-        </div>
+        <span style={{ fontSize: 13 }}>
+          <strong style={{ color: 'var(--app-success)' }}>{r.passedCriteria} Đạt</strong> ·{' '}
+          <strong style={{ color: 'var(--app-danger)' }}>{r.failedCriteria} Lỗi</strong> / {r.totalCriteria} mục
+        </span>
       ),
     },
     {
@@ -126,10 +119,8 @@ export function InspectionTable({
         const grade = getComplianceGrade(v, r.maxRiskLevel)
         return (
           <div>
-            <div style={{ fontWeight: 600 }}>{v.toLocaleString('vi-VN')}%</div>
-            <Tag color={grade.color} style={{ fontSize: 11, margin: 0, marginTop: 2 }}>
-              {grade.label}
-            </Tag>
+            <strong>{v.toLocaleString('vi-VN')}%</strong>
+            <div><Tag color={grade.color} style={{ fontSize: 11, margin: '2px 0 0' }}>{grade.label}</Tag></div>
           </div>
         )
       },
@@ -147,15 +138,8 @@ export function InspectionTable({
       key: 'createdAt',
       width: 150,
       render: (v, r) => {
-        const duration = formatInspectionDuration(r.checkinAt, r.submittedAt)
-        return (
-          <div>
-            <div>{formatDate(v)}</div>
-            {duration !== '—' && (
-              <div style={{ fontSize: 11, color: 'var(--app-text-secondary)' }}>Thời lượng: {duration}</div>
-            )}
-          </div>
-        )
+        const d = formatInspectionDuration(r.checkinAt, r.submittedAt)
+        return <div><div>{formatDate(v)}</div>{d !== '—' && <div style={{ fontSize: 11, color: 'var(--app-text-secondary)' }}>Thời lượng: {d}</div>}</div>
       },
     },
     {
@@ -166,23 +150,13 @@ export function InspectionTable({
       render: (_, r) => (
         <Space size={6}>
           <Tooltip title="Xem chi tiết phiếu chấm">
-            <button
-              type="button"
-              className="action-btn action-btn-view"
-              aria-label="Xem chi tiết phiếu chấm"
-              onClick={() => onView(r)}
-            >
+            <button type="button" className="action-btn action-btn-view" aria-label="Xem chi tiết phiếu" onClick={() => onView(r)}>
               <EyeOutlined />
             </button>
           </Tooltip>
           {(r.status === 'ASSIGNED' || r.status === 'IN_PROGRESS') && canCancel && (
             <Tooltip title="Huỷ phiếu">
-              <button
-                type="button"
-                className="action-btn action-btn-delete"
-                aria-label="Huỷ phiếu chấm"
-                onClick={() => onCancel(r)}
-              >
+              <button type="button" className="action-btn action-btn-delete" aria-label="Huỷ phiếu chấm" onClick={() => onCancel(r)}>
                 <CloseCircleOutlined />
               </button>
             </Tooltip>

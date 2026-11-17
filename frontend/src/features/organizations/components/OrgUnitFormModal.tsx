@@ -25,17 +25,9 @@ const TYPE_OPTIONS = (Object.keys(ORG_UNIT_TYPE_LABEL) as OrgUnitType[]).map((t)
 }))
 
 const EMPTY: OrgUnitFormValues = {
-  companyId: null,
-  unitType: 'RESTAURANT',
-  code: '',
-  name: '',
-  address: '',
-    storeManagerUserId: null,
-  obmUserId: null,
-  latitude: null,
-  longitude: null,
-  checkinRadiusM: DEFAULT_CHECKIN_RADIUS_M,
-  active: true,
+  companyId: null, unitType: 'RESTAURANT', code: '', name: '', address: '',
+  storeManagerUserId: null, obmUserId: null, latitude: null, longitude: null,
+  checkinRadiusM: DEFAULT_CHECKIN_RADIUS_M, active: true,
 }
 
 function toFormValues(u: OrgUnit): OrgUnitFormValues {
@@ -138,52 +130,8 @@ export function OrgUnitFormModal({ open, unit, fixedUnitType, onClose }: OrgUnit
       <Form layout="vertical" onFinish={() => void onSubmit()}>
         {/* Nút submit ẩn: nhấn Enter trong ô nhập sẽ lưu (nút Lưu nằm ở footer, ngoài form). */}
         <button type="submit" hidden />
-        {fixedUnitType ? (
-          <Row gutter={16}>
-            <Col xs={24} md={12}>
-              <FormSelect<OrgUnitFormValues, number>
-                control={control}
-                name="companyId"
-                label="Công ty"
-                required
-                showSearch={{ optionFilterProp: 'label' }}
-                placeholder="Chọn công ty"
-                loading={companies.isFetching}
-                options={companyOptions}
-              />
-            </Col>
-            <Col xs={24} md={12}>
-              <FormInput
-                control={control}
-                name="code"
-                label={isRestaurant ? 'Mã nhà hàng' : 'Mã phòng ban'}
-                required
-                maxLength={30}
-                placeholder={isRestaurant ? 'VD: NH-Q1-01' : 'VD: PB-QC'}
-              />
-            </Col>
-            <Col span={24}>
-              <FormInput
-                control={control}
-                name="name"
-                label={isRestaurant ? 'Tên nhà hàng' : 'Tên phòng ban'}
-                required
-                maxLength={200}
-                placeholder={isRestaurant ? 'VD: Nhà hàng Chi nhánh Quận 1' : 'VD: Phòng Kiểm soát chất lượng'}
-              />
-            </Col>
-            <Col span={24}>
-              <FormInput
-                control={control}
-                name="address"
-                label={isRestaurant ? 'Địa chỉ' : 'Địa chỉ / Vị trí'}
-                maxLength={500}
-                placeholder={isRestaurant ? 'VD: 123 Nguyễn Huệ, P. Bến Nghé, Q.1, TP.HCM' : 'VD: Tầng 4, Toà nhà Lotus Group'}
-              />
-            </Col>
-          </Row>
-        ) : (
-          <Row gutter={16}>
+        <Row gutter={16}>
+          {!fixedUnitType && (
             <Col xs={24} md={12}>
               <FormSelect<OrgUnitFormValues, OrgUnitType>
                 control={control}
@@ -193,29 +141,49 @@ export function OrgUnitFormModal({ open, unit, fixedUnitType, onClose }: OrgUnit
                 options={TYPE_OPTIONS}
               />
             </Col>
-            <Col xs={24} md={12}>
-              <FormSelect<OrgUnitFormValues, number>
-                control={control}
-                name="companyId"
-                label="Công ty"
-                required
-                showSearch={{ optionFilterProp: 'label' }}
-                placeholder="Chọn công ty"
-                loading={companies.isFetching}
-                options={companyOptions}
-              />
-            </Col>
-            <Col xs={24} md={8}>
-              <FormInput control={control} name="code" label="Mã" required maxLength={30} />
-            </Col>
-            <Col xs={24} md={16}>
-              <FormInput control={control} name="name" label="Tên" required maxLength={200} />
-            </Col>
-            <Col span={24}>
-              <FormInput control={control} name="address" label="Địa chỉ" maxLength={500} />
-            </Col>
-          </Row>
-        )}
+          )}
+          <Col xs={24} md={fixedUnitType ? 12 : 12}>
+            <FormSelect<OrgUnitFormValues, number>
+              control={control}
+              name="companyId"
+              label="Công ty"
+              required
+              showSearch={{ optionFilterProp: 'label' }}
+              placeholder="Chọn công ty"
+              loading={companies.isFetching}
+              options={companyOptions}
+            />
+          </Col>
+          <Col xs={24} md={fixedUnitType ? 12 : 8}>
+            <FormInput
+              control={control}
+              name="code"
+              label={isRestaurant ? 'Mã nhà hàng' : 'Mã phòng ban'}
+              required
+              maxLength={30}
+              placeholder={isRestaurant ? 'VD: NH-Q1-01' : 'VD: PB-QC'}
+            />
+          </Col>
+          <Col xs={24} md={fixedUnitType ? 24 : 16}>
+            <FormInput
+              control={control}
+              name="name"
+              label={isRestaurant ? 'Tên nhà hàng' : 'Tên phòng ban'}
+              required
+              maxLength={200}
+              placeholder={isRestaurant ? 'VD: Nhà hàng Chi nhánh Quận 1' : 'VD: Phòng KSVH'}
+            />
+          </Col>
+          <Col span={24}>
+            <FormInput
+              control={control}
+              name="address"
+              label={isRestaurant ? 'Địa chỉ' : 'Địa chỉ / Vị trí'}
+              maxLength={500}
+              placeholder={isRestaurant ? 'VD: 123 Nguyễn Huệ, P. Bến Nghé, Q.1' : 'VD: Tầng 4, Toà nhà Lotus'}
+            />
+          </Col>
+        </Row>
 
         {isRestaurant && <RestaurantFormSection control={control} setValue={setValue} unit={unit} />}
 

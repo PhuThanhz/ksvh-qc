@@ -18,8 +18,8 @@ const PERIODS = [
 
 function SectionTitle({ children }: { children: string }) {
   return (
-    <Flex align="center" gap={12} style={{ marginTop: 6, marginBottom: 2 }}>
-      <Typography.Text style={{ fontSize: 13, fontWeight: 700, color: 'var(--app-text-body)', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+    <Flex align="center" gap={12} style={{ marginTop: 8, marginBottom: 4 }}>
+      <Typography.Text style={{ fontSize: 15, fontWeight: 600, color: 'var(--app-text)' }}>
         {children}
       </Typography.Text>
       <div style={{ flex: 1, height: 1, background: 'var(--app-border)' }} />

@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { STALE_CATALOG_MS } from '@/constants/app.constants'
 import { companiesApi, orgUnitsApi } from '@/features/organizations/api/organizations.api'
 import { organizationKeys } from '@/features/organizations/api/organizations.keys'
 import type {
@@ -14,6 +15,7 @@ export function useCompanies(params: CompanyListParams) {
     queryKey: organizationKeys.companies(params),
     queryFn: () => companiesApi.list(params),
     placeholderData: keepPreviousData,
+    staleTime: STALE_CATALOG_MS,
   })
 }
 
@@ -22,6 +24,7 @@ export function useOrgUnits(params: OrgUnitListParams) {
     queryKey: organizationKeys.orgUnits(params),
     queryFn: () => orgUnitsApi.list(params),
     placeholderData: keepPreviousData,
+    staleTime: STALE_CATALOG_MS,
   })
 }
 

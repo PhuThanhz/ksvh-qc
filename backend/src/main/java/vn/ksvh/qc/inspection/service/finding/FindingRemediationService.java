@@ -1,6 +1,7 @@
 package vn.ksvh.qc.inspection.service.finding;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -139,22 +141,28 @@ public class FindingRemediationService {
         Map<Long, InspectionItem> items = itemRepository.findAllById(itemIds).stream()
                 .collect(Collectors.toMap(InspectionItem::getId, Function.identity()));
 
+        int processed = 0;
         for (Finding f : overdue) {
-            lifecycle.reassess(f);
-            f.setDeadlineDate(today.plusDays(f.getRemediationDays()));
-            lifecycle.transition(f, FindingStatus.CONFIRMED, FindingEventAction.OVERDUE, null,
-                    "Quá hạn khắc phục -> Tự động +1 tần suất vi phạm, mở vòng khắc phục mới");
-            lifecycle.addOccurrence(f, OccurrenceSource.OVERDUE);
-            OrgUnitRef rest = rests.get(f.getRestaurantId());
-            String resName = rest != null ? rest.name() : ("#" + f.getRestaurantId());
-            InspectionItem it = items.get(f.getInspectionItemId());
-            String critName = it != null ? it.getCriterionName() : ("Tiêu chí #" + f.getCriterionId());
-            eventPublisher.publishEvent(new FindingOverdueEvent(
-                    f.getId(), f.getRestaurantId(), resName, critName, f.getCalculatedScore()
-            ));
+            try {
+                lifecycle.reassess(f);
+                f.setDeadlineDate(today.plusDays(f.getRemediationDays()));
+                lifecycle.transition(f, FindingStatus.CONFIRMED, FindingEventAction.OVERDUE, null,
+                        "Quá hạn khắc phục -> Tự động +1 tần suất vi phạm, mở vòng khắc phục mới");
+                lifecycle.addOccurrence(f, OccurrenceSource.OVERDUE);
+                OrgUnitRef rest = rests.get(f.getRestaurantId());
+                String resName = rest != null ? rest.name() : ("#" + f.getRestaurantId());
+                InspectionItem it = items.get(f.getInspectionItemId());
+                String critName = it != null ? it.getCriterionName() : ("Tiêu chí #" + f.getCriterionId());
+                eventPublisher.publishEvent(new FindingOverdueEvent(
+                        f.getId(), f.getRestaurantId(), resName, critName, f.getCalculatedScore()
+                ));
+                processed++;
+            } catch (Exception e) {
+                log.error("Lỗi khi xử lý quá hạn lỗi vi phạm #{}: {}", f.getId(), e.getMessage(), e);
+            }
         }
         findingRepository.flush();
-        return overdue.size();
+        return processed;
     }
 
     @Transactional
@@ -167,15 +175,21 @@ public class FindingRemediationService {
         Map<Long, InspectionItem> items = itemRepository.findAllById(itemIds).stream()
                 .collect(Collectors.toMap(InspectionItem::getId, Function.identity()));
 
+        int sent = 0;
         for (Finding f : dueTomorrow) {
-            OrgUnitRef rest = rests.get(f.getRestaurantId());
-            String resName = rest != null ? rest.name() : ("#" + f.getRestaurantId());
-            InspectionItem it = items.get(f.getInspectionItemId());
-            String critName = it != null ? it.getCriterionName() : ("Tiêu chí #" + f.getCriterionId());
-            eventPublisher.publishEvent(new FindingReminderDueEvent(
-                    f.getId(), f.getRestaurantId(), resName, critName, f.getDeadlineDate()
-            ));
+            try {
+                OrgUnitRef rest = rests.get(f.getRestaurantId());
+                String resName = rest != null ? rest.name() : ("#" + f.getRestaurantId());
+                InspectionItem it = items.get(f.getInspectionItemId());
+                String critName = it != null ? it.getCriterionName() : ("Tiêu chí #" + f.getCriterionId());
+                eventPublisher.publishEvent(new FindingReminderDueEvent(
+                        f.getId(), f.getRestaurantId(), resName, critName, f.getDeadlineDate()
+                ));
+                sent++;
+            } catch (Exception e) {
+                log.error("Lỗi khi gửi nhắc hẹn lỗi #{}: {}", f.getId(), e.getMessage(), e);
+            }
         }
-        return dueTomorrow.size();
+        return sent;
     }
 }

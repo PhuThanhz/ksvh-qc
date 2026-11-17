@@ -1,0 +1,169 @@
+import {
+  AppstoreAddOutlined,
+  EditOutlined,
+  EyeOutlined,
+  FolderOpenOutlined,
+  PlusCircleOutlined,
+  RightOutlined,
+} from '@ant-design/icons'
+import { Space, Tag, Tooltip, Typography } from 'antd'
+import type { ColumnsType } from 'antd/es/table'
+import { StatusBadge } from '@/components/data-display/StatusBadge'
+import type { CriterionGroup } from '@/features/criteria/criteria.types'
+import { PERMISSIONS, ProtectedAction } from '@/permissions'
+
+const ACTIVE_META = {
+  active: { label: 'Đang dùng', tone: 'success' as const },
+  inactive: { label: 'Ngưng', tone: 'default' as const },
+}
+
+interface ColumnHandlers {
+  onEdit: (group: CriterionGroup) => void
+  onAddCriterion: (group: CriterionGroup) => void
+  onBatchAddCriteria?: (group: CriterionGroup) => void
+  onViewCriteria: (group: CriterionGroup) => void
+}
+
+export function useGroupTableColumns({
+  onEdit,
+  onAddCriterion,
+  onBatchAddCriteria,
+  onViewCriteria,
+}: ColumnHandlers): ColumnsType<CriterionGroup> {
+  return [
+    {
+      title: '#',
+      key: 'index',
+      width: 50,
+      align: 'center',
+      render: (_, __, index) => index + 1,
+    },
+    {
+      title: 'Mã nhóm',
+      dataIndex: 'code',
+      key: 'code',
+      width: 140,
+      render: (code: string) => <Typography.Text code strong>{code}</Typography.Text>,
+    },
+    {
+      title: 'Tên nhóm tiêu chí',
+      dataIndex: 'name',
+      key: 'name',
+      minWidth: 260,
+      render: (name: string, g: CriterionGroup) => (
+        <Tooltip title="Xem chi tiết nhóm và danh sách các tiêu chí con">
+          <Typography.Link
+            onClick={() => onViewCriteria(g)}
+            style={{
+              fontWeight: 600,
+              fontSize: 13.5,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              textDecoration: g.active ? 'none' : 'line-through',
+            }}
+          >
+            <FolderOpenOutlined style={{ fontSize: 16, color: 'var(--app-text-secondary)' }} />
+            <span>{name}</span>
+          </Typography.Link>
+        </Tooltip>
+      ),
+    },
+    {
+      title: 'Công ty áp dụng',
+      dataIndex: 'companyName',
+      key: 'companyName',
+      width: 180,
+      render: (comp?: string | null) =>
+        comp ? <Tag>{comp}</Tag> : <Tag color="default">Dùng chung toàn hệ thống</Tag>,
+    },
+    {
+      title: 'Số tiêu chí con',
+      dataIndex: 'criterionCount',
+      key: 'criterionCount',
+      width: 150,
+      render: (count: number, g: CriterionGroup) => (
+        <Tag
+          onClick={() => onViewCriteria(g)}
+          style={{
+            cursor: 'pointer',
+            borderRadius: 999,
+            padding: '2px 10px',
+            fontSize: 12.5,
+            fontWeight: 600,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+          }}
+        >
+          <span>{count} tiêu chí</span>
+          <RightOutlined style={{ fontSize: 9, opacity: 0.7 }} />
+        </Tag>
+      ),
+    },
+    {
+      title: 'Trạng thái',
+      dataIndex: 'active',
+      width: 120,
+      render: (a: boolean) => <StatusBadge status={a ? 'active' : 'inactive'} meta={ACTIVE_META} />,
+    },
+    {
+      title: 'Thao tác',
+      key: 'actions',
+      width: 170,
+      fixed: 'right',
+      render: (_, g: CriterionGroup) => (
+        <Space size={6}>
+          <Tooltip title="Xem chi tiết nhóm">
+            <button
+              type="button"
+              className="action-btn action-btn-view"
+              aria-label={`Xem chi tiết nhóm ${g.name}`}
+              onClick={() => onViewCriteria(g)}
+            >
+              <EyeOutlined />
+            </button>
+          </Tooltip>
+          <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
+            <Tooltip title="Thêm 1 tiêu chí con">
+              <button
+                type="button"
+                className="action-btn action-btn-add"
+                aria-label={`Thêm tiêu chí con vào ${g.name}`}
+                onClick={() => onAddCriterion(g)}
+              >
+                <PlusCircleOutlined />
+              </button>
+            </Tooltip>
+          </ProtectedAction>
+          {onBatchAddCriteria && (
+            <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
+              <Tooltip title="Thêm nhanh nhiều tiêu chí con">
+                <button
+                  type="button"
+                  className="action-btn action-btn-add"
+                  aria-label={`Thêm nhanh nhiều tiêu chí vào ${g.name}`}
+                  onClick={() => onBatchAddCriteria(g)}
+                >
+                  <AppstoreAddOutlined />
+                </button>
+              </Tooltip>
+            </ProtectedAction>
+          )}
+          <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
+            <Tooltip title="Sửa thông tin nhóm">
+              <button
+                type="button"
+                className="action-btn action-btn-edit"
+                aria-label={`Sửa nhóm ${g.name}`}
+                onClick={() => onEdit(g)}
+              >
+                <EditOutlined />
+              </button>
+            </Tooltip>
+          </ProtectedAction>
+        </Space>
+      ),
+    },
+  ]
+}

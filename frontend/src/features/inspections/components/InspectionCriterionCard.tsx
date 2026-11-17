@@ -1,10 +1,9 @@
-import { CameraOutlined, DeleteOutlined } from '@ant-design/icons'
-import { Button, Card, Image, ProgressBar, Space, Tag, TextArea, Toast } from 'antd-mobile'
-import { useRef, type ChangeEvent } from 'react'
+import { Button, Card, Tag, TextArea, Toast } from 'antd-mobile'
+import type { ChangeEvent } from 'react'
+import { CriterionEvidenceSection } from '@/features/inspections/components/CriterionEvidenceSection'
 import { FindingRemediationInfo } from '@/features/inspections/components/FindingRemediationInfo'
 import { usePhotoCapture } from '@/features/media'
 import type { InspectionItemResponse, ItemResult } from '@/features/inspections/inspection.types'
-import { isVideoUrl, toMediaUrl } from '@/utils/media-url'
 
 export interface CriterionRating {
   result: ItemResult
@@ -40,7 +39,6 @@ export function InspectionCriterionCard({
   readOnly = false,
 }: Props) {
   const photo = usePhotoCapture()
-  const inputRef = useRef<HTMLInputElement>(null)
   const isBusy = photo.step === 'processing' || photo.step === 'uploading'
 
   const onCapturePhoto = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -100,28 +98,28 @@ export function InspectionCriterionCard({
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginTop: 12 }}>
         <Button
-          size="small"
           disabled={readOnly}
           color={rating.result === 'PASS' ? 'success' : 'default'}
           fill={rating.result === 'PASS' ? 'solid' : 'outline'}
+          style={{ height: 44, fontSize: 14, fontWeight: 600, borderRadius: 8 }}
           onClick={() => onSetResult('PASS')}
         >
           Đạt
         </Button>
         <Button
-          size="small"
           disabled={readOnly}
           color={rating.result === 'FAIL' ? 'danger' : 'default'}
           fill={rating.result === 'FAIL' ? 'solid' : 'outline'}
+          style={{ height: 44, fontSize: 14, fontWeight: 600, borderRadius: 8 }}
           onClick={() => onSetResult('FAIL')}
         >
           Không đạt
         </Button>
         <Button
-          size="small"
           disabled={readOnly}
           color={rating.result === 'NA' ? 'primary' : 'default'}
           fill={rating.result === 'NA' ? 'solid' : 'outline'}
+          style={{ height: 44, fontSize: 14, fontWeight: 600, borderRadius: 8 }}
           onClick={() => onSetResult('NA')}
         >
           N/A
@@ -145,60 +143,16 @@ export function InspectionCriterionCard({
             style={{ background: 'var(--app-surface)', padding: 6, borderRadius: 4 }}
           />
 
-          <div style={{ marginTop: 8 }}>
-            {!readOnly && (
-              <>
-                <input
-                  ref={inputRef}
-                  type="file"
-                  accept="image/*,video/mp4,video/quicktime"
-                  capture="environment"
-                  hidden
-                  onChange={onCapturePhoto}
-                />
-                <Button
-                  size="small"
-                  color="primary"
-                  fill="outline"
-                  loading={isBusy}
-                  onClick={() => inputRef.current?.click()}
-                  style={{ width: '100%' }}
-                >
-                  <CameraOutlined style={{ marginRight: 6 }} /> Chụp ảnh / Quay video bằng chứng
-                </Button>
-                {photo.step === 'uploading' && <ProgressBar percent={photo.progress} style={{ marginTop: 6 }} />}
-                {photo.error && <div style={{ color: 'var(--app-danger)', fontSize: 12, marginTop: 4 }}>{photo.error}</div>}
-              </>
-            )}
-
-            {evidenceList.length > 0 && (
-              <Space wrap style={{ marginTop: 8 }}>
-                {evidenceList.map((url) => {
-                  const isVid = isVideoUrl(url)
-                  return (
-                    <div key={url} style={{ position: 'relative', display: 'inline-block' }}>
-                      {isVid ? (
-                        <video src={toMediaUrl(url)} controls style={{ width: 80, height: 64, objectFit: 'cover', borderRadius: 6 }} />
-                      ) : (
-                        <Image lazy src={toMediaUrl(url)} width={64} height={64} fit="cover" style={{ borderRadius: 6 }} />
-                      )}
-                      {!readOnly && (
-                        <Button
-                          size="mini"
-                          color="danger"
-                          onClick={() => onRemovePhoto(url)}
-                          style={{ position: 'absolute', top: -6, right: -6, padding: '0 4px', height: 20, minWidth: 20, borderRadius: 10 }}
-                        >
-                          <DeleteOutlined style={{ fontSize: 10 }} />
-                        </Button>
-                      )}
-                    </div>
-                  )
-                })}
-              </Space>
-            )}
-
-          </div>
+          <CriterionEvidenceSection
+            evidenceList={evidenceList}
+            readOnly={readOnly}
+            isBusy={isBusy}
+            photoStep={photo.step}
+            photoProgress={photo.progress}
+            photoError={photo.error}
+            onCapturePhoto={onCapturePhoto}
+            onRemovePhoto={onRemovePhoto}
+          />
         </div>
       )}
 

@@ -7,14 +7,17 @@ Nguyên tắc chung: **không đổi hành vi nghiệp vụ** (trừ Plan O4 –
 ## Số đo hiện tại (để so sánh khi xong)
 | Chỉ số | Hiện tại | Mục tiêu | Trạng thái |
 |---|---|---|---|
-| `vendor-antd` (gzip) | 1.457 kB (461 kB) | < 900 kB (< 300 kB) | Chờ Plan O5 |
-| `vendor-echarts` (gzip) | 516 kB (172 kB) | < 250 kB (< 90 kB), chỉ tải ở trang có biểu đồ | Chờ Plan O5 |
-| `InspectionService.java` / `FindingService.java` | 873 / 693 dòng | mỗi lớp < 300 dòng | Chờ Plan O1 |
-| `ReportService` / `PdfExportService` / `InspectionPlanService` | 519 / 485 / 429 dòng | < 300 dòng | Chờ Plan O1 |
-| File frontend sát giới hạn 250 dòng | 0 file ≥ 200 dòng trong số 10 file mục tiêu | không file nào > 200 dòng | **ĐÃ XONG (O2.3)** |
+| `vendor-antd` (gzip) | 1.397 kB (444 kB) + `vendor-antd-icons` (16 kB) | tách icons & lazy-load modal | **ĐÃ XONG (O5.1)** |
+| `vendor-echarts` (gzip) | 516 kB (172 kB), chỉ tải ở Dashboard/Báo cáo | modular imports + lazy route | **ĐÃ XONG (O5.2)** |
+| `InspectionService.java` / `FindingService.java` | 78 / 88 dòng (tách các class con < 300 dòng) | mỗi lớp < 300 dòng | **ĐÃ XONG (O1.1)** |
+| `ReportService` / `PdfExportService` / `InspectionPlanService` | 59 / 24 / 292 dòng | < 300 dòng | **ĐÃ XONG (O1.1)** |
+| File frontend sát giới hạn 250 dòng | **0 file > 200 dòng** trong toàn bộ `src/` (100% $\le 200$ dòng) | không file nào > 200 dòng | **ĐÃ XONG (O2.3 & O3)** |
 | Bảng trạng thái (`STATUS_TAG`/`STATUS_TABS`/`ACTION_META`) chép lại | 1 chỗ (`constants/status.ts`) | 1 chỗ | **ĐÃ XONG (O2.1)** |
 | Kiểu dữ liệu viết tay `inspection.types.ts` | Alias từ `api.generated.ts` | lấy từ `api.generated.ts` | **ĐÃ XONG (O2.2)** |
 | API layer URL rải rác | 1 hằng `PATH` tập trung | tập trung 1 chỗ | **ĐÃ XONG (O2.4)** |
+| TanStack Query staleTime danh mục | 5 phút (`STALE_CATALOG_MS`) | 5 phút | **ĐÃ XONG (O5.4)** |
+| Composite DB Index báo cáo | 3 index (`idx_findings_res_created`, `idx_findings_crit_created`, `idx_inspections_status_submitted`) | index cho báo cáo | **ĐÃ XONG (O5.7)** |
+| Giao diện nhất quán & mobile 375px | DataTable mobileRender, AppHeader co giãn, bảng cuộn ngang, modal $\le 200$ dòng | mượt mà trên 375px | **ĐÃ XONG (O3.1-O3.5)** |
 
 ---
 

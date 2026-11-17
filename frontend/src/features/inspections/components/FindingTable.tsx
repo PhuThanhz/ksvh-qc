@@ -1,16 +1,9 @@
-import {
-  AuditOutlined,
-  CheckCircleOutlined,
-  EyeOutlined,
-  FileDoneOutlined,
-  FormOutlined,
-  RollbackOutlined,
-} from '@ant-design/icons'
-import { Button, Space, Table, Tag, Tooltip } from 'antd'
+import { Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import { StatusBadge } from '@/components/data-display/StatusBadge'
 import { FINDING_STATUS_META } from '../constants/status'
+import { FindingActionButtons } from '@/features/inspections/components/FindingActionButtons'
 import type { FindingActionType } from '@/features/inspections/components/FindingActionModal'
 import type { FindingResponse, FindingStatus } from '@/features/inspections/inspection.types'
 import { formatDate } from '@/utils/format-date'
@@ -136,61 +129,15 @@ export function FindingTable({
       width: 170,
       align: 'center',
       render: (_, r) => (
-        <Space size={6}>
-          {onView && (
-            <Tooltip title="Xem chi tiết & lịch sử lỗi">
-              <button
-                type="button"
-                className="action-btn action-btn-view"
-                aria-label="Xem chi tiết và lịch sử lỗi"
-                onClick={() => onView(r)}
-              >
-                <EyeOutlined />
-              </button>
-            </Tooltip>
-          )}
-
-          {r.status === 'OPEN' && canRespond && (
-            <>
-              <Tooltip title="Xác nhận nhận lỗi">
-                <Button type="text" icon={<CheckCircleOutlined />} onClick={() => onAction(r, 'CONFIRM')} />
-              </Tooltip>
-              <Tooltip title="Khiếu nại">
-                <Button type="text" icon={<RollbackOutlined />} onClick={() => onAction(r, 'APPEAL')} />
-              </Tooltip>
-            </>
-          )}
-
-          {r.status === 'APPEALED' && (
-            <Tooltip title="Thẩm định khiếu nại">
-              <Button type="text" icon={<AuditOutlined />} onClick={() => onAction(r, 'SUBMIT_REVIEW')} />
-            </Tooltip>
-          )}
-
-          {r.status === 'APPEAL_MEETING' && canConclude && (
-            <Tooltip title="Kết luận họp khiếu nại">
-              <Button type="text" icon={<AuditOutlined />} onClick={() => onAction(r, 'CONCLUDE_APPEAL')} />
-            </Tooltip>
-          )}
-
-          {r.status === 'CONFIRMED' && canRemediate && (
-            <Tooltip title="Lập kế hoạch khắc phục">
-              <Button type="text" icon={<FormOutlined />} onClick={() => onAction(r, 'REMEDIATION_PLAN')} />
-            </Tooltip>
-          )}
-
-          {r.status === 'REMEDIATING' && canRemediate && (
-            <Tooltip title="Nộp bằng chứng khắc phục">
-              <Button type="text" icon={<FileDoneOutlined />} onClick={() => onAction(r, 'SUBMIT_REMEDIATION')} />
-            </Tooltip>
-          )}
-
-          {r.status === 'PENDING_VERIFICATION' && canVerify && (
-            <Tooltip title="Nghiệm thu đóng lỗi">
-              <Button type="text" icon={<CheckCircleOutlined />} onClick={() => onAction(r, 'VERIFY')} />
-            </Tooltip>
-          )}
-        </Space>
+        <FindingActionButtons
+          finding={r}
+          canRespond={canRespond}
+          canConclude={canConclude}
+          canRemediate={canRemediate}
+          canVerify={canVerify}
+          onAction={onAction}
+          onView={onView}
+        />
       ),
     },
   ]

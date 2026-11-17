@@ -7,14 +7,15 @@ import type { MenuEntry } from '@/components/layout/menu.types'
 import { usePermission } from '@/permissions'
 
 export interface MobileLayoutProps {
-  title: string
+  title: ReactNode
+  documentTitle?: string
   rootPath: string
   tabs: readonly MenuEntry[]
   headerRight?: ReactNode
 }
 
 /** Khung giao diện điện thoại: thanh tiêu đề + tab dưới đáy, thao tác một tay, tránh tai thỏ/thanh home. */
-export function MobileLayout({ title, rootPath, tabs, headerRight }: MobileLayoutProps) {
+export function MobileLayout({ title, documentTitle, rootPath, tabs, headerRight }: MobileLayoutProps) {
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const { allows } = usePermission()
@@ -23,8 +24,9 @@ export function MobileLayout({ title, rootPath, tabs, headerRight }: MobileLayou
   const activeLabel = visibleTabs.find((t) => t.path === active)?.label
 
   useEffect(() => {
-    document.title = activeLabel ? `${activeLabel} · ${title}` : title
-  }, [activeLabel, title])
+    const base = documentTitle || (typeof title === 'string' ? title : 'KSVH QC')
+    document.title = activeLabel ? `${activeLabel} · ${base}` : base
+  }, [activeLabel, title, documentTitle])
 
   return (
     <div

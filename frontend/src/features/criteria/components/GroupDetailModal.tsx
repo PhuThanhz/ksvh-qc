@@ -1,11 +1,4 @@
-import {
-  AppstoreAddOutlined,
-  ArrowRightOutlined,
-  EditOutlined,
-  EyeOutlined,
-  PlusOutlined,
-  SearchOutlined,
-} from '@ant-design/icons'
+import { AppstoreAddOutlined, ArrowRightOutlined, EditOutlined, EyeOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
 import { Badge, Button, Descriptions, Empty, Flex, Input, Modal, Space, Table, Tag, Typography } from 'antd'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
@@ -153,7 +146,7 @@ export function GroupDetailModal({
           size="small"
           loading={isLoading}
           dataSource={filteredList}
-          pagination={false}
+          pagination={{ pageSize: 20, showSizeChanger: true, size: 'small' }}
           locale={{ emptyText: <Empty description="Nhóm này chưa có tiêu chí con nào" image={Empty.PRESENTED_IMAGE_SIMPLE} /> }}
           columns={[
             { title: '#', key: 'idx', width: 44, align: 'center', render: (_, __, i) => i + 1 },
@@ -179,26 +172,13 @@ export function GroupDetailModal({
               render: (_, c) => (
                 <Space size={4}>
                   {onViewCriterion && (
-                    <button
-                      type="button"
-                      className="action-btn action-btn-view"
-                      title="Xem chi tiết tiêu chí"
-                      onClick={() => onViewCriterion(c)}
-                    >
+                    <button type="button" className="action-btn action-btn-view" title="Xem chi tiết tiêu chí" onClick={() => onViewCriterion(c)}>
                       <EyeOutlined />
                     </button>
                   )}
                   {onEditCriterion && (
                     <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-                      <button
-                        type="button"
-                        className="action-btn action-btn-edit"
-                        title="Sửa tiêu chí"
-                        onClick={() => {
-                          onClose()
-                          onEditCriterion(c)
-                        }}
-                      >
+                      <button type="button" className="action-btn action-btn-edit" title="Sửa tiêu chí" onClick={() => { onClose(); onEditCriterion(c) }}>
                         <EditOutlined />
                       </button>
                     </ProtectedAction>

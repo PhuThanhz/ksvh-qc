@@ -15,6 +15,8 @@ export function ExecutionSubmitBar({
   totalCriteria,
   onSubmit,
 }: Props) {
+  const remaining = totalCriteria - ratedCount
+
   return (
     <div
       style={{
@@ -25,6 +27,7 @@ export function ExecutionSubmitBar({
         background: 'var(--app-surface)',
         padding: '10px 16px',
         borderTop: '1px solid var(--app-border)',
+        boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.06)',
         zIndex: 100,
       }}
     >
@@ -35,10 +38,13 @@ export function ExecutionSubmitBar({
         loading={isPending}
         disabled={pendingCount > 0}
         onClick={onSubmit}
+        style={{ height: 48, fontSize: 15, fontWeight: 600, borderRadius: 10 }}
       >
         {pendingCount > 0
           ? `Chờ đồng bộ ${pendingCount} tệp...`
-          : `Hoàn thành & Nộp phiếu chấm (${ratedCount}/${totalCriteria})`}
+          : remaining > 0
+          ? `Gửi kết quả (Còn ${remaining} tiêu chí chưa chấm)`
+          : `Gửi kết quả kiểm tra (${ratedCount}/${totalCriteria} tiêu chí)`}
       </Button>
     </div>
   )

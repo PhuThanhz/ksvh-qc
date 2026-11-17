@@ -36,13 +36,15 @@ export function PlanAssignmentEditor({ value = [], onChange, dateRange, disabled
 
   const onAddRow = () => {
     const defaultDate = dateRange ? dateRange[0].format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD')
-    const next: PlanAssignmentRequest = {
-      restaurantId: undefined as unknown as number,
-      inspectorId: undefined as unknown as number,
-      templateId: undefined as unknown as number,
-      scheduledDate: defaultDate,
-    }
-    onChange?.([...value, next])
+    onChange?.([
+      ...value,
+      {
+        restaurantId: undefined as unknown as number,
+        inspectorId: undefined as unknown as number,
+        templateId: undefined as unknown as number,
+        scheduledDate: defaultDate,
+      },
+    ])
   }
 
   const onRemoveRow = (idx: number) => {
@@ -117,10 +119,7 @@ export function PlanAssignmentEditor({ value = [], onChange, dateRange, disabled
           disabled={disabled}
           style={{ width: '100%' }}
           filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
-          options={inspectors.data?.items.map((u) => ({
-            value: u.id,
-            label: `${u.fullName} (${u.username})`,
-          }))}
+          options={inspectors.data?.items.map((u) => ({ value: u.id, label: `${u.fullName} (${u.username})` }))}
         />
       ),
     },
@@ -142,10 +141,7 @@ export function PlanAssignmentEditor({ value = [], onChange, dateRange, disabled
             disabled={disabled}
             style={{ width: '100%' }}
             filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
-            options={tplList.map((t) => ({
-              value: t.id,
-              label: t.name,
-            }))}
+            options={tplList.map((t) => ({ value: t.id, label: t.name }))}
           />
         )
       },
@@ -160,10 +156,7 @@ export function PlanAssignmentEditor({ value = [], onChange, dateRange, disabled
           value={r.scheduledDate ? dayjs(r.scheduledDate) : null}
           onChange={(d) => onUpdateField(idx, 'scheduledDate', d ? d.format('YYYY-MM-DD') : '')}
           disabled={disabled}
-          disabledDate={(cur) => {
-            if (!dateRange) return false
-            return cur.isBefore(dateRange[0], 'day') || cur.isAfter(dateRange[1], 'day')
-          }}
+          disabledDate={(cur) => (dateRange ? cur.isBefore(dateRange[0], 'day') || cur.isAfter(dateRange[1], 'day') : false)}
           style={{ width: '100%' }}
         />
       ),
@@ -175,13 +168,7 @@ export function PlanAssignmentEditor({ value = [], onChange, dateRange, disabled
       align: 'center',
       render: (_, __, idx) =>
         disabled ? null : (
-          <Button
-            type="text"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => onRemoveRow(idx)}
-            title="Xoá dòng phân công"
-          />
+          <Button type="text" danger icon={<DeleteOutlined />} onClick={() => onRemoveRow(idx)} title="Xoá dòng" />
         ),
     },
   ]

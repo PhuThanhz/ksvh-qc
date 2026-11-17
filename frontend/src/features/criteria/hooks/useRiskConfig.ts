@@ -1,15 +1,24 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { STALE_CATALOG_MS } from '@/constants/app.constants'
 import { riskConfigApi } from '@/features/criteria/api/criteria.api'
 import { criteriaKeys } from '@/features/criteria/api/criteria.keys'
 import type { EscalationRulePayload, FrequencyConfigPayload, RiskLevelVersionPayload } from '@/features/criteria/criteria.types'
 import type { Id } from '@/types/common.types'
 
 export function useRiskLevels() {
-  return useQuery({ queryKey: criteriaKeys.riskLevels(), queryFn: riskConfigApi.riskLevels })
+  return useQuery({
+    queryKey: criteriaKeys.riskLevels(),
+    queryFn: riskConfigApi.riskLevels,
+    staleTime: STALE_CATALOG_MS,
+  })
 }
 
 export function useRiskLevelVersions() {
-  return useQuery({ queryKey: criteriaKeys.riskLevelVersions(), queryFn: riskConfigApi.riskLevelVersions })
+  return useQuery({
+    queryKey: criteriaKeys.riskLevelVersions(),
+    queryFn: riskConfigApi.riskLevelVersions,
+    staleTime: STALE_CATALOG_MS,
+  })
 }
 
 /** Lưu bảng mức rủi ro thành phiên bản áp dụng từ ngày hiệu lực. */
@@ -34,11 +43,19 @@ export function useDeleteRiskLevelVersion() {
 }
 
 export function useFrequencyConfigs() {
-  return useQuery({ queryKey: criteriaKeys.frequency(), queryFn: riskConfigApi.frequency })
+  return useQuery({
+    queryKey: criteriaKeys.frequency(),
+    queryFn: riskConfigApi.frequency,
+    staleTime: STALE_CATALOG_MS,
+  })
 }
 
 export function useEscalationRules() {
-  return useQuery({ queryKey: criteriaKeys.escalation(), queryFn: riskConfigApi.escalation })
+  return useQuery({
+    queryKey: criteriaKeys.escalation(),
+    queryFn: riskConfigApi.escalation,
+    staleTime: STALE_CATALOG_MS,
+  })
 }
 
 export function useCreateFrequency() {

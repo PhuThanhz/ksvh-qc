@@ -120,3 +120,57 @@ Kính gửi Phòng KSVH xem xét và cho ý kiến xác nhận đối với các
 
 **Đại diện Phòng KSVH ký xác nhận:**  
 *(Ký, ghi rõ họ tên và ngày xác nhận)*
+
+---
+
+## Đối chiếu với tài liệu gốc `PM_KIEMSOATVANHANH_CHECK.pdf` (rà 18/11/2026)
+Tài liệu PDF là **slide họp giới thiệu** (21/10/2026, 18 trang, có trang Hỏi & Đáp) nên chỉ trả lời được một phần.
+Câu nào PDF đã trả lời thì **không cần hỏi lại**; câu còn lại vẫn gửi Phòng KSVH.
+
+| Câu | PDF trả lời? | Căn cứ trong PDF | Kết luận |
+|---|---|---|---|
+| Q2 – lỗi nhiều lần trong một vòng | **Một phần** | s.13: "Quá hạn **hoặc** nghiệm thu chưa đạt → phần mềm tự cộng thêm 1 lần lỗi"; s.15: "Cộng **mọi** lần lỗi… trong kỳ" | Mỗi sự kiện +1 riêng. PDF **không nói** quá hạn và nghiệm thu chưa đạt **cùng một vòng** có +2 không → vẫn hỏi (phần mềm hiện: quá hạn mở vòng mới với hạn mới nên không +2 trong cùng vòng). |
+| Q3 – tháng dương lịch hay số ngày | **Có** | s.15: đang tính tại **tháng 8**, kỳ 6 tháng = **"tháng 3 → tháng 8"**, lỗi T1, T2 ra khỏi kỳ | Đếm theo **tháng dương lịch, gồm tháng hiện tại** – đúng như phần mềm đang làm. **Đóng câu hỏi.** |
+| Q4 – hạn khắc phục vòng mới | **Có (đã chốt)** | s.14: "Lỗi chốt Không đạt → Tần suất +1 → Điểm tăng → **Hạn rút ngắn**" | Hạn tính lại theo mức mới – khớp quyết định 17/11. |
+| Q5 – hạn CHT phản hồi | **Không** | s.11 chỉ có "Phần mềm thông báo phiếu chấm cần xác nhận" | Vẫn hỏi. |
+| Q6 – hội đồng thẩm định | **Một phần** | s.12: CHT "chọn **N** người thẩm định"; "Danh sách người thẩm định **có 1 đại diện KSVH**"; không thống nhất → "tổ chức họp". s.6: **OBM** "tham gia xem xét khiếu nại"; **Quản lý KSVH** "xem xét khiếu nại, **chủ trì họp thống nhất**" | Người xét = đại diện KSVH + OBM; Quản lý KSVH chủ trì họp và nhập kết luận – khớp phần mềm. **Còn hỏi:** N tối thiểu/tối đa (phần mềm đang 2–5), "có 1 đại diện KSVH" là **đúng 1** hay **ít nhất 1** (phần mềm đang ≥ 1), hạn xử lý khiếu nại. |
+| Q7 – % tuân thủ, N/A | **Không** | s.1 chỉ là hình minh hoạ ("92% tuân thủ", "6 / 9 tiêu chí") và ghi rõ "**số liệu không phải dữ liệu thực tế**" | Vẫn hỏi. Gợi ý thêm từ s.14: "**Khiếu nại chốt → Đạt → Không tính**" ⇒ lỗi bị bỏ do khiếu nại đúng nên được tính như **Đạt** trong tỷ lệ tuân thủ (phần mềm giữ kết quả chấm gốc bất biến và tính "điểm sau khiếu nại" riêng – cần KSVH xác nhận hiển thị số nào). |
+| Q8 – mã phiếu, kế hoạch nhiều phiếu | **Có (đã chốt)** | s.1: mã phiếu **`PER-2610-NH002-01`**; s.9: duyệt → "Tạo phiếu chấm" | Khớp mã `PER-<yyMM>-<mã NH>-<stt>` phần mềm đang sinh. |
+| Q9 – kênh thông báo | **Không** | s.9, s.11 chỉ ghi "thông báo" | Vẫn hỏi (phần mềm đã có trong app + email/Zalo theo mặc định). |
+| Q10 – video | **Một phần** | s.10: Không đạt "bắt buộc mô tả lỗi, **đính kèm ảnh / video**" | Video là bắt buộc hỗ trợ – phần mềm đã có. **Còn hỏi:** giới hạn dung lượng/thời lượng (đang 50 MB ≈ 60 giây), CHT/OBM dùng điện thoại hay máy tính. |
+| Q11 – sửa sau khi gửi, chữ ký CHT | **Không** | s.10: "Hoàn tất đánh giá → Gửi kết quả" | Vẫn hỏi. |
+| Q12 – biên bản M4 | **Một phần** | s.14: M4 Nghiêm trọng, hạn 1 ngày, hành động "**Lập biên bản, báo cáo lãnh đạo**" | Có biên bản là đúng PDF (phần mềm đã xuất PDF biên bản M4). **Còn hỏi:** tự gửi Ban Giám đốc hay chỉ tải về; ai ký. |
+
+### Điểm PDF khác với phần mềm hiện tại (do người dùng đã quyết định – cần KSVH biết)
+1. **Kỳ đếm**: PDF s.8 và s.15 ghi "**3 hoặc 6 tháng**"; phần mềm cho nhập **1–24 tháng** (theo yêu cầu người dùng 17/11, có nút chọn nhanh 3/6/12).
+2. **Mẫu phiếu theo loại nhà hàng**: PDF s.8 ghi "theo **loại nhà hàng** / loại kiểm tra"; phần mềm đã **bỏ loại nhà hàng**, mẫu phiếu chỉ theo công ty
+   (theo tài liệu Word "Ví dụ quy trình kiểm tra… YS-LTT", chốt 16/11).
+3. **"Lỗi bị xóa"**: PDF s.12 ghi bỏ lỗi = "lỗi bị **xóa**"; phần mềm **không xoá dòng**, chỉ chuyển trạng thái "Đã bỏ" để giữ lịch sử
+   (quy tắc bắt buộc số 4 của dự án) – kết quả nghiệp vụ giống nhau: không cộng tần suất, không phải khắc phục.
+4. **GPS**: PDF s.10 "GPS kiểm tra tọa độ, bán kính khi bấm Bắt đầu" (xác thực); phần mềm hiện **chỉ ghi nhận**, không chặn
+   (theo tài liệu Word, chốt 16/11 – cho phép nhà hàng chưa khai toạ độ và kiểm tra từ xa).
+
+### Câu thực sự còn phải gửi Phòng KSVH
+**Q2** (một phần) · **Q5** · **Q6** (N và "đúng 1 hay ít nhất 1" đại diện KSVH, hạn) · **Q7** · **Q9** · **Q10** (giới hạn) · **Q11** · **Q12** (tự gửi hay tải về)
+– và xác nhận 4 điểm khác biệt ở trên. **Q3 đã đóng theo PDF.**
+
+---
+
+## Phương án TẠM ÁP DỤNG trong lúc chờ Phòng KSVH (chốt bởi người dùng 18/11/2026)
+Nguyên tắc chọn: **không phạt nhà hàng khi chưa có sự đồng ý của người**, mọi con số đặt trong **cấu hình** (đổi không cần sửa code),
+ghi rõ "tạm áp dụng" trên giao diện cấu hình. Khi KSVH trả lời khác → chỉ đổi cấu hình hoặc sửa nhỏ.
+
+| Câu | Phương án tạm | Phần mềm hiện tại | Cần làm thêm |
+|---|---|---|---|
+| **Q2** Lỗi nhiều lần trong một vòng | Mỗi **vòng khắc phục** tối đa **+1**: quá hạn hoặc nghiệm thu chưa đạt đều mở vòng mới với hạn mới, nên không +2 trong cùng vòng. Lỗi cùng tiêu chí phát hiện ở **phiếu khác** (vd đột xuất) vẫn +1 riêng ("cộng mọi lần lỗi" – PDF s.15). | Đã đúng. | Thêm test chốt: cùng vòng không +2. |
+| **Q5** Hạn CHT phản hồi | CHT có **3 ngày** (cấu hình `response-days`) để Xác nhận / Khiếu nại. Ngày 2: nhắc CHT. Quá hạn: **không tự xác nhận** (tránh +1 khi CHT chưa đồng ý); gắn nhãn "Quá hạn phản hồi", báo **OBM + Quản lý KSVH** để đôn đốc. Hạn khắc phục vẫn tính từ ngày phát hiện nên chậm phản hồi là thiệt cho nhà hàng. | **Chưa có** gì. | BE: cấu hình + job + sự kiện thông báo + cờ quá hạn trong API. FE: nhãn, bộ lọc, thẻ đếm trên dashboard. |
+| **Q6** Hội đồng thẩm định | N = **2–5** người (cấu hình); **ít nhất 1** đại diện KSVH (PDF "có 1" hiểu là bắt buộc có); người chấm lỗi đó không được xét; mỗi lỗi **khiếu nại 1 lần**. Mỗi người thẩm định có **3 ngày** (cấu hình); hết hạn còn người chưa đánh giá → **tự chuyển sang họp** (Quản lý KSVH chủ trì) thay vì treo. | Có N cấu hình, ≥1 KSVH, loại người chấm. **Chưa có** hạn thẩm định. | BE: cấu hình `appeal-review-days`, job chuyển họp + thông báo. FE: hiện hạn thẩm định, người chưa đánh giá. |
+| **Q7** % tuân thủ, N/A | % tuân thủ = Σ trọng số Đạt / Σ trọng số (Đạt + Không đạt) × 100, **N/A loại khỏi mẫu số**; trọng số = mức ảnh hưởng gốc. "x / y tiêu chí" = số Đạt / số tiêu chí đã chấm **trừ N/A**. Dashboard và báo cáo dùng **điểm sau khiếu nại** (lỗi bỏ do khiếu nại đúng = Đạt, PDF s.14); chi tiết phiếu hiện **cả hai** (khi chấm / sau khiếu nại). | Đã có `complianceScore` và `adjustedComplianceScore`. | Kiểm tra dashboard + 5 báo cáo đều dùng điểm sau khiếu nại; FE hiện cả hai trên chi tiết phiếu; thống nhất cách đếm "x / y". |
+| **Q9** Kênh thông báo | **Trong ứng dụng**: luôn bật. **Email**: bật mặc định. **Zalo**: tắt mặc định tới khi đăng ký Zalo ZNS (cần tài khoản doanh nghiệp). **SMS**: không làm. Người dùng tự bật/tắt email, Zalo. | Đã có trong app + email + Zalo. | Đặt mặc định Zalo = tắt; ẩn Zalo nếu chưa cấu hình khoá ZNS. |
+| **Q10** Video, thiết bị | Video ≤ **50 MB** và ≤ **60 giây**, mp4/mov; ảnh ≤ 10 MB. **CHT** dùng điện thoại (`/qc`); **OBM** dùng máy tính (`/admin`) để xem và thẩm định khiếu nại, có thể mở trên điện thoại. | Ảnh 10 MB; video theo agent ghi 50 MB. | Kiểm tra giới hạn video ở **server** (presign) chứ không chỉ ở giao diện; giới hạn thời lượng kiểm ở giao diện. |
+| **Q11** Sửa sau khi gửi, chữ ký | Chuyên viên **không sửa** sau khi gửi (bất biến). Mất mạng: lưu nháp trên máy, gửi khi có mạng (đã có). Chấm nhầm: CHT **khiếu nại** (luồng sẵn có) – không mở đường sửa riêng. **Không cần chữ ký tại chỗ**: thao tác "Xác nhận" của CHT trên ứng dụng thay chữ ký (có người, thời điểm). | Đã đúng. | Không. Ghi rõ trong hướng dẫn sử dụng. |
+| **Q12** Biên bản M4 | Lỗi được xác nhận/giữ ở mức **M4**: phần mềm **tự sinh biên bản PDF** và **tự thông báo** Ban Giám đốc + Quản lý KSVH (trong app + email), kèm link tải. Biên bản có ô ký Chuyên viên và CHT để **in ký tay** khi cần (không ký số). | Có PDF biên bản M4 + sự kiện cảnh báo M4. | Kiểm tra người nhận gồm cả BGĐ và Quản lý KSVH, có link tải biên bản; thời điểm gửi = khi lỗi chốt M4 (xác nhận / giữ lỗi / nâng lên M4). |
+
+### 4 điểm khác PDF – giữ như hiện tại
+1. Kỳ đếm 1–24 tháng (mặc định 6, chọn nhanh 3/6/12). 2. Mẫu phiếu theo công ty, không theo loại nhà hàng.
+3. Bỏ lỗi = đổi trạng thái, không xoá dòng. 4. GPS ghi nhận, không chặn; phiếu ngoài bán kính bị **đánh dấu** trong danh sách và báo cáo để Quản lý xem xét.

@@ -4,10 +4,11 @@ import {
   LogoutOutlined,
 } from '@ant-design/icons'
 import { Avatar, Button, Dropdown, Flex, Tag, Tooltip, Typography, type MenuProps } from 'antd'
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import type { LayoutUser } from '@/components/layout/menu.types'
-import { ThemeModal } from '@/features/theme'
 import { roleLabel } from '@/permissions'
+
+const ThemeModal = lazy(() => import('@/features/theme').then((m) => ({ default: m.ThemeModal })))
 
 export interface SidebarProfileProps {
   user: LayoutUser | null
@@ -122,7 +123,11 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
           </Button>
         )}
       </Dropdown>
-      <ThemeModal open={themeOpen} onClose={() => setThemeOpen(false)} />
+      {themeOpen && (
+        <Suspense fallback={null}>
+          <ThemeModal open={themeOpen} onClose={() => setThemeOpen(false)} />
+        </Suspense>
+      )}
     </div>
   )
 }

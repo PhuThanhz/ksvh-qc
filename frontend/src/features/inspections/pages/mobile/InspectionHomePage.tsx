@@ -1,16 +1,23 @@
-import { Button, Card, ErrorBlock, Segmented, Space, Tag } from 'antd-mobile'
-import { useState } from 'react'
+import { Button, Card, ErrorBlock, PullToRefresh, Segmented, Space, Tag } from 'antd-mobile'
+import { lazy, Suspense, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useSession } from '@/features/auth'
-import { FindingActionModal, type FindingActionType } from '@/features/inspections/components/FindingActionModal'
-import { InspectionFormModal } from '@/features/inspections/components/InspectionFormModal'
+import type { FindingActionType } from '@/features/inspections/components/FindingActionModal'
 import { AckInspectionList } from '@/features/inspections/components/mobile/AckInspectionList'
 import { MobileFindingCard } from '@/features/inspections/components/mobile/MobileFindingCard'
+import { PendingReviewsCard } from '@/features/inspections/components/mobile/PendingReviewsCard'
 import { useFindings, useMyTasks, usePendingReviews } from '@/features/inspections/hooks/useInspectionData'
 import type { FindingResponse } from '@/features/inspections/inspection.types'
 import { INSPECTION_KIND_LABEL, INSPECTION_MODE_LABEL } from '@/features/inspections/inspection.types'
 import { PERMISSIONS, usePermission } from '@/permissions'
 import { formatDate } from '@/utils/format-date'
+
+const FindingActionModal = lazy(() =>
+  import('@/features/inspections/components/FindingActionModal').then((m) => ({ default: m.FindingActionModal })),
+)
+const InspectionFormModal = lazy(() =>
+  import('@/features/inspections/components/InspectionFormModal').then((m) => ({ default: m.InspectionFormModal })),
+)
 
 export function InspectionHomePage() {
   const { user } = useSession()
@@ -39,21 +46,19 @@ export function InspectionHomePage() {
     setActionState({ open: true, action: a, finding: f })
   }
 
-  const handleRefresh = () => {
-    void refetchTasks()
-    void refetchFindings()
-    void refetchReviews()
-  }
-
   return (
-    <Space direction="vertical" block style={{ padding: 16 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <div style={{ fontSize: 13, color: 'var(--app-text-secondary)' }}>{roleTitle}</div>
-          <div style={{ fontSize: 18, fontWeight: 700 }}>{user?.fullName}</div>
+    <PullToRefresh
+      onRefresh={async () => {
+        await Promise.all([refetchTasks(), refetchFindings(), refetchReviews()])
+      }}
+    >
+      <Space direction="vertical" block style={{ padding: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <div style={{ fontSize: 13, color: 'var(--app-text-secondary)' }}>{roleTitle}</div>
+            <div style={{ fontSize: 18, fontWeight: 700 }}>{user?.fullName}</div>
+          </div>
         </div>
-        <Button size="small" fill="outline" onClick={handleRefresh}>Làm mới</Button>
-      </div>
 
       {(canPerform || canCreate) && (canRespond || canRemediate) && (
         <Segmented
@@ -66,38 +71,7 @@ export function InspectionHomePage() {
         />
       )}
 
-      {pendingReviews && pendingReviews.length > 0 && (
-        <Card style={{ borderRadius: 12, background: 'var(--app-warning-bg)', border: '1px solid var(--app-border-warning)' }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--app-warning)' }}>
-            Yêu cầu thẩm định khiếu nại ({pendingReviews.length})
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
-            {pendingReviews.map((f) => (
-              <div key={f.id} style={{ background: 'var(--app-surface)', padding: 10, borderRadius: 8 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontWeight: 600, fontSize: 13 }}>#{f.id} · {f.restaurantName}</span>
-                  <Tag color="warning">Chờ thẩm định</Tag>
-                </div>
-                <div style={{ fontSize: 12, color: 'var(--app-text)', marginTop: 2 }}>{f.criterionName}</div>
-                {f.appealReason && (
-                  <div style={{ fontSize: 11, color: 'var(--app-text-secondary)', marginTop: 4 }}>
-                    Khiếu nại: {f.appealReason}
-                  </div>
-                )}
-                <Button
-                  block
-                  color="warning"
-                  size="small"
-                  style={{ marginTop: 8 }}
-                  onClick={() => onOpenAction(f, 'SUBMIT_REVIEW')}
-                >
-                  Thẩm định khiếu nại
-                </Button>
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
+      <PendingReviewsCard pendingReviews={pendingReviews ?? []} onOpenAction={onOpenAction} />
 
       {tab === 'tasks' && (
         <>
@@ -141,7 +115,12 @@ export function InspectionHomePage() {
             ))
           ) : (
             !loadingTasks && (
-              <ErrorBlock status="empty" title="Chưa có việc chấm" description="Không có đợt kiểm tra nào đang diễn ra" />
+              <ErrorBlock
+                status="empty"
+                style={{ '--image-height': '80px' }}
+                title="Chưa có việc chấm"
+                description="Kéo xuống để làm mới danh sách"
+              />
             )
           )}
         </>
@@ -180,20 +159,38 @@ export function InspectionHomePage() {
               ))
             ) : (
               !loadingFindings && (
-                <ErrorBlock status="empty" title="Không có lỗi nào" description={findingFilter === 'urgent' ? 'Tuyệt vời! Nhà hàng không còn lỗi nào cần xử lý ngay.' : 'Chưa có lỗi nào trong mục này.'} />
+                <ErrorBlock
+                  status="empty"
+                  style={{ '--image-height': '80px' }}
+                  title="Không có lỗi nào"
+                  description={
+                    findingFilter === 'urgent'
+                      ? 'Tuyệt vời! Nhà hàng không còn lỗi nào cần xử lý ngay.'
+                      : 'Kéo xuống để làm mới danh sách'
+                  }
+                />
               )
             )}
           </>
         )
       })()}
 
-      <InspectionFormModal open={createModal} onClose={() => { setCreateModal(false); void refetchTasks() }} />
-      <FindingActionModal
-        open={actionState.open}
-        action={actionState.action}
-        finding={actionState.finding}
-        onClose={() => { setActionState({ open: false }); void refetchFindings() }}
-      />
+      {createModal && (
+        <Suspense fallback={null}>
+          <InspectionFormModal open={createModal} onClose={() => { setCreateModal(false); void refetchTasks() }} />
+        </Suspense>
+      )}
+      {actionState.open && actionState.action && actionState.finding && (
+        <Suspense fallback={null}>
+          <FindingActionModal
+            open={actionState.open}
+            action={actionState.action}
+            finding={actionState.finding}
+            onClose={() => { setActionState({ open: false }); void refetchFindings() }}
+          />
+        </Suspense>
+      )}
     </Space>
-  )
+  </PullToRefresh>
+)
 }
