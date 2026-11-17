@@ -20,7 +20,7 @@ export function RestaurantComplianceChart({ data, loading, onSelectRestaurant }:
   const option = useMemo(() => {
     const list = data ?? []
     return {
-      grid: { left: 8, right: 16, top: 24, bottom: 24, containLabel: true },
+      grid: { left: 8, right: 16, top: 28, bottom: 48, containLabel: true },
       tooltip: {
         ...tooltipBase,
         trigger: 'item',
@@ -36,12 +36,14 @@ export function RestaurantComplianceChart({ data, loading, onSelectRestaurant }:
       },
       xAxis: {
         type: 'category',
-        data: list.map((item) => item.name.replace(/^(Kichi-Kichi|Gogi House|King BBQ|Hotpot Story)\s*/, '$1\n')),
+        data: list.map((item) => item.name),
         axisLabel: {
           ...axisLabel,
           interval: 0,
+          rotate: 20,
           fontSize: 11,
           lineHeight: 14,
+          formatter: (value: string) => (value.length > 20 ? `${value.slice(0, 18)}…` : value),
         },
         axisLine: { lineStyle: { color: CHART_COLORS.axis } },
         axisTick: { show: false },

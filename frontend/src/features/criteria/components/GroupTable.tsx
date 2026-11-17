@@ -24,6 +24,7 @@ export function GroupTable({ groups, loading, onEdit, onAddCriterion, onViewCrit
       loading={loading}
       dataSource={groups as CriterionGroup[]}
       pagination={false}
+      scroll={{ x: 960 }}
       onRow={(record) => ({
         onDoubleClick: () => onViewCriteria(record),
         style: { cursor: 'pointer' },
@@ -32,7 +33,7 @@ export function GroupTable({ groups, loading, onEdit, onAddCriterion, onViewCrit
         {
           title: '#',
           key: 'index',
-          width: 60,
+          width: 50,
           align: 'center',
           render: (_: unknown, __: unknown, index: number) => index + 1,
         },
@@ -40,13 +41,18 @@ export function GroupTable({ groups, loading, onEdit, onAddCriterion, onViewCrit
           title: 'Mã nhóm',
           dataIndex: 'code',
           key: 'code',
-          width: 130,
-          render: (code: string) => <Typography.Text code strong>{code}</Typography.Text>,
+          width: 140,
+          render: (code: string) => (
+            <Typography.Text code strong style={{ whiteSpace: 'nowrap' }}>
+              {code}
+            </Typography.Text>
+          ),
         },
         {
           title: 'Tên nhóm tiêu chí',
           dataIndex: 'name',
           key: 'name',
+          minWidth: 260,
           render: (name: string, g: CriterionGroup) => (
             <Tooltip title="Nhấp để xem chi tiết nhóm và các tiêu chí con">
               <Typography.Link
@@ -65,7 +71,7 @@ export function GroupTable({ groups, loading, onEdit, onAddCriterion, onViewCrit
           title: 'Công ty áp dụng',
           dataIndex: 'companyName',
           key: 'companyName',
-          width: 170,
+          width: 180,
           render: (companyName: string | null | undefined) =>
             companyName ? (
               <Tag color="blue">{companyName}</Tag>
@@ -77,7 +83,7 @@ export function GroupTable({ groups, loading, onEdit, onAddCriterion, onViewCrit
           title: 'Số tiêu chí con',
           dataIndex: 'criterionCount',
           key: 'criterionCount',
-          width: 170,
+          width: 180,
           render: (count: number, g: CriterionGroup) => (
             <Space>
               <Badge count={count} showZero color="blue" />
@@ -95,13 +101,13 @@ export function GroupTable({ groups, loading, onEdit, onAddCriterion, onViewCrit
         {
           title: 'Trạng thái',
           dataIndex: 'active',
-          width: 110,
+          width: 120,
           render: (a: boolean) => <StatusBadge status={a ? 'active' : 'inactive'} meta={ACTIVE_META} />,
         },
         {
           title: 'Thao tác',
           key: 'actions',
-          width: 150,
+          width: 140,
           fixed: 'right',
           render: (_: unknown, g: CriterionGroup) => (
             <Space size={4}>
