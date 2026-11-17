@@ -48,27 +48,27 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
         overflow: 'hidden',
       }}
     >
-      {/* Nền phong cảnh núi tuyết hoàng hôn được làm mờ quang học mượt mà */}
+      {/* Nền phong cảnh Yosemite bình minh phản chiếu hồ nước làm mờ mềm mại chuẩn Apple */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
-          backgroundImage: 'url("https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=2400&q=85")',
+          backgroundImage: 'url("https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=2560&q=85")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          filter: 'blur(32px)',
-          transform: 'scale(1.08)',
+          filter: 'blur(16px)',
+          transform: 'scale(1.06)',
           pointerEvents: 'none',
         }}
       />
-      {/* Lớp phủ ánh sáng Apple Light Frosted (sáng trong, thanh lịch, không bị tối) */}
+      {/* Lớp phủ khuếch tán ánh sáng Apple Light Frosted (sáng trong, thanh lịch, sang trọng) */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'rgba(255, 255, 255, 0.48)',
-          backdropFilter: 'blur(16px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+          background: 'rgba(255, 255, 255, 0.42)',
+          backdropFilter: 'blur(12px) saturate(170%)',
+          WebkitBackdropFilter: 'blur(12px) saturate(170%)',
           pointerEvents: 'none',
         }}
       />
@@ -197,13 +197,13 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
           style={{
             width: '100%',
             maxWidth: 440,
-            background: 'rgba(255, 255, 255, 0.82)',
-            backdropFilter: 'blur(30px) saturate(190%)',
-            WebkitBackdropFilter: 'blur(30px) saturate(190%)',
-            borderRadius: 20,
-            padding: '36px 32px',
-            boxShadow: '0 20px 50px -10px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.02)',
-            border: '1px solid rgba(255, 255, 255, 0.9)',
+            background: 'rgba(255, 255, 255, 0.78)',
+            backdropFilter: 'blur(32px) saturate(200%)',
+            WebkitBackdropFilter: 'blur(32px) saturate(200%)',
+            borderRadius: 24,
+            padding: '38px 34px',
+            boxShadow: '0 24px 60px -12px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.04), inset 0 1.5px 1px rgba(255, 255, 255, 1)',
+            border: '1px solid rgba(255, 255, 255, 0.95)',
           }}
         >
           {/* Header trong thẻ đăng nhập */}

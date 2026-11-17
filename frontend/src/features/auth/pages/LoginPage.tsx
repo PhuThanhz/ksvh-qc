@@ -20,31 +20,28 @@ const QUICK_ROLES = [
     key: 'admin',
     label: 'Quản trị viên',
     desc: 'Toàn quyền cấu hình, tài khoản, tiêu chí & báo cáo',
-    icon: <CrownOutlined style={{ color: '#0f172a' }} />,
+    icon: <CrownOutlined style={{ color: '#0f172a', fontSize: 15 }} />,
     user: 'admin',
     pass: 'Admin@123',
-    bg: '#f1f5f9',
-    border: '#cbd5e1',
+    badgeBg: 'rgba(15, 23, 42, 0.06)',
   },
   {
     key: 'inspector',
     label: 'Chuyên viên QC',
     desc: 'Lập kế hoạch, chấm điểm phiếu & ghi nhận lỗi',
-    icon: <SafetyCertificateOutlined style={{ color: '#10b981' }} />,
+    icon: <SafetyCertificateOutlined style={{ color: '#059669', fontSize: 15 }} />,
     user: 'inspector',
     pass: 'Inspector@123',
-    bg: '#f0fdf4',
-    border: '#bbf7d0',
+    badgeBg: 'rgba(16, 185, 129, 0.12)',
   },
   {
     key: 'store',
     label: 'Cửa hàng trưởng',
     desc: 'Giải trình lỗi, báo cáo khắc phục & phúc tra',
-    icon: <ShopOutlined style={{ color: '#f59e0b' }} />,
+    icon: <ShopOutlined style={{ color: '#d97706', fontSize: 15 }} />,
     user: 'store',
     pass: 'Store@123',
-    bg: '#fffbeb',
-    border: '#fde68a',
+    badgeBg: 'rgba(245, 158, 11, 0.12)',
   },
 ]
 
@@ -93,7 +90,7 @@ export function LoginPage() {
         Hoặc truy cập nhanh theo phân quyền
       </Divider>
 
-      <Flex gap={8} justify="space-between">
+      <Flex gap={10} justify="space-between">
         {QUICK_ROLES.map((role) => (
           <Tooltip key={role.key} title={role.desc} placement="top">
             <button
@@ -102,19 +99,34 @@ export function LoginPage() {
               onClick={() => handleQuickLogin(role.user, role.pass)}
               style={{
                 flex: 1,
-                padding: '8px 6px',
-                borderRadius: 8,
-                border: `1px solid ${role.border}`,
-                background: role.bg,
+                padding: '10px 8px',
+                borderRadius: 12,
+                border: '1px solid rgba(255, 255, 255, 0.9)',
+                background: 'rgba(255, 255, 255, 0.65)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03), inset 0 1px 1px rgba(255, 255, 255, 0.95)',
                 cursor: login.isPending ? 'not-allowed' : 'pointer',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 4,
-                transition: 'all 0.15s ease',
+                gap: 6,
+                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
               }}
             >
-              <span style={{ fontSize: 15 }}>{role.icon}</span>
+              <div
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  background: role.badgeBg,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {role.icon}
+              </div>
               <span style={{ fontSize: 11.5, fontWeight: 600, color: '#1e293b', whiteSpace: 'nowrap' }}>
                 {role.label}
               </span>
