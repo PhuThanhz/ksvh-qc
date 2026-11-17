@@ -65,12 +65,13 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
     <Avatar
       size={collapsed ? 36 : 34}
       style={{
-        background: 'linear-gradient(135deg, #334155 0%, #0f172a 100%)',
-        color: '#ffffff',
+        background: 'rgba(255, 255, 255, 0.85)',
+        color: '#0f172a',
         fontWeight: 700,
         fontSize: 14,
         flexShrink: 0,
-        boxShadow: '0 2px 6px rgba(15, 23, 42, 0.25)',
+        border: '1px solid rgba(255, 255, 255, 0.9)',
+        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.06)',
       }}
     >
       {initialsOf(user?.fullName)}

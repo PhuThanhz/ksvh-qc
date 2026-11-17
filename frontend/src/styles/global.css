@@ -11,21 +11,21 @@ body {
 .compact-table-form .ant-form-item { margin-bottom: 0; }
 .compact-table-form .ant-table-cell { vertical-align: top; }
 
-/* Sidebar kính mờ Apple (macOS Frosted Glass Sidebar) */
+/* Sidebar kính mờ Apple nhẹ nhàng, thanh thoát (macOS Frosted Glass Sidebar) */
 .apple-frosted-sidebar {
-  background: rgba(255, 255, 255, 0.76) !important;
+  background: rgba(255, 255, 255, 0.58) !important;
   backdrop-filter: blur(24px) saturate(180%) !important;
   -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
   border-inline-end: 1px solid rgba(255, 255, 255, 0.45) !important;
-  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.04) !important;
+  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.03) !important;
 }
 
 .apple-frosted-header {
-  background: rgba(255, 255, 255, 0.76) !important;
+  background: rgba(255, 255, 255, 0.58) !important;
   backdrop-filter: blur(24px) saturate(180%) !important;
   -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.45) !important;
-  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.03) !important;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.02) !important;
 }
 
 .apple-frosted-sidebar .ant-menu {
@@ -74,12 +74,12 @@ body {
   font-size: 11px !important;
 }
 
-/* Hover: Lớp nhám phẳng mờ dịu mắt, nổi bật chữ */
+/* Hover: Lớp kính mờ trắng sáng dịu mắt */
 .apple-frosted-sidebar .ant-menu-item:hover,
 .apple-frosted-sidebar .ant-menu-submenu-title:hover {
-  background: rgba(0, 0, 0, 0.05) !important;
+  background: rgba(255, 255, 255, 0.45) !important;
   border: none !important;
-  box-shadow: none !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03) !important;
   color: #0f172a !important;
 }
 
@@ -91,23 +91,26 @@ body {
 /* Khi nhấn chuột: Phẳng êm ái */
 .apple-frosted-sidebar .ant-menu-item:active,
 .apple-frosted-sidebar .ant-menu-submenu-title:active {
-  background: rgba(0, 0, 0, 0.08) !important;
+  background: rgba(255, 255, 255, 0.6) !important;
   border: none !important;
   box-shadow: none !important;
 }
 
-/* Selected: Nền Slate 900 trung tính sang trọng, chữ trắng sắc nét */
+/* Selected: Viên nang kính mờ sáng trắng tinh khôi, nhẹ nhàng, trong suốt */
 .apple-frosted-sidebar .ant-menu-item-selected {
-  background: #0f172a !important;
-  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.82) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  color: #0f172a !important;
   font-weight: 600 !important;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.88) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.02) !important;
 }
 
 .apple-frosted-sidebar .ant-menu-item-selected .ant-menu-item-icon,
 .apple-frosted-sidebar .ant-menu-item-selected a,
 .apple-frosted-sidebar .ant-menu-item-selected .ant-menu-title-content {
-  color: #ffffff !important;
+  color: #0f172a !important;
 }
 
 .apple-frosted-sidebar .ant-menu-sub { background: transparent !important; }

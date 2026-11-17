@@ -19,9 +19,9 @@ const sidebarMenuTheme = {
     Menu: {
       itemColor: '#334155',
       itemHoverColor: '#0f172a',
-      itemHoverBg: 'rgba(0, 0, 0, 0.05)',
-      itemSelectedColor: '#ffffff',
-      itemSelectedBg: '#0f172a',
+      itemHoverBg: 'rgba(255, 255, 255, 0.45)',
+      itemSelectedColor: '#0f172a',
+      itemSelectedBg: 'rgba(255, 255, 255, 0.82)',
       subMenuItemBg: 'transparent',
       itemBg: 'transparent',
       fontSize: 13.5,
