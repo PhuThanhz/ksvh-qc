@@ -1,11 +1,9 @@
-const CACHE_NAME = 'ksvh-qc-static-v1'
+const CACHE_NAME = 'ksvh-qc-static-__BUILD_ID__'
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
   '/manifest.webmanifest',
   '/favicon.svg',
   '/icon-192.png',
-  '/icon-512.png'
+  '/icon-512.png',
 ]
 
 self.addEventListener('install', (event) => {
@@ -38,7 +36,32 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // Tài nguyên tĩnh trong /assets/ hoặc tệp tĩnh: Cache-First, fallback Network
+  // 1. Điều hướng SPA (Navigation) và index.html: Network-First
+  // Khi có mạng: tải bản mới nhất từ server và cập nhật cache cho lần sau
+  // Khi mất mạng: trả về index.html từ cache để ứng dụng hoạt động offline bình thường
+  if (event.request.mode === 'navigate' || url.pathname === '/' || url.pathname === '/index.html') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response.ok) {
+            const clone = response.clone()
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, clone)
+              cache.put('/index.html', clone)
+            })
+          }
+          return response
+        })
+        .catch(() => {
+          return caches.match(event.request).then((cached) => {
+            return cached || caches.match('/index.html')
+          })
+        })
+    )
+    return
+  }
+
+  // 2. Tài nguyên tĩnh đã được hash (/assets/) hoặc các icon cố định: Cache-First, fallback Network
   if (url.pathname.startsWith('/assets/') || STATIC_ASSETS.includes(url.pathname)) {
     event.respondWith(
       caches.match(event.request).then((cached) => {
@@ -53,12 +76,5 @@ self.addEventListener('fetch', (event) => {
       })
     )
     return
-  }
-
-  // Điều hướng SPA: Trả về index.html nếu mất mạng
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request).catch(() => caches.match('/index.html'))
-    )
   }
 })
