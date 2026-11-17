@@ -1,12 +1,10 @@
-import { CalculatorOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
+import { EditOutlined, PlusOutlined } from '@ant-design/icons'
 import { Button, Card, Flex, Space } from 'antd'
 import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router'
 import { ErrorState } from '@/components/feedback/ErrorState'
 import { useConfirm } from '@/components/feedback/useConfirm'
 import { useNotify } from '@/components/feedback/useNotify'
 import { PageContainer } from '@/components/layout/PageContainer'
-import { ROUTES } from '@/constants/routes'
 import { ConfigStatusTag } from '@/features/criteria/components/ConfigStatusTag'
 import { RiskLevelEditor } from '@/features/criteria/components/RiskLevelEditor'
 import { RiskLevelVersionsCard } from '@/features/criteria/components/RiskLevelVersionsCard'
@@ -21,7 +19,6 @@ type Editing = { mode: 'new' } | { mode: 'edit'; effectiveFrom: string } | null
 
 /** Danh mục 7: bảng phân loại rủi ro theo phiên bản ngày hiệu lực. Xem mặc định; sửa bằng cách tạo phiên bản. */
 export function RiskLevelPage() {
-  const navigate = useNavigate()
   const notify = useNotify()
   const confirm = useConfirm()
   const { can } = usePermission()
@@ -55,9 +52,6 @@ export function RiskLevelPage() {
       subtitle="Điểm rủi ro = mức ảnh hưởng × tần suất lỗi; mỗi mức có khoảng điểm, hạn khắc phục và hành động bắt buộc"
       extra={
         <Space>
-          <Button icon={<CalculatorOutlined />} onClick={() => navigate(ROUTES.admin.riskRules)}>
-            Mô phỏng điểm
-          </Button>
           {editable && !editing && (
             <Button type="primary" icon={<PlusOutlined />} onClick={() => setEditing({ mode: 'new' })} disabled={!selected}>
               Tạo phiên bản mới

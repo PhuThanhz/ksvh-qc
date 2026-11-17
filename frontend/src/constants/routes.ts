@@ -23,6 +23,5 @@ export const ROUTES = {
   qc: {
     root: '/qc',
     execute: '/qc/execute/:id',
-    checkinDemo: '/qc/checkin-demo',
   },
 } as const

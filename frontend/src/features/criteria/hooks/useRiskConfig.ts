@@ -1,4 +1,4 @@
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { riskConfigApi } from '@/features/criteria/api/criteria.api'
 import { criteriaKeys } from '@/features/criteria/api/criteria.keys'
 import type { EscalationRulePayload, FrequencyConfigPayload, RiskLevelVersionPayload } from '@/features/criteria/criteria.types'
@@ -84,14 +84,5 @@ export function useDeleteEscalation() {
       void qc.invalidateQueries({ queryKey: criteriaKeys.escalation() })
       void qc.invalidateQueries({ queryKey: [...criteriaKeys.all, 'risk-preview'] })
     },
-  })
-}
-
-/** Mô phỏng điểm rủi ro bằng bộ tính của backend (cấu hình hiệu lực hôm nay). */
-export function useRiskPreview(baseImpact: number, violations: number) {
-  return useQuery({
-    queryKey: criteriaKeys.riskPreview(baseImpact, violations),
-    queryFn: () => riskConfigApi.preview({ baseImpact, violations }),
-    placeholderData: keepPreviousData,
   })
 }

@@ -50,10 +50,4 @@ export const inspectionsMobileRoutes: AppRoute[] = [
         Component: m.InspectionExecutionPage,
       })),
   },
-  {
-    path: ROUTES.qc.checkinDemo,
-    handle: { access: PERMISSIONS.MEDIA.UPLOAD, menu: { label: 'Thử GPS & ảnh', icon: 'checkin' } },
-    lazy: () =>
-      import('@/features/inspections/pages/mobile/CheckinDemoPage').then((m) => ({ Component: m.CheckinDemoPage })),
-  },
 ]

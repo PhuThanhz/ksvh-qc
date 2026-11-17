@@ -2,7 +2,6 @@ import { Flex } from 'antd'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { EscalationCard } from '@/features/criteria/components/EscalationCard'
 import { FrequencyCard } from '@/features/criteria/components/FrequencyCard'
-import { RiskSimulatorCard } from '@/features/criteria/components/RiskSimulatorCard'
 
 /** Danh mục 8–9: cấu hình tần suất và quy tắc nâng mức ảnh hưởng (phiên bản theo ngày hiệu lực). */
 export function RiskRulesPage() {
@@ -14,7 +13,6 @@ export function RiskRulesPage() {
       <Flex vertical gap={16}>
         <FrequencyCard />
         <EscalationCard />
-        <RiskSimulatorCard />
       </Flex>
     </PageContainer>
   )
