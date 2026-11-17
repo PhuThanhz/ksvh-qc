@@ -13,19 +13,19 @@ body {
 
 /* Sidebar kính mờ Apple (macOS Frosted Glass Sidebar) */
 .apple-frosted-sidebar {
-  background: rgba(255, 255, 255, 0.08) !important;
-  backdrop-filter: blur(16px) saturate(140%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
-  border-inline-end: 1px solid rgba(255, 255, 255, 0.15) !important;
+  background: rgba(255, 255, 255, 0.82) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border-inline-end: 1px solid rgba(0, 0, 0, 0.08) !important;
   box-shadow: 2px 0 16px rgba(0, 0, 0, 0.04) !important;
 }
 
 .apple-frosted-header {
-  background: rgba(255, 255, 255, 0.12) !important;
-  backdrop-filter: blur(16px) saturate(140%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.04) !important;
+  background: rgba(255, 255, 255, 0.82) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03) !important;
 }
 
 .apple-frosted-sidebar .ant-menu {
@@ -34,7 +34,7 @@ body {
   background: transparent !important;
 }
 
-/* Các mục menu: Cỡ chữ chuẩn Apple macOS 13.5px, icon 16px, chiều cao 36px thanh thoát */
+/* Các mục menu: Cỡ chữ chuẩn 13.5px, icon 16px, chiều cao 36px thanh thoát */
 .apple-frosted-sidebar .ant-menu-item,
 .apple-frosted-sidebar .ant-menu-submenu-title {
   border-radius: 8px !important;
@@ -44,21 +44,20 @@ body {
   line-height: 36px !important;
   font-size: 13.5px !important;
   font-weight: 500 !important;
-  color: #ffffff !important;
+  color: #334155 !important;
   letter-spacing: -0.01em !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
-  transition: background 0.15s ease, color 0.15s ease !important;
+  transition: all 0.15s ease !important;
   border: none !important;
   box-shadow: none !important;
 }
 
-/* Toàn bộ chữ và icon trên Sidebar luôn là màu trắng sắc nét */
+/* Toàn bộ chữ và icon trên Sidebar rõ nét, tương phản cao */
 .apple-frosted-sidebar .ant-menu-title-content,
 .apple-frosted-sidebar .ant-menu-item a,
 .apple-frosted-sidebar .ant-menu-item .ant-menu-item-icon,
 .apple-frosted-sidebar .ant-menu-submenu-title .ant-menu-item-icon,
 .apple-frosted-sidebar .ant-menu-submenu-arrow {
-  color: #ffffff !important;
+  color: inherit !important;
   font-size: inherit;
   transition: color 0.15s ease !important;
 }
@@ -67,47 +66,48 @@ body {
 .apple-frosted-sidebar .ant-menu-submenu-title .ant-menu-item-icon {
   font-size: 16px !important;
   margin-right: 9px !important;
+  color: #64748b !important;
 }
 
 .apple-frosted-sidebar .ant-menu-submenu-arrow {
-  color: rgba(255, 255, 255, 0.85) !important;
+  color: #94a3b8 !important;
   font-size: 11px !important;
 }
 
-/* Hover: Lớp nhám phẳng mờ dịu mắt, tuyệt đối không viền, không bóng */
+/* Hover: Lớp nhám phẳng mờ dịu mắt, nổi bật chữ */
 .apple-frosted-sidebar .ant-menu-item:hover,
 .apple-frosted-sidebar .ant-menu-submenu-title:hover {
-  background: rgba(255, 255, 255, 0.12) !important;
+  background: rgba(0, 0, 0, 0.05) !important;
   border: none !important;
   box-shadow: none !important;
-  color: #ffffff !important;
+  color: #0f172a !important;
 }
 
-/* Khi nhấn chuột: Phẳng êm ái, không bóng lóa */
+.apple-frosted-sidebar .ant-menu-item:hover .ant-menu-item-icon,
+.apple-frosted-sidebar .ant-menu-submenu-title:hover .ant-menu-item-icon {
+  color: #0f172a !important;
+}
+
+/* Khi nhấn chuột: Phẳng êm ái */
 .apple-frosted-sidebar .ant-menu-item:active,
 .apple-frosted-sidebar .ant-menu-submenu-title:active {
-  background: rgba(255, 255, 255, 0.22) !important;
+  background: rgba(0, 0, 0, 0.08) !important;
   border: none !important;
   box-shadow: none !important;
 }
 
-/* Selected: Nền nhám phẳng mờ mịn màng (Matte Frosted), không viền, không bóng loáng */
+/* Selected: Nền Apple Blue nổi bật, chữ trắng sắc nét */
 .apple-frosted-sidebar .ant-menu-item-selected {
-  background: rgba(255, 255, 255, 0.2) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-  border: none !important;
-  box-shadow: none !important;
+  background: #0071e3 !important;
   color: #ffffff !important;
   font-weight: 600 !important;
-  text-shadow: none !important;
+  box-shadow: 0 2px 8px rgba(0, 113, 227, 0.28) !important;
 }
 
 .apple-frosted-sidebar .ant-menu-item-selected .ant-menu-item-icon,
 .apple-frosted-sidebar .ant-menu-item-selected a,
 .apple-frosted-sidebar .ant-menu-item-selected .ant-menu-title-content {
   color: #ffffff !important;
-  text-shadow: none !important;
 }
 
 .apple-frosted-sidebar .ant-menu-sub { background: transparent !important; }

@@ -23,7 +23,7 @@ function BrandHeader({ collapsed, borderColor }: { collapsed: boolean; borderCol
       justify={collapsed ? 'center' : 'flex-start'}
       gap={12}
       style={{
-        height: 58,
+        height: 56,
         paddingInline: collapsed ? 0 : 20,
         borderBottom: `1px solid ${borderColor}`,
         flexShrink: 0,
@@ -36,11 +36,10 @@ function BrandHeader({ collapsed, borderColor }: { collapsed: boolean; borderCol
           width: 32,
           height: 32,
           borderRadius: 8,
-          background: 'rgba(255, 255, 255, 0.22)',
-          color: '#ffffff',
+          background: 'rgba(0, 113, 227, 0.12)',
+          color: '#0071e3',
           fontSize: 18,
           flexShrink: 0,
-          backdropFilter: 'blur(8px)',
         }}
       >
         <SafetyCertificateFilled />
@@ -48,14 +47,14 @@ function BrandHeader({ collapsed, borderColor }: { collapsed: boolean; borderCol
       {!collapsed && (
         <Flex vertical style={{ lineHeight: 1.2, overflow: 'hidden' }}>
           <Flex align="center" gap={6}>
-            <Typography.Text strong style={{ fontSize: 16, fontWeight: 700, letterSpacing: -0.2, color: '#ffffff', textShadow: '0 1px 3px rgba(0, 0, 0, 0.6)' }}>
+            <Typography.Text strong style={{ fontSize: 16, fontWeight: 700, letterSpacing: -0.2, color: '#0f172a' }}>
               KSVH QC
             </Typography.Text>
-            <Tag style={{ fontSize: 10, lineHeight: '16px', padding: '0 4px', margin: 0, borderRadius: 4, background: 'rgba(255, 255, 255, 0.25)', color: '#ffffff', border: 'none' }}>
+            <Tag style={{ fontSize: 10, lineHeight: '16px', padding: '0 4px', margin: 0, borderRadius: 4, background: 'rgba(0, 113, 227, 0.12)', color: '#0071e3', border: 'none', fontWeight: 600 }}>
               PRO
             </Tag>
           </Flex>
-          <Typography.Text style={{ fontSize: 11, whiteSpace: 'nowrap', color: 'rgba(255, 255, 255, 0.85)', textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)' }}>
+          <Typography.Text style={{ fontSize: 11, whiteSpace: 'nowrap', color: '#64748b' }}>
             Kiểm soát vận hành
           </Typography.Text>
         </Flex>
@@ -102,7 +101,7 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
           }}
         >
           <Flex vertical style={{ height: '100%', overflow: 'hidden' }}>
-            <BrandHeader collapsed={collapsed} borderColor="rgba(255, 255, 255, 0.12)" />
+            <BrandHeader collapsed={collapsed} borderColor="rgba(0, 0, 0, 0.08)" />
             <div style={{ flex: 1, overflowY: 'auto' }}>
               <Sidebar menu={menu} />
             </div>
@@ -125,7 +124,7 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
           styles={{ body: { padding: 0 } }}
         >
           <Flex vertical style={{ height: '100%' }}>
-            <BrandHeader collapsed={false} borderColor="rgba(255, 255, 255, 0.12)" />
+            <BrandHeader collapsed={false} borderColor="rgba(0, 0, 0, 0.08)" />
             <div style={{ flex: 1, overflowY: 'auto' }}>
               <Sidebar menu={menu} onSelect={() => setMobileOpen(false)} />
             </div>

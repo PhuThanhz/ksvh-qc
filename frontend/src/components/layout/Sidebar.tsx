@@ -17,11 +17,11 @@ const groupKey = (label: string) => `group:${label}`
 const sidebarMenuTheme = {
   components: {
     Menu: {
-      itemColor: 'rgba(255, 255, 255, 0.92)',
-      itemHoverColor: '#ffffff',
-      itemHoverBg: 'rgba(255, 255, 255, 0.12)',
+      itemColor: '#334155',
+      itemHoverColor: '#0f172a',
+      itemHoverBg: 'rgba(0, 0, 0, 0.05)',
       itemSelectedColor: '#ffffff',
-      itemSelectedBg: 'rgba(255, 255, 255, 0.2)',
+      itemSelectedBg: '#0071e3',
       subMenuItemBg: 'transparent',
       itemBg: 'transparent',
       fontSize: 13.5,
@@ -30,7 +30,7 @@ const sidebarMenuTheme = {
       itemMarginBlock: 3,
       itemMarginInline: 6,
       itemBorderRadius: 8,
-      groupTitleColor: 'rgba(255, 255, 255, 0.95)',
+      groupTitleColor: '#64748b',
     },
   },
 }

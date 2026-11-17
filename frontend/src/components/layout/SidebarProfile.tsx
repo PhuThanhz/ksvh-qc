@@ -65,13 +65,12 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
     <Avatar
       size={collapsed ? 36 : 34}
       style={{
-        background: 'linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%)',
-        color: '#1d1d1f',
+        background: 'linear-gradient(135deg, #0071e3 0%, #0056b3 100%)',
+        color: '#ffffff',
         fontWeight: 700,
         fontSize: 14,
         flexShrink: 0,
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)',
-        border: '1px solid rgba(255, 255, 255, 0.9)',
+        boxShadow: '0 2px 6px rgba(0, 113, 227, 0.3)',
       }}
     >
       {initialsOf(user?.fullName)}
@@ -82,7 +81,7 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
     <div
       style={{
         padding: collapsed ? '12px 0' : '10px 12px',
-        borderTop: '1px solid rgba(255, 255, 255, 0.15)',
+        borderTop: '1px solid rgba(0, 0, 0, 0.08)',
         marginTop: 'auto',
         background: 'transparent',
       }}
@@ -110,14 +109,14 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
             <Flex align="center" gap={10} style={{ width: '100%', overflow: 'hidden' }}>
               {avatar}
               <Flex vertical style={{ flex: 1, minWidth: 0, lineHeight: 1.25 }}>
-                <Typography.Text strong ellipsis style={{ fontSize: 13, color: '#ffffff', textShadow: '0 1px 2px rgba(0, 0, 0, 0.6)' }}>
+                <Typography.Text strong ellipsis style={{ fontSize: 13, color: '#0f172a' }}>
                   {user?.fullName ?? 'Người dùng'}
                 </Typography.Text>
-                <Typography.Text ellipsis style={{ fontSize: 11, color: 'rgba(255, 255, 255, 0.85)', textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)' }}>
+                <Typography.Text ellipsis style={{ fontSize: 11, color: '#64748b' }}>
                   {user?.roles.map(roleLabel).join(', ')}
                 </Typography.Text>
               </Flex>
-              <DownOutlined style={{ fontSize: 10, color: '#ffffff', flexShrink: 0 }} />
+              <DownOutlined style={{ fontSize: 10, color: '#94a3b8', flexShrink: 0 }} />
             </Flex>
           </Button>
         )}
