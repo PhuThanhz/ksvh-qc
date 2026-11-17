@@ -18,6 +18,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import vn.ksvh.qc.security.jwt.JwtProperties;
 import vn.ksvh.qc.security.jwt.JwtService;
 import vn.ksvh.qc.shared.web.ApiPaths;
@@ -54,7 +55,14 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .headers(headers -> headers
                         .contentTypeOptions(Customizer.withDefaults())
-                        .frameOptions(frame -> frame.deny()))
+                        .frameOptions(frame -> frame.deny())
+                        .httpStrictTransportSecurity(hsts -> hsts
+                                .includeSubDomains(true)
+                                .maxAgeInSeconds(31536000))
+                        .contentSecurityPolicy(csp -> csp
+                                .policyDirectives("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'none'; object-src 'none'"))
+                        .referrerPolicy(referrer -> referrer
+                                .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC).permitAll()

@@ -25,6 +25,11 @@ app:
     cookie:
       secure: true
       same-site: Strict
+  web:
+    cors:
+      # Ở production, chỉ nhận danh sách domain thật từ biến môi trường (phân tách bởi dấu phẩy)
+      # Ví dụ: CORS_ALLOWED_ORIGINS=https://qc.example.com,https://m.qc.example.com
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:}
 
 logging:
   level:

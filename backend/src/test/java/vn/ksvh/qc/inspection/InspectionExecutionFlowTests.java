@@ -614,6 +614,95 @@ class InspectionExecutionFlowTests extends ApiTestSupport {
                 .andExpect(jsonPath("$[1].findingStatus").value("DISMISSED"));
     }
 
+    @Test
+    void testStrictImmutabilityOfInspectionItemsAcrossEntirePostSubmitLifecycle() throws Exception {
+        long inspector = insertUser("imm_insp", RoleCodes.KSVH_INSPECTOR);
+        long chtUser = insertUser("imm_cht", RoleCodes.STORE_MANAGER);
+        long revLead = insertUser("imm_lead", RoleCodes.KSVH_LEAD);
+        long revManager = insertUser("imm_mgr", RoleCodes.KSVH_MANAGER);
+
+        long compId = createCompany("IC-" + suffix);
+        long storeId = createStore(compId, "IR-" + suffix, 10.7769, 106.7009, 150, chtUser);
+        long groupId = createCriterionGroup("IG-" + suffix);
+        long c1 = createCriterion(groupId, "IC1-" + suffix, 2);
+        long c2 = createCriterion(groupId, "IC2-" + suffix, 3);
+        long c3 = createCriterion(groupId, "IC3-" + suffix, 5);
+        long tplId = createTemplate("IT-" + suffix, List.of(c1, c2, c3));
+
+        long insId = createApprovedPlanWithAssignment(storeId, inspector, tplId, TODAY);
+        mvc.perform(withJson(post("/api/v1/inspections/" + insId + "/checkin"),
+                new InspectionCheckinRequest(10.7769, 106.7009)).with(as(inspector, QC_PERMS))).andExpect(status().isOk());
+
+        // Chấm điểm và nộp phiếu
+        String ev1 = evidenceKey(inspector);
+        String ev2 = evidenceKey(inspector);
+        List<InspectionSubmitItemRequest> submitItems = List.of(
+                new InspectionSubmitItemRequest(c1, ItemResult.PASS, "Đạt chuẩn vệ sinh", null),
+                new InspectionSubmitItemRequest(c2, ItemResult.FAIL, "Sàn bếp ẩm mốc", ev1),
+                new InspectionSubmitItemRequest(c3, ItemResult.FAIL, "Thịt hết hạn 2 ngày", ev2)
+        );
+        mvc.perform(withJson(post("/api/v1/inspections/" + insId + "/submit"),
+                new InspectionSubmitRequest(submitItems, "Ghi chú chấm")).with(as(inspector, QC_PERMS))).andExpect(status().isOk());
+
+        // LƯU BASELINE SNAPSHOT trực tiếp từ bảng inspection_items ngay sau khi SUBMIT
+        List<java.util.Map<String, Object>> baseline = jdbc.queryForList(
+                "SELECT id, criterion_id, result, comment, evidence_urls FROM inspection_items WHERE inspection_id = ? ORDER BY id",
+                insId
+        );
+        assertThat(baseline).hasSize(3);
+
+        // Lấy danh sách findings
+        List<Long> findingIds = jdbc.queryForList(
+                "SELECT id FROM findings WHERE inspection_id = ? ORDER BY id",
+                Long.class, insId
+        );
+        assertThat(findingIds).hasSize(2);
+        long f1 = findingIds.get(0); // gắn với c2
+        long f2 = findingIds.get(1); // gắn với c3
+
+        // 1. Thao tác trên f1: CHT xác nhận trực tiếp -> lên kế hoạch -> gửi bằng chứng -> nghiệm thu ĐẠT (CLOSED)
+        mvc.perform(post("/api/v1/findings/" + f1 + "/confirm").with(as(chtUser, STORE_PERMS))).andExpect(status().isOk());
+        mvc.perform(withJson(post("/api/v1/findings/" + f1 + "/remediation-plan"),
+                new FindingRemediationPlanRequest("Lau dọn sàn", TODAY)).with(as(chtUser, STORE_PERMS))).andExpect(status().isOk());
+        String remEv = evidenceKey(chtUser);
+        mvc.perform(withJson(post("/api/v1/findings/" + f1 + "/submit-remediation"),
+                new FindingSubmitRemediationRequest(remEv)).with(as(chtUser, STORE_PERMS))).andExpect(status().isOk());
+        mvc.perform(withJson(post("/api/v1/findings/" + f1 + "/verify"),
+                new FindingVerifyRequest(true, "Nghiệm thu đạt")).with(as(inspector, PermissionCodes.INSPECTION_READ_OWN, PermissionCodes.FINDING_VERIFY))).andExpect(status().isOk());
+
+        // 2. Thao tác trên f2: CHT khiếu nại -> Hội đồng đồng thuận BỎ LỖI (DISMISSED)
+        mvc.perform(withJson(post("/api/v1/findings/" + f2 + "/appeal"),
+                new FindingAppealRequest("Khiếu nại nhãn thịt", null, List.of(revLead, revManager))).with(as(chtUser, STORE_PERMS))).andExpect(status().isOk());
+        mvc.perform(withJson(post("/api/v1/findings/" + f2 + "/appeal-reviews"),
+                new AppealReviewRequest(AppealVerdict.FINDING_INVALID, "Bỏ lỗi")).with(as(revLead, QA_PERMS))).andExpect(status().isOk());
+        mvc.perform(withJson(post("/api/v1/findings/" + f2 + "/appeal-reviews"),
+                new AppealReviewRequest(AppealVerdict.FINDING_INVALID, "Đồng ý")).with(as(revManager, QA_PERMS))).andExpect(status().isOk());
+
+        // KIỂM TRA BẤT BIẾN DỮ LIỆU: Toàn bộ bảng inspection_items phải y nguyên 100% so với baseline!
+        List<java.util.Map<String, Object>> current = jdbc.queryForList(
+                "SELECT id, criterion_id, result, comment, evidence_urls FROM inspection_items WHERE inspection_id = ? ORDER BY id",
+                insId
+        );
+        assertThat(current).hasSize(3);
+        for (int i = 0; i < 3; i++) {
+            java.util.Map<String, Object> baseRow = baseline.get(i);
+            java.util.Map<String, Object> currRow = current.get(i);
+            assertThat(currRow.get("id")).isEqualTo(baseRow.get("id"));
+            assertThat(currRow.get("criterion_id")).isEqualTo(baseRow.get("criterion_id"));
+            assertThat(currRow.get("result")).isEqualTo(baseRow.get("result"));
+            assertThat(currRow.get("comment")).isEqualTo(baseRow.get("comment"));
+            assertThat(currRow.get("evidence_urls")).isEqualTo(baseRow.get("evidence_urls"));
+        }
+
+        // Kiểm tra qua API GET items: result gốc của mục bị bỏ lỗi vẫn là FAIL, chỉ findingStatus là DISMISSED
+        mvc.perform(get("/api/v1/inspections/" + insId + "/items").with(as(inspector, QC_PERMS)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].result").value("PASS"))
+                .andExpect(jsonPath("$[1].result").value("FAIL"))
+                .andExpect(jsonPath("$[2].result").value("FAIL"))
+                .andExpect(jsonPath("$[2].findingStatus").value("DISMISSED"));
+    }
+
     private long createApprovedPlanWithAssignment(long storeId, long inspectorId, long templateId, LocalDate date) throws Exception {
         String pCode = "PL-" + suffix + "-" + (System.nanoTime() % 100000);
         PlanCreateRequest req = new PlanCreateRequest(

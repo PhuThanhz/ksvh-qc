@@ -6,6 +6,7 @@ import { useInspection, useInspectionItems, useInspectionMutations } from '@/fea
 import { InspectionCriterionCard, type CriterionRating } from '@/features/inspections/components/InspectionCriterionCard'
 import type { InspectionSubmitItemRequest, ItemResult } from '@/features/inspections/inspection.types'
 import { INSPECTION_KIND_LABEL, INSPECTION_MODE_LABEL, LOCATION_STATUS_META } from '@/features/inspections/inspection.types'
+import { useOfflineSync } from '@/features/media'
 
 const DRAFT_PREFIX = 'qc_draft_ins_'
 
@@ -18,14 +19,19 @@ export function InspectionExecutionPage() {
   const { data: items } = useInspectionItems(insId)
   const { checkin, submit } = useInspectionMutations()
   const { status: geoStatus, fix: geoFix, locate } = useGeolocation()
-
   const [overrides, setOverrides] = useState<Record<number, Partial<CriterionRating>>>(() => {
     try {
       const saved = localStorage.getItem(`${DRAFT_PREFIX}${insId}`)
       return saved ? (JSON.parse(saved) as Record<number, Partial<CriterionRating>>) : {}
-    } catch {
-      return {}
-    }
+    } catch { return {} }
+  })
+
+  const { isOnline, pendingCount, isSyncing } = useOfflineSync(insId, (critId, newKey) => {
+    setOverrides((prev) => {
+      const cur = prev[critId]?.evidenceUrls ?? ''
+      const updated = cur.split(',').map((u) => u.trim()).filter((u) => !u.startsWith('offline:')).concat(newKey).join(', ')
+      return { ...prev, [critId]: { ...prev[critId], evidenceUrls: updated } }
+    })
   })
 
   // Lưu nháp tự động để Chuyên viên không bị mất dữ liệu khi đổi tab / chụp ảnh
@@ -39,9 +45,7 @@ export function InspectionExecutionPage() {
 
   const needsLocation = ins?.status === 'ASSIGNED' && ins.inspectionMode === 'ON_SITE'
   useEffect(() => {
-    if (needsLocation && geoStatus === 'idle') {
-      locate()
-    }
+    if (needsLocation && geoStatus === 'idle') locate()
   }, [needsLocation, geoStatus, locate])
 
   const onPerformCheckin = async () => {
@@ -55,16 +59,11 @@ export function InspectionExecutionPage() {
       Toast.show({ icon: res.locationStatus === 'OUTSIDE_RADIUS' ? undefined : 'success', content: `Bắt đầu kiểm tra · ${status}` })
       void refetch()
     } catch (err: unknown) {
-      void Dialog.alert({
-        title: 'Không bắt đầu được phiếu',
-        content: (err as { message?: string })?.message ?? 'Đã xảy ra lỗi, vui lòng thử lại',
-      })
+      void Dialog.alert({ title: 'Không bắt đầu được phiếu', content: (err as { message?: string })?.message ?? 'Đã xảy ra lỗi, vui lòng thử lại' })
     }
   }
 
-  const setCriterionResult = (critId: number, result: ItemResult) => {
-    setOverrides((prev) => ({ ...prev, [critId]: { ...prev[critId], result } }))
-  }
+  const setCriterionResult = (critId: number, result: ItemResult) => setOverrides((prev) => ({ ...prev, [critId]: { ...prev[critId], result } }))
   const setCriterionComment = (critId: number, comment: string) => setOverrides((prev) => ({ ...prev, [critId]: { ...prev[critId], comment } }))
   const setCriterionEvidence = (critId: number, evidenceUrls: string) => setOverrides((prev) => ({ ...prev, [critId]: { ...prev[critId], evidenceUrls } }))
 
@@ -99,6 +98,10 @@ export function InspectionExecutionPage() {
 
   const onSubmitAll = async () => {
     if (!items) return
+    if (pendingCount > 0) {
+      Toast.show({ content: `Còn ${pendingCount} tệp chờ đồng bộ lên máy chủ. Vui lòng kết nối mạng và chờ hoàn tất.`, position: 'bottom' })
+      return
+    }
     const submitItems: InspectionSubmitItemRequest[] = []
 
     for (const it of items) {
@@ -108,19 +111,14 @@ export function InspectionExecutionPage() {
         return
       }
       if (r.result === 'FAIL' && (!r.comment?.trim() || !r.evidenceUrls?.trim())) {
-        Toast.show({ content: `Tiêu chí không đạt phải có mô tả và ảnh bằng chứng: ${it.criterionName}`, position: 'bottom' })
+        Toast.show({ content: `Không đạt phải có mô tả và bằng chứng: ${it.criterionName}`, position: 'bottom' })
         return
       }
       if (r.result === 'NA' && !r.comment?.trim()) {
-        Toast.show({ content: `Tiêu chí N/A phải ghi lý do: ${it.criterionName}`, position: 'bottom' })
+        Toast.show({ content: `N/A phải ghi rõ lý do: ${it.criterionName}`, position: 'bottom' })
         return
       }
-      submitItems.push({
-        criterionId: it.criterionId,
-        result: r.result,
-        comment: r.comment?.trim() || undefined,
-        evidenceUrls: r.evidenceUrls?.trim() || undefined,
-      })
+      submitItems.push({ criterionId: it.criterionId, result: r.result, comment: r.comment?.trim() || undefined, evidenceUrls: r.evidenceUrls?.trim() || undefined })
     }
 
     try {
@@ -133,9 +131,7 @@ export function InspectionExecutionPage() {
     }
   }
 
-  if (isLoading || !ins) {
-    return <div style={{ padding: 24, textAlign: 'center' }}>Đang tải thông tin phiếu chấm...</div>
-  }
+  if (isLoading || !ins) return <div style={{ padding: 24, textAlign: 'center' }}>Đang tải thông tin phiếu chấm...</div>
 
   const totalCriteria = items?.length ?? 0
   const ratedCount = items?.filter((it) => getRating(it).result !== 'UNRATED').length ?? 0
@@ -143,7 +139,6 @@ export function InspectionExecutionPage() {
   const passCount = items?.filter((it) => getRating(it).result === 'PASS').length ?? 0
   const naCount = items?.filter((it) => getRating(it).result === 'NA').length ?? 0
   const progressPercent = totalCriteria > 0 ? Math.round((ratedCount / totalCriteria) * 100) : 0
-
   const gpsString = geoFix ? `GPS ${geoFix.lat.toFixed(6)}, ${geoFix.lng.toFixed(6)}` : undefined
 
   return (
@@ -151,6 +146,12 @@ export function InspectionExecutionPage() {
       <NavBar onBack={() => navigate('/qc')}>{ins.code}</NavBar>
 
       <div style={{ padding: 12 }}>
+        {(!isOnline || pendingCount > 0) && (
+          <div style={{ background: '#fffbe6', border: '1px solid #ffe58f', padding: '6px 12px', borderRadius: 8, marginBottom: 8, fontSize: 12, color: '#d46b08' }}>
+            {!isOnline ? '⚠️ Đang offline. ' : ''}
+            {pendingCount > 0 ? `Còn ${pendingCount} tệp chờ tải lên.${isSyncing ? ' Đang đồng bộ...' : ''}` : 'Dữ liệu được lưu nháp an toàn.'}
+          </div>
+        )}
         <Card style={{ marginBottom: 12, borderRadius: 10 }}>
           <div style={{ fontWeight: 600, fontSize: 16 }}>{ins.restaurantName}</div>
           <div style={{ fontSize: 13, color: 'var(--app-text-secondary)', marginTop: 4 }}>
@@ -209,10 +210,10 @@ export function InspectionExecutionPage() {
             {ins.status !== 'IN_PROGRESS' && (
               <Card style={{ borderRadius: 10, background: ins.status === 'CANCELLED' ? 'var(--app-danger-bg)' : 'var(--app-success-bg)', border: `1px solid ${ins.status === 'CANCELLED' ? 'var(--app-danger-border)' : 'var(--app-success-border)'}` }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: ins.status === 'CANCELLED' ? 'var(--app-danger)' : 'var(--app-success)' }}>
-                  {ins.status === 'SUBMITTED' && 'Phiếu chấm đã được nộp. Đang trong quy trình xử lý và khắc phục lỗi vi phạm.'}
-                  {ins.status === 'AWAITING_ACK' && 'Phiếu không có lỗi. Đang chờ Cửa hàng trưởng xác nhận đã xem.'}
+                  {ins.status === 'SUBMITTED' && 'Phiếu chấm đã được nộp. Đang xử lý lỗi.'}
+                  {ins.status === 'AWAITING_ACK' && 'Phiếu không có lỗi. Chờ CHT xác nhận đã xem.'}
                   {ins.status === 'COMPLETED' && 'Phiếu chấm đã hoàn thành toàn diện.'}
-                  {ins.status === 'CANCELLED' && `Phiếu chấm đã bị huỷ${ins.cancelReason ? `: ${ins.cancelReason}` : ''}.`}
+                  {ins.status === 'CANCELLED' && `Phiếu đã bị huỷ${ins.cancelReason ? `: ${ins.cancelReason}` : ''}.`}
                 </div>
               </Card>
             )}
@@ -225,6 +226,7 @@ export function InspectionExecutionPage() {
                 onSetResult={(res) => setCriterionResult(it.criterionId, res)}
                 onSetComment={(comment) => setCriterionComment(it.criterionId, comment)}
                 onSetEvidence={(urls) => setCriterionEvidence(it.criterionId, urls)}
+                inspectionId={insId}
                 inspectorName={ins.inspectorName}
                 restaurantName={ins.restaurantName}
                 gpsCoords={gpsString}
@@ -237,8 +239,8 @@ export function InspectionExecutionPage() {
 
       {ins.status === 'IN_PROGRESS' && (
         <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'var(--app-surface)', padding: '10px 16px', borderTop: '1px solid var(--app-border)', zIndex: 100 }}>
-          <Button block color="primary" size="large" loading={submit.isPending} onClick={onSubmitAll}>
-            Hoàn thành & Nộp phiếu chấm ({ratedCount}/{totalCriteria})
+          <Button block color="primary" size="large" loading={submit.isPending} disabled={pendingCount > 0} onClick={onSubmitAll}>
+            {pendingCount > 0 ? `Chờ đồng bộ ${pendingCount} tệp...` : `Hoàn thành & Nộp phiếu chấm (${ratedCount}/${totalCriteria})`}
           </Button>
         </div>
       )}

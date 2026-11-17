@@ -40,6 +40,25 @@ docker compose up -d --build
 
 ---
 
+## Hướng dẫn Triển khai Production & Bảo mật
+
+### 1. Biến môi trường bắt buộc (Không dùng giá trị mặc định khi chạy thật)
+Thiết lập trong file `.env` hoặc secret manager của máy chủ:
+- `JWT_SECRET`: Chuỗi bí mật ngẫu nhiên tối thiểu 32 ký tự (HS256).
+- `SPRING_DATASOURCE_PASSWORD`: Mật khẩu người dùng PostgreSQL thật.
+- `S3_ACCESS_KEY` & `S3_SECRET_KEY`: Khóa truy cập kho lưu trữ ảnh/video S3/MinIO.
+- `CORS_ALLOWED_ORIGINS`: Danh sách domain thật được phép gọi API (ví dụ: `https://qc.example.com,https://m.qc.example.com`).
+
+### 2. Thiết lập sau lần triển khai đầu tiên
+- **Đổi mật khẩu tài khoản Quản trị (`admin`) ngay lập tức**: Đăng nhập tài khoản `admin` và đổi mật khẩu từ `Admin@123` sang mật khẩu mạnh mới.
+- **Bật sao lưu tự động (Cron job)**: Thiết lập cron chạy `./scripts/backup.sh` hàng ngày vào 02:00 sáng.
+- **Kiểm tra cơ chế bảo mật tự động**:
+  - Tự động khoá tạm 15 phút nếu nhập sai mật khẩu quá 5 lần liên tiếp (chống tấn công vét cạn / brute-force).
+  - Tự động gắn các HTTP Security Headers: `HSTS`, `Content-Security-Policy (CSP)`, `Referrer-Policy`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`.
+  - Access token chỉ lưu trong RAM trình duyệt; Refresh token bảo vệ bằng cookie `HttpOnly`, `SameSite=Strict` và cờ `Secure`.
+
+---
+
 ## Chạy Môi trường Phát triển (Dev)
 ### Yêu cầu
 - Java 21 (JDK), Node.js 20+, PostgreSQL 17.

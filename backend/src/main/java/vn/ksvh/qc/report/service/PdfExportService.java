@@ -42,15 +42,15 @@ public class PdfExportService {
             return;
         }
         try {
-            ClassPathResource regRes = new ClassPathResource("fonts/Arial.ttf");
+            ClassPathResource regRes = new ClassPathResource("fonts/BeVietnamPro-Regular.ttf");
             byte[] regBytes = StreamUtils.copyToByteArray(regRes.getInputStream());
-            regularBaseFont = BaseFont.createFont("Arial.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, true, regBytes, null);
+            regularBaseFont = BaseFont.createFont("BeVietnamPro-Regular.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, true, regBytes, null);
 
-            ClassPathResource boldRes = new ClassPathResource("fonts/Arial-Bold.ttf");
+            ClassPathResource boldRes = new ClassPathResource("fonts/BeVietnamPro-Bold.ttf");
             byte[] boldBytes = StreamUtils.copyToByteArray(boldRes.getInputStream());
-            boldBaseFont = BaseFont.createFont("Arial-Bold.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, true, boldBytes, null);
+            boldBaseFont = BaseFont.createFont("BeVietnamPro-Bold.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED, true, boldBytes, null);
         } catch (Exception e) {
-            log.warn("Không thể nạp font tiếng Việt Arial từ classpath, dùng font mặc định: {}", e.getMessage());
+            log.warn("Không thể nạp font tiếng Việt Be Vietnam Pro từ classpath, dùng font mặc định: {}", e.getMessage());
             try {
                 regularBaseFont = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
                 boldBaseFont = BaseFont.createFont(BaseFont.HELVETICA_BOLD, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);

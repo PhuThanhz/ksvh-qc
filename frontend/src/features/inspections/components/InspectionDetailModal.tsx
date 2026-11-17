@@ -8,7 +8,7 @@ import { reportApi } from '@/features/reports/api/report.api'
 import { useNotify } from '@/hooks/useNotify'
 import { formatDate } from '@/utils/format-date'
 import { INSPECTION_KIND_LABEL, INSPECTION_MODE_LABEL, LOCATION_STATUS_META } from '@/features/inspections/inspection.types'
-import { parseMediaUrls, toMediaUrl } from '@/utils/media-url'
+import { isVideoUrl, parseMediaUrls, toMediaUrl } from '@/utils/media-url'
 import { formatInspectionDuration, getComplianceGrade } from '@/features/inspections/utils/inspection-metrics'
 import { InspectionPrintModal } from './InspectionPrintModal'
 
@@ -62,9 +62,16 @@ export function InspectionDetailModal({ open, inspectionId, onClose }: Props) {
             {r.comment && <div style={{ fontSize: 13, color: 'var(--app-text-body)', marginTop: 4 }}>Ghi chú: {r.comment}</div>}
             {photos.length > 0 && (
               <div style={{ marginTop: 6 }}>
-                <Image.PreviewGroup>
-                  <Space size={6} wrap>
-                    {photos.map((url, i) => (
+                <Space size={6} wrap>
+                  {photos.map((url, i) =>
+                    isVideoUrl(url) ? (
+                      <video
+                        key={i}
+                        src={toMediaUrl(url)}
+                        controls
+                        style={{ width: 100, height: 48, objectFit: 'cover', borderRadius: 4, border: '1px solid var(--app-border)' }}
+                      />
+                    ) : (
                       <Image
                         key={i}
                         src={toMediaUrl(url)}
@@ -74,9 +81,9 @@ export function InspectionDetailModal({ open, inspectionId, onClose }: Props) {
                         height={48}
                         style={{ objectFit: 'cover', borderRadius: 4, border: '1px solid var(--app-border)' }}
                       />
-                    ))}
-                  </Space>
-                </Image.PreviewGroup>
+                    )
+                  )}
+                </Space>
               </div>
             )}
           </div>

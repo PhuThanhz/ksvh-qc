@@ -24,6 +24,7 @@ export function InspectionHomePage() {
 
   const isStore = user?.roles?.includes('STORE_MANAGER') ?? false
   const [tab, setTab] = useState<'tasks' | 'findings'>(isStore && !canPerform ? 'findings' : 'tasks')
+  const [findingFilter, setFindingFilter] = useState<'urgent' | 'pending' | 'all'>('urgent')
 
   const { data: tasks, isLoading: loadingTasks, refetch: refetchTasks } = useMyTasks()
   const { data: findingsPage, isLoading: loadingFindings, refetch: refetchFindings } = useFindings({ page: 0, size: 50 })
@@ -146,29 +147,45 @@ export function InspectionHomePage() {
         </>
       )}
 
-      {tab === 'findings' && (
-        <>
-          {canRespond && <AckInspectionList />}
-          <div style={{ fontSize: 15, fontWeight: 600 }}>
-            Lỗi vi phạm tại nhà hàng ({findingsPage?.totalItems ?? 0})
-          </div>
-          {findingsPage?.items && findingsPage.items.length > 0 ? (
-            findingsPage.items.map((f) => (
-              <MobileFindingCard
-                key={f.id}
-                finding={f}
-                canRespond={canRespond}
-                canRemediate={canRemediate}
-                onAction={onOpenAction}
-              />
-            ))
-          ) : (
-            !loadingFindings && (
-              <ErrorBlock status="empty" title="Không có lỗi nào" description="Nhà hàng chưa ghi nhận lỗi vi phạm nào" />
-            )
-          )}
-        </>
-      )}
+      {tab === 'findings' && (() => {
+        const allItems = findingsPage?.items ?? []
+        const urgentItems = allItems.filter((f) => f.status === 'OPEN' || f.status === 'CONFIRMED' || f.status === 'REMEDIATING')
+        const pendingItems = allItems.filter((f) => f.status === 'APPEALED' || f.status === 'APPEAL_MEETING' || f.status === 'PENDING_VERIFICATION')
+        const displayed = findingFilter === 'urgent' ? urgentItems : findingFilter === 'pending' ? pendingItems : allItems
+
+        return (
+          <>
+            {canRespond && <AckInspectionList />}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontSize: 15, fontWeight: 600 }}>Việc của tôi · Lỗi vi phạm</div>
+            </div>
+            <Segmented
+              value={findingFilter}
+              onChange={(v) => setFindingFilter(v as 'urgent' | 'pending' | 'all')}
+              options={[
+                { label: `Cần xử lý (${urgentItems.length})`, value: 'urgent' },
+                { label: `Chờ kết quả (${pendingItems.length})`, value: 'pending' },
+                { label: `Tất cả (${allItems.length})`, value: 'all' },
+              ]}
+            />
+            {displayed.length > 0 ? (
+              displayed.map((f) => (
+                <MobileFindingCard
+                  key={f.id}
+                  finding={f}
+                  canRespond={canRespond}
+                  canRemediate={canRemediate}
+                  onAction={onOpenAction}
+                />
+              ))
+            ) : (
+              !loadingFindings && (
+                <ErrorBlock status="empty" title="Không có lỗi nào" description={findingFilter === 'urgent' ? 'Tuyệt vời! Nhà hàng không còn lỗi nào cần xử lý ngay.' : 'Chưa có lỗi nào trong mục này.'} />
+              )
+            )}
+          </>
+        )
+      })()}
 
       <InspectionFormModal open={createModal} onClose={() => { setCreateModal(false); void refetchTasks() }} />
       <FindingActionModal

@@ -16,9 +16,9 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 class EvidenceService implements EvidenceApi {
 
-    /** Khớp định dạng key do MediaService.presignUpload sinh: photos/yyyy/MM/u{userId}/{uuid}.{ext}. */
+    /** Khớp định dạng key do MediaService.presignUpload sinh: (photos|videos)/yyyy/MM/u{userId}/{uuid}.{ext}. */
     private static final Pattern KEY = Pattern.compile(
-            "^photos/\\d{4}/\\d{2}/u(\\d+)/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.(jpg|png|webp)$");
+            "^(?:photos|videos)/\\d{4}/\\d{2}/u(\\d+)/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.(?:jpg|png|webp|mp4|mov)$");
     private static final int MAX_FILES = 20;
 
     private final ObjectStore store;
@@ -33,15 +33,15 @@ class EvidenceService implements EvidenceApi {
             return null;
         }
         if (keys.size() > MAX_FILES) {
-            throw invalid("Tối đa %d ảnh bằng chứng cho mỗi lần gửi".formatted(MAX_FILES));
+            throw invalid("Tối đa %d tệp bằng chứng cho mỗi lần gửi".formatted(MAX_FILES));
         }
         for (String key : keys) {
             Matcher m = KEY.matcher(key);
             if (!m.matches()) {
-                throw invalid("Ảnh bằng chứng phải được chụp/tải lên qua ứng dụng (không nhận đường dẫn ngoài)");
+                throw invalid("Tệp bằng chứng (ảnh/video) phải được tải lên qua ứng dụng (không nhận đường dẫn ngoài)");
             }
             if (uploaderId == null || !m.group(1).equals(String.valueOf(uploaderId))) {
-                throw invalid("Ảnh bằng chứng phải do chính người gửi tải lên");
+                throw invalid("Tệp bằng chứng (ảnh/video) phải do chính người gửi tải lên");
             }
             boolean exists;
             try {

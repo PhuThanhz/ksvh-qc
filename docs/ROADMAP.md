@@ -50,7 +50,7 @@ không lỗi · bộ tính rủi ro (RiskCalculator) · dashboard cơ bản · i
 - Test: integration test `NotificationFlowTests` (quyền hạn, đánh dấu đã đọc, unread count, chuyển phát sự kiện miền, job nhắc việc). ModularityTest và 78 test backend pass 100%, frontend lint/typecheck/build pass.
 
 ## Plan 3 – Báo cáo & xuất file (Excel & PDF) · Ưu tiên CAO – ĐÃ HOÀN THÀNH (17/11/2026)
-- Thư viện PDF: tích hợp `com.github.librepdf:openpdf:2.0.3` (được người dùng duyệt theo TECH_STACK.md); nhúng font tiếng Việt Arial TrueType (`Arial.ttf`, `Arial-Bold.ttf`) trong `backend/src/main/resources/fonts/` đảm bảo chạy tương thích mọi môi trường Docker/Linux/Mac.
+- Thư viện PDF: tích hợp `com.github.librepdf:openpdf:2.0.3` (được người dùng duyệt theo TECH_STACK.md); nhúng font tiếng Việt mã nguồn mở `Be Vietnam Pro` (SIL Open Font License: `BeVietnamPro-Regular.ttf`, `BeVietnamPro-Bold.ttf`) trong `backend/src/main/resources/fonts/` (thay thế font thương mại Arial), tuân thủ 100% bản quyền và đảm bảo chạy tương thích mọi môi trường Docker/Linux/Mac.
 - Backend (module `report`):
   - 5 báo cáo điều hành nghiệp vụ KSVH:
     1. Tổng hợp phiếu chấm theo tháng (số phiếu, tỷ lệ % tuân thủ, lỗi M1–M4).
@@ -75,7 +75,7 @@ không lỗi · bộ tính rủi ro (RiskCalculator) · dashboard cơ bản · i
   - Nút "Biên bản M4 (PDF)" trên modal chi tiết lỗi vi phạm M4 (`FindingDetailModal`).
 - Test: integration test `ReportApiTests` (8 integration tests kiểm tra đầy đủ JSON API, xuất Excel 5 báo cáo, xuất PDF phiếu kiểm tra, xuất PDF biên bản M4, kiểm tra phân quyền 403). Backend verify pass 86/86 tests + Spring Modulith compliant, frontend build pass 100%.
 
-## Plan 4 – Hạ mức ảnh hưởng & Hồ sơ rủi ro từng nhà hàng · Ưu tiên TRUNG BÌNH – ĐÃ HOÀN THÀNH (17/11/2026)
+## Plan 4 – Hạ mức ảnh hưởng & Hồ sơ rủi ro từng nhà hàng · Ưu tiên TRUNG BÌNH – XONG PHẦN KỸ THUẬT – CHỜ KSVH XÁC NHẬN (17/11/2026)
 - Rà `RiskCalculator` với TC-3 (hạ mức sau kỳ không lỗi):
   - Phương thức `evaluateCurrentRisk` đánh giá trạng thái rủi ro tại bất kỳ thời điểm nào (`asOfDate`).
   - Tự động hạ mức về `baseImpact` khi nhà hàng có đủ số tháng dương lịch sạch lỗi (`resetPeriodMonths`, mặc định 6 tháng).
@@ -89,6 +89,10 @@ không lỗi · bộ tính rủi ro (RiskCalculator) · dashboard cơ bản · i
     - Tab 1: Hồ sơ rủi ro nhà hàng (bộ chọn nhà hàng, chọn ngày, 4 KPI cards, bảng tiêu chí, modal lịch sử vi phạm).
     - Tab 2: Tiêu chí đang nâng mức toàn hệ thống (bảng toàn hệ thống, liên kết 1 click xem hồ sơ chi tiết).
   - Tích hợp deep link từ Báo cáo Xếp hạng nhà hàng sang Hồ sơ rủi ro.
+- **Trạng thái xác nhận nghiệp vụ:** Kỹ thuật đã hoàn tất 100%. Đang chờ Phòng KSVH xác nhận các câu hỏi nghiệp vụ liên quan:
+  - **Q2:** Chu kỳ đếm tần suất vi phạm (3 tháng / 6 tháng / 1 năm) – phần mềm đang để cấu hình linh hoạt mặc định 12 tháng.
+  - **Q3:** Điều kiện hạ mức (số tháng không lỗi liên tiếp) – phần mềm đang để cấu hình linh hoạt mặc định 6 tháng.
+  - Chi tiết giả định và câu hỏi xem tại [docs/QUESTIONS_FOR_KSVH.md](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/docs/QUESTIONS_FOR_KSVH.md).
 - Test: Unit test `RiskCalculatorTests` và Integration test `RestaurantRiskProfileApiTests` (4 integration tests) pass 100%. ModularityTest và toàn bộ 91 test backend pass 100%, frontend lint/typecheck/build pass.
 
 ## Plan 5 – Kiểm tra kết quả khắc phục & đề xuất kiểm tra đột xuất · Ưu tiên TRUNG BÌNH – ĐÃ HOÀN THÀNH (17/11/2026)
@@ -110,12 +114,14 @@ không lỗi · bộ tính rủi ro (RiskCalculator) · dashboard cơ bản · i
   - Hiển thị đầy đủ thông tin lỗi ban đầu, ảnh vi phạm, phương án và ảnh bằng chứng khắc phục của nhà hàng qua component `FindingRemediationInfo`.
 - Test: integration test `VerificationAndSurpriseFlowTests` (4 integration tests kiểm tra toàn diện luồng tạo phiếu nghiệm thu, chấm đạt đóng lỗi, chấm không đạt phạt vi phạm, đề xuất đột xuất, cảnh báo kế hoạch). Toàn bộ 95 backend tests pass 100%, Spring Modulith compliant, frontend build pass 100% (tất cả các file source <= 250 dòng).
 
-## Plan 6 – Trải nghiệm điện thoại & ngoại tuyến (Web Responsive) · Ưu tiên TRUNG BÌNH – ĐÃ HOÀN THÀNH (17/11/2026)
-- Trải nghiệm di động Web Responsive:
-  - Ứng dụng web tối ưu trải nghiệm cho trình duyệt điện thoại (Safari / Chrome) bằng bộ giao diện `antd-mobile` tích hợp sẵn, không phát sinh cấu hình app native cồng kềnh.
+## Plan 6 – Trải nghiệm điện thoại & ngoại tuyến (Web Responsive & PWA) · Ưu tiên TRUNG BÌNH – ĐÃ HOÀN THÀNH (17/11/2026)
+- Trải nghiệm di động Web Responsive & PWA:
+  - Ứng dụng web tối ưu trải nghiệm cho trình duyệt điện thoại (Safari / Chrome) bằng bộ giao diện `antd-mobile` tích hợp sẵn, hỗ trợ cài đặt lên màn hình chính điện thoại (PWA qua `manifest.webmanifest` và Service Worker tĩnh `sw.js`).
+  - Hàng đợi ngoại tuyến IndexedDB (`offline-media-queue.ts` & `useOfflineSync.ts`): Khi mạng chập chờn hoặc mất sóng tại hiện trường (tầng hầm, nhà bếp), ảnh chụp bằng chứng được lưu trữ an toàn trong IndexedDB của trình duyệt và tự động đẩy lên máy chủ ngay khi có kết nối trở lại.
+  - Hỗ trợ quay & tải video ngắn bằng chứng ($\le 50\text{MB} \approx 60$ giây, MP4/MOV) kèm trình phát video tích hợp trên thẻ tiêu chí và các modal chi tiết.
   - Lưu nháp tự động trên máy (`localStorage` theo từng phiếu kiểm tra): Chuyên viên đang chấm điểm tại hiện trường nếu bị mất sóng, vô tình reload hoặc đổi ứng dụng thì dữ liệu chấm vẫn được lưu trữ nguyên vẹn, tránh mất bài.
   - Chụp ảnh bằng chứng có watermark vị trí GPS, thời gian thực, tên Chuyên viên và tên nhà hàng.
-  - Màn hình mobile thông minh cho Cửa hàng trưởng & Chuyên viên (`InspectionHomePage`): gom việc cần làm (phiếu được giao, yêu cầu thẩm định khiếu nại, lỗi cần xác nhận, lỗi đang khắc phục, phiếu chờ xác nhận đã xem).
+  - Màn hình mobile thông minh cho Cửa hàng trưởng & Chuyên viên (`InspectionHomePage`): Bộ lọc segmented "Cần xử lý", "Chờ kết quả", "Tất cả" giúp gom gọn việc cần làm (phiếu được giao, yêu cầu thẩm định khiếu nại, lỗi cần xác nhận, lỗi đang khắc phục, phiếu chờ xác nhận đã xem).
 
 ## Plan 7 – Nhật ký hệ thống & toàn vẹn dữ liệu · Ưu tiên TRUNG BÌNH – ĐÃ HOÀN THÀNH (17/11/2026)
 - Database:
@@ -123,13 +129,13 @@ không lỗi · bộ tính rủi ro (RiskCalculator) · dashboard cơ bản · i
 - Backend (Module `audit` & `shared.audit`):
   - Sự kiện `AuditLogEvent` trong `vn.ksvh.qc.shared.audit` cho phép mọi module publish event kiểm toán mà không gây phụ thuộc vòng (tuân thủ 100% Spring Modulith).
   - Tự động ghi vết mọi thao tác quản trị & thay đổi dữ liệu nhạy cảm:
-    - Người dùng & phân quyền: `USER_CREATE`, `USER_UPDATE`, `USER_RESET_PASSWORD`, `USER_DELETE`, `ROLE_CREATE`, `ROLE_UPDATE`, `ROLE_DELETE`.
+    - Người dùng & phân quyền: `USER_CREATE`, `USER_UPDATE`, `USER_RESET_PASSWORD`, `USER_DELETE`, `ROLE_CREATE`, `ROLE_UPDATE`, `ROLE_DELETE`, `LOGIN_LOCKOUT`.
     - Danh mục tiêu chí: `CRITERION_CREATE`, `CRITERION_UPDATE`, `CRITERION_DELETE`, `CRITERION_GROUP_CREATE`, `CRITERION_GROUP_UPDATE`.
     - Cấu hình rủi ro: `RISK_CONFIG_UPDATE` (bảng phân loại mức rủi ro, cấu hình tần suất, quy tắc nâng mức).
     - Kế hoạch & kiểm tra: `PLAN_APPROVE`, `PLAN_REJECT`, `INSPECTION_CANCEL` (lưu lý do huỷ phiếu).
     - Khiếu nại: `APPEAL_CONCLUDE` (biên bản kết luận cuộc họp khiếu nại của Quản lý KSVH).
   - API: `GET /api/v1/audit-logs` (phân trang, lọc theo keyword, action, targetType, userId, khoảng ngày), `GET /api/v1/audit-logs/{id}`, `GET /api/v1/audit-logs/actions`, `GET /api/v1/audit-logs/target-types`. Phân quyền nghiêm ngặt với `system:log:read`.
-  - Rà soát tính bất biến dữ liệu: Sau khi nộp `SUBMITTED`, phiếu kiểm tra không thể bị sửa kết quả qua bất kỳ API nào; mọi sự thay đổi trạng thái lỗi đều qua `finding_events` có lịch sử đầy đủ.
+  - Rà soát & khoá chặt tính bất biến dữ liệu: Sau khi nộp `SUBMITTED`, bảng `inspection_items` (kết quả chấm gốc `FAIL`, ghi chú hiện trường, ảnh/video bằng chứng gốc) hoàn toàn bất biến qua toàn bộ chu kỳ khiếu nại, khắc phục và nghiệm thu; tiêu chí được chấp nhận khiếu nại giữ nguyên kết quả gốc `FAIL` và chỉ chuyển trạng thái hiển thị `findingStatus` sang `DISMISSED`. Đã kiểm chứng qua test tích hợp chuyên sâu `testStrictImmutabilityOfInspectionItemsAcrossEntirePostSubmitLifecycle`.
 - Frontend:
   - Trang `/admin/audit-logs` ([AuditLogPage.tsx](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/frontend/src/features/audit/pages/AuditLogPage.tsx)): Bộ lọc đa năng (hành động, loại đối tượng, khoảng ngày, từ khoá), bảng dữ liệu có Tag màu theo loại hành động, nút xem chi tiết và nút xuất CSV.
   - Modal [AuditLogDetailModal.tsx](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/frontend/src/features/audit/components/AuditLogDetailModal.tsx): Xem chi tiết bản ghi kiểm toán, format JSON dữ liệu chi tiết dễ nhìn.
@@ -145,7 +151,7 @@ không lỗi · bộ tính rủi ro (RiskCalculator) · dashboard cơ bản · i
   - Tự động phân giải thông tin người nhận: ưu tiên cấu hình riêng của user $\rightarrow$ email/số điện thoại từ hồ sơ nhân viên (`employee.api.EmployeeLookupApi`) $\rightarrow$ tài khoản username.
   - Trình tạo email HTML tiếng Việt chuẩn nhận diện thương hiệu KSVH QC (`EmailTemplateService`): banner màu xanh KSVH `#003a8c`, khung card tin nhắn sắc nét, nút bấm Call-to-Action dẫn thẳng tới màn hình chi tiết, hỗ trợ hiển thị đẹp trên mọi trình duyệt/thiết bị.
   - Bộ gửi `EmailNotificationSender` & `ZaloNotificationSender`: gửi thật khi có cấu hình (SMTP/Zalo ZNS), tự động ghi nhận mô phỏng môi trường phát triển (không làm tắc nghẽn luồng nghiệp vụ).
-  - Tự động tạo bản ghi gửi thông báo kênh ngoài đồng bộ theo sự kiện in-app của Plan 2; xử lý ngầm bất đồng bộ `@Async`.
+  - Tự động tạo bản ghi gửi thông báo kênh ngoài đồng bộ theo sự kiện in-app của Plan 2; xử lý ngầm bất đồng bộ `@Async` chỉ sau khi giao dịch cơ sở dữ liệu đã commit thành công (`@TransactionalEventListener(phase = AFTER_COMMIT)`), tránh triệt để lỗi khoá ngoại.
   - Cơ chế thử lại tự động: Scheduled job `retryFailedDispatches` quét 5 phút/lần tự động gửi lại các thông báo bị lỗi tối đa 3 lần.
   - API cấu hình kênh cá nhân: `GET /api/v1/notifications/preferences`, `PUT /api/v1/notifications/preferences`.
 - Frontend:
@@ -153,41 +159,38 @@ không lỗi · bộ tính rủi ro (RiskCalculator) · dashboard cơ bản · i
   - Modal [NotificationPreferenceModal.tsx](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/frontend/src/features/notifications/components/NotificationPreferenceModal.tsx): giao diện trực quan cho phép người dùng bật/tắt nhận Email, bật/tắt nhận Zalo, nhập email/SĐT tuỳ chọn (hiển thị email mặc định).
 - Test: integration test `ExternalNotificationFlowTests` (lấy/cập nhật cấu hình, tạo bản ghi gửi outbox khi có sự kiện, sinh HTML template, quét và thử lại bản ghi thất bại). Toàn bộ 100/100 test backend pass 100%, Spring Modulith compliant, frontend build pass 100%.
 
-## Plan 9 – Sẵn sàng triển khai · Ưu tiên CAO – ĐÃ HOÀN THÀNH (17/11/2026)
+## Plan 9 – Sẵn sàng triển khai & Tăng cường Bảo mật · Ưu tiên CAO – ĐÃ HOÀN THÀNH (17/11/2026)
 - Docker & Triển khai 1 Lệnh:
   - Multi-stage build `backend/Dockerfile`: Build bằng Maven + Eclipse Temurin 21 JDK, runtime tối ưu Eclipse Temurin 21 JRE, font TrueType tiếng Việt cho PDF, non-root user `appuser:appgroup`, healthcheck `/actuator/health`.
   - Multi-stage build `frontend/Dockerfile`: Build bằng Node 22 Alpine, runtime Nginx 1.27 Alpine phục vụ file tĩnh, SPA routing fallback `/index.html`, reverse proxy `/api` và `/actuator` sang backend container, gzip nén tài nguyên và cache 1 năm cho assets.
   - Cấu hình [docker-compose.yml](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/docker-compose.yml) đầy đủ 5 services: `postgres:17-alpine` (healthcheck, volume `pgdata`), `minio` (healthcheck, volume `miniodata`), `minio-init` (tự động tạo bucket `ksvh-qc`), `backend` (kết nối nội bộ mạng Docker), `frontend` (Nginx cổng 80).
   - Tệp mẫu biến môi trường [.env.example](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/.env.example) chú thích tiếng Việt rõ ràng, tuyệt đối không lưu secret cứng trong repo.
-- Bảo mật hệ thống:
-  - Cấu hình profile `prod` ([application-prod.yml](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/backend/src/main/resources/application-prod.yml)): Tự động tắt Swagger UI và OpenAPI docs, tắt seed data mẫu, tắt hiển thị chi tiết stacktrace khi lỗi, cookie `Secure` + `SameSite=Strict`, giới hạn mức log.
-  - Header bảo mật Nginx: `X-Frame-Options DENY`, `X-Content-Type-Options nosniff`, `X-XSS-Protection "1; mode=block"`, `Referrer-Policy strict-origin-when-cross-origin`, `Permissions-Policy "geolocation=(self), camera=(self)"`.
+- Bảo mật hệ thống & Phòng chống Brute-force:
+  - Cấu hình profile `prod` ([application-prod.yml](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/backend/src/main/resources/application-prod.yml)): Tự động tắt Swagger UI và OpenAPI docs, tắt seed data mẫu, tắt hiển thị chi tiết stacktrace khi lỗi, cookie `Secure` + `SameSite=Strict`, giới hạn mức log. CORS cấu hình linh hoạt qua biến môi trường `CORS_ALLOWED_ORIGINS`.
+  - Chống Brute-force đăng nhập (`LoginAttemptService`): Giới hạn 5 lần đăng nhập thất bại trong 15 phút theo cặp `username@ip`. Lần thứ 6 bị chặn ngay với mã lỗi 429 `AUTH_ACCOUNT_LOCKED`, tự động ghi audit log `LOGIN_LOCKOUT`.
+  - Header bảo mật Spring Security & Nginx: HTTP Strict Transport Security (`HSTS` maxAge 31536000s, includeSubDomains), Content-Security-Policy (`CSP`), `X-Frame-Options DENY`, `X-Content-Type-Options nosniff`, `X-XSS-Protection "1; mode=block"`, `Referrer-Policy strict-origin-when-cross-origin`, `Permissions-Policy "geolocation=(self), camera=(self)"`.
 - Vận hành & Sao lưu tự động:
   - Script [scripts/backup.sh](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/scripts/backup.sh): Tự động xuất cơ sở dữ liệu PostgreSQL (`pg_dump` nén gzip) và kho ảnh MinIO Media, sinh mã băm SHA256 checksum kiểm tra toàn vẹn, tự động dọn dẹp bản sao lưu quá 30 ngày.
   - Script [scripts/restore.sh](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/scripts/restore.sh): Phục hồi nhanh cơ sở dữ liệu và dữ liệu ảnh chỉ bằng 1 dòng lệnh.
 - Tài liệu vận hành & Hướng dẫn:
   - Hướng dẫn triển khai Production chi tiết: [docs/DEPLOYMENT_GUIDE.md](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/docs/DEPLOYMENT_GUIDE.md) (yêu cầu phần cứng, cấu hình SSL/HTTPS cho camera/GPS di động, cron backup, giám sát healthcheck).
   - Sổ tay hướng dẫn sử dụng: [docs/USER_MANUAL.md](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/docs/USER_MANUAL.md) chi tiết cho cả 8 vai trò người dùng và toàn bộ quy trình 6 giai đoạn vận hành KSVH.
-  - Cập nhật [README.md](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/README.md) hoàn thiện.
+  - Cập nhật [README.md](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/README.md) đầy đủ mục Hướng dẫn Triển khai Production & Cấu hình Biến môi trường.
 
-## Plan 10 – Kiểm thử tổng & nghiệm thu với Phòng KSVH · Cuối cùng – ĐÃ HOÀN THÀNH (17/11/2026)
+## Plan 10 – Kiểm thử tổng & nghiệm thu với Phòng KSVH · Cuối cùng – XONG PHẦN KỸ THUẬT – CHỜ KSVH XÁC NHẬN (17/11/2026)
 - Kịch bản end-to-end theo 6 bước PDF cho cả 8 vai trò người dùng: Lập kế hoạch $\rightarrow$ Duyệt tự động sinh phiếu $\rightarrow$ Chấm trên điện thoại (GPS check-in, ảnh watermark) $\rightarrow$ Xác nhận & Khiếu nại hội đồng $\rightarrow$ Khắc phục & Nghiệm thu / Quá hạn phạt tần suất $\rightarrow$ Báo cáo & Điều hành.
-- Toàn bộ 100/100 automated test backend pass 100%, Spring Modulith compliant 100%.
+- Toàn bộ 102/102 automated test backend pass 100%, Spring Modulith compliant 100%.
 - Frontend: 0 lỗi TypeScript, 0 cảnh báo lint, build production thành công, 100% tệp mã nguồn $\le 250$ dòng.
-- Giải quyết toàn diện danh mục câu hỏi Q1–Q12 (`DOMAIN_SPEC §8`) kèm giá trị cấu hình mặc định chuẩn hoá cho nghiệp vụ KSVH.
-- Bàn giao Báo cáo Nghiệm thu tổng thể [docs/ACCEPTANCE_REPORT.md](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/docs/ACCEPTANCE_REPORT.md), Sổ tay Người dùng [docs/USER_MANUAL.md](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/docs/USER_MANUAL.md), Hướng dẫn Triển khai [docs/DEPLOYMENT_GUIDE.md](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/docs/DEPLOYMENT_GUIDE.md).
+- **Trạng thái nghiệm thu:**
+  - Kỹ thuật & tự động hoá: Đã hoàn tất 100% và sẵn sàng.
+  - Danh mục 9 câu hỏi nghiệp vụ gửi Phòng KSVH xem tại [docs/QUESTIONS_FOR_KSVH.md](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/docs/QUESTIONS_FOR_KSVH.md) (bao gồm Q2, Q3, Q5, Q6, Q7, Q9, Q10, Q11, Q12 cùng các giả định an toàn phần mềm đang áp dụng).
+  - Kịch bản & checklist nghiệm thu UAT chi tiết theo từng vai trò đã soạn thảo tại [docs/UAT_CHECKLIST.md](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/docs/UAT_CHECKLIST.md) (21 kịch bản kiểm thử cho 6 nhóm vai trò).
+  - Bàn giao Báo cáo Nghiệm thu tổng thể [docs/ACCEPTANCE_REPORT.md](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/docs/ACCEPTANCE_REPORT.md), Sổ tay Người dùng [docs/USER_MANUAL.md](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/docs/USER_MANUAL.md), Hướng dẫn Triển khai [docs/DEPLOYMENT_GUIDE.md](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/docs/DEPLOYMENT_GUIDE.md).
 
 ---
 
 ## Tổng kết Lộ trình Phát triển
-**10/10 Plans đã hoàn thành 100%:**
-1. ✅ **Plan 1:** Khiếu nại nhiều người thẩm định ($N \in [2,5]$ người, giải quyết bất đồng họp khiếu nại)
-2. ✅ **Plan 2:** Thông báo trong ứng dụng (In-app Notification, chuông, nhắc việc trước 1 ngày)
-3. ✅ **Plan 3:** Báo cáo & Xuất file (5 báo cáo Excel, PDF phiếu chấm & PDF biên bản M4)
-4. ✅ **Plan 4:** Hạ mức ảnh hưởng sau kỳ không lỗi & Hồ sơ rủi ro từng nhà hàng
-5. ✅ **Plan 5:** Phiếu kiểm tra kết quả khắc phục (`VERIFICATION`) & Gợi ý kiểm tra đột xuất
-6. ✅ **Plan 6:** Trải nghiệm di động Web Responsive (lưu nháp ngoại tuyến `localStorage`, GPS watermark)
-7. ✅ **Plan 7:** Nhật ký hệ thống & Toàn vẹn dữ liệu (Audit Log, tính bất biến dữ liệu)
-8. ✅ **Plan 8:** Kênh thông báo ngoài (Email HTML nhận diện thương hiệu, Zalo ZNS, Outbox & Retry)
-9. ✅ **Plan 9:** Sẵn sàng triển khai (Docker multi-stage, Docker Compose, Scripts backup/restore, Bảo mật Production)
-10. ✅ **Plan 10:** Kiểm thử toàn luồng & Nghiệm thu kỹ thuật với Phòng KSVH
+- **8/10 Plans đã hoàn thành 100%:** Plan 1, 2, 3, 5, 6, 7, 8, 9.
+- **2/10 Plans đã xong phần kỹ thuật – chờ Phòng KSVH xác nhận nghiệp vụ & nghiệm thu thực tế:**
+  - ⏳ **Plan 4:** Hạ mức ảnh hưởng sau kỳ không lỗi & Hồ sơ rủi ro (Chờ chốt Q2, Q3 về chu kỳ tháng sạch lỗi và chu kỳ nâng mức).
+  - ⏳ **Plan 10:** Kiểm thử UAT với Phòng KSVH (Chờ đại diện KSVH thực hiện 21 kịch bản UAT trong [docs/UAT_CHECKLIST.md](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/docs/UAT_CHECKLIST.md) và phản hồi 9 câu hỏi trong [docs/QUESTIONS_FOR_KSVH.md](file:///Users/huynhthanhphu/Documents/PROJECT%20-%20KSVH/docs/QUESTIONS_FOR_KSVH.md)).

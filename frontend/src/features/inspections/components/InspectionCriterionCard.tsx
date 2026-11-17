@@ -4,7 +4,7 @@ import { useRef, type ChangeEvent } from 'react'
 import { FindingRemediationInfo } from '@/features/inspections/components/FindingRemediationInfo'
 import { usePhotoCapture } from '@/features/media'
 import type { InspectionItemResponse, ItemResult } from '@/features/inspections/inspection.types'
-import { toMediaUrl } from '@/utils/media-url'
+import { isVideoUrl, toMediaUrl } from '@/utils/media-url'
 
 export interface CriterionRating {
   result: ItemResult
@@ -19,6 +19,7 @@ interface Props {
   onSetResult: (res: ItemResult) => void
   onSetComment: (comment: string) => void
   onSetEvidence: (evidenceUrls: string) => void
+  inspectionId?: number
   inspectorName?: string
   restaurantName?: string
   gpsCoords?: string
@@ -32,6 +33,7 @@ export function InspectionCriterionCard({
   onSetResult,
   onSetComment,
   onSetEvidence,
+  inspectionId,
   inspectorName,
   restaurantName,
   gpsCoords,
@@ -51,12 +53,18 @@ export function InspectionCriterionCard({
     if (inspectorName) lines.push(`Chuyên viên: ${inspectorName}`)
     if (gpsCoords) lines.push(gpsCoords)
 
-    const captured = await photo.process(file, lines)
+    const captured = await photo.process(file, lines, {
+      inspectionId: inspectionId ?? 0,
+      criterionId: item.criterionId,
+    })
     if (captured) {
       const currentUrls = rating.evidenceUrls ? rating.evidenceUrls.split(',').map((u) => u.trim()).filter(Boolean) : []
       currentUrls.push(captured.objectKey)
       onSetEvidence(currentUrls.join(', '))
-      Toast.show({ icon: 'success', content: 'Đã tải ảnh bằng chứng lên' })
+      Toast.show({
+        icon: captured.isOffline ? 'warning' : 'success',
+        content: captured.isOffline ? 'Đã lưu ngoại tuyến (tự đồng bộ khi có mạng)' : 'Đã tải bằng chứng lên',
+      })
     }
   }
 
@@ -143,7 +151,7 @@ export function InspectionCriterionCard({
                 <input
                   ref={inputRef}
                   type="file"
-                  accept="image/*"
+                  accept="image/*,video/mp4,video/quicktime"
                   capture="environment"
                   hidden
                   onChange={onCapturePhoto}
@@ -156,7 +164,7 @@ export function InspectionCriterionCard({
                   onClick={() => inputRef.current?.click()}
                   style={{ width: '100%' }}
                 >
-                  <CameraOutlined style={{ marginRight: 6 }} /> Chụp ảnh / Chọn ảnh bằng chứng
+                  <CameraOutlined style={{ marginRight: 6 }} /> Chụp ảnh / Quay video bằng chứng
                 </Button>
                 {photo.step === 'uploading' && <ProgressBar percent={photo.progress} style={{ marginTop: 6 }} />}
                 {photo.error && <div style={{ color: 'var(--app-danger)', fontSize: 12, marginTop: 4 }}>{photo.error}</div>}
@@ -165,21 +173,28 @@ export function InspectionCriterionCard({
 
             {evidenceList.length > 0 && (
               <Space wrap style={{ marginTop: 8 }}>
-                {evidenceList.map((url) => (
-                  <div key={url} style={{ position: 'relative', display: 'inline-block' }}>
-                    <Image lazy src={toMediaUrl(url)} width={64} height={64} fit="cover" style={{ borderRadius: 6 }} />
-                    {!readOnly && (
-                      <Button
-                        size="mini"
-                        color="danger"
-                        onClick={() => onRemovePhoto(url)}
-                        style={{ position: 'absolute', top: -6, right: -6, padding: '0 4px', height: 20, minWidth: 20, borderRadius: 10 }}
-                      >
-                        <DeleteOutlined style={{ fontSize: 10 }} />
-                      </Button>
-                    )}
-                  </div>
-                ))}
+                {evidenceList.map((url) => {
+                  const isVid = isVideoUrl(url)
+                  return (
+                    <div key={url} style={{ position: 'relative', display: 'inline-block' }}>
+                      {isVid ? (
+                        <video src={toMediaUrl(url)} controls style={{ width: 80, height: 64, objectFit: 'cover', borderRadius: 6 }} />
+                      ) : (
+                        <Image lazy src={toMediaUrl(url)} width={64} height={64} fit="cover" style={{ borderRadius: 6 }} />
+                      )}
+                      {!readOnly && (
+                        <Button
+                          size="mini"
+                          color="danger"
+                          onClick={() => onRemovePhoto(url)}
+                          style={{ position: 'absolute', top: -6, right: -6, padding: '0 4px', height: 20, minWidth: 20, borderRadius: 10 }}
+                        >
+                          <DeleteOutlined style={{ fontSize: 10 }} />
+                        </Button>
+                      )}
+                    </div>
+                  )
+                })}
               </Space>
             )}
 

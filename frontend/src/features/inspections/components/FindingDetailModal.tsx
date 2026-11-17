@@ -8,7 +8,7 @@ import { useFinding } from '@/features/inspections/hooks/useInspectionData'
 import { reportApi } from '@/features/reports/api/report.api'
 import { useNotify } from '@/hooks/useNotify'
 import { formatDate } from '@/utils/format-date'
-import { parseMediaUrls, toMediaUrl } from '@/utils/media-url'
+import { isVideoUrl, parseMediaUrls, toMediaUrl } from '@/utils/media-url'
 
 interface Props {
   open: boolean
@@ -23,23 +23,34 @@ function EvidenceGallery({ urls, title }: { urls?: string | null; title: string 
   return (
     <div style={{ marginTop: 8 }}>
       <Typography.Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
-        {title} ({list.length} ảnh):
+        {title} ({list.length} tệp):
       </Typography.Text>
-      <Image.PreviewGroup>
-        <Space size={8} wrap>
-          {list.map((u, idx) => (
+      <Space size={8} wrap>
+        {list.map((u, idx) => {
+          const mediaUrl = toMediaUrl(u)
+          if (isVideoUrl(u)) {
+            return (
+              <video
+                key={idx}
+                src={mediaUrl}
+                controls
+                style={{ width: 140, height: 80, borderRadius: 4, objectFit: 'cover', border: '1px solid var(--app-border)' }}
+              />
+            )
+          }
+          return (
             <Image
               key={idx}
-              src={toMediaUrl(u)}
+              src={mediaUrl}
               alt={`${title} #${idx + 1}`}
               loading="lazy"
               width={72}
               height={72}
               style={{ objectFit: 'cover', borderRadius: 4, border: '1px solid var(--app-border)' }}
             />
-          ))}
-        </Space>
-      </Image.PreviewGroup>
+          )
+        })}
+      </Space>
     </div>
   )
 }
