@@ -66,7 +66,7 @@ export function NotificationBell({ isMobile }: NotificationBellProps) {
       open={open}
       onOpenChange={setOpen}
       placement="bottomRight"
-      overlayInnerStyle={{ padding: 0 }}
+      styles={{ container: { padding: 0 } }}
     >
       {bellButton}
     </Popover>

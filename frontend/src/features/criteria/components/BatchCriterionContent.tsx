@@ -152,7 +152,7 @@ export function BatchCriterionContent({ group, onClose, onSuccess }: BatchCriter
       <Alert
         type="info"
         showIcon
-        message="Nhập nhanh nhiều tiêu chí con cho nhóm. Bạn có thể gõ từng dòng hoặc dán nhanh danh sách từ Word/Excel."
+        title="Nhập nhanh nhiều tiêu chí con cho nhóm. Bạn có thể gõ từng dòng hoặc dán nhanh danh sách từ Word/Excel."
       />
       {showPasteBox && (
         <BatchPasteBox

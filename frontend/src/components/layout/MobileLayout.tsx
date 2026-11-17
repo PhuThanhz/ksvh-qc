@@ -1,6 +1,7 @@
 import { NavBar, SafeArea, TabBar } from 'antd-mobile'
 import { Suspense, useEffect, type ReactNode } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router'
+import { ContentErrorBoundary } from '@/components/feedback/ContentErrorBoundary'
 import { LoadingState } from '@/components/feedback/LoadingState'
 import type { MenuEntry } from '@/components/layout/menu.types'
 import { usePermission } from '@/permissions'
@@ -52,9 +53,11 @@ export function MobileLayout({ title, rootPath, tabs, headerRight }: MobileLayou
           {title}
         </NavBar>
         <main style={{ flex: 1, overflowY: 'auto', background: 'var(--app-surface-sunken)' }}>
-          <Suspense fallback={<LoadingState />}>
-            <Outlet />
-          </Suspense>
+          <ContentErrorBoundary>
+            <Suspense fallback={<LoadingState />}>
+              <Outlet />
+            </Suspense>
+          </ContentErrorBoundary>
         </main>
         {visibleTabs.length > 1 && (
           <TabBar activeKey={active} onChange={(key) => navigate(key)}>

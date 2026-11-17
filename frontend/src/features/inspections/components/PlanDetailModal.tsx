@@ -88,7 +88,7 @@ export function PlanDetailModal({ planId, open, onClose }: Props) {
       onCancel={onClose}
       footer={null}
       width={860}
-      destroyOnClose
+      destroyOnHidden
     >
       <Spin spinning={planQuery.isLoading}>
         {plan && (

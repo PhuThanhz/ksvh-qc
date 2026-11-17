@@ -105,7 +105,7 @@ export function SurpriseSuggestionsModal({ open, onClose, onCreateSurprise }: Pr
       <Alert
         type="info"
         showIcon
-        message="Hệ thống tự động phân tích các nhà hàng có lỗi M3/M4 chưa khắc phục, điểm rủi ro tăng cao hoặc tiêu chí bị nâng mức để đề xuất kiểm tra đột xuất theo chuyên đề."
+        title="Hệ thống tự động phân tích các nhà hàng có lỗi M3/M4 chưa khắc phục, điểm rủi ro tăng cao hoặc tiêu chí bị nâng mức để đề xuất kiểm tra đột xuất theo chuyên đề."
         style={{ marginBottom: 16 }}
       />
 

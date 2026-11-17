@@ -43,7 +43,7 @@ export function BatchCriterionModal({ open, group, groups, onClose, onSuccess }:
       styles={{ body: { maxHeight: 'calc(100vh - 170px)', overflowY: 'auto' } }}
       onCancel={onClose}
       footer={null}
-      destroyOnClose
+      destroyOnHidden
     >
       <BatchCriterionContent key={activeGroup.id} group={activeGroup} onClose={onClose} onSuccess={onSuccess} />
     </Modal>

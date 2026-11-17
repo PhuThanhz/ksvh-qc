@@ -86,7 +86,7 @@ export function FindingActionModal({ open, action, finding, onClose }: Props) {
       onCancel={onClose}
       onOk={onSubmit}
       confirmLoading={isPending}
-      destroyOnClose
+      destroyOnHidden
       width={600}
     >
       <Form form={form} layout="vertical" style={{ marginTop: 16 }}>

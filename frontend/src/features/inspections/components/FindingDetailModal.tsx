@@ -102,7 +102,7 @@ export function FindingDetailModal({ open, findingId, onClose }: Props) {
       onCancel={onClose}
       footer={null}
       width={760}
-      destroyOnClose
+      destroyOnHidden
     >
       {isLoading ? (
         <Flex justify="center" align="center" style={{ minHeight: 200 }}>

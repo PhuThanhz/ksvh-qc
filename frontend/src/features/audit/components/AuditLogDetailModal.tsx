@@ -29,7 +29,7 @@ export function AuditLogDetailModal({ logId, open, onClose }: Props) {
       onCancel={onClose}
       footer={null}
       width={720}
-      destroyOnClose
+      destroyOnHidden
     >
       <Spin spinning={isLoading}>
         {log && (

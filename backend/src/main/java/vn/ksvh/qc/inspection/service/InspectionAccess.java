@@ -16,24 +16,24 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Kiểm tra quyền theo dữ liệu cho phiếu chấm và lỗi (quy tắc 2).
+ * Kiểm tra quyền truy cập phiếu chấm và lỗi vi phạm:
  * {@code inspection:read:all} xem mọi thứ; còn lại chỉ thấy phiếu được giao
  * hoặc phiếu của nhà hàng mình là CHT / OBM.
  */
 @Component
 @RequiredArgsConstructor
-class InspectionAccess {
+public class InspectionAccess {
 
     private static final String DENIED = "Bạn không có quyền với dữ liệu này";
 
     private final OrgUnitLookupApi orgUnitLookupApi;
 
-    boolean canReadAll(CurrentUser user) {
+    public boolean canReadAll(CurrentUser user) {
         return user.has(PermissionCodes.INSPECTION_READ_ALL);
     }
 
     /** Điều kiện lọc danh sách phiếu theo phạm vi người dùng; {@code null} = không giới hạn. */
-    Specification<Inspection> inspectionScope(CurrentUser user) {
+    public Specification<Inspection> inspectionScope(CurrentUser user) {
         if (canReadAll(user)) {
             return null;
         }
@@ -44,7 +44,7 @@ class InspectionAccess {
     }
 
     /** Điều kiện lọc danh sách lỗi; lỗi thuộc phiếu được giao được xử lý bằng danh sách id phiếu. */
-    Specification<Finding> findingScope(CurrentUser user, List<Long> ownInspectionIds) {
+    public Specification<Finding> findingScope(CurrentUser user, List<Long> ownInspectionIds) {
         if (canReadAll(user)) {
             return null;
         }
@@ -56,7 +56,7 @@ class InspectionAccess {
         };
     }
 
-    void requireRead(Inspection inspection, CurrentUser user) {
+    public void requireRead(Inspection inspection, CurrentUser user) {
         if (canReadAll(user) || isInspector(inspection, user) || managesRestaurant(inspection.getRestaurantId(), user)) {
             return;
         }
@@ -64,14 +64,14 @@ class InspectionAccess {
     }
 
     /** Chỉ Chuyên viên được giao mới check-in / chấm phiếu. */
-    void requireAssignedInspector(Inspection inspection, CurrentUser user) {
+    public void requireAssignedInspector(Inspection inspection, CurrentUser user) {
         if (!isInspector(inspection, user)) {
             throw new BusinessException(ErrorCode.ACCESS_DENIED, "Phiếu này không được giao cho bạn");
         }
     }
 
     /** Chỉ CHT của nhà hàng mới xác nhận / khiếu nại / khắc phục lỗi. */
-    void requireStoreManager(Long restaurantId, CurrentUser user) {
+    public void requireStoreManager(Long restaurantId, CurrentUser user) {
         OrgUnitRef rest = orgUnitLookupApi.findRefs(List.of(restaurantId)).get(restaurantId);
         if (rest == null || !Objects.equals(rest.storeManagerUserId(), user.id())) {
             throw new BusinessException(ErrorCode.ACCESS_DENIED, "Bạn không phải Cửa hàng trưởng của nhà hàng này");
@@ -79,7 +79,7 @@ class InspectionAccess {
     }
 
     /** Nghiệm thu: Chuyên viên chấm phiếu đó, hoặc người được xem mọi phiếu. */
-    void requireVerifier(Inspection inspection, CurrentUser user) {
+    public void requireVerifier(Inspection inspection, CurrentUser user) {
         if (!canReadAll(user) && !isInspector(inspection, user)) {
             throw new BusinessException(ErrorCode.ACCESS_DENIED, "Bạn không phải Chuyên viên phụ trách phiếu này");
         }

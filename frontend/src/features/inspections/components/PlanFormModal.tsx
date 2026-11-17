@@ -109,7 +109,7 @@ export function PlanFormModal({ open, plan, onClose }: Props) {
       onCancel={onClose}
       onOk={onSubmit}
       confirmLoading={save.isPending}
-      destroyOnClose
+      destroyOnHidden
       width={880}
     >
       <Spin spinning={isEdit && planDetail.isLoading}>

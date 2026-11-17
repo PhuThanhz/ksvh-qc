@@ -66,7 +66,7 @@ export function OccurrenceHistoryModal({ open, criterion, onClose }: OccurrenceH
       onCancel={onClose}
       footer={null}
       width={600}
-      destroyOnClose
+      destroyOnHidden
     >
       <div style={{ marginTop: 12 }}>
         <Table

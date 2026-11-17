@@ -55,7 +55,7 @@ export function NotificationPreferenceModal({ open, onClose }: NotificationPrefe
       confirmLoading={updateMutation.isPending}
       okText="Lưu thay đổi"
       cancelText="Đóng"
-      destroyOnClose
+      destroyOnHidden
       width={460}
     >
       <Form form={form} layout="vertical" onFinish={handleFinish} disabled={isLoading}>

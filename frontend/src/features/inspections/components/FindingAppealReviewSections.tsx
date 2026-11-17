@@ -12,7 +12,7 @@ export function FindingReviewFormSection({ finding }: ReviewSectionProps) {
         type="info"
         showIcon
         style={{ marginBottom: 16 }}
-        message={`Lý do khiếu nại từ nhà hàng: ${finding?.appealReason || '—'}`}
+        title={`Lý do khiếu nại từ nhà hàng: ${finding?.appealReason || '—'}`}
       />
       <Form.Item name="verdict" label="Ý kiến thẩm định" rules={[{ required: true }]}>
         <Radio.Group>
@@ -34,7 +34,7 @@ export function FindingMeetingConcludeSection() {
         type="warning"
         showIcon
         style={{ marginBottom: 16 }}
-        message="Họp giải quyết bất đồng ý kiến"
+        title="Họp giải quyết bất đồng ý kiến"
         description="Các thẩm định viên không đồng thuận 100%. Quản lý KSVH chủ trì họp và đưa ra kết luận cuối cùng cùng biên bản họp."
       />
       <Form.Item name="conclusion" label="Kết luận cuối cùng" rules={[{ required: true }]}>

@@ -66,7 +66,7 @@ export function InspectionBatchForm({ onSuccess, onCancel }: Props) {
         type="info"
         showIcon
         style={{ marginBottom: 16 }}
-        message="Tạo đợt kiểm tra hàng loạt cho nhiều nhà hàng đồng thời cùng tiêu chí và chuyên viên."
+        title="Tạo đợt kiểm tra hàng loạt cho nhiều nhà hàng đồng thời cùng tiêu chí và chuyên viên."
       />
 
       <Form.Item

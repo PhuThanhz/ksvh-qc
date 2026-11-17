@@ -81,7 +81,7 @@ export function VerificationCandidateSelector({ restaurantId, value = [], onChan
       <Alert
         type="info"
         showIcon
-        message="Vui lòng chọn nhà hàng ở trên để hệ thống tự động tải danh sách lỗi chờ nghiệm thu."
+        title="Vui lòng chọn nhà hàng ở trên để hệ thống tự động tải danh sách lỗi chờ nghiệm thu."
         style={{ marginTop: 8 }}
       />
     )

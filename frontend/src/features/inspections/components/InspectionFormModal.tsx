@@ -19,7 +19,7 @@ export function InspectionFormModal({ open, onClose, initialValues }: Props) {
       title="Khởi tạo phiếu kiểm tra & phân công"
       onCancel={onClose}
       footer={null}
-      destroyOnClose
+      destroyOnHidden
       width={680}
     >
       {!initialValues && (

@@ -2,6 +2,7 @@ import { SafetyCertificateFilled } from '@ant-design/icons'
 import { Drawer, Flex, Grid, Layout, Typography } from 'antd'
 import { Suspense, useState } from 'react'
 import { Outlet } from 'react-router'
+import { ContentErrorBoundary } from '@/components/feedback/ContentErrorBoundary'
 import { LoadingState } from '@/components/feedback/LoadingState'
 import { AmbientCanvas } from '@/components/layout/AmbientCanvas'
 import { AppHeader } from '@/components/layout/AppHeader'
@@ -162,9 +163,11 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
             minHeight: 'calc(100vh - 52px)',
           }}
         >
-          <Suspense fallback={<LoadingState />}>
-            <Outlet />
-          </Suspense>
+          <ContentErrorBoundary>
+            <Suspense fallback={<LoadingState />}>
+              <Outlet />
+            </Suspense>
+          </ContentErrorBoundary>
         </Layout.Content>
       </Layout>
     </Layout>

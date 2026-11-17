@@ -55,7 +55,7 @@ export function FindingAppealFormSection({
         type="info"
         showIcon
         style={{ marginBottom: 16 }}
-        message="Hội đồng thẩm định khiếu nại (2 – 5 người)"
+        title="Hội đồng thẩm định khiếu nại (2 – 5 người)"
         description="Chọn 2–5 người thẩm định (bắt buộc ≥ 1 đại diện KSVH). Không được chọn chuyên viên đã chấm lỗi này. 100% đồng thuận bỏ lỗi → Bỏ lỗi; 100% đồng thuận giữ lỗi → Giữ lỗi; Bất đồng ý kiến → Họp thống nhất do Quản lý KSVH chủ trì."
       />
 
