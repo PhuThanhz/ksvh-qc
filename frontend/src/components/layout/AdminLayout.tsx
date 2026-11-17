@@ -8,7 +8,6 @@ import { AppHeader } from '@/components/layout/AppHeader'
 import type { LayoutUser, MenuEntry } from '@/components/layout/menu.types'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { SidebarProfile } from '@/components/layout/SidebarProfile'
-import { ThemeModal } from '@/features/theme'
 
 export interface AdminLayoutProps {
   menu: readonly MenuEntry[]
@@ -72,7 +71,6 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
 
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [themeOpen, setThemeOpen] = useState(false)
 
   const handleToggle = () => {
     if (isDesktop) {
@@ -85,7 +83,6 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
   return (
     <Layout style={{ minHeight: '100vh', background: 'transparent', position: 'relative' }}>
       <AmbientCanvas />
-      <ThemeModal open={themeOpen} onClose={() => setThemeOpen(false)} />
       {isDesktop ? (
         <Layout.Sider
           collapsible
@@ -158,7 +155,6 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
             collapsed={isDesktop ? collapsed : !mobileOpen}
             onToggleSidebar={handleToggle}
             menu={menu}
-            onOpenTheme={() => setThemeOpen(true)}
           />
         </Layout.Header>
         <Layout.Content style={{ padding: isDesktop ? '14px 20px 24px' : '10px 12px 18px' }}>
