@@ -1,20 +1,20 @@
 import type { ThemeConfig } from 'antd'
 
-/** Màu sắc thương hiệu chuẩn Enterprise Operations: Sky / Blue (#0284c7) */
-export const BRAND_PRIMARY = '#0284c7'
+/** Màu sắc thương hiệu chuẩn Apple Design: Vivid Blue (#0071e3) */
+export const BRAND_PRIMARY = '#0071e3'
 
 export const antdTheme: ThemeConfig = {
   token: {
     colorPrimary: BRAND_PRIMARY,
     colorInfo: BRAND_PRIMARY,
-    colorSuccess: '#16a34a',
-    colorWarning: '#f59e0b',
-    colorError: '#dc2626',
-    colorTextBase: '#0f172a',
-    colorTextSecondary: '#475569',
-    colorBorder: '#e2e8f0',
-    colorBorderSecondary: '#f1f5f9',
-    colorBgLayout: '#f8fafc',
+    colorSuccess: '#34c759',
+    colorWarning: '#ff9500',
+    colorError: '#ff3b30',
+    colorTextBase: '#1d1d1f',
+    colorTextSecondary: '#6e6e73',
+    colorBorder: 'rgba(0, 0, 0, 0.08)',
+    colorBorderSecondary: 'rgba(0, 0, 0, 0.04)',
+    colorBgLayout: 'transparent',
     colorBgContainer: '#ffffff',
     borderRadius: 8,
     fontFamily:
@@ -22,22 +22,22 @@ export const antdTheme: ThemeConfig = {
   },
   components: {
     Card: {
-      colorBorderSecondary: '#e2e8f0',
-      boxShadowTertiary: '0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04)',
+      colorBorderSecondary: 'rgba(0, 0, 0, 0.06)',
+      boxShadowTertiary: '0 1px 2px rgba(0, 0, 0, 0.02), 0 4px 16px -2px rgba(0, 0, 0, 0.04)',
     },
     Table: {
-      headerBg: '#f8fafc',
-      headerColor: '#475569',
-      borderColor: '#f1f5f9',
-      rowHoverBg: '#f8fafc',
+      headerBg: '#fafafc',
+      headerColor: '#6e6e73',
+      borderColor: 'rgba(0, 0, 0, 0.05)',
+      rowHoverBg: 'rgba(0, 113, 227, 0.04)',
     },
     Button: {
       fontWeight: 500,
     },
     Layout: {
-      bodyBg: '#f8fafc',
-      headerBg: '#ffffff',
-      siderBg: '#0f172a',
+      bodyBg: 'transparent',
+      headerBg: 'transparent',
+      siderBg: 'transparent',
     },
   },
 }

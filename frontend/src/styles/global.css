@@ -4,92 +4,113 @@ html, body, #root { margin: 0; min-height: 100%; }
 body {
   font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: transparent;
+  color: #1d1d1f;
 }
 
 .compact-table-form .ant-form-item { margin-bottom: 0; }
 .compact-table-form .ant-table-cell { vertical-align: top; }
 
-/* Sidebar doanh nghiệp hiện đại: Slate 900 vững chãi, tương phản cao, không nhoè */
-.enterprise-dark-sidebar {
-  background: #0f172a !important;
-  border-inline-end: 1px solid #1e293b !important;
-  box-shadow: 1px 0 4px rgba(0, 0, 0, 0.08) !important;
+/* Sidebar kính mờ Apple (macOS Frosted Glass Sidebar) */
+.apple-frosted-sidebar {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(16px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
+  border-inline-end: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.04) !important;
 }
 
-.enterprise-dark-sidebar .ant-menu {
+.apple-frosted-header {
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(16px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.04) !important;
+}
+
+.apple-frosted-sidebar .ant-menu {
   border-inline-end: none !important;
   padding-inline: 4px !important;
   background: transparent !important;
 }
 
-/* Các mục menu: Cỡ chữ 13.5px, icon 16px, chiều cao 38px thanh thoát */
-.enterprise-dark-sidebar .ant-menu-item,
-.enterprise-dark-sidebar .ant-menu-submenu-title {
+/* Các mục menu: Cỡ chữ chuẩn Apple macOS 13.5px, icon 16px, chiều cao 36px thanh thoát */
+.apple-frosted-sidebar .ant-menu-item,
+.apple-frosted-sidebar .ant-menu-submenu-title {
   border-radius: 8px !important;
   margin-inline: 6px !important;
   margin-block: 3px !important;
-  height: 38px !important;
-  line-height: 38px !important;
+  height: 36px !important;
+  line-height: 36px !important;
   font-size: 13.5px !important;
   font-weight: 500 !important;
-  color: #94a3b8 !important;
+  color: #ffffff !important;
   letter-spacing: -0.01em !important;
-  transition: all 0.15s ease !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
+  transition: background 0.15s ease, color 0.15s ease !important;
   border: none !important;
   box-shadow: none !important;
 }
 
-.enterprise-dark-sidebar .ant-menu-title-content,
-.enterprise-dark-sidebar .ant-menu-item a,
-.enterprise-dark-sidebar .ant-menu-item .ant-menu-item-icon,
-.enterprise-dark-sidebar .ant-menu-submenu-title .ant-menu-item-icon,
-.enterprise-dark-sidebar .ant-menu-submenu-arrow {
-  color: inherit !important;
+/* Toàn bộ chữ và icon trên Sidebar luôn là màu trắng sắc nét */
+.apple-frosted-sidebar .ant-menu-title-content,
+.apple-frosted-sidebar .ant-menu-item a,
+.apple-frosted-sidebar .ant-menu-item .ant-menu-item-icon,
+.apple-frosted-sidebar .ant-menu-submenu-title .ant-menu-item-icon,
+.apple-frosted-sidebar .ant-menu-submenu-arrow {
+  color: #ffffff !important;
   font-size: inherit;
   transition: color 0.15s ease !important;
 }
 
-.enterprise-dark-sidebar .ant-menu-item .ant-menu-item-icon,
-.enterprise-dark-sidebar .ant-menu-submenu-title .ant-menu-item-icon {
+.apple-frosted-sidebar .ant-menu-item .ant-menu-item-icon,
+.apple-frosted-sidebar .ant-menu-submenu-title .ant-menu-item-icon {
   font-size: 16px !important;
-  margin-right: 10px !important;
-  color: #64748b !important;
+  margin-right: 9px !important;
 }
 
-.enterprise-dark-sidebar .ant-menu-submenu-arrow {
-  color: #64748b !important;
+.apple-frosted-sidebar .ant-menu-submenu-arrow {
+  color: rgba(255, 255, 255, 0.85) !important;
   font-size: 11px !important;
 }
 
-/* Hover: Slate 800 nhẹ nhàng */
-.enterprise-dark-sidebar .ant-menu-item:hover,
-.enterprise-dark-sidebar .ant-menu-submenu-title:hover {
-  background: rgba(255, 255, 255, 0.06) !important;
-  color: #f8fafc !important;
+/* Hover: Lớp nhám phẳng mờ dịu mắt, tuyệt đối không viền, không bóng */
+.apple-frosted-sidebar .ant-menu-item:hover,
+.apple-frosted-sidebar .ant-menu-submenu-title:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
 }
 
-.enterprise-dark-sidebar .ant-menu-item:hover .ant-menu-item-icon,
-.enterprise-dark-sidebar .ant-menu-submenu-title:hover .ant-menu-item-icon {
-  color: #f8fafc !important;
+/* Khi nhấn chuột: Phẳng êm ái, không bóng lóa */
+.apple-frosted-sidebar .ant-menu-item:active,
+.apple-frosted-sidebar .ant-menu-submenu-title:active {
+  background: rgba(255, 255, 255, 0.22) !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
-/* Selected: Nền Brand Blue hoặc Indigo sáng rõ, chữ trắng tuyệt đối */
-.enterprise-dark-sidebar .ant-menu-item-selected {
-  background: #0284c7 !important;
+/* Selected: Nền nhám phẳng mờ mịn màng (Matte Frosted), không viền, không bóng loáng */
+.apple-frosted-sidebar .ant-menu-item-selected {
+  background: rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: none !important;
+  box-shadow: none !important;
   color: #ffffff !important;
   font-weight: 600 !important;
-  box-shadow: 0 1px 3px rgba(2, 132, 199, 0.4) !important;
+  text-shadow: none !important;
 }
 
-.enterprise-dark-sidebar .ant-menu-item-selected .ant-menu-item-icon,
-.enterprise-dark-sidebar .ant-menu-item-selected a,
-.enterprise-dark-sidebar .ant-menu-item-selected .ant-menu-title-content {
+.apple-frosted-sidebar .ant-menu-item-selected .ant-menu-item-icon,
+.apple-frosted-sidebar .ant-menu-item-selected a,
+.apple-frosted-sidebar .ant-menu-item-selected .ant-menu-title-content {
   color: #ffffff !important;
+  text-shadow: none !important;
 }
 
-.enterprise-dark-sidebar .ant-menu-sub { background: transparent !important; }
+.apple-frosted-sidebar .ant-menu-sub { background: transparent !important; }
 
 /* Thẻ Card nội dung: Nền trắng tinh khiết, viền mảnh Slate 200, đổ bóng sắc nét */
 .ant-card:not(.ant-card-bordered-none) {
@@ -217,5 +238,5 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.6); }
-.enterprise-dark-sidebar ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); }
-.enterprise-dark-sidebar ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.35); }
+.apple-frosted-sidebar ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.25); }
+.apple-frosted-sidebar ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.45); }

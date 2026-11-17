@@ -19,11 +19,13 @@ export function PageContainer({ title, subtitle, extra, children }: PageContaine
     <Flex vertical gap={12}>
       <div
         style={{
-          background: '#ffffff',
-          borderRadius: 10,
-          padding: '14px 20px',
-          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04)',
-          border: '1px solid #e2e8f0',
+          background: 'rgba(255, 255, 255, 0.88)',
+          backdropFilter: 'blur(20px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+          borderRadius: 14,
+          padding: '12px 20px',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.03), 0 4px 16px rgba(0, 0, 0, 0.04)',
+          border: '1px solid rgba(255, 255, 255, 0.7)',
         }}
       >
         <Flex justify="space-between" align="center" gap={12} wrap>

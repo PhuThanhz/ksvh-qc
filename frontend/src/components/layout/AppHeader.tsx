@@ -29,9 +29,9 @@ export function AppHeader({ collapsed, onToggleSidebar, menu, onOpenTheme }: App
             type="text"
             icon={
               collapsed ? (
-                <MenuUnfoldOutlined style={{ color: '#475569', fontSize: 16 }} />
+                <MenuUnfoldOutlined style={{ color: '#1d1d1f', fontSize: 16 }} />
               ) : (
-                <MenuFoldOutlined style={{ color: '#475569', fontSize: 16 }} />
+                <MenuFoldOutlined style={{ color: '#1d1d1f', fontSize: 16 }} />
               )
             }
             onClick={onToggleSidebar}
@@ -39,9 +39,10 @@ export function AppHeader({ collapsed, onToggleSidebar, menu, onOpenTheme }: App
             style={{
               width: 32,
               height: 32,
-              borderRadius: 6,
-              background: '#f8fafc',
-              border: '1px solid #e2e8f0',
+              borderRadius: 8,
+              background: 'rgba(255, 255, 255, 0.5)',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(255, 255, 255, 0.7)',
             }}
           />
         )}
@@ -50,11 +51,11 @@ export function AppHeader({ collapsed, onToggleSidebar, menu, onOpenTheme }: App
           <Flex align="center" gap={6} style={{ fontSize: 13.5, userSelect: 'none' }}>
             {activeEntry.group && (
               <>
-                <span style={{ color: '#64748b', fontWeight: 500 }}>{activeEntry.group}</span>
-                <span style={{ color: '#cbd5e1' }}>/</span>
+                <span style={{ color: 'rgba(29, 29, 31, 0.65)', fontWeight: 500 }}>{activeEntry.group}</span>
+                <span style={{ color: 'rgba(29, 29, 31, 0.35)' }}>/</span>
               </>
             )}
-            <span style={{ color: '#0f172a', fontWeight: 600 }}>
+            <span style={{ color: '#1d1d1f', fontWeight: 600 }}>
               {activeEntry.label}
             </span>
           </Flex>
@@ -65,7 +66,7 @@ export function AppHeader({ collapsed, onToggleSidebar, menu, onOpenTheme }: App
         <Tooltip title="Đổi chủ đề / hình nền giao diện">
           <Button
             type="text"
-            icon={<BgColorsOutlined style={{ color: '#0284c7', fontSize: 15 }} />}
+            icon={<BgColorsOutlined style={{ color: '#0071e3', fontSize: 15 }} />}
             onClick={onOpenTheme}
             aria-label="Đổi hình nền giao diện"
             style={{
@@ -73,13 +74,15 @@ export function AppHeader({ collapsed, onToggleSidebar, menu, onOpenTheme }: App
               alignItems: 'center',
               gap: 6,
               height: 32,
-              borderRadius: 6,
-              paddingInline: 10,
-              background: '#f0f9ff',
-              border: '1px solid #bae6fd',
-              color: '#0369a1',
+              borderRadius: 8,
+              paddingInline: 12,
+              background: 'rgba(255, 255, 255, 0.6)',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(255, 255, 255, 0.8)',
+              color: '#0071e3',
               fontWeight: 500,
               fontSize: 12.5,
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
             }}
           >
             Đổi hình nền

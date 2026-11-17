@@ -17,18 +17,17 @@ export interface AdminLayoutProps {
   loggingOut?: boolean
 }
 
-function BrandHeader({ collapsed }: { collapsed: boolean }) {
+function BrandHeader({ collapsed, borderColor }: { collapsed: boolean; borderColor: string }) {
   return (
     <Flex
       align="center"
       justify={collapsed ? 'center' : 'flex-start'}
       gap={12}
       style={{
-        height: 54,
-        paddingInline: collapsed ? 0 : 18,
-        borderBottom: '1px solid #1e293b',
+        height: 58,
+        paddingInline: collapsed ? 0 : 20,
+        borderBottom: `1px solid ${borderColor}`,
         flexShrink: 0,
-        background: '#0f172a',
       }}
     >
       <Flex
@@ -38,11 +37,11 @@ function BrandHeader({ collapsed }: { collapsed: boolean }) {
           width: 32,
           height: 32,
           borderRadius: 8,
-          background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+          background: 'rgba(255, 255, 255, 0.22)',
           color: '#ffffff',
-          fontSize: 17,
+          fontSize: 18,
           flexShrink: 0,
-          boxShadow: '0 2px 6px rgba(2, 132, 199, 0.35)',
+          backdropFilter: 'blur(8px)',
         }}
       >
         <SafetyCertificateFilled />
@@ -50,14 +49,14 @@ function BrandHeader({ collapsed }: { collapsed: boolean }) {
       {!collapsed && (
         <Flex vertical style={{ lineHeight: 1.2, overflow: 'hidden' }}>
           <Flex align="center" gap={6}>
-            <Typography.Text strong style={{ fontSize: 15, fontWeight: 700, letterSpacing: -0.2, color: '#f8fafc' }}>
+            <Typography.Text strong style={{ fontSize: 16, fontWeight: 700, letterSpacing: -0.2, color: '#ffffff', textShadow: '0 1px 3px rgba(0, 0, 0, 0.6)' }}>
               KSVH QC
             </Typography.Text>
-            <Tag style={{ fontSize: 10, lineHeight: '16px', padding: '0 4px', margin: 0, borderRadius: 4, background: 'rgba(2, 132, 199, 0.2)', color: '#38bdf8', border: '1px solid rgba(2, 132, 199, 0.3)' }}>
+            <Tag style={{ fontSize: 10, lineHeight: '16px', padding: '0 4px', margin: 0, borderRadius: 4, background: 'rgba(255, 255, 255, 0.25)', color: '#ffffff', border: 'none' }}>
               PRO
             </Tag>
           </Flex>
-          <Typography.Text style={{ fontSize: 11, whiteSpace: 'nowrap', color: '#94a3b8' }}>
+          <Typography.Text style={{ fontSize: 11, whiteSpace: 'nowrap', color: 'rgba(255, 255, 255, 0.85)', textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)' }}>
             Kiểm soát vận hành
           </Typography.Text>
         </Flex>
@@ -92,23 +91,21 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
           collapsible
           collapsed={collapsed}
           trigger={null}
-          theme="dark"
-          width={260}
-          collapsedWidth={72}
-          className="enterprise-dark-sidebar"
+          theme="light"
+          width={280}
+          collapsedWidth={76}
+          className="apple-frosted-sidebar"
           style={{
             position: 'sticky',
             top: 0,
             height: '100vh',
             display: 'flex',
             flexDirection: 'column',
-            background: '#0f172a',
-            borderRight: '1px solid #1e293b',
             zIndex: 100,
           }}
         >
           <Flex vertical style={{ height: '100%', overflow: 'hidden' }}>
-            <BrandHeader collapsed={collapsed} />
+            <BrandHeader collapsed={collapsed} borderColor="rgba(255, 255, 255, 0.12)" />
             <div style={{ flex: 1, overflowY: 'auto' }}>
               <Sidebar menu={menu} />
             </div>
@@ -125,13 +122,13 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
           placement="left"
           open={mobileOpen}
           onClose={() => setMobileOpen(false)}
-          size={260}
+          size={280}
           closable={false}
-          className="enterprise-dark-sidebar"
-          styles={{ body: { padding: 0, background: '#0f172a' } }}
+          className="apple-frosted-sidebar"
+          styles={{ body: { padding: 0 } }}
         >
           <Flex vertical style={{ height: '100%' }}>
-            <BrandHeader collapsed={false} />
+            <BrandHeader collapsed={false} borderColor="rgba(255, 255, 255, 0.12)" />
             <div style={{ flex: 1, overflowY: 'auto' }}>
               <Sidebar menu={menu} onSelect={() => setMobileOpen(false)} />
             </div>
@@ -147,18 +144,14 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
 
       <Layout style={{ minWidth: 0, background: 'transparent', position: 'relative', zIndex: 1 }}>
         <Layout.Header
+          className="apple-frosted-header"
           style={{
-            paddingInline: isDesktop ? 24 : 16,
-            height: 52,
-            lineHeight: '52px',
+            paddingInline: isDesktop ? 20 : 16,
+            height: 50,
+            lineHeight: '50px',
             position: 'sticky',
             top: 0,
             zIndex: 10,
-            background: 'rgba(255, 255, 255, 0.92)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            borderBottom: '1px solid #e2e8f0',
-            boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.03)',
           }}
         >
           <AppHeader
@@ -168,7 +161,7 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
             onOpenTheme={() => setThemeOpen(true)}
           />
         </Layout.Header>
-        <Layout.Content style={{ padding: isDesktop ? '16px 24px 28px' : '12px 14px 20px' }}>
+        <Layout.Content style={{ padding: isDesktop ? '14px 20px 24px' : '10px 12px 18px' }}>
           <Suspense fallback={<LoadingState />}>
             <Outlet />
           </Suspense>

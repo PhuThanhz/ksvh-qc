@@ -37,27 +37,16 @@ export function AmbientCanvas() {
       }}
     >
       {activeTheme.isImage && (
-        <>
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              backgroundImage: `url("${activeTheme.imageUrl}")`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              transition: 'background-image 0.5s ease-in-out',
-            }}
-          />
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'rgba(248, 250, 252, 0.72)',
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
-            }}
-          />
-        </>
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `url("${activeTheme.imageUrl}")`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            transition: 'background-image 0.5s ease-in-out',
+          }}
+        />
       )}
     </div>
   )
