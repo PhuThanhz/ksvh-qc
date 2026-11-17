@@ -65,7 +65,7 @@ export function LoginPage() {
             onClick={() => handleQuickLogin('admin', 'Admin@123')}
             style={{ textAlign: 'left', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: 8, height: 38 }}
           >
-            <span><strong style={{ color: '#0071e3' }}>Quản trị hệ thống</strong> <span style={{ color: '#64748b', fontSize: 12 }}>(admin)</span></span>
+            <span><strong style={{ color: '#0f172a' }}>Quản trị hệ thống</strong> <span style={{ color: '#64748b', fontSize: 12 }}>(admin)</span></span>
             <span style={{ color: '#94a3b8', fontSize: 12, fontFamily: 'monospace' }}>Admin@123</span>
           </Button>
           <Button

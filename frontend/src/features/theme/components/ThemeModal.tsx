@@ -99,8 +99,8 @@ export function ThemeModal({ open, onClose }: ThemeModalProps) {
                 borderRadius: 10,
                 overflow: 'hidden',
                 cursor: 'pointer',
-                border: isSelected ? '2px solid #0071e3' : '1px solid #e2e8f0',
-                boxShadow: isSelected ? '0 0 0 3px rgba(0, 113, 227, 0.2)' : undefined,
+                border: isSelected ? '2px solid #0f172a' : '1px solid #e2e8f0',
+                boxShadow: isSelected ? '0 0 0 3px rgba(15, 23, 42, 0.15)' : undefined,
                 transition: 'all 0.2s ease',
               }}
               styles={{ body: { padding: '8px 6px' } }}
@@ -120,7 +120,7 @@ export function ThemeModal({ open, onClose }: ThemeModalProps) {
                         position: 'absolute',
                         top: 6,
                         right: 6,
-                        color: '#0071e3',
+                        color: '#0f172a',
                         fontSize: 18,
                         background: '#ffffff',
                         borderRadius: '50%',

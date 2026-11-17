@@ -64,7 +64,7 @@ export function RestaurantComplianceChart({ data, loading, onSelectRestaurant }:
           data: list.map((item) => ({
             value: item.complianceScore ?? 0,
             itemStyle: {
-              color: item.attention ? '#f97316' : '#0284c7',
+              color: item.attention ? '#f97316' : '#0f172a',
               borderRadius: [4, 4, 0, 0],
             },
           })),

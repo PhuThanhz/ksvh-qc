@@ -36,8 +36,8 @@ function BrandHeader({ collapsed, borderColor }: { collapsed: boolean; borderCol
           width: 32,
           height: 32,
           borderRadius: 8,
-          background: 'rgba(0, 113, 227, 0.12)',
-          color: '#0071e3',
+          background: 'rgba(15, 23, 42, 0.08)',
+          color: '#0f172a',
           fontSize: 18,
           flexShrink: 0,
         }}
@@ -50,7 +50,7 @@ function BrandHeader({ collapsed, borderColor }: { collapsed: boolean; borderCol
             <Typography.Text strong style={{ fontSize: 16, fontWeight: 700, letterSpacing: -0.2, color: '#0f172a' }}>
               KSVH QC
             </Typography.Text>
-            <Tag style={{ fontSize: 10, lineHeight: '16px', padding: '0 4px', margin: 0, borderRadius: 4, background: 'rgba(0, 113, 227, 0.12)', color: '#0071e3', border: 'none', fontWeight: 600 }}>
+            <Tag style={{ fontSize: 10, lineHeight: '16px', padding: '0 4px', margin: 0, borderRadius: 4, background: 'rgba(15, 23, 42, 0.08)', color: '#0f172a', border: '1px solid rgba(15, 23, 42, 0.12)', fontWeight: 600 }}>
               PRO
             </Tag>
           </Flex>

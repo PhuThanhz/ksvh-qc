@@ -96,12 +96,12 @@ body {
   box-shadow: none !important;
 }
 
-/* Selected: Nền Apple Blue nổi bật, chữ trắng sắc nét */
+/* Selected: Nền Slate 900 trung tính sang trọng, chữ trắng sắc nét */
 .apple-frosted-sidebar .ant-menu-item-selected {
-  background: #0071e3 !important;
+  background: #0f172a !important;
   color: #ffffff !important;
   font-weight: 600 !important;
-  box-shadow: 0 2px 8px rgba(0, 113, 227, 0.28) !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.25) !important;
 }
 
 .apple-frosted-sidebar .ant-menu-item-selected .ant-menu-item-icon,
@@ -156,7 +156,7 @@ body {
 }
 
 .ant-table-wrapper .ant-table-tbody > tr:hover > td {
-  background: rgba(0, 113, 227, 0.05) !important;
+  background: rgba(15, 23, 42, 0.04) !important;
 }
 
 /* Ô nhập liệu kính mờ */
@@ -167,21 +167,23 @@ body {
 }
 
 .ant-input:focus, .ant-input-focused, .ant-select-focused .ant-select-selector {
-  border-color: #0071e3 !important;
-  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.14) !important;
+  border-color: #0f172a !important;
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.12) !important;
 }
 
-/* Nút bấm chuẩn Apple */
+/* Nút bấm chuẩn Apple Obsidian / Dark Slate */
 .ant-btn-primary {
-  background: #0071e3 !important;
-  border-color: #0071e3 !important;
+  background: #0f172a !important;
+  border-color: #0f172a !important;
   border-radius: 8px !important;
-  box-shadow: 0 2px 6px rgba(0, 113, 227, 0.25) !important;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2) !important;
   font-weight: 500 !important;
+  color: #ffffff !important;
 }
 .ant-btn-primary:hover {
-  background: #0077ed !important;
-  border-color: #0077ed !important;
+  background: #334155 !important;
+  border-color: #334155 !important;
+  color: #ffffff !important;
 }
 
 /* Modal & Toast kính mờ chuẩn sắc */
@@ -221,9 +223,9 @@ body {
 }
 .ant-tabs-nav::before { display: none !important; }
 .ant-tabs-tab { font-size: 13.5px !important; font-weight: 500 !important; padding: 6px 14px !important; color: #64748b !important; border-radius: 8px !important; transition: all 0.15s ease !important; }
-.ant-tabs-tab:hover { color: #0071e3 !important; }
+.ant-tabs-tab:hover { color: #0f172a !important; }
 .ant-tabs-tab-active { background: #ffffff !important; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important; }
-.ant-tabs-tab-active .ant-tabs-tab-btn { font-weight: 600 !important; color: #0071e3 !important; }
+.ant-tabs-tab-active .ant-tabs-tab-btn { font-weight: 600 !important; color: #0f172a !important; }
 .ant-tabs-ink-bar { display: none !important; }
 
 /* Thin Smooth Scrollbar */

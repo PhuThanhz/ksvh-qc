@@ -5,7 +5,7 @@ export type KpiTone = 'neutral' | 'blue' | 'critical' | 'good' | 'warning'
 
 const TONES: Record<KpiTone, { fg: string; bg: string }> = {
   neutral: { fg: '#475569', bg: '#f1f5f9' },
-  blue: { fg: '#0284c7', bg: '#e0f2fe' },
+  blue: { fg: '#0f172a', bg: 'rgba(15, 23, 42, 0.08)' },
   critical: { fg: '#dc2626', bg: '#fee2e2' },
   good: { fg: '#16a34a', bg: '#dcfce7' },
   warning: { fg: '#d97706', bg: '#fef3c7' },

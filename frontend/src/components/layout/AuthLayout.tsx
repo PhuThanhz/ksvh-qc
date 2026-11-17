@@ -63,10 +63,10 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
               width: 44,
               height: 44,
               borderRadius: 12,
-              background: 'linear-gradient(135deg, #0071e3 0%, #0056b3 100%)',
+              background: 'linear-gradient(135deg, #334155 0%, #0f172a 100%)',
               color: '#ffffff',
               fontSize: 24,
-              boxShadow: '0 4px 12px rgba(0, 113, 227, 0.35)',
+              boxShadow: '0 4px 12px rgba(15, 23, 42, 0.35)',
             }}
           >
             <SafetyCertificateFilled />

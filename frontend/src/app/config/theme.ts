@@ -1,7 +1,7 @@
 import type { ThemeConfig } from 'antd'
 
-/** Màu sắc thương hiệu chuẩn Apple Design: Vivid Blue (#0071e3) */
-export const BRAND_PRIMARY = '#0071e3'
+/** Màu sắc thương hiệu trung tính Obsidian / Dark Slate: phối hợp hài hoà với mọi màu nền */
+export const BRAND_PRIMARY = '#0f172a'
 
 export const antdTheme: ThemeConfig = {
   token: {
@@ -29,7 +29,7 @@ export const antdTheme: ThemeConfig = {
       headerBg: '#fafafc',
       headerColor: '#6e6e73',
       borderColor: 'rgba(0, 0, 0, 0.05)',
-      rowHoverBg: 'rgba(0, 113, 227, 0.04)',
+      rowHoverBg: 'rgba(0, 0, 0, 0.03)',
     },
     Button: {
       fontWeight: 500,
