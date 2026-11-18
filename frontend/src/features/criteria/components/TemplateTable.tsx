@@ -22,7 +22,7 @@ export function TemplateTable({ onView, onEdit, onDelete, ...props }: TemplateTa
     <DataTable<Template>
       {...props}
       rowKey="id"
-      scroll={{ x: 950 }}
+      scroll={{ x: 1180 }}
       columns={[
         {
           title: '#',
@@ -38,7 +38,7 @@ export function TemplateTable({ onView, onEdit, onDelete, ...props }: TemplateTa
           key: 'code',
           sorter: true,
           width: 130,
-          render: (code: string) => <Typography.Text strong code>{code}</Typography.Text>,
+          render: (code: string) => <Typography.Text strong code style={{ whiteSpace: 'nowrap' }}>{code}</Typography.Text>,
         },
         {
           title: 'Mẫu phiếu',
@@ -70,6 +70,7 @@ export function TemplateTable({ onView, onEdit, onDelete, ...props }: TemplateTa
         {
           title: 'Loại kiểm tra',
           dataIndex: 'inspectionType',
+          width: 130,
           render: (v: string | null) => (v ? <Tag>{v}</Tag> : <Typography.Text type="secondary">—</Typography.Text>),
         },
         {
@@ -85,12 +86,11 @@ export function TemplateTable({ onView, onEdit, onDelete, ...props }: TemplateTa
           width: 120,
           render: (a: boolean) => <StatusBadge status={a ? 'active' : 'inactive'} meta={ACTIVE_META} />,
         },
-        { title: 'Cập nhật', dataIndex: 'updatedAt', width: 140, render: formatDateTime },
+        { title: 'Cập nhật', dataIndex: 'updatedAt', width: 160, render: formatDateTime },
         {
           title: 'Thao tác',
           key: 'actions',
           width: 140,
-          fixed: 'right',
           render: (_: unknown, t: Template) => (
             <TableActions
               onView={() => onView(t)}

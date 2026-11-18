@@ -75,14 +75,15 @@ export function OrgUnitTable({ onView, onEdit, onDelete, onFilterType, fixedUnit
           },
         ]
       : []),
-    { title: 'Công ty', dataIndex: 'companyName' },
+    { title: 'Công ty', dataIndex: 'companyName', width: 140 },
     ...(!isDepartment
       ? [
-          { title: 'Cửa hàng trưởng', dataIndex: 'storeManager', render: userName },
-          { title: 'OBM', dataIndex: 'obm', render: userName },
+          { title: 'Cửa hàng trưởng', dataIndex: 'storeManager', width: 160, render: userName },
+          { title: 'OBM', dataIndex: 'obm', width: 150, render: userName },
           {
             title: 'GPS',
             key: 'gps',
+            width: 160,
             render: (_: unknown, row: OrgUnit) =>
               row.latitude !== null && row.longitude !== null ? (
                 <Flex vertical>
@@ -100,7 +101,6 @@ export function OrgUnitTable({ onView, onEdit, onDelete, onFilterType, fixedUnit
       title: 'Thao tác',
       key: 'actions',
       width: 140,
-      fixed: 'right' as const,
       render: (_: unknown, row: OrgUnit) => (
         <TableActions
           onView={() => onView(row)}
@@ -118,6 +118,7 @@ export function OrgUnitTable({ onView, onEdit, onDelete, onFilterType, fixedUnit
     <DataTable<OrgUnit>
       {...props}
       rowKey="id"
+      scroll={{ x: 1250 }}
       columns={columns}
     />
   )

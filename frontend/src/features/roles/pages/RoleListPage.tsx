@@ -101,7 +101,6 @@ export function RoleListPage() {
                 title: 'Thao tác',
                 key: 'actions',
                 width: 130,
-                fixed: 'right',
                 render: (_: unknown, r) => (
                   <TableActions
                     onView={() => setViewing(r)}

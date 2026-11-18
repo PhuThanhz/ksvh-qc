@@ -52,14 +52,14 @@ export function PlanTable({
       title: 'Mã kế hoạch',
       dataIndex: 'planCode',
       key: 'planCode',
-      width: 140,
-      render: (v) => <span style={{ fontWeight: 600 }}>{v}</span>,
+      width: 120,
+      render: (v) => <span style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{v}</span>,
     },
     {
       title: 'Tiêu đề kế hoạch',
       dataIndex: 'title',
       key: 'title',
-      width: 320,
+      width: 240,
       render: (t, r) => (
         <div>
           {onView ? (
@@ -80,14 +80,14 @@ export function PlanTable({
     {
       title: 'Thời gian',
       key: 'period',
-      width: 220,
+      width: 180,
       render: (_, r) => `${formatDate(r.startDate)} - ${formatDate(r.endDate)}`,
     },
     {
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
-      width: 130,
+      width: 120,
       render: (st: PlanStatus) => <StatusBadge status={st} meta={PLAN_STATUS_META} />,
     },
     {
@@ -102,22 +102,21 @@ export function PlanTable({
       title: 'Người tạo',
       dataIndex: 'createdByName',
       key: 'createdByName',
-      width: 150,
+      width: 130,
       render: (v) => v || '—',
     },
     {
       title: 'Người duyệt',
       dataIndex: 'approvedByName',
       key: 'approvedByName',
-      width: 150,
+      width: 130,
       render: (v) => v || '—',
     },
     {
       title: 'Thao tác',
       key: 'actions',
-      width: 175,
+      width: 150,
       align: 'center',
-      fixed: 'right',
       render: (_, r) => (
         <PlanActionButtons
           plan={r}
@@ -140,7 +139,7 @@ export function PlanTable({
       dataSource={data}
       rowKey="id"
       loading={loading}
-      scroll={{ x: 1350 }}
+      scroll={{ x: 1230 }}
       pagination={
         totalItems !== undefined
           ? {

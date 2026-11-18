@@ -132,7 +132,6 @@ export function RestaurantRankingTab() {
             icon={<FileExcelOutlined />}
             loading={exporting}
             onClick={handleExport}
-            className="btn-tint-excel"
           >
             Xuất Excel
           </Button>

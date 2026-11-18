@@ -132,7 +132,6 @@ export function FindingTable({
       key: 'actions',
       width: 175,
       align: 'center',
-      fixed: 'right',
       render: (_, r) => (
         <FindingActionButtons
           finding={r}

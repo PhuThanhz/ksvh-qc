@@ -61,7 +61,6 @@ export function UserTable({ roleName, onView, onEdit, onDelete, onResetPassword,
           title: 'Thao tác',
           key: 'actions',
           width: 175,
-          fixed: 'right',
           render: (_: unknown, u: User) => (
             <TableActions
               onView={() => onView(u)}

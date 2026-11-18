@@ -3,6 +3,7 @@ import { Button, DatePicker, Flex, Select, Table, Tooltip, Typography } from 'an
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import { useCallback, useState } from 'react'
+import { TableCard } from '@/components/data-display/TableCard'
 import { AdvancedFilter } from '@/components/data-entry/AdvancedFilter'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { AuditActionTag } from '@/features/audit/components/AuditActionTag'
@@ -146,20 +147,23 @@ export function AuditLogPage() {
           />
         </AdvancedFilter>
 
-        <Table
-          columns={columns}
-          dataSource={auditLogs.data?.content}
-          rowKey="id"
-          loading={auditLogs.isLoading}
-          pagination={{
-            current: params.page + 1,
-            pageSize: params.size,
-            total: auditLogs.data?.totalElements,
-            showSizeChanger: true,
-            onChange: (p, s) => onTableChange({ page: p - 1, size: s }),
-          }}
-          size="middle"
-        />
+        <TableCard>
+          <Table
+            columns={columns}
+            dataSource={auditLogs.data?.content}
+            rowKey="id"
+            loading={auditLogs.isLoading}
+            scroll={{ x: 1000 }}
+            pagination={{
+              current: params.page + 1,
+              pageSize: params.size,
+              total: auditLogs.data?.totalElements,
+              showSizeChanger: true,
+              onChange: (p, s) => onTableChange({ page: p - 1, size: s }),
+            }}
+            size="middle"
+          />
+        </TableCard>
       </Flex>
 
       <AuditLogDetailModal

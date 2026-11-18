@@ -34,7 +34,14 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
           render: (_: unknown, __: unknown, index: number) =>
             ((props.params?.page ?? 0) * (props.params?.size ?? 20)) + index + 1,
         },
-        { title: 'Mã', dataIndex: 'code', key: 'code', sorter: true, width: 110 },
+        {
+          title: 'Mã',
+          dataIndex: 'code',
+          key: 'code',
+          sorter: true,
+          width: 120,
+          render: (code: string) => <span style={{ whiteSpace: 'nowrap', fontWeight: 600 }}>{code}</span>,
+        },
         {
           title: 'Nhóm tiêu chí',
           dataIndex: 'groupName',
@@ -116,7 +123,6 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
           title: 'Thao tác',
           key: 'actions',
           width: 120,
-          fixed: 'right',
           render: (_: unknown, c: Criterion) => (
             <TableActions
               onView={() => onView(c)}

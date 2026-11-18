@@ -109,7 +109,6 @@ export function useGroupTableColumns({
       title: 'Thao tác',
       key: 'actions',
       width: 180,
-      fixed: 'right',
       render: (_, g: CriterionGroup) => (
         <TableActions
           recordName={g.name}

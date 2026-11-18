@@ -148,7 +148,6 @@ export function InspectionTable({
       key: 'actions',
       width: 120,
       align: 'center',
-      fixed: 'right',
       render: (_, r) => (
         <TableActions
           recordName={r.code}
@@ -176,7 +175,7 @@ export function InspectionTable({
       dataSource={data}
       rowKey="id"
       loading={loading}
-      scroll={{ x: 1250 }}
+      scroll={{ x: 1550 }}
       onRow={(r) => ({
         onDoubleClick: () => onView(r),
         style: { cursor: 'pointer' },

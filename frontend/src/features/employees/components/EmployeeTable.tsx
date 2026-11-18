@@ -24,7 +24,7 @@ export function EmployeeTable({ onView, onEdit, onDelete, ...props }: EmployeeTa
     <DataTable<Employee>
       {...props}
       rowKey="id"
-      scroll={{ x: 800 }}
+      scroll={{ x: 1100 }}
       columns={[
         {
           title: '#',
@@ -34,7 +34,14 @@ export function EmployeeTable({ onView, onEdit, onDelete, ...props }: EmployeeTa
           render: (_: unknown, __: unknown, index: number) =>
             ((props.params?.page ?? 0) * (props.params?.size ?? 20)) + index + 1,
         },
-        { title: 'Mã NV', dataIndex: 'employeeCode', key: 'employeeCode', sorter: true, width: 110 },
+        {
+          title: 'Mã NV',
+          dataIndex: 'employeeCode',
+          key: 'employeeCode',
+          sorter: true,
+          width: 110,
+          render: (c: string) => <span style={{ whiteSpace: 'nowrap', fontWeight: 600 }}>{c}</span>,
+        },
         {
           title: 'Họ tên',
           dataIndex: 'fullName',
@@ -52,6 +59,7 @@ export function EmployeeTable({ onView, onEdit, onDelete, ...props }: EmployeeTa
         {
           title: 'Liên hệ',
           key: 'contact',
+          width: 170,
           render: (_: unknown, e: Employee) => (
             <Flex vertical>
               <span>{dash(e.phone)}</span>
@@ -62,18 +70,19 @@ export function EmployeeTable({ onView, onEdit, onDelete, ...props }: EmployeeTa
         {
           title: 'Tài khoản',
           dataIndex: 'username',
+          width: 130,
           render: (u: string | null) => (u ? <Tag>{u}</Tag> : <Typography.Text type="secondary">Chưa có</Typography.Text>),
         },
         {
           title: 'Trạng thái',
           dataIndex: 'active',
+          width: 130,
           render: (active: boolean) => <StatusBadge status={active ? 'active' : 'inactive'} meta={ACTIVE_META} />,
         },
         {
           title: 'Thao tác',
           key: 'actions',
           width: 140,
-          fixed: 'right',
           render: (_: unknown, e: Employee) => (
             <TableActions
               onView={() => onView(e)}
