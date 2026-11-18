@@ -1,0 +1,77 @@
+/**
+ * ============================================================================
+ * DESIGN TOKENS CHUẨN — APPLE GLASS & MINIMALIST
+ * ECOM MINI / KSVH QC UI/UX MASTER BLUEPRINT
+ * ============================================================================
+ */
+
+:root {
+  /* Brand Primary Palette (Màu cam thương hiệu & Gradient ấm) */
+  --brand-primary: #ea580c;
+  --brand-primary-hover: #c2410c;
+  --brand-primary-light: #ffedd5;
+  --brand-coral: #e11d48;
+  --brand-amber: #f59e0b;
+  --brand-amber-light: #fef3c7;
+  --brand-amber-text: #b45309;
+
+  /* Nút CTA chính: Ánh sáng Apple từ trên xuống */
+  --brand-cta: linear-gradient(180deg, #fb8a2e 0%, #f26b12 100%);
+  --brand-cta-hover: linear-gradient(180deg, #fd963f 0%, #f5751c 100%);
+  --brand-cta-active: linear-gradient(180deg, #ea6a14 0%, #dc5a0a 100%);
+  --brand-cta-shadow: 0 1px 0 rgba(255, 255, 255, 0.35) inset, 0 6px 16px -4px rgba(242, 107, 18, 0.45);
+
+  /* Trạng thái hệ thống (Status Indicators) */
+  --status-up: #10b981;
+  --status-up-bg: #d1fae5;
+  --status-up-text: #047857;
+  --status-down: #ef4444;
+  --status-down-bg: #fee2e2;
+
+  /* Bảng màu trung tính Apple (Apple Neutral Canvas) */
+  --apple-bg-canvas: #f8fafc;
+  --apple-surface: rgba(255, 255, 255, 0.92);
+  --apple-surface-card: #ffffff;
+  --apple-surface-hover: #f1f5f9;
+  --apple-border: rgba(15, 23, 42, 0.08);
+  --apple-border-strong: rgba(15, 23, 42, 0.14);
+  --apple-border-focus: #ea580c;
+  --apple-input-border: rgba(15, 23, 42, 0.22);
+  --apple-placeholder: #7c8798;
+
+  /* Màu chữ phân cấp (Typography Hierarchy) */
+  --apple-text-primary: #0f172a;
+  --apple-text-secondary: #475569;
+  --apple-text-tertiary: #94a3b8;
+  --apple-text-on-accent: #ffffff;
+
+  /* Hiệu ứng Kính & Bóng mờ */
+  --apple-glass-bg: rgba(255, 255, 255, 0.78);
+  --apple-glass-blur: blur(24px) saturate(180%);
+  --apple-mask-bg: rgba(15, 23, 42, 0.42);
+  --apple-mask-blur: blur(10px) saturate(120%);
+  --apple-shadow-modal: 0 32px 80px -12px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(15, 23, 42, 0.04);
+  --apple-shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06);
+  --apple-shadow-md: 0 10px 30px -4px rgba(15, 23, 42, 0.08);
+
+  /* Phân cấp bo góc */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* Kiểu chữ */
+  --font-family-apple: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  --font-family-code: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Cụm nút hành động bảng (Action Buttons) */
+  --action-view: #2563eb;
+  --action-view-bg: #eff6ff;
+  --action-edit: #ea580c;
+  --action-edit-bg: #fff7ed;
+  --action-on: #059669;
+  --action-on-bg: #ecfdf5;
+  --action-danger: #dc2626;
+  --action-danger-bg: #fef2f2;
+}

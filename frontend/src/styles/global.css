@@ -1,3 +1,5 @@
+@import './tokens.css';
+
 /* ==========================================================================
    BIẾN MÀU DÙNG CHUNG — đổi màu toàn hệ thống chỉ cần sửa ở đây.
    Màu nhấn dạng "R, G, B" để dùng được với rgba(var(--x), độ trong).
@@ -70,10 +72,15 @@
 html, body, #root { margin: 0; min-height: 100%; }
 
 body {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-family-apple);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   background-color: transparent;
-  color: #1d1d1f;
+  color: var(--apple-text-primary);
+}
+
+code, kbd, samp, pre, .font-code {
+  font-family: var(--font-family-code) !important;
 }
 
 .compact-table-form .ant-form-item { margin-bottom: 0; }
@@ -498,12 +505,14 @@ td.ant-table-cell:last-child {
 }
 
 /* ==========================================================================
-   NÚT THAO TÁC CÓ MÀU TOÀN BỘ PHẦN MỀM (XEM - SỬA - XOÁ - THÊM)
+   NÚT THAO TÁC CÓ MÀU TOÀN BỘ PHẦN MỀM (XEM - SỬA - XOÁ - THÊM - BẬT/TẮT)
+   Quy chuẩn Apple Minimalist: 32x32px, bo góc 6px, nền nhạt tương phản cao.
    ========================================================================== */
 
 .action-btn {
-  width: 30px !important;
-  height: 30px !important;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
   padding: 0 !important;
   display: inline-flex !important;
   align-items: center !important;
@@ -513,31 +522,75 @@ td.ant-table-cell:last-child {
   transition: all 0.15s ease !important;
 }
 
-/* Nút kính trong pha màu: một khuôn dùng chung, đổi màu bằng biến --tint (R, G, B).
-   Nút thao tác trong bảng: Xem / Thêm / Sửa / Xoá; nút Excel: .btn-tint-excel. */
-.action-btn-view, .table-action-view { --tint: var(--tint-view); }
-.action-btn-add, .table-action-add { --tint: var(--tint-add); }
-.action-btn-edit, .table-action-edit { --tint: var(--tint-edit); }
-.action-btn-delete, .table-action-delete { --tint: var(--tint-delete); }
-.btn-tint-excel { --tint: var(--tint-excel); }
-
-.action-btn-view, .table-action-view,
-.action-btn-add, .table-action-add,
-.action-btn-edit, .table-action-edit,
-.action-btn-delete, .table-action-delete,
-.ant-btn.btn-tint-excel:not(:disabled) {
-  color: rgb(var(--tint)) !important;
-  background: rgba(var(--tint), 0.08) !important;
-  border: 1px solid rgba(var(--tint), 0.22) !important;
+/* Nút theo hệ thống token Master Blueprint */
+.action-btn-view, .table-action-view {
+  color: var(--action-view) !important;
+  background: var(--action-view-bg) !important;
+  border: 1px solid rgba(37, 99, 235, 0.22) !important;
 }
-.action-btn-view:hover:not(:disabled), .table-action-view:hover:not(:disabled),
-.action-btn-add:hover:not(:disabled), .table-action-add:hover:not(:disabled),
-.action-btn-edit:hover:not(:disabled), .table-action-edit:hover:not(:disabled),
-.action-btn-delete:hover:not(:disabled), .table-action-delete:hover:not(:disabled),
-.ant-btn.btn-tint-excel:not(:disabled):hover {
-  color: rgb(var(--tint)) !important;
-  background: rgba(var(--tint), 0.16) !important;
-  border-color: rgba(var(--tint), 0.4) !important;
+.action-btn-view:hover:not(:disabled), .table-action-view:hover:not(:disabled) {
+  background: rgba(37, 99, 235, 0.16) !important;
+  border-color: rgba(37, 99, 235, 0.4) !important;
+}
+
+.action-btn-edit, .table-action-edit {
+  color: var(--action-edit) !important;
+  background: var(--action-edit-bg) !important;
+  border: 1px solid rgba(234, 88, 12, 0.22) !important;
+}
+.action-btn-edit:hover:not(:disabled), .table-action-edit:hover:not(:disabled) {
+  background: rgba(234, 88, 12, 0.16) !important;
+  border-color: rgba(234, 88, 12, 0.4) !important;
+}
+
+.action-btn-delete, .table-action-delete, .action-btn-danger {
+  color: var(--action-danger) !important;
+  background: var(--action-danger-bg) !important;
+  border: 1px solid rgba(220, 38, 38, 0.22) !important;
+}
+.action-btn-delete:hover:not(:disabled), .table-action-delete:hover:not(:disabled), .action-btn-danger:hover:not(:disabled) {
+  background: rgba(220, 38, 38, 0.16) !important;
+  border-color: rgba(220, 38, 38, 0.4) !important;
+}
+
+.action-btn-on, .table-action-on {
+  color: var(--action-on) !important;
+  background: var(--action-on-bg) !important;
+  border: 1px solid rgba(5, 150, 105, 0.22) !important;
+}
+.action-btn-on:hover:not(:disabled), .table-action-on:hover:not(:disabled) {
+  background: rgba(5, 150, 105, 0.16) !important;
+  border-color: rgba(5, 150, 105, 0.4) !important;
+}
+
+.action-btn-add, .table-action-add {
+  color: var(--status-up-text) !important;
+  background: var(--status-up-bg) !important;
+  border: 1px solid rgba(16, 185, 129, 0.22) !important;
+}
+.action-btn-add:hover:not(:disabled), .table-action-add:hover:not(:disabled) {
+  background: rgba(16, 185, 129, 0.16) !important;
+  border-color: rgba(16, 185, 129, 0.4) !important;
+}
+
+.action-btn-neutral {
+  color: var(--apple-text-secondary) !important;
+  background: rgba(118, 118, 128, 0.08) !important;
+  border: 1px solid var(--apple-border) !important;
+}
+.action-btn-neutral:hover:not(:disabled) {
+  background: rgba(118, 118, 128, 0.16) !important;
+  border-color: var(--apple-border-strong) !important;
+}
+
+.btn-tint-excel {
+  color: #107c41 !important;
+  background: #ecfdf5 !important;
+  border: 1px solid rgba(16, 124, 65, 0.22) !important;
+}
+.btn-tint-excel:hover:not(:disabled) {
+  background: rgba(16, 124, 65, 0.16) !important;
+  border-color: rgba(16, 124, 65, 0.4) !important;
 }
 
 
@@ -609,6 +662,67 @@ td.ant-table-cell:last-child {
   border: 1px solid var(--app-border, rgba(0, 0, 0, 0.06)) !important;
   background: var(--app-surface, #ffffff) !important;
 }
+
+/* ==========================================================================
+   MASTER BLUEPRINT — APPLE GLASS & MINIMALIST BUTTONS & MODALS
+   ========================================================================== */
+.btn-primary-apple {
+  background: var(--brand-cta) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  border: none !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: var(--brand-cta-shadow) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.btn-primary-apple:hover:not(:disabled) {
+  background: var(--brand-cta-hover) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+.btn-primary-apple:active:not(:disabled) {
+  background: var(--brand-cta-active) !important;
+  transform: translateY(0);
+}
+
+.btn-secondary-apple {
+  background: rgba(118, 118, 128, 0.12) !important;
+  color: var(--apple-text-primary) !important;
+  font-weight: 500 !important;
+  border: none !important;
+  border-radius: var(--radius-sm) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.btn-secondary-apple:hover:not(:disabled) {
+  background: rgba(118, 118, 128, 0.2) !important;
+  color: var(--apple-text-primary) !important;
+}
+
+/* Modal theo phong cách Apple Glass */
+.apple-glass-modal .ant-modal-content {
+  border-radius: var(--radius-xl) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: var(--apple-shadow-modal) !important;
+  overflow: hidden !important;
+  padding: 24px !important;
+}
+.apple-glass-modal .ant-modal-mask {
+  background: var(--apple-mask-bg) !important;
+  backdrop-filter: var(--apple-mask-blur) !important;
+  -webkit-backdrop-filter: var(--apple-mask-blur) !important;
+}
+
+/* Code monospace */
+.code-badge {
+  font-family: var(--font-family-code) !important;
+  background: rgba(15, 23, 42, 0.05);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 12.5px;
+  letter-spacing: -0.01em;
+}
+
 
 .adm-nav-bar {
   background: var(--app-surface, #ffffff) !important;
