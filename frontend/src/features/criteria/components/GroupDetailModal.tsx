@@ -1,8 +1,9 @@
-import { AppstoreAddOutlined, ArrowRightOutlined, EditOutlined, EyeOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
+import { AppstoreAddOutlined, ArrowRightOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
 import { Badge, Button, Descriptions, Empty, Flex, Input, Modal, Space, Table, Tag, Typography } from 'antd'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { StatusBadge } from '@/components/data-display/StatusBadge'
+import { TableActions } from '@/components/data-display/TableActions'
 import { ROUTES } from '@/constants/routes'
 import { ImpactTag } from '@/features/criteria/components/ImpactTag'
 import type { Criterion, CriterionGroup } from '@/features/criteria/criteria.types'
@@ -170,20 +171,14 @@ export function GroupDetailModal({
               width: 90,
               align: 'center',
               render: (_, c) => (
-                <Space size={4}>
-                  {onViewCriterion && (
-                    <button type="button" className="action-btn action-btn-view" title="Xem chi tiết tiêu chí" onClick={() => onViewCriterion(c)}>
-                      <EyeOutlined />
-                    </button>
-                  )}
-                  {onEditCriterion && (
-                    <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-                      <button type="button" className="action-btn action-btn-edit" title="Sửa tiêu chí" onClick={() => { onClose(); onEditCriterion(c) }}>
-                        <EditOutlined />
-                      </button>
-                    </ProtectedAction>
-                  )}
-                </Space>
+                <TableActions
+                  recordName={c.name}
+                  onView={onViewCriterion ? () => onViewCriterion(c) : undefined}
+                  viewLabel="Xem chi tiết tiêu chí"
+                  onEdit={onEditCriterion ? () => { onClose(); onEditCriterion(c) } : undefined}
+                  editLabel="Sửa tiêu chí"
+                  editAccess={PERMISSIONS.CRITERIA.MANAGE}
+                />
               ),
             },
           ]}

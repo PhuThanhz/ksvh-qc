@@ -1,11 +1,6 @@
-import {
-  AppstoreAddOutlined,
-  EditOutlined,
-  EyeOutlined,
-  PlusCircleOutlined,
-  RightOutlined,
-} from '@ant-design/icons'
-import { Space, Tag, Tooltip, Typography } from 'antd'
+import { AppstoreAddOutlined, RightOutlined } from '@ant-design/icons'
+import { Space, Tag, Typography } from 'antd'
+import { ActionButton, TableActions } from '@/components/data-display/TableActions'
 import { StatusBadge } from '@/components/data-display/StatusBadge'
 import type { CriterionGroup } from '@/features/criteria/criteria.types'
 import { PERMISSIONS, ProtectedAction } from '@/permissions'
@@ -110,57 +105,32 @@ export function GroupMobileCard({
           marginTop: 4,
           display: 'flex',
           justifyContent: 'flex-end',
-          gap: 8,
         }}
       >
-        <Tooltip title="Xem chi tiết nhóm">
-          <button
-            type="button"
-            className="action-btn action-btn-view"
-            aria-label={`Xem chi tiết nhóm ${g.name}`}
-            onClick={() => onViewCriteria(g)}
-          >
-            <EyeOutlined />
-          </button>
-        </Tooltip>
-        <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-          <Tooltip title="Thêm 1 tiêu chí con">
-            <button
-              type="button"
-              className="action-btn action-btn-add"
-              aria-label={`Thêm tiêu chí con vào nhóm ${g.name}`}
-              onClick={() => onAddCriterion(g)}
-            >
-              <PlusCircleOutlined />
-            </button>
-          </Tooltip>
-        </ProtectedAction>
-        {onBatchAddCriteria && (
-          <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-            <Tooltip title="Thêm nhanh nhiều tiêu chí con">
-              <button
-                type="button"
-                className="action-btn action-btn-add"
-                aria-label={`Thêm nhanh nhiều tiêu chí vào nhóm ${g.name}`}
-                onClick={() => onBatchAddCriteria(g)}
-              >
-                <AppstoreAddOutlined />
-              </button>
-            </Tooltip>
-          </ProtectedAction>
-        )}
-        <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-          <Tooltip title="Sửa thông tin nhóm">
-            <button
-              type="button"
-              className="action-btn action-btn-edit"
-              aria-label={`Sửa nhóm ${g.name}`}
-              onClick={() => onEdit(g)}
-            >
-              <EditOutlined />
-            </button>
-          </Tooltip>
-        </ProtectedAction>
+        <TableActions
+          recordName={g.name}
+          onView={() => onViewCriteria(g)}
+          viewLabel="Xem chi tiết nhóm"
+          onAdd={() => onAddCriterion(g)}
+          addLabel="Thêm 1 tiêu chí con"
+          addAccess={PERMISSIONS.CRITERIA.MANAGE}
+          onEdit={() => onEdit(g)}
+          editLabel="Sửa thông tin nhóm"
+          editAccess={PERMISSIONS.CRITERIA.MANAGE}
+          extra={
+            onBatchAddCriteria && (
+              <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
+                <ActionButton
+                  tone="add"
+                  icon={<AppstoreAddOutlined />}
+                  tooltip="Thêm nhanh nhiều tiêu chí con"
+                  ariaLabel={`Thêm nhanh nhiều tiêu chí vào nhóm ${g.name}`}
+                  onClick={() => onBatchAddCriteria(g)}
+                />
+              </ProtectedAction>
+            )
+          }
+        />
       </div>
     </div>
   )

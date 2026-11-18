@@ -1,13 +1,61 @@
-import { DeleteOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons'
+import { DeleteOutlined, EditOutlined, EyeOutlined, PlusCircleOutlined } from '@ant-design/icons'
 import { Button, Space, Tooltip } from 'antd'
 import type { ReactNode } from 'react'
 import { ProtectedAction, type AccessRule } from '@/permissions'
+
+export type ActionTone = 'view' | 'add' | 'edit' | 'delete' | 'neutral'
+
+export interface ActionButtonProps {
+  tone?: ActionTone
+  icon: ReactNode
+  tooltip: string
+  ariaLabel?: string
+  disabled?: boolean
+  disabledReason?: string
+  onClick?: () => void
+}
+
+/** Nút thao tác đơn lẻ chuẩn hoá kích thước 30x30, màu sắc theo tone, tooltip và aria-label. */
+export function ActionButton({
+  tone = 'neutral',
+  icon,
+  tooltip,
+  ariaLabel,
+  disabled = false,
+  disabledReason,
+  onClick,
+}: ActionButtonProps) {
+  const isBlocked = disabled || Boolean(disabledReason)
+  const title = isBlocked && disabledReason ? disabledReason : tooltip
+  return (
+    <Tooltip title={title}>
+      <span>
+        <Button
+          type="text"
+          className={`action-btn action-btn-${tone}`}
+          icon={icon}
+          aria-label={ariaLabel ?? tooltip}
+          disabled={isBlocked}
+          onClick={onClick}
+        />
+      </span>
+    </Tooltip>
+  )
+}
 
 export interface TableActionsProps {
   /** Xem chi tiết */
   onView?: () => void
   viewLabel?: string
   viewAccess?: AccessRule
+
+  /** Thêm mới / thêm liên quan */
+  onAdd?: () => void
+  addLabel?: string
+  addIcon?: ReactNode
+  addAccess?: AccessRule
+  addDisabled?: boolean
+  addDisabledReason?: string
 
   /** Chỉnh sửa */
   onEdit?: () => void
@@ -31,13 +79,20 @@ export interface TableActionsProps {
 }
 
 /**
- * Component nhóm thao tác dùng chung cho các bảng dữ liệu (Xem chi tiết, Sửa, Xoá).
+ * Component nhóm thao tác dùng chung cho các bảng dữ liệu (Xem, Thêm, Sửa, Xoá).
  * Chuẩn hoá giao diện, icon, tooltip và phân quyền thống nhất toàn hệ thống.
  */
 export function TableActions({
   onView,
   viewLabel = 'Xem chi tiết',
   viewAccess,
+
+  onAdd,
+  addLabel = 'Thêm',
+  addIcon = <PlusCircleOutlined />,
+  addAccess,
+  addDisabled = false,
+  addDisabledReason,
 
   onEdit,
   editLabel = 'Sửa',
@@ -56,72 +111,47 @@ export function TableActions({
 }: TableActionsProps) {
   const aria = (action: string) => (recordName ? `${action} "${recordName}"` : action)
 
-  const isDeleteDisabled = deleteDisabled || Boolean(deleteDisabledReason)
-  const isEditDisabled = editDisabled || Boolean(editDisabledReason)
-
-  const editTooltip = isEditDisabled && editDisabledReason ? editDisabledReason : editLabel
-  const deleteTooltip = isDeleteDisabled && deleteDisabledReason ? deleteDisabledReason : deleteLabel
-
-  const renderEditBtn = () => (
-    <Tooltip title={editTooltip}>
-      <span>
-        <Button
-          type="text"
-          className="action-btn action-btn-edit"
-          icon={<EditOutlined />}
-          aria-label={aria(editLabel)}
-          disabled={isEditDisabled}
-          onClick={onEdit}
-        />
-      </span>
-    </Tooltip>
-  )
-
-  const renderDeleteBtn = () => (
-    <Tooltip title={deleteTooltip}>
-      <span>
-        <Button
-          type="text"
-          className="action-btn action-btn-delete"
-          icon={<DeleteOutlined />}
-          aria-label={aria(deleteLabel)}
-          disabled={isDeleteDisabled}
-          onClick={onDelete}
-        />
-      </span>
-    </Tooltip>
-  )
-
-  const renderViewBtn = () => (
-    <Tooltip title={viewLabel}>
-      <Button
-        type="text"
-        className="action-btn action-btn-view"
-        icon={<EyeOutlined />}
-        aria-label={aria(viewLabel)}
-        onClick={onView}
-      />
-    </Tooltip>
-  )
-
   return (
     <Space size={6} wrap={false}>
-      {onView &&
-        (viewAccess ? (
-          <ProtectedAction access={viewAccess}>{renderViewBtn()}</ProtectedAction>
+      {onView && (
+        viewAccess ? (
+          <ProtectedAction access={viewAccess}>
+            <ActionButton tone="view" icon={<EyeOutlined />} tooltip={viewLabel} ariaLabel={aria(viewLabel)} onClick={onView} />
+          </ProtectedAction>
         ) : (
-          renderViewBtn()
-        ))}
+          <ActionButton tone="view" icon={<EyeOutlined />} tooltip={viewLabel} ariaLabel={aria(viewLabel)} onClick={onView} />
+        )
+      )}
 
-      {onEdit &&
-        (editAccess ? <ProtectedAction access={editAccess}>{renderEditBtn()}</ProtectedAction> : renderEditBtn())}
-
-      {(onDelete || isDeleteDisabled) &&
-        (deleteAccess ? (
-          <ProtectedAction access={deleteAccess}>{renderDeleteBtn()}</ProtectedAction>
+      {onAdd && (
+        addAccess ? (
+          <ProtectedAction access={addAccess}>
+            <ActionButton tone="add" icon={addIcon} tooltip={addLabel} ariaLabel={aria(addLabel)} disabled={addDisabled} disabledReason={addDisabledReason} onClick={onAdd} />
+          </ProtectedAction>
         ) : (
-          renderDeleteBtn()
-        ))}
+          <ActionButton tone="add" icon={addIcon} tooltip={addLabel} ariaLabel={aria(addLabel)} disabled={addDisabled} disabledReason={addDisabledReason} onClick={onAdd} />
+        )
+      )}
+
+      {onEdit && (
+        editAccess ? (
+          <ProtectedAction access={editAccess}>
+            <ActionButton tone="edit" icon={<EditOutlined />} tooltip={editLabel} ariaLabel={aria(editLabel)} disabled={editDisabled} disabledReason={editDisabledReason} onClick={onEdit} />
+          </ProtectedAction>
+        ) : (
+          <ActionButton tone="edit" icon={<EditOutlined />} tooltip={editLabel} ariaLabel={aria(editLabel)} disabled={editDisabled} disabledReason={editDisabledReason} onClick={onEdit} />
+        )
+      )}
+
+      {(onDelete || deleteDisabled || Boolean(deleteDisabledReason)) && (
+        deleteAccess ? (
+          <ProtectedAction access={deleteAccess}>
+            <ActionButton tone="delete" icon={<DeleteOutlined />} tooltip={deleteLabel} ariaLabel={aria(deleteLabel)} disabled={deleteDisabled} disabledReason={deleteDisabledReason} onClick={onDelete} />
+          </ProtectedAction>
+        ) : (
+          <ActionButton tone="delete" icon={<DeleteOutlined />} tooltip={deleteLabel} ariaLabel={aria(deleteLabel)} disabled={deleteDisabled} disabledReason={deleteDisabledReason} onClick={onDelete} />
+        )
+      )}
 
       {extra}
     </Space>

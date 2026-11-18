@@ -1,6 +1,7 @@
-import { CloseCircleOutlined, EyeOutlined } from '@ant-design/icons'
-import { Space, Table, Tag, Tooltip, Typography } from 'antd'
+import { CloseCircleOutlined } from '@ant-design/icons'
+import { Table, Tag, Tooltip, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
+import { ActionButton, TableActions } from '@/components/data-display/TableActions'
 import { StatusBadge } from '@/components/data-display/StatusBadge'
 import { INSPECTION_STATUS_META } from '../constants/status'
 import type { InspectionResponse, InspectionStatus } from '@/features/inspections/inspection.types'
@@ -148,20 +149,22 @@ export function InspectionTable({
       width: 110,
       align: 'center',
       render: (_, r) => (
-        <Space size={6}>
-          <Tooltip title="Xem chi tiết phiếu chấm">
-            <button type="button" className="action-btn action-btn-view" aria-label="Xem chi tiết phiếu" onClick={() => onView(r)}>
-              <EyeOutlined />
-            </button>
-          </Tooltip>
-          {(r.status === 'ASSIGNED' || r.status === 'IN_PROGRESS') && canCancel && (
-            <Tooltip title="Huỷ phiếu">
-              <button type="button" className="action-btn action-btn-delete" aria-label="Huỷ phiếu chấm" onClick={() => onCancel(r)}>
-                <CloseCircleOutlined />
-              </button>
-            </Tooltip>
-          )}
-        </Space>
+        <TableActions
+          recordName={r.code}
+          onView={() => onView(r)}
+          viewLabel="Xem chi tiết phiếu chấm"
+          extra={
+            (r.status === 'ASSIGNED' || r.status === 'IN_PROGRESS') && canCancel ? (
+              <ActionButton
+                tone="delete"
+                icon={<CloseCircleOutlined />}
+                tooltip="Huỷ phiếu"
+                ariaLabel={`Huỷ phiếu chấm ${r.code}`}
+                onClick={() => onCancel(r)}
+              />
+            ) : null
+          }
+        />
       ),
     },
   ]

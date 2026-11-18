@@ -1,5 +1,6 @@
 import { CheckOutlined, CloseOutlined, DeleteOutlined, EditOutlined, EyeOutlined, SendOutlined } from '@ant-design/icons'
-import { Space, Tooltip } from 'antd'
+import { Space } from 'antd'
+import { ActionButton } from '@/components/data-display/TableActions'
 import type { PlanResponse } from '@/features/inspections/inspection.types'
 
 interface Props {
@@ -25,78 +26,63 @@ export function PlanActionButtons({
   onReject,
   onDelete,
 }: Props) {
+  const isDraftOrRejected = (r.status === 'DRAFT' || r.status === 'REJECTED') && canCreate
+  const isPendingApproval = r.status === 'PENDING_APPROVAL' && canApprove
+
   return (
-    <Space size={6}>
+    <Space size={6} wrap={false}>
       {onView && (
-        <Tooltip title="Xem chi tiết kế hoạch">
-          <button
-            type="button"
-            className="action-btn action-btn-view"
-            aria-label="Xem chi tiết kế hoạch"
-            onClick={() => onView(r)}
-          >
-            <EyeOutlined />
-          </button>
-        </Tooltip>
+        <ActionButton
+          tone="view"
+          icon={<EyeOutlined />}
+          tooltip="Xem chi tiết kế hoạch"
+          ariaLabel={`Xem chi tiết kế hoạch ${r.planCode}`}
+          onClick={() => onView(r)}
+        />
       )}
 
-      {(r.status === 'DRAFT' || r.status === 'REJECTED') && canCreate && (
+      {isDraftOrRejected && (
         <>
-          <Tooltip title="Gửi duyệt">
-            <button
-              type="button"
-              className="action-btn action-btn-add"
-              aria-label="Gửi duyệt kế hoạch"
-              onClick={() => onSubmit(r)}
-            >
-              <SendOutlined />
-            </button>
-          </Tooltip>
-          <Tooltip title="Chỉnh sửa">
-            <button
-              type="button"
-              className="action-btn action-btn-edit"
-              aria-label="Chỉnh sửa kế hoạch"
-              onClick={() => onEdit(r)}
-            >
-              <EditOutlined />
-            </button>
-          </Tooltip>
-          <Tooltip title="Xoá">
-            <button
-              type="button"
-              className="action-btn action-btn-delete"
-              aria-label="Xoá kế hoạch"
-              onClick={() => onDelete(r)}
-            >
-              <DeleteOutlined />
-            </button>
-          </Tooltip>
+          <ActionButton
+            tone="add"
+            icon={<SendOutlined />}
+            tooltip="Gửi duyệt"
+            ariaLabel={`Gửi duyệt kế hoạch ${r.planCode}`}
+            onClick={() => onSubmit(r)}
+          />
+          <ActionButton
+            tone="edit"
+            icon={<EditOutlined />}
+            tooltip="Chỉnh sửa"
+            ariaLabel={`Chỉnh sửa kế hoạch ${r.planCode}`}
+            onClick={() => onEdit(r)}
+          />
+          <ActionButton
+            tone="delete"
+            icon={<DeleteOutlined />}
+            tooltip="Xoá"
+            ariaLabel={`Xoá kế hoạch ${r.planCode}`}
+            onClick={() => onDelete(r)}
+          />
         </>
       )}
 
-      {r.status === 'PENDING_APPROVAL' && canApprove && (
+      {isPendingApproval && (
         <>
-          <Tooltip title="Phê duyệt">
-            <button
-              type="button"
-              className="action-btn action-btn-add"
-              aria-label="Phê duyệt kế hoạch"
-              onClick={() => onApprove(r)}
-            >
-              <CheckOutlined />
-            </button>
-          </Tooltip>
-          <Tooltip title="Từ chối">
-            <button
-              type="button"
-              className="action-btn action-btn-delete"
-              aria-label="Từ chối kế hoạch"
-              onClick={() => onReject(r)}
-            >
-              <CloseOutlined />
-            </button>
-          </Tooltip>
+          <ActionButton
+            tone="add"
+            icon={<CheckOutlined />}
+            tooltip="Phê duyệt"
+            ariaLabel={`Phê duyệt kế hoạch ${r.planCode}`}
+            onClick={() => onApprove(r)}
+          />
+          <ActionButton
+            tone="delete"
+            icon={<CloseOutlined />}
+            tooltip="Từ chối"
+            ariaLabel={`Từ chối kế hoạch ${r.planCode}`}
+            onClick={() => onReject(r)}
+          />
         </>
       )}
     </Space>
