@@ -1,5 +1,5 @@
-import { AppstoreAddOutlined, PlusOutlined } from '@ant-design/icons'
-import { Button, Space } from 'antd'
+import { AppstoreAddOutlined, DownOutlined, PlusOutlined } from '@ant-design/icons'
+import { Dropdown, Space } from 'antd'
 import { useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { PageContainer } from '@/components/layout/PageContainer'
@@ -49,18 +49,29 @@ export function CriteriaPage() {
         <Space size={8} wrap>
           <CriteriaExcelActions />
           <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-            <Button icon={<AppstoreAddOutlined />} onClick={() => handleOpenBatch(initialGroupId)}>
-              Thêm nhanh
-            </Button>
-          </ProtectedAction>
-          <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-            <Button
+            <Dropdown.Button
               type="primary"
-              icon={<PlusOutlined />}
+              icon={<DownOutlined />}
               onClick={() => setCriterionModal({ open: true, defaultGroupId: initialGroupId })}
+              menu={{
+                items: [
+                  {
+                    key: 'single',
+                    icon: <PlusOutlined />,
+                    label: 'Thêm 1 tiêu chí',
+                    onClick: () => setCriterionModal({ open: true, defaultGroupId: initialGroupId }),
+                  },
+                  {
+                    key: 'batch',
+                    icon: <AppstoreAddOutlined />,
+                    label: 'Thêm nhanh nhiều tiêu chí',
+                    onClick: () => handleOpenBatch(initialGroupId),
+                  },
+                ],
+              }}
             >
-              Thêm tiêu chí
-            </Button>
+              <PlusOutlined /> Thêm tiêu chí
+            </Dropdown.Button>
           </ProtectedAction>
         </Space>
       }

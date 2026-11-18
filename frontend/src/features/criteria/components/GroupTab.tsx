@@ -84,7 +84,7 @@ export function GroupTab({
   return (
     <Flex vertical gap={16}>
       <AdvancedFilter
-        search={{ value: keyword, placeholder: 'Tìm theo mã hoặc tên nhóm...', maxWidth: 260, onSearch: setKeyword }}
+        search={{ value: keyword, placeholder: 'Tìm theo mã hoặc tên nhóm...', maxWidth: 380, onSearch: setKeyword }}
       >
         <Select
           allowClear

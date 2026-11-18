@@ -104,22 +104,20 @@
 }
 
 /* Nút chính Sapphire Blue Gradient rực rỡ nổi bật */
-.app-shell--themed :is(.ant-btn-primary, .ant-btn-color-primary):not(.ant-btn-dangerous):not(:disabled) {
+.app-shell--themed :is(.ant-btn-primary, .ant-btn-color-primary, .ant-dropdown-button .ant-btn-primary):not(.ant-btn-dangerous):not(:disabled) {
   border: 1px solid rgba(255, 255, 255, 0.35) !important;
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 55%, #1d4ed8 100%) !important;
   color: #ffffff !important;
   font-weight: 600 !important;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
   box-shadow: 0 4px 18px rgba(37, 99, 235, 0.45), 0 1px 3px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.38) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
   transition: all 0.2s ease !important;
 }
-.app-shell--themed :is(.ant-btn-primary, .ant-btn-color-primary):not(.ant-btn-dangerous):not(:disabled) .anticon { color: #ffffff !important; }
-.app-shell--themed :is(.ant-btn-primary, .ant-btn-color-primary):not(.ant-btn-dangerous):not(:disabled):hover {
+.app-shell--themed :is(.ant-btn-primary, .ant-btn-color-primary, .ant-dropdown-button .ant-btn-primary) .anticon { color: #ffffff !important; }
+.app-shell--themed :is(.ant-btn-primary, .ant-btn-color-primary, .ant-dropdown-button .ant-btn-primary):not(.ant-btn-dangerous):not(:disabled):hover {
   background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 55%, #2563eb 100%) !important;
   border-color: rgba(255, 255, 255, 0.5) !important;
-  box-shadow: 0 6px 22px rgba(37, 99, 235, 0.6), 0 2px 6px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 6px 22px rgba(37, 99, 235, 0.6), 0 2px 6px rgba(0, 0, 0, 0.2) !important;
   transform: translateY(-1px);
 }
 
@@ -127,29 +125,40 @@
 .app-shell--themed .glass-panel,
 .app-shell--themed .ant-card:not(.ant-card-bordered-none) {
   background: #ffffff !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
   border: 1px solid rgba(0, 0, 0, 0.08) !important;
   border-radius: 14px !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 8px 24px -10px rgba(0, 0, 0, 0.35) !important;
 }
 
-/* Ô nhập liệu & Placeholder: Sắc nét, tương phản cao, dễ đọc */
-.app-shell--themed ::placeholder,
-.app-shell--themed .ant-select-selection-placeholder {
-  color: #64748b !important;
+/* Ô nhập liệu & Placeholder: Tương phản cao đạt chuẩn WCAG, phân tách sắc nét */
+.app-shell--themed :is(::placeholder, input::placeholder, textarea::placeholder, .ant-select-selection-placeholder) {
+  color: #475569 !important;
   opacity: 1 !important;
+  font-weight: 400 !important;
 }
-.app-shell--themed .glass-panel :is(.ant-input, .ant-select-selector, .ant-picker) {
+.app-shell--themed .ant-input-prefix { color: #64748b !important; margin-right: 8px !important; }
+.app-shell--themed .glass-panel :is(.ant-input, .ant-input-affix-wrapper, .ant-select-selector, .ant-picker) {
   background: #f8fafc !important;
   border: 1px solid rgba(15, 23, 42, 0.16) !important;
   border-radius: 8px !important;
 }
-.app-shell--themed .glass-panel :is(.ant-input:focus, .ant-select-focused .ant-select-selector, .ant-picker-focused) {
+.app-shell--themed .glass-panel .ant-input-affix-wrapper input.ant-input {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.app-shell--themed .glass-panel :is(.ant-input:focus, .ant-input-affix-wrapper-focused, .ant-select-focused .ant-select-selector, .ant-picker-focused) {
   background: #ffffff !important;
   border-color: #2563eb !important;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.14) !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.16) !important;
 }
+.app-shell--themed .app-stat-chip {
+  background: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #334155 !important;
+  font-weight: 500 !important;
+}
+.app-shell--themed .app-stat-chip strong { color: #0f172a !important; font-weight: 700 !important; }
 
 /* Bảng dữ liệu trong khối trắng */
 .app-shell--themed .ant-table-wrapper .ant-table {

@@ -9,7 +9,8 @@
 
 -- 1. Công ty
 INSERT INTO companies (code, name) VALUES
-    ('GGG', 'CÔNG TY CP THƯƠNG MẠI DỊCH VỤ CỔNG VÀNG (Golden Gate Group)'),
+    ('LOTUS',  'CÔNG TY CP TẬP ĐOÀN LOTUS (V-Lotus Holdings F&B)'),
+    ('GGG',    'CÔNG TY CP THƯƠNG MẠI DỊCH VỤ CỔNG VÀNG (Golden Gate Group)'),
     ('REDSUN', 'CÔNG TY CP ĐẦU TƯ THƯƠNG MẠI QUỐC TẾ MẶT TRỜI ĐỎ (Redsun ITI)')
 ON CONFLICT DO NOTHING;
 
