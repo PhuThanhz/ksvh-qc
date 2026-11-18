@@ -39,9 +39,8 @@ export function AppHeader({ collapsed, onToggleSidebar, menu }: AppHeaderProps) 
               width: 32,
               height: 32,
               borderRadius: 8,
-              background: 'var(--app-on-dark-glass)',
-              backdropFilter: 'blur(8px)',
-              border: '1px solid var(--app-on-dark-glass-border)',
+              background: 'rgba(255, 255, 255, 0.12)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
               flexShrink: 0,
             }}
           />

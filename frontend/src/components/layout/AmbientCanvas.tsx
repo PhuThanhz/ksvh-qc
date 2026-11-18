@@ -33,6 +33,9 @@ export function AmbientCanvas() {
         pointerEvents: 'none',
         overflow: 'hidden',
         background: activeTheme.isImage ? '#0f172a' : activeTheme.gradient,
+        transform: 'translateZ(0)',
+        willChange: 'transform',
+        contain: 'strict',
         transition: 'background 0.5s ease',
       }}
     >

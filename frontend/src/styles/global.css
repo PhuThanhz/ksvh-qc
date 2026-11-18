@@ -79,21 +79,17 @@ body {
 .compact-table-form .ant-form-item { margin-bottom: 0; }
 .compact-table-form .ant-table-cell { vertical-align: top; }
 
-/* Sidebar kính mờ Apple nhẹ nhàng, thanh thoát (macOS Frosted Glass Sidebar) */
+/* Sidebar kính Apple nhẹ nhàng, thanh thoát (macOS Sidebar) */
 .apple-frosted-sidebar {
-  background: rgba(255, 255, 255, 0.58) !important;
-  backdrop-filter: blur(24px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-  border-inline-end: 1px solid rgba(255, 255, 255, 0.45) !important;
-  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.03) !important;
+  background: #ffffff !important;
+  border-inline-end: 1px solid var(--app-border) !important;
+  box-shadow: 1px 0 3px rgba(0, 0, 0, 0.02) !important;
 }
 
 .apple-frosted-header {
-  background: rgba(255, 255, 255, 0.58) !important;
-  backdrop-filter: blur(24px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.45) !important;
-  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.02) !important;
+  background: #ffffff !important;
+  border-bottom: 1px solid var(--app-border) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
 }
 
 .apple-frosted-sidebar .ant-menu {
@@ -164,15 +160,13 @@ body {
   box-shadow: none !important;
 }
 
-/* Selected: Viên nang kính mờ sáng trắng tinh khôi, nhẹ nhàng, trong suốt */
+/* Selected: Viên nang sáng trắng tinh khôi, nhẹ nhàng */
 .apple-frosted-sidebar .ant-menu-item-selected {
-  background: rgba(255, 255, 255, 0.82) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
+  background: #f1f5f9 !important;
   color: #0f172a !important;
   font-weight: 600 !important;
-  border: 1px solid rgba(255, 255, 255, 0.88) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+  border: 1px solid var(--app-border) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
 }
 
 .apple-frosted-sidebar .ant-menu-item-selected .ant-menu-item-icon,
@@ -242,21 +236,19 @@ body {
   box-shadow: 0 0 0 3px var(--app-focus-ring) !important;
 }
 
-/* Nút chính: kính trắng trong, viền xám mảnh, chữ đen (trên nền trắng của thẻ/bảng/modal) */
+/* Nút chính */
 .ant-btn-primary:not(:disabled) {
-  background: rgba(255, 255, 255, 0.72) !important;
-  border: 1px solid rgba(15, 23, 42, 0.14) !important;
-  color: #0f172a !important;
-  border-radius: 999px !important;
-  backdrop-filter: blur(12px) saturate(160%) !important;
-  -webkit-backdrop-filter: blur(12px) saturate(160%) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 3px rgba(15, 23, 42, 0.08), 0 4px 12px -4px rgba(15, 23, 42, 0.12) !important;
-  font-weight: 600 !important;
+  background: #0f172a !important;
+  border: 1px solid #0f172a !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08) !important;
+  font-weight: 500 !important;
 }
 .ant-btn-primary:not(:disabled):hover {
-  background: rgba(255, 255, 255, 0.95) !important;
-  border-color: rgba(15, 23, 42, 0.24) !important;
-  color: #0f172a !important;
+  background: #1e293b !important;
+  border-color: #1e293b !important;
+  color: #ffffff !important;
 }
 .ant-btn-primary.ant-btn-dangerous:not(:disabled) {
   background: rgba(220, 38, 38, 0.1) !important;
@@ -264,58 +256,52 @@ body {
   color: #b91c1c !important;
 }
 
-/* Nút chính trên header tối: kính trắng trong mờ */
+/* Nút chính trên header tối */
 .bitrix-frosted-header .ant-btn-primary:not(:disabled) {
-  background: rgba(255, 255, 255, 0.16) !important;
-  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  background: rgba(255, 255, 255, 0.14) !important;
+  border: 1px solid rgba(255, 255, 255, 0.24) !important;
   color: #ffffff !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
 }
 .bitrix-frosted-header .ant-btn-primary:not(:disabled):hover {
-  background: rgba(255, 255, 255, 0.26) !important;
-  border-color: rgba(255, 255, 255, 0.4) !important;
+  background: rgba(255, 255, 255, 0.22) !important;
+  border-color: rgba(255, 255, 255, 0.36) !important;
   color: #ffffff !important;
 }
 
-/* Modal & Toast kính mờ chuẩn sắc */
+/* Modal & Toast sắc nét, hiệu năng cao */
 .ant-modal-content {
-  background: rgba(255, 255, 255, 0.92) !important;
-  backdrop-filter: blur(24px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  background: #ffffff !important;
   border-radius: 16px !important;
-  box-shadow: 0 24px 50px -12px rgba(0, 0, 0, 0.18), 0 0 1px rgba(0, 0, 0, 0.12) !important;
-  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 20px 48px -10px rgba(0, 0, 0, 0.18) !important;
+  border: 1px solid var(--app-border) !important;
   padding: 24px !important;
 }
 .ant-modal-title { font-size: 16px !important; font-weight: 600 !important; letter-spacing: -0.01em !important; color: #0f172a !important; }
 
 .ant-notification-notice {
-  background: rgba(255, 255, 255, 0.92) !important;
-  backdrop-filter: blur(24px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  background: #ffffff !important;
   border-radius: 14px !important;
   padding: 16px 20px !important;
-  border: 1px solid rgba(255, 255, 255, 0.8) !important;
-  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid var(--app-border) !important;
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.15) !important;
 }
 .ant-notification-notice-message, .ant-notification-notice-title { font-size: 14.5px !important; font-weight: 600 !important; color: #0f172a !important; }
 .ant-notification-notice-icon { font-size: 18px !important; margin-top: 2px !important; }
 
-/* Tabs điều hướng kính mờ */
+/* Tabs điều hướng */
 .ant-tabs-nav {
-  background: rgba(255, 255, 255, 0.82) !important;
-  backdrop-filter: blur(20px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-  border-radius: 12px !important;
+  background: #ffffff !important;
+  border-radius: 10px !important;
   padding: 4px 6px !important;
   margin-bottom: 12px !important;
-  border: 1px solid rgba(255, 255, 255, 0.65) !important;
-  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid var(--app-border) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
 }
 .ant-tabs-nav::before { display: none !important; }
-.ant-tabs-tab { font-size: 13.5px !important; font-weight: 500 !important; padding: 6px 14px !important; color: #64748b !important; border-radius: 8px !important; transition: all 0.15s ease !important; }
+.ant-tabs-tab { font-size: 13.5px !important; font-weight: 500 !important; padding: 6px 14px !important; color: #64748b !important; border-radius: 6px !important; transition: all 0.15s ease !important; }
 .ant-tabs-tab:hover { color: #0f172a !important; }
-.ant-tabs-tab-active { background: #ffffff !important; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important; }
+.ant-tabs-tab-active { background: #f1f5f9 !important; box-shadow: none !important; }
 .ant-tabs-tab-active .ant-tabs-tab-btn { font-weight: 600 !important; color: #0f172a !important; }
 .ant-tabs-ink-bar { display: none !important; }
 
@@ -332,9 +318,7 @@ body {
    ========================================================================== */
 
 .bitrix-frosted-sidebar {
-  background: var(--app-chrome-bg) !important;
-  backdrop-filter: blur(20px) saturate(110%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(110%) !important;
+  background: #0f172a !important;
   border-inline-end: 1px solid rgba(255, 255, 255, 0.08) !important;
   box-shadow: none !important;
 }
@@ -399,11 +383,9 @@ body {
 }
 
 .bitrix-frosted-header {
-  background: var(--app-chrome-bg) !important;
-  backdrop-filter: blur(24px) saturate(110%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(110%) !important;
+  background: #111c34 !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12) !important;
 }
 
 .bitrix-badge-count {
@@ -507,8 +489,6 @@ body {
   color: rgb(var(--tint)) !important;
   background: rgba(var(--tint), 0.08) !important;
   border: 1px solid rgba(var(--tint), 0.22) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
 }
 .action-btn-view:hover:not(:disabled), .table-action-view:hover:not(:disabled),
 .action-btn-add:hover:not(:disabled), .table-action-add:hover:not(:disabled),
@@ -521,14 +501,12 @@ body {
 }
 
 
-/* Khối kính trắng dùng chung cho vùng Bộ lọc (AdvancedFilter) và vùng Bảng (TableCard): mỗi vùng một khối riêng. */
+/* Khối nền trắng dùng chung cho vùng Bộ lọc (AdvancedFilter) và vùng Bảng (TableCard): hiệu năng cao 60-120 FPS. */
 .glass-panel {
-  background: var(--app-glass-bg);
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
-  border-radius: 14px;
-  border: 1px solid var(--app-glass-border);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid var(--app-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 /* Các lớp tiện ích chuẩn hoá style lặp (Plan O2.5) */
