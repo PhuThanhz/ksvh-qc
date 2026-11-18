@@ -11,6 +11,10 @@ public interface PlanAssignmentRepository extends JpaRepository<PlanAssignment, 
 
     List<PlanAssignment> findByPlanIdOrderBySortOrderAscIdAsc(Long planId);
 
+    default List<PlanAssignment> findByPlanId(Long planId) {
+        return findByPlanIdOrderBySortOrderAscIdAsc(planId);
+    }
+
     List<PlanAssignment> findByPlanIdIn(Collection<Long> planIds);
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
