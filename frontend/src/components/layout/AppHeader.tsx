@@ -3,9 +3,17 @@ import {
   MenuUnfoldOutlined,
 } from '@ant-design/icons'
 import { Button, Flex } from 'antd'
+import { useState } from 'react'
 import { useLocation } from 'react-router'
 import type { MenuEntry } from '@/components/layout/menu.types'
 import { NotificationBell } from '@/features/notifications'
+
+const DATE_FORMATTER = new Intl.DateTimeFormat('vi-VN', {
+  weekday: 'long',
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+})
 
 export interface AppHeaderProps {
   collapsed?: boolean
@@ -15,6 +23,7 @@ export interface AppHeaderProps {
 
 export function AppHeader({ collapsed, onToggleSidebar, menu }: AppHeaderProps) {
   const { pathname } = useLocation()
+  const [todayString] = useState(() => DATE_FORMATTER.format(new Date()))
 
   const activeEntry = menu
     ?.filter((m) => pathname === m.path || pathname.startsWith(`${m.path}/`))
@@ -49,13 +58,13 @@ export function AppHeader({ collapsed, onToggleSidebar, menu }: AppHeaderProps) 
           <Flex align="center" gap={6} style={{ fontSize: 13.5, userSelect: 'none', minWidth: 0, overflow: 'hidden' }}>
             {activeEntry.group && (
               <span className="app-header-breadcrumb-group" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                <span style={{ color: 'var(--app-on-dark-secondary)', fontWeight: 500 }}>{activeEntry.group}</span>
-                <span style={{ color: 'var(--app-on-dark-faint)' }}>/</span>
+                <span style={{ color: 'rgba(255, 255, 255, 0.72)', fontWeight: 500 }}>{activeEntry.group}</span>
+                <span style={{ color: 'rgba(255, 255, 255, 0.45)' }}>/</span>
               </span>
             )}
             <span
               style={{
-                color: 'var(--app-on-dark)',
+                color: '#ffffff',
                 fontWeight: 600,
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
@@ -68,7 +77,10 @@ export function AppHeader({ collapsed, onToggleSidebar, menu }: AppHeaderProps) 
         )}
       </Flex>
 
-      <Flex align="center" gap={10}>
+      <Flex align="center" gap={14}>
+        <span style={{ color: 'rgba(255, 255, 255, 0.82)', fontSize: 13, whiteSpace: 'nowrap' }}>
+          {todayString}
+        </span>
         <NotificationBell />
       </Flex>
     </Flex>

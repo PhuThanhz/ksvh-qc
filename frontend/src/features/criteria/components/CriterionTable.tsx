@@ -24,7 +24,7 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
     <DataTable<Criterion>
       {...props}
       rowKey="id"
-      scroll={{ x: 1100 }}
+      scroll={{ x: 1250 }}
       columns={[
         {
           title: '#',
@@ -68,7 +68,7 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
           sorter: true,
           width: 320,
           render: (name: string, c: Criterion) => (
-            <Flex vertical style={{ minWidth: 0, maxWidth: 360 }}>
+            <Flex vertical style={{ minWidth: 0 }}>
               <Typography.Link onClick={() => onView(c)} style={{ fontWeight: 500 }}>
                 {name}
               </Typography.Link>
@@ -84,6 +84,7 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
           title: 'Mẫu phiếu áp dụng',
           dataIndex: 'templates',
           key: 'templates',
+          width: 170,
           render: (templates: Criterion['templates']) => {
             if (!templates || templates.length === 0) {
               return <Tag color="default">Chưa gán mẫu</Tag>
@@ -104,7 +105,7 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
             )
           },
         },
-        { title: 'Ảnh hưởng', dataIndex: 'baseImpact', key: 'baseImpact', sorter: true, width: 110, render: (v: number) => <ImpactTag value={v} /> },
+        { title: 'Ảnh hưởng', dataIndex: 'baseImpact', key: 'baseImpact', sorter: true, width: 100, render: (v: number) => <ImpactTag value={v} /> },
         {
           title: 'Trạng thái',
           dataIndex: 'active',
@@ -114,7 +115,7 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
         {
           title: 'Thao tác',
           key: 'actions',
-          width: 140,
+          width: 120,
           fixed: 'right',
           render: (_: unknown, c: Criterion) => (
             <TableActions

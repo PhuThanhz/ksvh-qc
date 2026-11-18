@@ -7,6 +7,7 @@ import { App } from '@/app/App'
 import { setupSession } from '@/features/auth'
 import { createQueryClient } from '@/lib/query-client'
 import '@/styles/global.css'
+import '@/styles/theme-ambient.css'
 
 dayjs.locale('vi')
 

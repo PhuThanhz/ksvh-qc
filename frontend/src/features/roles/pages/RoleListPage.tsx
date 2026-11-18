@@ -60,18 +60,19 @@ export function RoleListPage() {
             loading={roles.isFetching}
             dataSource={roles.data}
             pagination={false}
-            scroll={{ x: 'max-content' }}
+            scroll={{ x: 1050 }}
             columns={[
               {
                 title: '#',
                 key: 'index',
-                width: 60,
+                width: 56,
                 align: 'center',
                 render: (_: unknown, __: unknown, index: number) => index + 1,
               },
               {
                 title: 'Vai trò',
                 dataIndex: 'name',
+                width: 200,
                 render: (name: string, r) => (
                   <Flex vertical>
                     <Space size={6}>
@@ -82,12 +83,13 @@ export function RoleListPage() {
                   </Flex>
                 ),
               },
-              { title: 'Mô tả', dataIndex: 'description', render: (d: string | null) => d ?? '—' },
-              { title: 'Số quyền', dataIndex: 'permissions', align: 'right', render: (p: string[]) => p.length },
-              { title: 'Người dùng', dataIndex: 'userCount', align: 'right' },
+              { title: 'Mô tả', dataIndex: 'description', width: 280, render: (d: string | null) => d ?? '—' },
+              { title: 'Số quyền', dataIndex: 'permissions', width: 100, align: 'right', render: (p: string[]) => p.length },
+              { title: 'Người dùng', dataIndex: 'userCount', width: 110, align: 'right' },
               {
                 title: 'Cập nhật',
                 key: 'updated',
+                width: 170,
                 render: (_: unknown, r) => (
                   <Flex vertical>
                     <span>{formatDateTime(r.updatedAt)}</span>
@@ -98,7 +100,7 @@ export function RoleListPage() {
               {
                 title: 'Thao tác',
                 key: 'actions',
-                width: 140,
+                width: 130,
                 fixed: 'right',
                 render: (_: unknown, r) => (
                   <TableActions

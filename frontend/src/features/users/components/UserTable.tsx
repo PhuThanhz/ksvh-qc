@@ -26,7 +26,7 @@ export function UserTable({ roleName, onView, onEdit, onDelete, onResetPassword,
     <DataTable<User>
       {...props}
       rowKey="id"
-      scroll={{ x: 800 }}
+      scroll={{ x: 1050 }}
       columns={[
         {
           title: '#',
@@ -36,11 +36,12 @@ export function UserTable({ roleName, onView, onEdit, onDelete, onResetPassword,
           render: (_: unknown, __: unknown, index: number) =>
             ((props.params?.page ?? 0) * (props.params?.size ?? 20)) + index + 1,
         },
-        { title: 'Tên đăng nhập', dataIndex: 'username', key: 'username', sorter: true, width: 150 },
-        { title: 'Họ tên', dataIndex: 'fullName', key: 'fullName', sorter: true, width: 180 },
+        { title: 'Tên đăng nhập', dataIndex: 'username', key: 'username', sorter: true, width: 140 },
+        { title: 'Họ tên', dataIndex: 'fullName', key: 'fullName', sorter: true, width: 170 },
         {
           title: 'Vai trò',
           dataIndex: 'roles',
+          width: 250,
           render: (roles: User['roles']) => (
             <Space size={4} wrap>
               {roles.map((r) => (
@@ -52,9 +53,10 @@ export function UserTable({ roleName, onView, onEdit, onDelete, onResetPassword,
         {
           title: 'Trạng thái',
           dataIndex: 'active',
+          width: 130,
           render: (active: boolean) => <StatusBadge status={active ? 'active' : 'inactive'} meta={ACTIVE_META} />,
         },
-        { title: 'Ngày tạo', dataIndex: 'createdAt', key: 'createdAt', sorter: true, render: formatDateTime },
+        { title: 'Ngày tạo', dataIndex: 'createdAt', key: 'createdAt', sorter: true, width: 150, render: formatDateTime },
         {
           title: 'Thao tác',
           key: 'actions',

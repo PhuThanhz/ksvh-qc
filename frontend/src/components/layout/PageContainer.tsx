@@ -9,44 +9,40 @@ export interface PageContainerProps {
   children: ReactNode
 }
 
-/** Khung chuẩn Enterprise cho trang dashboard: tiêu đề, mô tả, hành động, nội dung sắc nét. */
+/** Khung chuẩn Hub Shopee / Apple: Tiêu đề trực tiếp trên ảnh nền, nút hành động kính mờ / cam nổi bật */
 export function PageContainer({ title, subtitle, extra, children }: PageContainerProps) {
   useEffect(() => {
     document.title = `${title} · KSVH QC`
   }, [title])
 
   return (
-    <Flex vertical gap={12}>
-      <div
-        style={{
-          background: 'var(--app-surface)',
-          borderRadius: 10,
-          padding: '14px 20px',
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
-          border: '1px solid var(--app-border)',
-        }}
-      >
+    <Flex vertical gap={16}>
+      <div className="page-header page-container-header" style={{ marginBottom: 4 }}>
         <Flex justify="space-between" align="center" gap={12} wrap>
           <div>
             <Typography.Title
-              level={4}
+              level={2}
+              className="page-title"
               style={{
                 margin: 0,
-                color: 'var(--app-text)',
+                color: '#ffffff',
                 fontWeight: 700,
-                letterSpacing: '-0.015em',
-                fontSize: 18,
+                letterSpacing: '-0.02em',
+                fontSize: 24,
+                textShadow: '0 2px 12px rgba(0, 0, 0, 0.45)',
               }}
             >
               {title}
             </Typography.Title>
             {subtitle && (
               <Typography.Text
+                className="page-subtitle"
                 style={{
-                  color: 'var(--app-text-secondary)',
-                  fontSize: 13,
-                  marginTop: 2,
+                  color: 'rgba(255, 255, 255, 0.86)',
+                  fontSize: 13.5,
+                  marginTop: 4,
                   display: 'block',
+                  textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
                 }}
               >
                 {subtitle}
@@ -54,7 +50,7 @@ export function PageContainer({ title, subtitle, extra, children }: PageContaine
             )}
           </div>
           {extra && (
-            <Flex align="center" gap={8} wrap style={{ maxWidth: '100%' }}>
+            <Flex align="center" gap={8} wrap className="page-header__actions" style={{ maxWidth: '100%' }}>
               {extra}
             </Flex>
           )}

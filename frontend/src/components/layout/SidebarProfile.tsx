@@ -3,7 +3,7 @@ import {
   DownOutlined,
   LogoutOutlined,
 } from '@ant-design/icons'
-import { Avatar, Button, Dropdown, Flex, Tooltip, Typography, type MenuProps } from 'antd'
+import { Avatar, Dropdown, Flex, Tooltip, Typography, type MenuProps } from 'antd'
 import { lazy, Suspense, useState } from 'react'
 import type { LayoutUser } from '@/components/layout/menu.types'
 import { roleLabel } from '@/permissions'
@@ -75,27 +75,41 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
   ]
 
   const avatar = (
-    <Avatar
-      size={collapsed ? 36 : 34}
-      style={{
-        background: '#eff6ff',
-        color: '#2563eb',
-        fontWeight: 700,
-        fontSize: 14,
-        flexShrink: 0,
-        border: '1px solid #dbeafe',
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
-      }}
-    >
-      {initialsOf(user?.fullName)}
-    </Avatar>
+    <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Avatar
+        size={collapsed ? 34 : 36}
+        style={{
+          background: 'rgba(255, 255, 255, 0.22)',
+          color: '#ffffff',
+          fontWeight: 700,
+          fontSize: 14,
+          flexShrink: 0,
+          border: '1px solid rgba(255, 255, 255, 0.35)',
+        }}
+      >
+        {initialsOf(user?.fullName)}
+      </Avatar>
+      <span
+        style={{
+          position: 'absolute',
+          right: -1,
+          bottom: -1,
+          width: 9,
+          height: 9,
+          borderRadius: '50%',
+          background: '#10b981',
+          border: '2px solid rgba(15, 23, 42, 0.8)',
+        }}
+        aria-label="Đang trực tuyến"
+      />
+    </div>
   )
 
   return (
     <div
       style={{
-        padding: collapsed ? '12px 0' : '10px 12px',
-        borderTop: '1px solid rgba(255, 255, 255, 0.45)',
+        padding: collapsed ? '10px 8px 12px' : '10px 10px 12px',
+        borderTop: '1px solid rgba(255, 255, 255, 0.12)',
         marginTop: 'auto',
         background: 'transparent',
       }}
@@ -108,36 +122,72 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
             </Flex>
           </Tooltip>
         ) : (
-          <Button
-            type="text"
-            block
-            className="glass-profile-card"
+          <button
+            type="button"
+            className="sidebar-account-card"
             style={{
-              height: 'auto',
-              padding: '8px 10px',
-              borderRadius: 12,
-              textAlign: 'left',
+              width: '100%',
               display: 'flex',
               alignItems: 'center',
-              background: 'rgba(255, 255, 255, 0.45)',
-              border: '1px solid rgba(255, 255, 255, 0.65)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
+              gap: 10,
+              padding: '8px 10px',
+              borderRadius: 12,
+              border: '1px solid rgba(255, 255, 255, 0.18)',
+              background: 'rgba(255, 255, 255, 0.14)',
+              boxShadow: '0 4px 16px -2px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25)',
+              backdropFilter: 'blur(14px)',
+              WebkitBackdropFilter: 'blur(14px)',
+              cursor: 'pointer',
+              textAlign: 'left',
+              transition: 'all 0.2s ease',
             }}
           >
-            <Flex align="center" gap={10} style={{ width: '100%', overflow: 'hidden' }}>
-              {avatar}
-              <Flex vertical style={{ flex: 1, minWidth: 0, lineHeight: 1.25 }}>
-                <Typography.Text strong ellipsis style={{ fontSize: 13, color: '#0f172a' }}>
+            {avatar}
+            <Flex vertical style={{ flex: 1, minWidth: 0, lineHeight: 1.25, gap: 2 }}>
+              <Flex align="center" gap={6}>
+                <span
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 650,
+                    color: '#ffffff',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    textShadow: '0 1px 2px rgba(0, 0, 0, 0.35)',
+                  }}
+                >
                   {user?.fullName ?? 'Người dùng'}
-                </Typography.Text>
-                <Typography.Text ellipsis style={{ fontSize: 11, color: '#64748b' }}>
-                  {getPrimaryRoleLabel(user?.roles)}
-                </Typography.Text>
+                </span>
+                <span
+                  style={{
+                    fontSize: 9.5,
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
+                    padding: '1px 6px',
+                    borderRadius: 999,
+                    background: 'rgba(255, 255, 255, 0.22)',
+                    color: '#ffffff',
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {user?.roles?.includes('SYSTEM_ADMIN') ? 'Admin' : 'QC'}
+                </span>
               </Flex>
-              <DownOutlined style={{ fontSize: 10, color: '#94a3b8', flexShrink: 0 }} />
+              <span
+                style={{
+                  fontSize: 11.5,
+                  color: 'rgba(255, 255, 255, 0.78)',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {getPrimaryRoleLabel(user?.roles)}
+              </span>
             </Flex>
-          </Button>
+            <DownOutlined style={{ fontSize: 10, color: 'rgba(255, 255, 255, 0.65)', flexShrink: 0 }} />
+          </button>
         )}
       </Dropdown>
       {themeOpen && (
