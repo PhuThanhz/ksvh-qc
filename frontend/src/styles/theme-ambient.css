@@ -57,16 +57,11 @@
   color: rgba(255, 255, 255, 0.82) !important;
 }
 
-.app-shell--themed .app-sidebar .ant-menu-item:hover,
-.app-shell--themed .app-sidebar .ant-menu-submenu-title:hover {
+.app-shell--themed .app-sidebar :is(.ant-menu-item, .ant-menu-submenu-title):hover {
   background: rgba(255, 255, 255, 0.12) !important;
   color: #ffffff !important;
 }
-
-.app-shell--themed .app-sidebar .ant-menu-item:hover .ant-menu-item-icon,
-.app-shell--themed .app-sidebar .ant-menu-submenu-title:hover .ant-menu-item-icon {
-  color: #ffffff !important;
-}
+.app-shell--themed .app-sidebar :is(.ant-menu-item, .ant-menu-submenu-title):hover .ant-menu-item-icon { color: #ffffff !important; }
 
 /* Mục đang chọn: Viên nang phát quang trong mờ */
 .app-shell--themed .app-sidebar .ant-menu-item-selected {
@@ -78,12 +73,7 @@
   font-weight: 600 !important;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
 }
-
-.app-shell--themed .app-sidebar .ant-menu-item-selected .ant-menu-item-icon,
-.app-shell--themed .app-sidebar .ant-menu-item-selected a,
-.app-shell--themed .app-sidebar .ant-menu-item-selected .ant-menu-title-content {
-  color: #ffffff !important;
-}
+.app-shell--themed .app-sidebar .ant-menu-item-selected :is(.ant-menu-item-icon, a, .ant-menu-title-content) { color: #ffffff !important; }
 
 /* ---------- 3. Tiêu đề trang & Nút hành động (Page Header & Actions) ---------- */
 .app-shell--themed .page-header h2.ant-typography {
@@ -91,7 +81,6 @@
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5) !important;
   font-weight: 700 !important;
 }
-
 .app-shell--themed .page-header .page-header__subtitle {
   color: rgba(255, 255, 255, 0.88) !important;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) !important;
@@ -109,11 +98,7 @@
   -webkit-backdrop-filter: blur(10px) !important;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
-
-.app-shell--themed .page-header__actions .ant-btn:not(.ant-btn-primary):not(:disabled) .anticon {
-  color: #ffffff !important;
-}
-
+.app-shell--themed .page-header__actions .ant-btn:not(.ant-btn-primary):not(:disabled) .anticon { color: #ffffff !important; }
 .app-shell--themed .page-header__actions .ant-btn:not(.ant-btn-primary):not(:disabled):hover {
   background: rgba(255, 255, 255, 0.25) !important;
   border-color: rgba(255, 255, 255, 0.45) !important;
@@ -128,26 +113,16 @@
   color: #ffffff !important;
   font-weight: 600 !important;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
-  box-shadow:
-    0 4px 18px rgba(250, 84, 28, 0.45),
-    0 1px 3px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.38) !important;
+  box-shadow: 0 4px 18px rgba(250, 84, 28, 0.45), 0 1px 3px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.38) !important;
   backdrop-filter: blur(10px) !important;
   -webkit-backdrop-filter: blur(10px) !important;
   transition: all 0.2s ease !important;
 }
-
-.app-shell--themed :is(.ant-btn-primary, .ant-btn-color-primary):not(.ant-btn-dangerous):not(:disabled) .anticon {
-  color: #ffffff !important;
-}
-
+.app-shell--themed :is(.ant-btn-primary, .ant-btn-color-primary):not(.ant-btn-dangerous):not(:disabled) .anticon { color: #ffffff !important; }
 .app-shell--themed :is(.ant-btn-primary, .ant-btn-color-primary):not(.ant-btn-dangerous):not(:disabled):hover {
   background: linear-gradient(135deg, #ff8252 0%, #ff642c 55%, #f4511e 100%) !important;
   border-color: rgba(255, 255, 255, 0.5) !important;
-  box-shadow:
-    0 6px 22px rgba(250, 84, 28, 0.6),
-    0 2px 6px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 6px 22px rgba(250, 84, 28, 0.6), 0 2px 6px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
   transform: translateY(-1px);
 }
 
@@ -189,19 +164,82 @@
 }
 
 /* Cột cố định (Fixed Columns) của bảng: BẮT BUỘC nền trắng đặc 100% */
-.app-shell--themed .ant-table-wrapper .ant-table-cell-fix-left,
-.app-shell--themed .ant-table-wrapper .ant-table-cell-fix-right {
-  background: #ffffff !important;
-  z-index: 2 !important;
-}
+.app-shell--themed .ant-table-wrapper :is(.ant-table-cell-fix-left, .ant-table-cell-fix-right) { background: #ffffff !important; z-index: 2 !important; }
+.app-shell--themed .ant-table-wrapper thead th:is(.ant-table-cell-fix-left, .ant-table-cell-fix-right) { background: #f8fafc !important; z-index: 3 !important; }
+.app-shell--themed .ant-table-wrapper tr:hover td:is(.ant-table-cell-fix-left, .ant-table-cell-fix-right) { background: #f1f5f9 !important; }
 
-.app-shell--themed .ant-table-wrapper .ant-table-thead > tr > th.ant-table-cell-fix-left,
-.app-shell--themed .ant-table-wrapper .ant-table-thead > tr > th.ant-table-cell-fix-right {
-  background: #f8fafc !important;
-  z-index: 3 !important;
+/* ---------- 5. Thanh điều hướng Tabs & Phân đoạn (Tabs & Segmented) ---------- */
+/* Tabs trên nền hình nền: Kính mờ cao cấp, thay thế nền trắng toát */
+.app-shell--themed .ant-tabs-nav {
+  background: rgba(20, 24, 33, 0.68) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 12px !important;
+  padding: 5px 6px !important;
+  margin-bottom: 16px !important;
+  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.16) !important;
 }
+.app-shell--themed .ant-tabs-nav::before { display: none !important; }
+.app-shell--themed .ant-tabs-tab {
+  color: rgba(255, 255, 255, 0.82) !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  padding: 7px 18px !important;
+  border-radius: 8px !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  border: none !important;
+  margin: 0 2px !important;
+}
+.app-shell--themed .ant-tabs-tab:hover { color: #ffffff !important; background: rgba(255, 255, 255, 0.12) !important; }
+.app-shell--themed .ant-tabs-tab-active {
+  background: linear-gradient(135deg, #ff6e3a 0%, #fa541c 55%, #ee4d2d 100%) !important;
+  box-shadow: 0 4px 16px rgba(250, 84, 28, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+}
+.app-shell--themed .ant-tabs-tab-active .ant-tabs-tab-btn { color: #ffffff !important; font-weight: 600 !important; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important; }
+.app-shell--themed .ant-tabs-tab-active .anticon { color: #ffffff !important; }
+.app-shell--themed .ant-tabs-ink-bar { display: none !important; }
 
-.app-shell--themed .ant-table-wrapper .ant-table-tbody > tr:hover > td.ant-table-cell-fix-left,
-.app-shell--themed .ant-table-wrapper .ant-table-tbody > tr:hover > td.ant-table-cell-fix-right {
+/* Tabs bên trong Modal hoặc Card trắng */
+.app-shell--themed :is(.ant-modal-content, .ant-drawer-content) .ant-tabs-nav {
   background: #f1f5f9 !important;
+  backdrop-filter: none !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  box-shadow: none !important;
 }
+.app-shell--themed :is(.ant-modal-content, .ant-drawer-content) .ant-tabs-tab { color: #64748b !important; }
+.app-shell--themed :is(.ant-modal-content, .ant-drawer-content) .ant-tabs-tab:hover { color: #0f172a !important; background: rgba(0, 0, 0, 0.04) !important; }
+
+/* Thanh phân đoạn Segmented: Đậm đà, chống trắng toát, pill cam nổi bật */
+.app-shell--themed .ant-segmented {
+  background: rgba(15, 23, 42, 0.07) !important;
+  border: 1px solid rgba(15, 23, 42, 0.09) !important;
+  border-radius: 9px !important;
+  padding: 3px !important;
+}
+.app-shell--themed .ant-segmented .ant-segmented-item {
+  color: #475569 !important;
+  font-weight: 500 !important;
+  font-size: 13px !important;
+  border-radius: 7px !important;
+  transition: all 0.2s ease !important;
+}
+.app-shell--themed .ant-segmented .ant-segmented-item:hover:not(.ant-segmented-item-selected) {
+  color: #0f172a !important;
+  background: rgba(15, 23, 42, 0.06) !important;
+}
+.app-shell--themed .ant-segmented .ant-segmented-item-selected {
+  background: linear-gradient(135deg, #ff6e3a 0%, #fa541c 55%, #ee4d2d 100%) !important;
+  box-shadow: 0 2px 8px rgba(250, 84, 28, 0.35) !important;
+}
+.app-shell--themed .ant-segmented .ant-segmented-item-selected .ant-segmented-item-label {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+}
+.app-shell--themed .page-header__actions .ant-segmented {
+  background: rgba(20, 24, 33, 0.65) !important;
+  backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+.app-shell--themed .page-header__actions .ant-segmented .ant-segmented-item { color: rgba(255, 255, 255, 0.8) !important; }
