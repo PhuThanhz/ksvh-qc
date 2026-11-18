@@ -106,23 +106,23 @@
   transform: translateY(-1px);
 }
 
-/* Nút chính Shopee Orange Gradient rực rỡ nổi bật */
+/* Nút chính Sapphire Blue Gradient rực rỡ nổi bật */
 .app-shell--themed :is(.ant-btn-primary, .ant-btn-color-primary):not(.ant-btn-dangerous):not(:disabled) {
   border: 1px solid rgba(255, 255, 255, 0.35) !important;
-  background: linear-gradient(135deg, #ff6e3a 0%, #fa541c 55%, #ee4d2d 100%) !important;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 55%, #1d4ed8 100%) !important;
   color: #ffffff !important;
   font-weight: 600 !important;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
-  box-shadow: 0 4px 18px rgba(250, 84, 28, 0.45), 0 1px 3px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.38) !important;
+  box-shadow: 0 4px 18px rgba(37, 99, 235, 0.45), 0 1px 3px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.38) !important;
   backdrop-filter: blur(10px) !important;
   -webkit-backdrop-filter: blur(10px) !important;
   transition: all 0.2s ease !important;
 }
 .app-shell--themed :is(.ant-btn-primary, .ant-btn-color-primary):not(.ant-btn-dangerous):not(:disabled) .anticon { color: #ffffff !important; }
 .app-shell--themed :is(.ant-btn-primary, .ant-btn-color-primary):not(.ant-btn-dangerous):not(:disabled):hover {
-  background: linear-gradient(135deg, #ff8252 0%, #ff642c 55%, #f4511e 100%) !important;
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 55%, #2563eb 100%) !important;
   border-color: rgba(255, 255, 255, 0.5) !important;
-  box-shadow: 0 6px 22px rgba(250, 84, 28, 0.6), 0 2px 6px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 6px 22px rgba(37, 99, 235, 0.6), 0 2px 6px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
   transform: translateY(-1px);
 }
 
@@ -193,8 +193,8 @@
 }
 .app-shell--themed .ant-tabs-tab:hover { color: #ffffff !important; background: rgba(255, 255, 255, 0.12) !important; }
 .app-shell--themed .ant-tabs-tab-active {
-  background: linear-gradient(135deg, #ff6e3a 0%, #fa541c 55%, #ee4d2d 100%) !important;
-  box-shadow: 0 4px 16px rgba(250, 84, 28, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 55%, #1d4ed8 100%) !important;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
 }
 .app-shell--themed .ant-tabs-tab-active .ant-tabs-tab-btn { color: #ffffff !important; font-weight: 600 !important; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important; }
 .app-shell--themed .ant-tabs-tab-active .anticon { color: #ffffff !important; }
@@ -229,8 +229,8 @@
   background: rgba(15, 23, 42, 0.06) !important;
 }
 .app-shell--themed .ant-segmented .ant-segmented-item-selected {
-  background: linear-gradient(135deg, #ff6e3a 0%, #fa541c 55%, #ee4d2d 100%) !important;
-  box-shadow: 0 2px 8px rgba(250, 84, 28, 0.35) !important;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 55%, #1d4ed8 100%) !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35) !important;
 }
 .app-shell--themed .ant-segmented .ant-segmented-item-selected .ant-segmented-item-label {
   color: #ffffff !important;
