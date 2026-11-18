@@ -42,29 +42,39 @@ export function DashboardPage() {
       subtitle={`Xin chào ${user?.fullName ?? ''} · ${capitalize(today.format('dddd, DD/MM/YYYY'))}`}
       extra={
         canOps ? (
-          <Segmented
-            size="middle"
-            options={PERIODS}
-            value={months}
-            onChange={(v) => setMonths(Number(v))}
-          />
+          <Flex align="center" gap={8}>
+            <span style={{ fontSize: 13, color: '#ffffff', fontWeight: 500, textShadow: '0 1px 4px rgba(0, 0, 0, 0.6)' }}>
+              Khoảng thời gian:
+            </span>
+            <Segmented
+              size="middle"
+              options={PERIODS}
+              value={months}
+              onChange={(v) => setMonths(Number(v))}
+            />
+          </Flex>
         ) : undefined
       }
     >
       <Flex vertical gap={20} style={{ paddingBottom: 24 }}>
+        {/* 1. KHỐI CHỈ SỐ KPI & BIỂU ĐỒ: Luôn ưu tiên hiển thị đầu trang Dashboard */}
+        {canOps && (
+          <>
+            <SectionTitle>Chỉ số KPI & Biểu đồ phân tích vận hành QC</SectionTitle>
+            <OperationsSection months={months} />
+          </>
+        )}
+
+        {/* 2. HÀNG CHỜ PHÊ DUYỆT */}
         {canApprove && (
           <>
             <SectionTitle>Hàng chờ xử lý & phê duyệt</SectionTitle>
             <ApprovalQueueSection />
           </>
         )}
-        {canOps && (
-          <>
-            <SectionTitle>Chỉ số hoạt động & Xu hướng kiểm soát vận hành</SectionTitle>
-            <OperationsSection months={months} />
-          </>
-        )}
-        <SectionTitle>Danh mục & Cấu hình kiểm soát</SectionTitle>
+
+        {/* 3. QUY MÔ HỆ THỐNG & DANH MỤC TIÊU CHUẨN */}
+        <SectionTitle>Quy mô hệ thống & Danh mục tiêu chuẩn</SectionTitle>
         <CatalogSection />
       </Flex>
     </PageContainer>
