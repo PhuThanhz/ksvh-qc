@@ -61,7 +61,7 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
     {
       key: 'theme',
       icon: <BgColorsOutlined />,
-      label: 'Đổi chủ đề / giao diện',
+      label: 'Đổi chủ đề / hình nền',
       onClick: () => setThemeOpen(true),
     },
     {

@@ -95,7 +95,7 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
   }
 
   return (
-    <Layout style={{ minHeight: '100vh', background: '#f8fafc', position: 'relative' }}>
+    <Layout style={{ minHeight: '100vh', background: 'transparent', position: 'relative' }}>
       <AmbientCanvas />
       {isDesktop ? (
         <Layout.Sider

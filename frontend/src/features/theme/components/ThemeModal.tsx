@@ -50,7 +50,7 @@ export function ThemeModal({ open, onClose }: ThemeModalProps) {
 
   return (
     <Modal
-      title="Cài đặt chủ đề màu sắc giao diện"
+      title="Cài đặt hình ảnh giao diện & hình nền"
       open={open}
       onCancel={onClose}
       footer={null}
@@ -60,7 +60,7 @@ export function ThemeModal({ open, onClose }: ThemeModalProps) {
     >
       <Flex justify="space-between" align="center" style={{ marginBottom: 12 }}>
         <Typography.Paragraph type="secondary" style={{ fontSize: 13, margin: 0 }}>
-          Chọn phong cách màu sắc thanh lịch, tinh gọn phù hợp với môi trường làm việc:
+          Chọn một hình nền từ bộ sưu tập hoặc tải ảnh riêng từ máy tính:
         </Typography.Paragraph>
         <Button
           type="text"

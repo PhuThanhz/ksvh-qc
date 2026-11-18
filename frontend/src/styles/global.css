@@ -88,15 +88,19 @@ code, kbd, samp, pre, .font-code {
 
 /* Sidebar kính Apple nhẹ nhàng, thanh thoát (macOS Sidebar) */
 .apple-frosted-sidebar {
-  background: #ffffff !important;
-  border-inline-end: 1px solid var(--app-border) !important;
-  box-shadow: 1px 0 3px rgba(0, 0, 0, 0.02) !important;
+  background: rgba(255, 255, 255, 0.88) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border-inline-end: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 1px 0 12px rgba(0, 0, 0, 0.04) !important;
 }
 
 .apple-frosted-header {
-  background: #ffffff !important;
-  border-bottom: 1px solid var(--app-border) !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 1px 12px rgba(0, 0, 0, 0.04) !important;
 }
 
 .apple-frosted-sidebar .ant-menu {
