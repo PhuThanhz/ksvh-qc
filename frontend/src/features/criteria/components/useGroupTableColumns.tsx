@@ -47,7 +47,7 @@ export function useGroupTableColumns({
       title: 'Tên nhóm tiêu chí',
       dataIndex: 'name',
       key: 'name',
-      minWidth: 260,
+      width: 280,
       render: (name: string, g: CriterionGroup) => (
         <Tooltip title="Xem chi tiết nhóm và danh sách các tiêu chí con">
           <Typography.Link

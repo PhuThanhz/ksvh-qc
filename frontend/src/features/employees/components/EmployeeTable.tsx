@@ -40,7 +40,7 @@ export function EmployeeTable({ onView, onEdit, onDelete, ...props }: EmployeeTa
           dataIndex: 'fullName',
           key: 'fullName',
           sorter: true,
-          minWidth: 160,
+          width: 180,
           render: (name: string, e: Employee) => (
             <Flex vertical>
               <span>{name}</span>
@@ -48,7 +48,7 @@ export function EmployeeTable({ onView, onEdit, onDelete, ...props }: EmployeeTa
             </Flex>
           ),
         },
-        { title: 'Nhà hàng / phòng ban', dataIndex: 'orgUnitName', minWidth: 160, render: dash },
+        { title: 'Nhà hàng / phòng ban', dataIndex: 'orgUnitName', width: 200, render: dash },
         {
           title: 'Liên hệ',
           key: 'contact',

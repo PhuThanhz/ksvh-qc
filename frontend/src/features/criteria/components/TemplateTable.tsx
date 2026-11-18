@@ -45,7 +45,7 @@ export function TemplateTable({ onView, onEdit, onDelete, ...props }: TemplateTa
           dataIndex: 'name',
           key: 'name',
           sorter: true,
-          minWidth: 200,
+          width: 240,
           render: (name: string, t: Template) => (
             <Flex vertical>
               <Typography.Link onClick={() => onView(t)} style={{ fontWeight: 500 }}>

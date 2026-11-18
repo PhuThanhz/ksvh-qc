@@ -62,7 +62,7 @@ export function FindingTable({
     {
       title: 'Tiêu chí vi phạm',
       key: 'crit',
-      minWidth: 260,
+      width: 320,
       render: (_, r) => (
         <div>
           <div style={{ fontWeight: 500 }}>{r.criterionName}</div>
@@ -153,7 +153,7 @@ export function FindingTable({
       dataSource={data}
       rowKey="id"
       loading={loading}
-      scroll={{ x: 1100 }}
+      scroll={{ x: 1350 }}
       rowSelection={
         onSelectRowKeys
           ? {

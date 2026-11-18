@@ -98,7 +98,7 @@ export function RiskLevelTable({
           },
           {
             title: 'Hành động bắt buộc',
-            minWidth: 260,
+            width: 280,
             render: (_, __, i) => (
               <FormInput
                 control={control}

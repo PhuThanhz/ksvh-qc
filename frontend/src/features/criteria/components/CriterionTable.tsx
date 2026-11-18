@@ -57,7 +57,7 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
           dataIndex: 'name',
           key: 'name',
           sorter: true,
-          minWidth: 220,
+          width: 260,
           render: (name: string, c: Criterion) => (
             <Flex vertical style={{ maxWidth: 360 }}>
               <Typography.Link onClick={() => onView(c)} style={{ fontWeight: 500 }}>

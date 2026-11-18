@@ -36,8 +36,8 @@ export function UserTable({ roleName, onView, onEdit, onDelete, onResetPassword,
           render: (_: unknown, __: unknown, index: number) =>
             ((props.params?.page ?? 0) * (props.params?.size ?? 20)) + index + 1,
         },
-        { title: 'Tên đăng nhập', dataIndex: 'username', key: 'username', sorter: true, minWidth: 140 },
-        { title: 'Họ tên', dataIndex: 'fullName', key: 'fullName', sorter: true, minWidth: 150 },
+        { title: 'Tên đăng nhập', dataIndex: 'username', key: 'username', sorter: true, width: 150 },
+        { title: 'Họ tên', dataIndex: 'fullName', key: 'fullName', sorter: true, width: 180 },
         {
           title: 'Vai trò',
           dataIndex: 'roles',

@@ -257,6 +257,16 @@ td.ant-table-cell:last-child {
   white-space: nowrap !important;
 }
 
+/* Tiêu đề cột bảng: tuyệt đối không ngắt dòng thành hàng dọc 1 chữ cái */
+.ant-table-wrapper .ant-table-thead > tr > th {
+  white-space: nowrap !important;
+  font-size: 13.5px !important;
+}
+
+.ant-table-wrapper .ant-table-tbody > tr > td {
+  word-break: normal !important;
+}
+
 /* Đổ bóng ngăn cách cột fixed-right khỏi các cột đang cuộn phía sau */
 .ant-table-wrapper .ant-table-cell-fix-right-first::after {
   content: '';
@@ -283,18 +293,18 @@ td.ant-table-cell:last-child {
   box-shadow: 0 0 0 3px var(--app-focus-ring) !important;
 }
 
-/* Nút chính */
+/* Nút chính: Chuẩn xanh dương #2563eb, tuyệt đối không dùng màu đen */
 .ant-btn-primary:not(:disabled) {
-  background: #0f172a !important;
-  border: 1px solid #0f172a !important;
+  background: #2563eb !important;
+  border: 1px solid #2563eb !important;
   color: #ffffff !important;
   border-radius: 8px !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08) !important;
-  font-weight: 500 !important;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25) !important;
+  font-weight: 600 !important;
 }
 .ant-btn-primary:not(:disabled):hover {
-  background: #1e293b !important;
-  border-color: #1e293b !important;
+  background: #1d4ed8 !important;
+  border-color: #1d4ed8 !important;
   color: #ffffff !important;
 }
 .ant-btn-primary.ant-btn-dangerous:not(:disabled) {

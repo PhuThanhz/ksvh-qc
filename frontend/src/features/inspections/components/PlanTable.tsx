@@ -59,7 +59,7 @@ export function PlanTable({
       title: 'Tiêu đề kế hoạch',
       dataIndex: 'title',
       key: 'title',
-      minWidth: 260,
+      width: 320,
       render: (t, r) => (
         <div>
           {onView ? (
@@ -140,7 +140,7 @@ export function PlanTable({
       dataSource={data}
       rowKey="id"
       loading={loading}
-      scroll={{ x: 1100 }}
+      scroll={{ x: 1350 }}
       pagination={
         totalItems !== undefined
           ? {
