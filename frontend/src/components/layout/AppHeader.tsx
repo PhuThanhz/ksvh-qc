@@ -5,7 +5,6 @@ import {
 import { Button, Flex } from 'antd'
 import { useLocation } from 'react-router'
 import type { MenuEntry } from '@/components/layout/menu.types'
-import { CreateMenu } from '@/features/dashboard/components/CreateMenu'
 import { NotificationBell } from '@/features/notifications'
 
 export interface AppHeaderProps {
@@ -73,7 +72,6 @@ export function AppHeader({ collapsed, onToggleSidebar, menu }: AppHeaderProps) 
 
       <Flex align="center" gap={10}>
         <NotificationBell />
-        <CreateMenu />
       </Flex>
     </Flex>
   )

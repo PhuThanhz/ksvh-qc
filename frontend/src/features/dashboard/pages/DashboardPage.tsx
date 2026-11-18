@@ -1,11 +1,10 @@
-import { Flex, Segmented, Space, Typography } from 'antd'
+import { Flex, Segmented, Typography } from 'antd'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { useSession } from '@/features/auth'
 import { ApprovalQueueSection } from '@/features/dashboard/components/ApprovalQueueSection'
 import { CatalogSection } from '@/features/dashboard/components/CatalogSection'
-import { CreateMenu } from '@/features/dashboard/components/CreateMenu'
 import { OperationsSection } from '@/features/dashboard/components/OperationsSection'
 import { PERMISSIONS, usePermission } from '@/permissions'
 
@@ -42,17 +41,14 @@ export function DashboardPage() {
       title="Tổng quan vận hành"
       subtitle={`Xin chào ${user?.fullName ?? ''} · ${capitalize(today.format('dddd, DD/MM/YYYY'))}`}
       extra={
-        <Space size={10}>
-          {canOps && (
-            <Segmented
-              size="middle"
-              options={PERIODS}
-              value={months}
-              onChange={(v) => setMonths(Number(v))}
-            />
-          )}
-          <CreateMenu />
-        </Space>
+        canOps ? (
+          <Segmented
+            size="middle"
+            options={PERIODS}
+            value={months}
+            onChange={(v) => setMonths(Number(v))}
+          />
+        ) : undefined
       }
     >
       <Flex vertical gap={20} style={{ paddingBottom: 24 }}>
