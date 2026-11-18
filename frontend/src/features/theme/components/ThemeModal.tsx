@@ -43,14 +43,14 @@ export function ThemeModal({ open, onClose }: ThemeModalProps) {
   }
 
   const handleResetDefault = () => {
-    setTheme('sequoia')
-    message.success('Đã đặt lại giao diện Doanh nghiệp chuẩn!')
+    setTheme('clean-light')
+    message.success('Đã đặt lại giao diện Sáng tinh gọn chuẩn!')
     onClose()
   }
 
   return (
     <Modal
-      title="Cài đặt hình ảnh giao diện & hình nền"
+      title="Cài đặt chủ đề màu sắc giao diện"
       open={open}
       onCancel={onClose}
       footer={null}
@@ -60,7 +60,7 @@ export function ThemeModal({ open, onClose }: ThemeModalProps) {
     >
       <Flex justify="space-between" align="center" style={{ marginBottom: 12 }}>
         <Typography.Paragraph type="secondary" style={{ fontSize: 13, margin: 0 }}>
-          Chọn một hình nền từ bộ sưu tập 18 kiệt tác hoặc tải ảnh riêng từ máy tính:
+          Chọn phong cách màu sắc thanh lịch, tinh gọn phù hợp với môi trường làm việc:
         </Typography.Paragraph>
         <Button
           type="text"

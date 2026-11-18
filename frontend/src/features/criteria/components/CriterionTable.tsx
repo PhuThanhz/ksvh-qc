@@ -24,7 +24,7 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
     <DataTable<Criterion>
       {...props}
       rowKey="id"
-      scroll={{ x: 1000 }}
+      scroll={{ x: 1100 }}
       columns={[
         {
           title: '#',
@@ -40,11 +40,20 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
           dataIndex: 'groupName',
           key: 'groupName',
           sorter: true,
-          width: 170,
+          width: 220,
           render: (groupName: string, c: Criterion) => (
-            <Tooltip title={onFilterGroup ? `Nhấp để lọc nhóm: ${groupName}` : undefined}>
+            <Tooltip title={groupName}>
               <Tag
-                style={{ cursor: onFilterGroup ? 'pointer' : 'default', fontWeight: 500 }}
+                style={{
+                  cursor: onFilterGroup ? 'pointer' : 'default',
+                  fontWeight: 500,
+                  maxWidth: '100%',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  display: 'inline-block',
+                  verticalAlign: 'middle',
+                }}
                 onClick={onFilterGroup ? () => onFilterGroup(c.groupId) : undefined}
               >
                 {groupName}
@@ -57,9 +66,9 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
           dataIndex: 'name',
           key: 'name',
           sorter: true,
-          width: 260,
+          width: 320,
           render: (name: string, c: Criterion) => (
-            <Flex vertical style={{ maxWidth: 360 }}>
+            <Flex vertical style={{ minWidth: 0, maxWidth: 360 }}>
               <Typography.Link onClick={() => onView(c)} style={{ fontWeight: 500 }}>
                 {name}
               </Typography.Link>

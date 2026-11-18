@@ -5,14 +5,13 @@ import type { AmbientState } from './ambient.types'
 export const useAmbientStore = create<AmbientState>()(
   persist(
     (set) => ({
-      currentThemeId: 'bitrix-cyber',
+      currentThemeId: 'clean-light',
       customImageUrl: '',
       setTheme: (id: string) => set({ currentThemeId: id }),
       setCustomImageUrl: (url: string) => set({ customImageUrl: url, currentThemeId: 'custom' }),
     }),
     {
-      name: 'ksvh-ambient-theme-v3',
+      name: 'ksvh-ambient-theme-v5',
     },
   ),
 )
-

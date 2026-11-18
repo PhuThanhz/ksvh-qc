@@ -24,6 +24,17 @@ function initialsOf(fullName?: string): string {
   return (last?.[0] ?? 'U').toUpperCase()
 }
 
+function getPrimaryRoleLabel(roles?: readonly string[]): string {
+  if (!roles || roles.length === 0) return 'Người dùng'
+  if (roles.includes('SYSTEM_ADMIN')) return 'Quản trị hệ thống'
+  if (roles.includes('BUSINESS_ADMIN')) return 'Quản trị nghiệp vụ'
+  if (roles.includes('EXECUTIVE')) return 'Ban Giám đốc'
+  if (roles.includes('KSVH_MANAGER') || roles.includes('KSVH_LEAD')) return 'Quản lý KSVH'
+  if (roles.includes('QC_INSPECTOR')) return 'Chuyên viên QC'
+  if (roles.includes('STORE_MANAGER')) return 'Cửa hàng trưởng'
+  return roleLabel(roles[0]!)
+}
+
 export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: SidebarProfileProps) {
   const [themeOpen, setThemeOpen] = useState(false)
 
@@ -34,14 +45,14 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
       style: { cursor: 'default', opacity: 1 },
       label: (
         <Flex vertical gap={2} style={{ padding: '4px 2px', maxWidth: 260 }}>
-          <Typography.Text strong style={{ fontSize: 13.5, color: 'var(--app-text)' }}>
+          <Typography.Text strong style={{ fontSize: 13.5, color: '#0f172a' }}>
             {user?.fullName ?? 'Người dùng'}
           </Typography.Text>
           <Typography.Text
             type="secondary"
-            style={{ fontSize: 12, lineHeight: 1.4, color: 'var(--app-text-muted)' }}
+            style={{ fontSize: 12, lineHeight: 1.4, color: '#64748b' }}
           >
-            {user?.roles.map(roleLabel).join(' · ')}
+            {getPrimaryRoleLabel(user?.roles)}
           </Typography.Text>
         </Flex>
       ),
@@ -50,7 +61,7 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
     {
       key: 'theme',
       icon: <BgColorsOutlined />,
-      label: 'Đổi chủ đề / hình nền',
+      label: 'Đổi chủ đề / giao diện',
       onClick: () => setThemeOpen(true),
     },
     {
@@ -67,13 +78,13 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
     <Avatar
       size={collapsed ? 36 : 34}
       style={{
-        background: 'rgba(255, 255, 255, 0.85)',
-        color: 'var(--app-text)',
+        background: '#eff6ff',
+        color: '#2563eb',
         fontWeight: 700,
         fontSize: 14,
         flexShrink: 0,
-        border: '1px solid rgba(255, 255, 255, 0.9)',
-        boxShadow: '0 2px 6px rgba(0, 0, 0, 0.06)',
+        border: '1px solid #dbeafe',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
       }}
     >
       {initialsOf(user?.fullName)}
@@ -84,7 +95,7 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
     <div
       style={{
         padding: collapsed ? '12px 0' : '10px 12px',
-        borderTop: '1px solid var(--app-on-dark-border)',
+        borderTop: '1px solid var(--app-border)',
         marginTop: 'auto',
         background: 'transparent',
       }}
@@ -104,7 +115,7 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
             style={{
               height: 'auto',
               padding: '8px 10px',
-              borderRadius: 14,
+              borderRadius: 12,
               textAlign: 'left',
               display: 'flex',
               alignItems: 'center',
@@ -113,14 +124,14 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
             <Flex align="center" gap={10} style={{ width: '100%', overflow: 'hidden' }}>
               {avatar}
               <Flex vertical style={{ flex: 1, minWidth: 0, lineHeight: 1.25 }}>
-                <Typography.Text strong ellipsis style={{ fontSize: 13, color: 'var(--app-on-dark)' }}>
+                <Typography.Text strong ellipsis style={{ fontSize: 13, color: '#0f172a' }}>
                   {user?.fullName ?? 'Người dùng'}
                 </Typography.Text>
-                <Typography.Text ellipsis style={{ fontSize: 11, color: 'var(--app-on-dark-secondary)' }}>
-                  {user?.roles.map(roleLabel).join(', ')}
+                <Typography.Text ellipsis style={{ fontSize: 11, color: '#64748b' }}>
+                  {getPrimaryRoleLabel(user?.roles)}
                 </Typography.Text>
               </Flex>
-              <DownOutlined style={{ fontSize: 10, color: 'var(--app-on-dark-muted)', flexShrink: 0 }} />
+              <DownOutlined style={{ fontSize: 10, color: '#94a3b8', flexShrink: 0 }} />
             </Flex>
           </Button>
         )}

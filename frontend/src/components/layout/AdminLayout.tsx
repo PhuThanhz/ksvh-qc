@@ -45,22 +45,21 @@ function BrandHeader({
             width: 32,
             height: 32,
             borderRadius: 8,
-            background: 'rgba(255, 255, 255, 0.12)',
-            color: 'var(--app-on-dark)',
+            background: '#eff6ff',
+            color: '#2563eb',
             fontSize: 18,
             flexShrink: 0,
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.2)',
+            border: '1px solid #dbeafe',
           }}
         >
           <SafetyCertificateFilled />
         </Flex>
         {!collapsed && (
           <Flex vertical style={{ lineHeight: 1.2, overflow: 'hidden' }}>
-            <Typography.Text strong style={{ fontSize: 16, fontWeight: 800, letterSpacing: -0.2, color: 'var(--app-on-dark)' }}>
+            <Typography.Text strong style={{ fontSize: 16, fontWeight: 800, letterSpacing: -0.2, color: '#0f172a' }}>
               KSVH QC
             </Typography.Text>
-            <Typography.Text style={{ fontSize: 11, whiteSpace: 'nowrap', color: 'var(--app-on-dark-secondary)' }}>
+            <Typography.Text style={{ fontSize: 11, whiteSpace: 'nowrap', color: '#64748b' }}>
               Kiểm soát vận hành
             </Typography.Text>
           </Flex>
@@ -70,7 +69,7 @@ function BrandHeader({
         <Button
           type="text"
           shape="circle"
-          icon={<CloseOutlined style={{ color: 'var(--app-on-dark-secondary)', fontSize: 16 }} />}
+          icon={<CloseOutlined style={{ color: '#64748b', fontSize: 16 }} />}
           onClick={onClose}
           aria-label="Đóng thanh điều hướng"
         />
@@ -96,17 +95,17 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
   }
 
   return (
-    <Layout style={{ minHeight: '100vh', background: 'transparent', position: 'relative' }}>
+    <Layout style={{ minHeight: '100vh', background: '#f8fafc', position: 'relative' }}>
       <AmbientCanvas />
       {isDesktop ? (
         <Layout.Sider
           collapsible
           collapsed={collapsed}
           trigger={null}
-          theme="dark"
+          theme="light"
           width={280}
           collapsedWidth={76}
-          className="bitrix-frosted-sidebar"
+          className="apple-frosted-sidebar"
           style={{
             position: 'sticky',
             top: 0,
@@ -117,7 +116,7 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
           }}
         >
           <Flex vertical style={{ height: '100%', overflow: 'hidden' }}>
-            <BrandHeader collapsed={collapsed} borderColor="var(--app-on-dark-border)" />
+            <BrandHeader collapsed={collapsed} borderColor="var(--app-border)" />
             <div style={{ flex: 1, overflowY: 'auto' }}>
               <Sidebar menu={menu} />
             </div>
@@ -136,11 +135,11 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
           onClose={() => setMobileOpen(false)}
           size={280}
           closable={false}
-          className="bitrix-frosted-sidebar"
+          className="apple-frosted-sidebar"
           styles={{ body: { padding: 0 } }}
         >
           <Flex vertical style={{ height: '100%' }}>
-            <BrandHeader collapsed={false} borderColor="var(--app-on-dark-border)" onClose={() => setMobileOpen(false)} />
+            <BrandHeader collapsed={false} borderColor="var(--app-border)" onClose={() => setMobileOpen(false)} />
             <div style={{ flex: 1, overflowY: 'auto' }}>
               <Sidebar menu={menu} onSelect={() => setMobileOpen(false)} />
             </div>
@@ -156,25 +155,22 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
 
       <Layout style={{ minWidth: 0, background: 'transparent', position: 'relative', zIndex: 1 }}>
         <Layout.Header
-          className="bitrix-frosted-header"
+          className="apple-frosted-header"
           style={{
             paddingInline: isDesktop ? 20 : 16,
             height: 52,
             lineHeight: '52px',
             position: 'sticky',
             top: 0,
-            zIndex: 10,
+            zIndex: 99,
           }}
         >
-          <AppHeader
-            collapsed={isDesktop ? collapsed : !mobileOpen}
-            onToggleSidebar={handleToggle}
-            menu={menu}
-          />
+          <AppHeader onToggleSidebar={handleToggle} isDesktop={isDesktop} />
         </Layout.Header>
+
         <Layout.Content
           style={{
-            padding: isDesktop ? '18px 24px 32px' : '12px 14px 20px',
+            padding: isDesktop ? '20px 24px 32px' : '16px',
             minHeight: 'calc(100vh - 52px)',
           }}
         >
