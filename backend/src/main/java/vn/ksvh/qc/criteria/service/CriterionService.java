@@ -1,6 +1,8 @@
 package vn.ksvh.qc.criteria.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,6 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import vn.ksvh.qc.shared.config.CacheConfig;
 import vn.ksvh.qc.criteria.domain.Criterion;
 import vn.ksvh.qc.criteria.domain.CriterionGroup;
 import vn.ksvh.qc.criteria.domain.CriterionGroupRepository;
@@ -46,6 +49,7 @@ public class CriterionService {
 
     // ---- Nhóm ----
 
+    @Cacheable(value = CacheConfig.CRITERIA_GROUPS, key = "#companyId != null ? #companyId : 'all'")
     public List<CriterionGroupResponse> listGroups(Long companyId) {
         Map<Long, Long> counts = groupRepository.countCriteriaByGroup().stream()
                 .collect(Collectors.toMap(r -> (Long) r[0], r -> (Long) r[1]));
@@ -71,6 +75,7 @@ public class CriterionService {
     }
 
     @Transactional
+    @CacheEvict(value = CacheConfig.CRITERIA_GROUPS, allEntries = true)
     public CriterionGroupResponse createGroup(CriterionGroupRequest req, Long actorId) {
         String code = req.code().trim();
         if (groupRepository.existsByCodeIgnoreCase(code)) {
@@ -90,6 +95,7 @@ public class CriterionService {
     }
 
     @Transactional
+    @CacheEvict(value = CacheConfig.CRITERIA_GROUPS, allEntries = true)
     public CriterionGroupResponse updateGroup(Long id, CriterionGroupRequest req, Long actorId) {
         CriterionGroup g = loadGroup(id);
         String code = req.code().trim();
@@ -205,6 +211,7 @@ public class CriterionService {
     }
 
     @Transactional
+    @CacheEvict(value = CacheConfig.CRITERIA_GROUPS, allEntries = true)
     public CriterionResponse create(CriterionRequest req, Long actorId) {
         String code = req.code().trim();
         if (criterionRepository.existsByCodeIgnoreCase(code)) {
@@ -238,6 +245,7 @@ public class CriterionService {
     }
 
     @Transactional
+    @CacheEvict(value = CacheConfig.CRITERIA_GROUPS, allEntries = true)
     public CriterionResponse update(Long id, CriterionRequest req, Long actorId) {
         Criterion c = loadCriterion(id);
         String code = req.code().trim();
@@ -273,6 +281,7 @@ public class CriterionService {
      * → chuyển sang "ngưng hoạt động" để giữ lịch sử.
      */
     @Transactional
+    @CacheEvict(value = CacheConfig.CRITERIA_GROUPS, allEntries = true)
     public void deleteCriterion(Long id) {
         Criterion c = loadCriterion(id);
         List<String> templates = templateRepository.findTemplateRefsByCriterionId(id).stream()

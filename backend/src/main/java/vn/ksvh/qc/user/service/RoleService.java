@@ -1,12 +1,15 @@
 package vn.ksvh.qc.user.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import vn.ksvh.qc.security.permission.Permission;
 import vn.ksvh.qc.security.permission.PermissionCodes;
 import vn.ksvh.qc.security.permission.RoleCodes;
+import vn.ksvh.qc.shared.config.CacheConfig;
 import vn.ksvh.qc.shared.error.BusinessException;
 import vn.ksvh.qc.shared.error.ErrorCode;
 import vn.ksvh.qc.shared.error.NotFoundException;
@@ -45,6 +48,7 @@ public class RoleService {
     private final UserRepository userRepository;
     private final org.springframework.context.ApplicationEventPublisher eventPublisher;
 
+    @Cacheable(CacheConfig.ROLES)
     public List<RoleResponse> list() {
         Map<Long, Long> counts = userCounts();
         List<Role> roles = roleRepository.findAll();
@@ -61,6 +65,7 @@ public class RoleService {
     }
 
     /** Danh mục permission (thứ tự như trong code) kèm các vai trò đang có quyền. */
+    @Cacheable(CacheConfig.PERMISSIONS)
     public List<PermissionResponse> permissions() {
         Map<String, Set<String>> rolesByPermission = new HashMap<>();
         roleRepository.findAll().forEach(r -> r.getPermissions()
@@ -72,6 +77,7 @@ public class RoleService {
     }
 
     @Transactional
+    @CacheEvict(value = {CacheConfig.ROLES, CacheConfig.PERMISSIONS}, allEntries = true)
     public RoleResponse create(RoleRequest req, Long actorId) {
         String code = req.code().trim();
         if (roleRepository.existsByCodeIgnoreCase(code)) {
@@ -92,6 +98,7 @@ public class RoleService {
     }
 
     @Transactional
+    @CacheEvict(value = {CacheConfig.ROLES, CacheConfig.PERMISSIONS}, allEntries = true)
     public RoleResponse update(Long id, RoleRequest req, Long actorId) {
         Role role = load(id);
         apply(role, req, actorId);
@@ -106,6 +113,7 @@ public class RoleService {
     }
 
     @Transactional
+    @CacheEvict(value = {CacheConfig.ROLES, CacheConfig.PERMISSIONS}, allEntries = true)
     public void delete(Long id) {
         Role role = load(id);
         if (role.isSystemRole()) {

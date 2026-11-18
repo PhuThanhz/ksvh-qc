@@ -1,9 +1,12 @@
 package vn.ksvh.qc.criteria.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import vn.ksvh.qc.shared.config.CacheConfig;
 import vn.ksvh.qc.criteria.domain.EscalationRule;
 import vn.ksvh.qc.criteria.domain.EscalationRuleRepository;
 import vn.ksvh.qc.criteria.domain.FrequencyConfig;
@@ -58,11 +61,13 @@ public class RiskConfigService {
     // ---- Phân loại rủi ro ----
 
     /** Bộ mức rủi ro đang áp dụng hôm nay. */
+    @Cacheable(CacheConfig.RISK_LEVELS)
     public List<RiskLevelItem> riskLevels() {
         return riskLevelRepository.findEffectiveAt(BusinessDates.today(clock)).stream().map(RiskLevelItem::from).toList();
     }
 
     /** Mọi phiên bản, mới nhất trước. */
+    @Cacheable(value = CacheConfig.RISK_LEVELS, key = "'versions'")
     public List<RiskLevelVersionResponse> riskLevelVersions() {
         Map<LocalDate, List<RiskLevel>> byDate = riskLevelRepository.findAllByOrderByEffectiveFromDescMinScoreAsc().stream()
                 .collect(Collectors.groupingBy(RiskLevel::getEffectiveFrom, LinkedHashMap::new, Collectors.toList()));
@@ -83,6 +88,7 @@ public class RiskConfigService {
      * Các khoảng phải bắt đầu từ 0, liền nhau, không chồng; mức cuối không giới hạn trên.
      */
     @Transactional
+    @CacheEvict(value = CacheConfig.RISK_LEVELS, allEntries = true)
     public RiskLevelVersionResponse saveRiskLevelVersion(RiskLevelVersionRequest req, Long actorId) {
         LocalDate date = req.effectiveFrom();
         if (date.isBefore(BusinessDates.today(clock))) {
@@ -125,6 +131,7 @@ public class RiskConfigService {
 
     /** Chỉ xoá được phiên bản chưa đến ngày hiệu lực. */
     @Transactional
+    @CacheEvict(value = CacheConfig.RISK_LEVELS, allEntries = true)
     public void deleteRiskLevelVersion(LocalDate effectiveFrom) {
         List<RiskLevel> version = riskLevelRepository.findByEffectiveFromOrderByMinScoreAsc(effectiveFrom);
         if (version.isEmpty()) {
@@ -180,6 +187,7 @@ public class RiskConfigService {
 
     // ---- Tần suất ----
 
+    @Cacheable(CacheConfig.FREQUENCY_CONFIG)
     public List<FrequencyConfigResponse> frequencyConfigs() {
         List<FrequencyConfig> all = frequencyRepository.findAllByOrderByEffectiveFromDesc();
         Map<Long, UserSummary> creators = users.findSummaries(all.stream().map(FrequencyConfig::getCreatedBy).toList());
@@ -193,6 +201,7 @@ public class RiskConfigService {
     }
 
     @Transactional
+    @CacheEvict(value = CacheConfig.FREQUENCY_CONFIG, allEntries = true)
     public FrequencyConfigResponse createFrequency(FrequencyConfigRequest req, Long actorId) {
         assertNewEffectiveDate(req.effectiveFrom(), frequencyRepository.existsByEffectiveFrom(req.effectiveFrom()));
         var previous = frequencyRepository.findFirstByEffectiveFromLessThanOrderByEffectiveFromDesc(req.effectiveFrom());
@@ -215,6 +224,7 @@ public class RiskConfigService {
     }
 
     @Transactional
+    @CacheEvict(value = CacheConfig.FREQUENCY_CONFIG, allEntries = true)
     public void deleteFrequency(Long id) {
         FrequencyConfig c = frequencyRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy cấu hình tần suất #" + id));

@@ -1,4 +1,5 @@
 import { Tag } from 'antd'
+import { memo } from 'react'
 
 export type BadgeTone = 'default' | 'success' | 'processing' | 'warning' | 'danger'
 
@@ -16,7 +17,9 @@ export interface StatusBadgeProps<S extends string> {
   meta: Record<S, { label: string; tone: BadgeTone }>
 }
 
-export function StatusBadge<S extends string>({ status, meta }: StatusBadgeProps<S>) {
+function BaseStatusBadge<S extends string>({ status, meta }: StatusBadgeProps<S>) {
   const m = meta[status]
   return <Tag color={COLOR[m.tone]}>{m.label}</Tag>
 }
+
+export const StatusBadge = memo(BaseStatusBadge) as typeof BaseStatusBadge
