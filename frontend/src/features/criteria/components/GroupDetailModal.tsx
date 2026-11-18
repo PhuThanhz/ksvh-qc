@@ -168,7 +168,7 @@ export function GroupDetailModal({
             {
               title: 'Thao tác',
               key: 'actions',
-              width: 90,
+              width: 110,
               align: 'center',
               render: (_, c) => (
                 <TableActions

@@ -224,6 +224,46 @@ body {
   background: rgba(15, 23, 42, 0.04) !important;
 }
 
+/* Cột cố định (Fixed Columns) của bảng: BẮT BUỘC nền trắng đặc 100% để chữ cuộn phía sau không bị đè/lộ qua */
+.ant-table-wrapper .ant-table-cell-fix-left,
+.ant-table-wrapper .ant-table-cell-fix-right {
+  background: #ffffff !important;
+  z-index: 2 !important;
+}
+
+.ant-table-wrapper .ant-table-thead > tr > th.ant-table-cell-fix-left,
+.ant-table-wrapper .ant-table-thead > tr > th.ant-table-cell-fix-right {
+  background: #f8fafc !important;
+  z-index: 3 !important;
+}
+
+.ant-table-wrapper .ant-table-tbody > tr:hover > td.ant-table-cell-fix-left,
+.ant-table-wrapper .ant-table-tbody > tr:hover > td.ant-table-cell-fix-right {
+  background: #f1f5f9 !important;
+}
+
+/* Cột thao tác của bảng: vừa vặn nội dung (fit-content), không ngắt dòng làm vỡ nút */
+.ant-table-cell:has(.action-btn),
+.ant-table-cell:has([class*="action-btn"]),
+th.ant-table-cell:last-child,
+td.ant-table-cell:last-child {
+  white-space: nowrap !important;
+}
+
+/* Đổ bóng ngăn cách cột fixed-right khỏi các cột đang cuộn phía sau */
+.ant-table-wrapper .ant-table-cell-fix-right-first::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: -1px;
+  left: 0;
+  width: 30px;
+  transform: translateX(-100%);
+  pointer-events: none;
+  box-shadow: inset -10px 0 8px -8px rgba(0, 0, 0, 0.12) !important;
+  transition: box-shadow 0.2s ease;
+}
+
 /* Ô nhập liệu kính mờ */
 .ant-input, .ant-select-selector {
   border-radius: 8px !important;

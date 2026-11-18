@@ -32,7 +32,7 @@ export function CompanyTable({ onView, onEdit, onDelete, ...props }: CompanyTabl
         {
           title: 'Thao tác',
           key: 'actions',
-          width: 120,
+          width: 140,
           fixed: 'right',
           render: (_: unknown, row: Company) => (
             <TableActions

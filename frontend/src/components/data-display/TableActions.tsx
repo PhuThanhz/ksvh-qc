@@ -1,5 +1,5 @@
 import { DeleteOutlined, EditOutlined, EyeOutlined, PlusCircleOutlined } from '@ant-design/icons'
-import { Button, Space, Tooltip } from 'antd'
+import { Button, Tooltip } from 'antd'
 import type { ReactNode } from 'react'
 import { ProtectedAction, type AccessRule } from '@/permissions'
 
@@ -112,7 +112,7 @@ export function TableActions({
   const aria = (action: string) => (recordName ? `${action} "${recordName}"` : action)
 
   return (
-    <Space size={6} wrap={false}>
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap', width: 'max-content' }}>
       {onView && (
         viewAccess ? (
           <ProtectedAction access={viewAccess}>
@@ -154,6 +154,6 @@ export function TableActions({
       )}
 
       {extra}
-    </Space>
+    </div>
   )
 }

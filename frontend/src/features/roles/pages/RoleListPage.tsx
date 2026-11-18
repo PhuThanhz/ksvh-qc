@@ -98,7 +98,7 @@ export function RoleListPage() {
               {
                 title: 'Thao tác',
                 key: 'actions',
-                width: 120,
+                width: 140,
                 fixed: 'right',
                 render: (_: unknown, r) => (
                   <TableActions

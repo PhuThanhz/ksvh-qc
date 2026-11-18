@@ -99,7 +99,7 @@ export function OrgUnitTable({ onView, onEdit, onDelete, onFilterType, fixedUnit
     {
       title: 'Thao tác',
       key: 'actions',
-      width: 120,
+      width: 140,
       fixed: 'right' as const,
       render: (_: unknown, row: OrgUnit) => (
         <TableActions

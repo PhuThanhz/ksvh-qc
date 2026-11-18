@@ -6,7 +6,7 @@ import {
   FormOutlined,
   RollbackOutlined,
 } from '@ant-design/icons'
-import { Button, Space, Tooltip } from 'antd'
+import { ActionButton } from '@/components/data-display/TableActions'
 import type { FindingActionType } from '@/features/inspections/components/FindingActionModal'
 import type { FindingResponse } from '@/features/inspections/inspection.types'
 
@@ -29,54 +29,88 @@ export function FindingActionButtons({
   onAction,
   onView,
 }: Props) {
+  const code = r.criterionCode || `#${r.id}`
+
   return (
-    <Space size={4}>
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap', width: 'max-content' }}>
       {onView && (
-        <Tooltip title="Xem chi tiết">
-          <Button type="text" icon={<EyeOutlined />} onClick={() => onView(r)} />
-        </Tooltip>
+        <ActionButton
+          tone="view"
+          icon={<EyeOutlined />}
+          tooltip="Xem chi tiết"
+          ariaLabel={`Xem chi tiết lỗi ${code}`}
+          onClick={() => onView(r)}
+        />
       )}
 
       {r.status === 'OPEN' && canRespond && (
         <>
-          <Tooltip title="Xác nhận nhận lỗi">
-            <Button type="text" icon={<CheckCircleOutlined />} onClick={() => onAction(r, 'CONFIRM')} />
-          </Tooltip>
-          <Tooltip title="Khiếu nại">
-            <Button type="text" icon={<RollbackOutlined />} onClick={() => onAction(r, 'APPEAL')} />
-          </Tooltip>
+          <ActionButton
+            tone="add"
+            icon={<CheckCircleOutlined />}
+            tooltip="Xác nhận nhận lỗi"
+            ariaLabel={`Xác nhận nhận lỗi ${code}`}
+            onClick={() => onAction(r, 'CONFIRM')}
+          />
+          <ActionButton
+            tone="delete"
+            icon={<RollbackOutlined />}
+            tooltip="Khiếu nại"
+            ariaLabel={`Khiếu nại lỗi ${code}`}
+            onClick={() => onAction(r, 'APPEAL')}
+          />
         </>
       )}
 
       {r.status === 'APPEALED' && (
-        <Tooltip title="Thẩm định khiếu nại">
-          <Button type="text" icon={<AuditOutlined />} onClick={() => onAction(r, 'SUBMIT_REVIEW')} />
-        </Tooltip>
+        <ActionButton
+          tone="edit"
+          icon={<AuditOutlined />}
+          tooltip="Thẩm định khiếu nại"
+          ariaLabel={`Thẩm định khiếu nại lỗi ${code}`}
+          onClick={() => onAction(r, 'SUBMIT_REVIEW')}
+        />
       )}
 
       {r.status === 'APPEAL_MEETING' && canConclude && (
-        <Tooltip title="Kết luận họp khiếu nại">
-          <Button type="text" icon={<AuditOutlined />} onClick={() => onAction(r, 'CONCLUDE_APPEAL')} />
-        </Tooltip>
+        <ActionButton
+          tone="edit"
+          icon={<AuditOutlined />}
+          tooltip="Kết luận họp khiếu nại"
+          ariaLabel={`Kết luận họp khiếu nại lỗi ${code}`}
+          onClick={() => onAction(r, 'CONCLUDE_APPEAL')}
+        />
       )}
 
       {r.status === 'CONFIRMED' && canRemediate && (
-        <Tooltip title="Lập kế hoạch khắc phục">
-          <Button type="text" icon={<FormOutlined />} onClick={() => onAction(r, 'REMEDIATION_PLAN')} />
-        </Tooltip>
+        <ActionButton
+          tone="add"
+          icon={<FormOutlined />}
+          tooltip="Lập kế hoạch khắc phục"
+          ariaLabel={`Lập kế hoạch khắc phục lỗi ${code}`}
+          onClick={() => onAction(r, 'REMEDIATION_PLAN')}
+        />
       )}
 
       {r.status === 'REMEDIATING' && canRemediate && (
-        <Tooltip title="Nộp bằng chứng khắc phục">
-          <Button type="text" icon={<FileDoneOutlined />} onClick={() => onAction(r, 'SUBMIT_REMEDIATION')} />
-        </Tooltip>
+        <ActionButton
+          tone="add"
+          icon={<FileDoneOutlined />}
+          tooltip="Nộp bằng chứng khắc phục"
+          ariaLabel={`Nộp bằng chứng khắc phục lỗi ${code}`}
+          onClick={() => onAction(r, 'SUBMIT_REMEDIATION')}
+        />
       )}
 
       {r.status === 'PENDING_VERIFICATION' && canVerify && (
-        <Tooltip title="Nghiệm thu đóng lỗi">
-          <Button type="text" icon={<CheckCircleOutlined />} onClick={() => onAction(r, 'VERIFY')} />
-        </Tooltip>
+        <ActionButton
+          tone="add"
+          icon={<CheckCircleOutlined />}
+          tooltip="Nghiệm thu đóng lỗi"
+          ariaLabel={`Nghiệm thu đóng lỗi ${code}`}
+          onClick={() => onAction(r, 'VERIFY')}
+        />
       )}
-    </Space>
+    </div>
   )
 }

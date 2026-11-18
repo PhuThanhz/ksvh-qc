@@ -130,8 +130,9 @@ export function FindingTable({
     {
       title: 'Thao tác',
       key: 'actions',
-      width: 170,
+      width: 175,
       align: 'center',
+      fixed: 'right',
       render: (_, r) => (
         <FindingActionButtons
           finding={r}

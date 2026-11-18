@@ -89,7 +89,7 @@ export function TemplateTable({ onView, onEdit, onDelete, ...props }: TemplateTa
         {
           title: 'Thao tác',
           key: 'actions',
-          width: 120,
+          width: 140,
           fixed: 'right',
           render: (_: unknown, t: Template) => (
             <TableActions

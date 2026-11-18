@@ -146,8 +146,9 @@ export function InspectionTable({
     {
       title: 'Thao tác',
       key: 'actions',
-      width: 110,
+      width: 120,
       align: 'center',
+      fixed: 'right',
       render: (_, r) => (
         <TableActions
           recordName={r.code}

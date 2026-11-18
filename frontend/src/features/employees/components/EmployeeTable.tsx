@@ -72,7 +72,7 @@ export function EmployeeTable({ onView, onEdit, onDelete, ...props }: EmployeeTa
         {
           title: 'Thao tác',
           key: 'actions',
-          width: 120,
+          width: 140,
           fixed: 'right',
           render: (_: unknown, e: Employee) => (
             <TableActions

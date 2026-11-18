@@ -1,5 +1,4 @@
 import { CheckOutlined, CloseOutlined, DeleteOutlined, EditOutlined, EyeOutlined, SendOutlined } from '@ant-design/icons'
-import { Space } from 'antd'
 import { ActionButton } from '@/components/data-display/TableActions'
 import type { PlanResponse } from '@/features/inspections/inspection.types'
 
@@ -30,7 +29,7 @@ export function PlanActionButtons({
   const isPendingApproval = r.status === 'PENDING_APPROVAL' && canApprove
 
   return (
-    <Space size={6} wrap={false}>
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap', width: 'max-content' }}>
       {onView && (
         <ActionButton
           tone="view"
@@ -85,6 +84,6 @@ export function PlanActionButtons({
           />
         </>
       )}
-    </Space>
+    </div>
   )
 }

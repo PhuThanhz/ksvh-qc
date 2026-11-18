@@ -115,8 +115,9 @@ export function PlanTable({
     {
       title: 'Thao tác',
       key: 'actions',
-      width: 150,
+      width: 175,
       align: 'center',
+      fixed: 'right',
       render: (_, r) => (
         <PlanActionButtons
           plan={r}
@@ -139,7 +140,7 @@ export function PlanTable({
       dataSource={data}
       rowKey="id"
       loading={loading}
-      scroll={{ x: 1000 }}
+      scroll={{ x: 1100 }}
       pagination={
         totalItems !== undefined
           ? {

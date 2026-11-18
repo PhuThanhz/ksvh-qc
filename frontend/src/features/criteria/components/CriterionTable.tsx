@@ -105,7 +105,7 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
         {
           title: 'Thao tác',
           key: 'actions',
-          width: 120,
+          width: 140,
           fixed: 'right',
           render: (_: unknown, c: Criterion) => (
             <TableActions

@@ -108,7 +108,7 @@ export function useGroupTableColumns({
     {
       title: 'Thao tác',
       key: 'actions',
-      width: 170,
+      width: 180,
       fixed: 'right',
       render: (_, g: CriterionGroup) => (
         <TableActions
