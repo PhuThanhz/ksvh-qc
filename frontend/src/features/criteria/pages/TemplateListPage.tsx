@@ -96,7 +96,12 @@ export function TemplateListPage() {
     >
       <Flex vertical gap={16}>
         <AdvancedFilter
-          search={{ value: filters.keyword ?? '', placeholder: 'Tìm theo mã, tên, loại nhà hàng, loại kiểm tra', onSearch }}
+          search={{
+            value: filters.keyword ?? '',
+            placeholder: 'Tìm theo mã, tên, loại nhà hàng, kiểm tra...',
+            maxWidth: 480,
+            onSearch,
+          }}
           activeCount={activeFilterCount}
           onReset={resetFilters}
           activeTags={activeTags}

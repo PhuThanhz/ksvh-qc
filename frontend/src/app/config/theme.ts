@@ -65,6 +65,13 @@ export const antdTheme: ThemeConfig = {
       fontWeight: 500,
       borderRadius: 8,
     },
+    Segmented: {
+      itemSelectedBg: '#2563eb',
+      itemSelectedColor: '#ffffff',
+      itemColor: '#334155',
+      itemHoverColor: '#0f172a',
+      trackBg: '#f1f5f9',
+    },
     Modal: {
       borderRadiusLG: 24,
     },

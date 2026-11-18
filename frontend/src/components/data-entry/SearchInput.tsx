@@ -17,7 +17,7 @@ export function SearchInput({
   value: controlledValue,
   defaultValue = '',
   placeholder = 'Tìm kiếm…',
-  maxWidth = 440,
+  maxWidth = 460,
   style,
   onSearch,
 }: SearchInputProps) {
@@ -57,7 +57,7 @@ export function SearchInput({
       placeholder={placeholder}
       value={inner}
       onChange={(e) => setInner(e.target.value)}
-      style={{ minWidth: 260, maxWidth, flex: '1 1 320px', ...style }}
+      style={{ minWidth: 280, maxWidth, flex: '1 1 360px', ...style }}
     />
   )
 }

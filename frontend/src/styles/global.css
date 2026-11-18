@@ -292,9 +292,18 @@ td.ant-table-cell:last-child {
   background: rgba(255, 255, 255, 0.75) !important;
 }
 
-.ant-input:focus, .ant-input-focused, .ant-select-focused .ant-select-selector {
-  border-color: var(--app-focus-border) !important;
-  box-shadow: 0 0 0 3px var(--app-focus-ring) !important;
+.ant-input:not(.ant-input-affix-wrapper input):focus,
+.ant-input-focused:not(.ant-input-affix-wrapper input),
+.ant-input-affix-wrapper-focused,
+.ant-select-focused .ant-select-selector {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.16) !important;
+}
+.ant-input-affix-wrapper input.ant-input,
+.ant-input-affix-wrapper input.ant-input:focus {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* Nút chính: Chuẩn xanh dương #2563eb, tuyệt đối không dùng màu đen */
@@ -353,17 +362,21 @@ td.ant-table-cell:last-child {
 /* Tabs điều hướng */
 .ant-tabs-nav {
   background: #ffffff !important;
-  border-radius: 10px !important;
-  padding: 4px 6px !important;
-  margin-bottom: 12px !important;
-  border: 1px solid var(--app-border) !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+  border-radius: 12px !important;
+  padding: 5px 6px !important;
+  margin-bottom: 14px !important;
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04) !important;
 }
 .ant-tabs-nav::before { display: none !important; }
-.ant-tabs-tab { font-size: 13.5px !important; font-weight: 500 !important; padding: 6px 14px !important; color: #64748b !important; border-radius: 6px !important; transition: all 0.15s ease !important; }
-.ant-tabs-tab:hover { color: #0f172a !important; }
-.ant-tabs-tab-active { background: #f1f5f9 !important; box-shadow: none !important; }
-.ant-tabs-tab-active .ant-tabs-tab-btn { font-weight: 600 !important; color: #0f172a !important; }
+.ant-tabs-tab { font-size: 13.5px !important; font-weight: 500 !important; padding: 7px 18px !important; color: #475569 !important; border-radius: 8px !important; transition: all 0.15s ease !important; }
+.ant-tabs-tab:hover { color: #0f172a !important; background: rgba(15, 23, 42, 0.04) !important; }
+.ant-tabs-tab-active {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 55%, #1d4ed8 100%) !important;
+  box-shadow: 0 3px 12px rgba(37, 99, 235, 0.35) !important;
+}
+.ant-tabs-tab-active .ant-tabs-tab-btn { font-weight: 600 !important; color: #ffffff !important; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important; }
+.ant-tabs-tab-active .anticon { color: #ffffff !important; }
 .ant-tabs-ink-bar { display: none !important; }
 
 /* Thin Smooth Scrollbar */

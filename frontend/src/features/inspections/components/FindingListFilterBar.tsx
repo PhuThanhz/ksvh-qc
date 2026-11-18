@@ -69,6 +69,7 @@ export function FindingListFilterBar({
       }
       search={{
         placeholder: 'Tìm kiếm mô tả lỗi, khiếu nại, khắc phục...',
+        maxWidth: 460,
         value: keyword,
         onSearch,
       }}
