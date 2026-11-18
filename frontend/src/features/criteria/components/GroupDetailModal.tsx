@@ -1,14 +1,9 @@
-import {
-  ArrowRightOutlined,
-  EditOutlined,
-  EyeOutlined,
-  PlusOutlined,
-  SearchOutlined,
-} from '@ant-design/icons'
+import { AppstoreAddOutlined, ArrowRightOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
 import { Badge, Button, Descriptions, Empty, Flex, Input, Modal, Space, Table, Tag, Typography } from 'antd'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { StatusBadge } from '@/components/data-display/StatusBadge'
+import { TableActions } from '@/components/data-display/TableActions'
 import { ROUTES } from '@/constants/routes'
 import { ImpactTag } from '@/features/criteria/components/ImpactTag'
 import type { Criterion, CriterionGroup } from '@/features/criteria/criteria.types'
@@ -26,6 +21,7 @@ export interface GroupDetailModalProps {
   onClose: () => void
   onEditGroup?: (group: CriterionGroup) => void
   onAddCriterion?: (group: CriterionGroup) => void
+  onBatchAddCriteria?: (group: CriterionGroup) => void
   onViewCriterion?: (criterion: Criterion) => void
   onEditCriterion?: (criterion: Criterion) => void
 }
@@ -37,6 +33,7 @@ export function GroupDetailModal({
   onClose,
   onEditGroup,
   onAddCriterion,
+  onBatchAddCriteria,
   onViewCriterion,
   onEditCriterion,
 }: GroupDetailModalProps) {
@@ -72,7 +69,7 @@ export function GroupDetailModal({
           <Typography.Title level={5} style={{ margin: 0 }}>
             Chi tiết nhóm: {group.name}
           </Typography.Title>
-          <Tag color="geekblue" style={{ fontFamily: 'monospace', fontWeight: 600 }}>{group.code}</Tag>
+          <Tag style={{ fontFamily: 'monospace', fontWeight: 600 }}>{group.code}</Tag>
           <StatusBadge status={group.active ? 'active' : 'inactive'} meta={ACTIVE_META} />
         </Flex>
       }
@@ -87,10 +84,23 @@ export function GroupDetailModal({
             Mở trang tiêu chí đầy đủ
           </Button>
           <Space>
+            {onBatchAddCriteria && (
+              <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
+                <Button
+                  icon={<AppstoreAddOutlined />}
+                  onClick={() => {
+                    onClose()
+                    onBatchAddCriteria(group)
+                  }}
+                >
+                  Thêm nhanh nhiều tiêu chí
+                </Button>
+              </ProtectedAction>
+            )}
             {onAddCriterion && (
               <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
                 <Button type="dashed" icon={<PlusOutlined />} onClick={() => { onClose(); onAddCriterion(group) }}>
-                  Thêm tiêu chí con
+                  Thêm 1 tiêu chí con
                 </Button>
               </ProtectedAction>
             )}
@@ -110,9 +120,9 @@ export function GroupDetailModal({
         <Descriptions bordered size="small" column={{ xs: 1, sm: 3 }} style={{ marginBottom: 16 }}>
           <Descriptions.Item label="Mã nhóm"><Typography.Text code strong>{group.code}</Typography.Text></Descriptions.Item>
           <Descriptions.Item label="Thứ tự">#{group.sortOrder}</Descriptions.Item>
-          <Descriptions.Item label="Tiêu chí con"><Badge count={totalCount} showZero color="blue" /></Descriptions.Item>
+          <Descriptions.Item label="Tiêu chí con"><Badge count={totalCount} showZero color="var(--app-text-secondary)" /></Descriptions.Item>
           <Descriptions.Item label="Công ty áp dụng" span={2}>
-            {group.companyName ? <Tag color="blue">{group.companyName}</Tag> : <Tag color="default">Dùng chung toàn hệ thống</Tag>}
+            {group.companyName ? <Tag>{group.companyName}</Tag> : <Tag color="default">Dùng chung toàn hệ thống</Tag>}
           </Descriptions.Item>
           <Descriptions.Item label="Trạng thái">
             <StatusBadge status={group.active ? 'active' : 'inactive'} meta={ACTIVE_META} />
@@ -123,7 +133,7 @@ export function GroupDetailModal({
           <Typography.Text strong style={{ fontSize: 14 }}>Danh sách tiêu chí con trong nhóm ({totalCount})</Typography.Text>
           <Input
             size="small"
-            prefix={<SearchOutlined style={{ color: '#8c8c8c' }} />}
+            prefix={<SearchOutlined style={{ color: 'var(--app-text-secondary)' }} />}
             placeholder="Tìm theo mã hoặc tên tiêu chí..."
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
@@ -137,7 +147,7 @@ export function GroupDetailModal({
           size="small"
           loading={isLoading}
           dataSource={filteredList}
-          pagination={false}
+          pagination={{ pageSize: 20, showSizeChanger: true, size: 'small' }}
           locale={{ emptyText: <Empty description="Nhóm này chưa có tiêu chí con nào" image={Empty.PRESENTED_IMAGE_SIMPLE} /> }}
           columns={[
             { title: '#', key: 'idx', width: 44, align: 'center', render: (_, __, i) => i + 1 },
@@ -149,7 +159,7 @@ export function GroupDetailModal({
               render: (name: string, c) => (
                 <div>
                   <Typography.Text strong={c.active} delete={!c.active}>{name}</Typography.Text>
-                  {c.checkMethod && <div style={{ fontSize: 11, color: '#8c8c8c' }}>{c.checkMethod}</div>}
+                  {c.checkMethod && <div style={{ fontSize: 11, color: 'var(--app-text-secondary)' }}>{c.checkMethod}</div>}
                 </div>
               ),
             },
@@ -158,17 +168,17 @@ export function GroupDetailModal({
             {
               title: 'Thao tác',
               key: 'actions',
-              width: 90,
+              width: 110,
               align: 'center',
               render: (_, c) => (
-                <Space size={2}>
-                  {onViewCriterion && <Button type="text" size="small" icon={<EyeOutlined />} title="Xem chi tiết" onClick={() => onViewCriterion(c)} />}
-                  {onEditCriterion && (
-                    <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-                      <Button type="text" size="small" icon={<EditOutlined />} title="Sửa tiêu chí" onClick={() => { onClose(); onEditCriterion(c) }} />
-                    </ProtectedAction>
-                  )}
-                </Space>
+                <TableActions
+                  recordName={c.name}
+                  onView={onViewCriterion ? () => onViewCriterion(c) : undefined}
+                  viewLabel="Xem chi tiết tiêu chí"
+                  onEdit={onEditCriterion ? () => { onClose(); onEditCriterion(c) } : undefined}
+                  editLabel="Sửa tiêu chí"
+                  editAccess={PERMISSIONS.CRITERIA.MANAGE}
+                />
               ),
             },
           ]}

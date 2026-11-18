@@ -24,21 +24,23 @@ export function EmployeeTable({ onView, onEdit, onDelete, ...props }: EmployeeTa
     <DataTable<Employee>
       {...props}
       rowKey="id"
+      scroll={{ x: 800 }}
       columns={[
         {
           title: '#',
           key: 'index',
-          width: 60,
+          width: 56,
           align: 'center',
           render: (_: unknown, __: unknown, index: number) =>
             ((props.params?.page ?? 0) * (props.params?.size ?? 20)) + index + 1,
         },
-        { title: 'Mã NV', dataIndex: 'employeeCode', key: 'employeeCode', sorter: true },
+        { title: 'Mã NV', dataIndex: 'employeeCode', key: 'employeeCode', sorter: true, width: 110 },
         {
           title: 'Họ tên',
           dataIndex: 'fullName',
           key: 'fullName',
           sorter: true,
+          width: 180,
           render: (name: string, e: Employee) => (
             <Flex vertical>
               <span>{name}</span>
@@ -46,7 +48,7 @@ export function EmployeeTable({ onView, onEdit, onDelete, ...props }: EmployeeTa
             </Flex>
           ),
         },
-        { title: 'Nhà hàng / phòng ban', dataIndex: 'orgUnitName', render: dash },
+        { title: 'Nhà hàng / phòng ban', dataIndex: 'orgUnitName', width: 200, render: dash },
         {
           title: 'Liên hệ',
           key: 'contact',
@@ -70,7 +72,7 @@ export function EmployeeTable({ onView, onEdit, onDelete, ...props }: EmployeeTa
         {
           title: 'Thao tác',
           key: 'actions',
-          width: 120,
+          width: 140,
           fixed: 'right',
           render: (_: unknown, e: Employee) => (
             <TableActions

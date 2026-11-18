@@ -108,13 +108,13 @@ export function EmployeeFormModal({ open, employee, onClose }: EmployeeFormModal
         <button type="submit" hidden />
         <Row gutter={16}>
           <Col xs={24} md={8}>
-            <FormInput control={control} name="employeeCode" label="Mã nhân viên" required maxLength={30} />
+            <FormInput control={control} name="employeeCode" label="Mã nhân viên" required maxLength={30} placeholder="VD: NV0123" />
           </Col>
           <Col xs={24} md={16}>
-            <FormInput control={control} name="fullName" label="Họ tên" required maxLength={150} />
+            <FormInput control={control} name="fullName" label="Họ tên" required maxLength={150} placeholder="VD: Trần Thị Mai" />
           </Col>
           <Col xs={24} md={12}>
-            <FormInput control={control} name="jobTitle" label="Chức danh" maxLength={150} />
+            <FormInput control={control} name="jobTitle" label="Chức danh" maxLength={150} placeholder="VD: Bếp trưởng, Quản lý sảnh..." />
           </Col>
           <Col xs={24} md={12}>
             <FormField
@@ -127,10 +127,10 @@ export function EmployeeFormModal({ open, employee, onClose }: EmployeeFormModal
             />
           </Col>
           <Col xs={24} md={12}>
-            <FormInput control={control} name="phone" label="Số điện thoại" type="tel" maxLength={20} />
+            <FormInput control={control} name="phone" label="Số điện thoại" type="tel" maxLength={20} placeholder="VD: 0912345678" />
           </Col>
           <Col xs={24} md={12}>
-            <FormInput control={control} name="email" label="Email" type="email" maxLength={150} />
+            <FormInput control={control} name="email" label="Email" type="email" maxLength={150} placeholder="VD: mai.tran@lotusgroup.vn" />
           </Col>
           <Col span={24}>
             <FormField

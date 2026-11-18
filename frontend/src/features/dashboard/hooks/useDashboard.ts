@@ -12,3 +12,12 @@ export function useDashboard(months: number, enabled: boolean) {
     staleTime: 60_000,
   })
 }
+
+export function useApprovalQueue(enabled: boolean) {
+  return useQuery({
+    queryKey: ['dashboard', 'approval-queue'],
+    queryFn: () => dashboardApi.approvalQueue(),
+    enabled,
+    refetchInterval: 30_000,
+  })
+}

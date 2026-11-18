@@ -19,7 +19,7 @@ export function RoleDetailModal({ open, role, onClose }: RoleDetailModalProps) {
       value: (
         <Space size={6}>
           <span>{role.name}</span>
-          {role.systemRole && <Tag color="blue">Gốc</Tag>}
+          {role.systemRole && <Tag>Gốc</Tag>}
         </Space>
       ),
     },

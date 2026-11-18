@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.ksvh.qc.report.dto.ApprovalQueueResponse;
 import vn.ksvh.qc.report.dto.DashboardResponse;
 import vn.ksvh.qc.report.dto.DashboardResponse.CountItem;
 import vn.ksvh.qc.report.dto.DashboardResponse.Kpis;
@@ -105,20 +106,20 @@ public class DashboardService {
     private List<MonthPoint> trend(LocalDate periodStart, LocalDate monthStart) {
         Map<String, Long> inspMap = new HashMap<>();
         jdbc.query("""
-                SELECT DATE_FORMAT(submitted_at, '%Y-%m') AS ym, COUNT(*) AS cnt
+                SELECT to_char(submitted_at, 'YYYY-MM') AS ym, COUNT(*) AS cnt
                 FROM inspections
                 WHERE DATE(submitted_at) >= ?
-                GROUP BY DATE_FORMAT(submitted_at, '%Y-%m')
+                GROUP BY to_char(submitted_at, 'YYYY-MM')
                 """, rs -> {
             inspMap.put(rs.getString("ym"), rs.getLong("cnt"));
         }, Date.valueOf(periodStart));
 
         Map<String, Long> findMap = new HashMap<>();
         jdbc.query("""
-                SELECT DATE_FORMAT(created_at, '%Y-%m') AS ym, COUNT(*) AS cnt
+                SELECT to_char(created_at, 'YYYY-MM') AS ym, COUNT(*) AS cnt
                 FROM findings
                 WHERE DATE(created_at) >= ?
-                GROUP BY DATE_FORMAT(created_at, '%Y-%m')
+                GROUP BY to_char(created_at, 'YYYY-MM')
                 """, rs -> {
             findMap.put(rs.getString("ym"), rs.getLong("cnt"));
         }, Date.valueOf(periodStart));
@@ -183,7 +184,7 @@ public class DashboardService {
                     COALESCE(SUM(CASE WHEN ii.result = 'PASS' THEN ii.base_impact ELSE 0 END), 0) AS pass_weight,
                     COALESCE(SUM(CASE WHEN ii.result = 'FAIL' THEN ii.base_impact ELSE 0 END), 0) AS fail_weight
                 FROM org_units u
-                LEFT JOIN inspections i ON i.restaurant_id = u.id AND i.status = 'COMPLETED' AND DATE(i.submitted_at) >= ?
+                LEFT JOIN inspections i ON i.restaurant_id = u.id AND i.status IN ('COMPLETED', 'AWAITING_ACK') AND DATE(i.submitted_at) >= ?
                 LEFT JOIN inspection_items ii ON ii.inspection_id = i.id
                 WHERE u.unit_type = 'RESTAURANT' AND u.active = true
                 GROUP BY u.id, u.code, u.name
@@ -197,5 +198,46 @@ public class DashboardService {
             boolean attention = score != null && score.compareTo(BigDecimal.valueOf(85)) < 0;
             return new RestaurantCompliance(rs.getLong("id"), rs.getString("code"), rs.getString("name"), score, attention);
         }, Date.valueOf(periodStart));
+    }
+
+    public ApprovalQueueResponse getApprovalQueue() {
+        List<ApprovalQueueResponse.PendingPlanItem> pendingPlans = jdbc.query("""
+                SELECT p.id, p.plan_code, p.title, p.start_date, p.end_date, p.created_at,
+                       COUNT(a.id) AS restaurant_count
+                FROM inspection_plans p
+                LEFT JOIN inspection_plan_assignments a ON a.plan_id = p.id
+                WHERE p.status = 'PENDING_APPROVAL'
+                GROUP BY p.id, p.plan_code, p.title, p.start_date, p.end_date, p.created_at
+                ORDER BY p.created_at ASC
+                """, (rs, i) -> new ApprovalQueueResponse.PendingPlanItem(
+                rs.getLong("id"),
+                rs.getString("plan_code"),
+                rs.getString("title"),
+                rs.getDate("start_date") != null ? rs.getDate("start_date").toLocalDate() : null,
+                rs.getDate("end_date") != null ? rs.getDate("end_date").toLocalDate() : null,
+                rs.getInt("restaurant_count"),
+                rs.getTimestamp("created_at") != null ? rs.getTimestamp("created_at").toInstant() : null
+        ));
+
+        List<ApprovalQueueResponse.AppealMeetingItem> appealMeetings = jdbc.query("""
+                SELECT f.id, f.inspection_id, f.restaurant_id, f.risk_level_code, f.appeal_reason, f.updated_at,
+                       i.code AS inspection_code, o.name AS restaurant_name
+                FROM findings f
+                LEFT JOIN inspections i ON i.id = f.inspection_id
+                LEFT JOIN org_units o ON o.id = f.restaurant_id
+                WHERE f.status = 'APPEAL_MEETING'
+                ORDER BY f.updated_at ASC
+                """, (rs, i) -> new ApprovalQueueResponse.AppealMeetingItem(
+                rs.getLong("id"),
+                rs.getLong("inspection_id"),
+                rs.getString("inspection_code"),
+                rs.getLong("restaurant_id"),
+                rs.getString("restaurant_name"),
+                rs.getString("risk_level_code"),
+                rs.getString("appeal_reason"),
+                rs.getTimestamp("updated_at") != null ? rs.getTimestamp("updated_at").toInstant() : null
+        ));
+
+        return new ApprovalQueueResponse(pendingPlans, appealMeetings);
     }
 }

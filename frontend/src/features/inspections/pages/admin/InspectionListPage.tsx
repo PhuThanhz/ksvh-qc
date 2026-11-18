@@ -1,15 +1,24 @@
-import { DownloadOutlined, PlusOutlined } from '@ant-design/icons'
-import { Button, Card, Flex, Input, Modal, Segmented, Select, Space } from 'antd'
+import { DownloadOutlined, PlusOutlined, ThunderboltOutlined } from '@ant-design/icons'
+import { Badge, Button, Flex, Space } from 'antd'
 import dayjs from 'dayjs'
 import { useCallback, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router'
-import { AdvancedFilter } from '@/components/data-entry/AdvancedFilter'
 import { PageContainer } from '@/components/layout/PageContainer'
+import { CancelInspectionModal } from '@/features/inspections/components/CancelInspectionModal'
 import { InspectionDetailModal } from '@/features/inspections/components/InspectionDetailModal'
 import { InspectionFormModal } from '@/features/inspections/components/InspectionFormModal'
+import { InspectionListFilterBar } from '@/features/inspections/components/InspectionListFilterBar'
 import { InspectionTable } from '@/features/inspections/components/InspectionTable'
+import { SurpriseSuggestionsModal } from '@/features/inspections/components/SurpriseSuggestionsModal'
 import { useInspectionMutations, useInspections } from '@/features/inspections/hooks/useInspectionData'
-import { INSPECTION_KIND_LABEL, INSPECTION_MODE_LABEL, type InspectionStatus } from '@/features/inspections/inspection.types'
+import { useSurpriseSuggestions } from '@/features/inspections/hooks/useVerificationAndSurprise'
+import {
+  INSPECTION_KIND_LABEL,
+  INSPECTION_MODE_LABEL,
+  type InspectionCreateRequest,
+  type InspectionStatus,
+  type SurpriseInspectionSuggestion,
+} from '@/features/inspections/inspection.types'
 import { getComplianceGrade } from '@/features/inspections/utils/inspection-metrics'
 import { useOrgUnits } from '@/features/organizations/hooks/useOrganizations'
 import { useListParams } from '@/hooks/useListParams'
@@ -24,15 +33,6 @@ interface Filters extends Record<string, unknown> {
   status?: InspectionStatus
 }
 
-const STATUS_TABS: { value: string; label: string }[] = [
-  { value: 'ALL', label: 'Tất cả' },
-  { value: 'ASSIGNED', label: 'Đã phân công' },
-  { value: 'IN_PROGRESS', label: 'Đang chấm' },
-  { value: 'SUBMITTED', label: 'Đã nộp' },
-  { value: 'COMPLETED', label: 'Hoàn thành' },
-  { value: 'CANCELLED', label: 'Đã huỷ' },
-]
-
 export function InspectionListPage() {
   const [searchParams] = useSearchParams()
   const statusParam = searchParams.get('status') as InspectionStatus | null
@@ -44,11 +44,14 @@ export function InspectionListPage() {
   const { params, filters, setFilter, onTableChange, resetFilters, activeFilterCount } =
     useListParams<Filters>(initialFilters)
   const inspections = useInspections(params)
+  const suggestions = useSurpriseSuggestions()
   const restaurants = useOrgUnits({ unitType: 'RESTAURANT', page: 0, size: 200, active: true })
   const { cancel } = useInspectionMutations()
   const notify = useNotify()
 
   const [createModal, setCreateModal] = useState(false)
+  const [surpriseModal, setSurpriseModal] = useState(false)
+  const [prefilledCreate, setPrefilledCreate] = useState<Partial<InspectionCreateRequest> | undefined>()
   const [detailModal, setDetailModal] = useState<{ open: boolean; id?: number }>({ open: false })
   const [cancelDialog, setCancelDialog] = useState<{ open: boolean; id?: number; reason: string }>({
     open: false,
@@ -96,6 +99,7 @@ export function InspectionListPage() {
   }
 
   const activeTab = (filters.status as string) || 'ALL'
+  const canCreateRule = { anyOf: [PERMISSIONS.PLAN.CREATE, PERMISSIONS.INSPECTION.PERFORM] }
 
   return (
     <PageContainer
@@ -103,85 +107,74 @@ export function InspectionListPage() {
       subtitle="Quản lý và theo dõi quá trình thực hiện chấm điểm vận hành tại các nhà hàng"
       extra={
         <Space size={8}>
-          <Button
-            icon={<DownloadOutlined />}
-            onClick={onExportInspections}
-            disabled={!inspections.data?.items?.length}
-          >
+          <Button icon={<DownloadOutlined />} onClick={onExportInspections} disabled={!inspections.data?.items?.length}>
             Xuất CSV
           </Button>
-          <ProtectedAction access={{ anyOf: [PERMISSIONS.PLAN.CREATE, PERMISSIONS.INSPECTION.PERFORM] }}>
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModal(true)}>
+          <ProtectedAction access={canCreateRule}>
+            <Button icon={<ThunderboltOutlined />} onClick={() => setSurpriseModal(true)}>
+              <Badge count={suggestions.data?.length ?? 0} offset={[8, -2]} size="small">
+                Gợi ý đột xuất
+              </Badge>
+            </Button>
+          </ProtectedAction>
+          <ProtectedAction access={canCreateRule}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => {
+                setPrefilledCreate(undefined)
+                setCreateModal(true)
+              }}
+            >
               Tạo đợt kiểm tra
             </Button>
           </ProtectedAction>
         </Space>
       }
     >
-      <Card styles={{ body: { padding: '16px 20px' } }}>
-        <Flex vertical gap={16}>
-          {/* Thanh chuyển tab trạng thái nhanh (1-click lọc) */}
-          <Segmented
-            options={STATUS_TABS}
-            value={activeTab}
-            onChange={(val) => setFilter('status', val === 'ALL' ? undefined : (val as InspectionStatus))}
-            style={{ width: 'fit-content', background: '#f1f5f9', padding: 3, borderRadius: 8 }}
-          />
+      <Flex vertical gap={16}>
+        <InspectionListFilterBar
+          activeTab={activeTab}
+          keyword={filters.keyword}
+          restaurantId={filters.restaurantId}
+          status={filters.status}
+          activeFilterCount={activeFilterCount}
+          restaurants={restaurants.data?.items ?? []}
+          onSearch={onSearch}
+          onFilterStatus={(val) => setFilter('status', val)}
+          onFilterRestaurant={(val) => setFilter('restaurantId', val)}
+          onReset={resetFilters}
+        />
 
-          <AdvancedFilter
-            search={{
-              placeholder: 'Tìm theo mã phiếu, loại kiểm tra...',
-              value: filters.keyword,
-              onSearch,
-            }}
-            activeCount={activeFilterCount}
-            onReset={resetFilters}
-          >
-            <Select
-              placeholder="Nhà hàng"
-              allowClear
-              showSearch
-              value={filters.restaurantId}
-              onChange={(v) => setFilter('restaurantId', v)}
-              style={{ width: 220 }}
-              filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
-              options={restaurants.data?.items.map((r) => ({ value: r.id, label: `${r.code} - ${r.name}` }))}
-            />
-
-            <Select
-              placeholder="Trạng thái"
-              allowClear
-              value={filters.status}
-              onChange={(v) => setFilter('status', v)}
-              style={{ width: 160 }}
-              options={[
-                { value: 'ASSIGNED', label: 'Đã phân công' },
-                { value: 'IN_PROGRESS', label: 'Đang chấm' },
-                { value: 'SUBMITTED', label: 'Đã nộp' },
-                { value: 'COMPLETED', label: 'Hoàn thành' },
-                { value: 'CANCELLED', label: 'Đã huỷ' },
-              ]}
-            />
-          </AdvancedFilter>
-
-          <InspectionTable
-            data={inspections.data?.items}
-            loading={inspections.isLoading}
-            currentPage={params.page}
-            pageSize={params.size}
-            totalItems={inspections.data?.totalItems}
-            onPageChange={(p, s) => onTableChange({ page: p - 1, size: s })}
-            onView={(ins) => setDetailModal({ open: true, id: ins.id })}
-            onCancel={(ins) => setCancelDialog({ open: true, id: ins.id, reason: '' })}
-          />
-        </Flex>
-      </Card>
+        <InspectionTable
+          data={inspections.data?.items}
+          loading={inspections.isLoading}
+          currentPage={params.page}
+          pageSize={params.size}
+          totalItems={inspections.data?.totalItems}
+          onPageChange={(p, s) => onTableChange({ page: p - 1, size: s })}
+          onView={(ins) => setDetailModal({ open: true, id: ins.id })}
+          onCancel={(ins) => setCancelDialog({ open: true, id: ins.id, reason: '' })}
+        />
+      </Flex>
 
       <InspectionFormModal
         open={createModal}
-        onClose={() => {
-          setCreateModal(false)
-          inspections.refetch()
+        initialValues={prefilledCreate}
+        onClose={() => { setCreateModal(false); setPrefilledCreate(undefined); inspections.refetch() }}
+      />
+
+      <SurpriseSuggestionsModal
+        open={surpriseModal}
+        onClose={() => setSurpriseModal(false)}
+        onCreateSurprise={(suggestion: SurpriseInspectionSuggestion) => {
+          setPrefilledCreate({
+            inspectionType: 'SURPRISE',
+            restaurantId: suggestion.restaurantId,
+            topicGroupIds: suggestion.suggestedTopicGroupIds,
+            notes: `Kiểm tra đột xuất theo đề xuất: ${suggestion.primaryReason}`,
+          })
+          setCreateModal(true)
         }}
       />
 
@@ -191,25 +184,14 @@ export function InspectionListPage() {
         onClose={() => setDetailModal({ open: false })}
       />
 
-      <Modal
-        title="Xác nhận huỷ phiếu kiểm tra"
+      <CancelInspectionModal
         open={cancelDialog.open}
+        reason={cancelDialog.reason}
+        loading={cancel.isPending}
+        onChangeReason={(val) => setCancelDialog((prev) => ({ ...prev, reason: val }))}
+        onConfirm={onConfirmCancel}
         onCancel={() => setCancelDialog({ open: false, reason: '' })}
-        onOk={onConfirmCancel}
-        okText="Huỷ phiếu"
-        okButtonProps={{ danger: true, loading: cancel.isPending }}
-        centered
-      >
-        <p style={{ marginTop: 12 }}>
-          Bạn có chắc chắn muốn huỷ phiếu kiểm tra này? Thao tác này sẽ huỷ bỏ toàn bộ các mục chấm điểm và lỗi liên quan.
-        </p>
-        <Input.TextArea
-          rows={3}
-          placeholder="Nhập lý do huỷ phiếu bắt buộc..."
-          value={cancelDialog.reason}
-          onChange={(e) => setCancelDialog((prev) => ({ ...prev, reason: e.target.value }))}
-        />
-      </Modal>
+      />
     </PageContainer>
   )
 }

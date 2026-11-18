@@ -1,7 +1,8 @@
-import { SafetyCertificateFilled } from '@ant-design/icons'
-import { Drawer, Flex, Grid, Layout, Tag, Typography } from 'antd'
+import { CloseOutlined, SafetyCertificateFilled } from '@ant-design/icons'
+import { Button, Drawer, Flex, Grid, Layout, Typography } from 'antd'
 import { Suspense, useState } from 'react'
 import { Outlet } from 'react-router'
+import { ContentErrorBoundary } from '@/components/feedback/ContentErrorBoundary'
 import { LoadingState } from '@/components/feedback/LoadingState'
 import { AmbientCanvas } from '@/components/layout/AmbientCanvas'
 import { AppHeader } from '@/components/layout/AppHeader'
@@ -16,50 +17,63 @@ export interface AdminLayoutProps {
   loggingOut?: boolean
 }
 
-function BrandHeader({ collapsed, borderColor }: { collapsed: boolean; borderColor: string }) {
+function BrandHeader({
+  collapsed,
+  borderColor,
+  onClose,
+}: {
+  collapsed: boolean
+  borderColor: string
+  onClose?: () => void
+}) {
   return (
     <Flex
       align="center"
-      justify={collapsed ? 'center' : 'flex-start'}
-      gap={12}
+      justify={collapsed ? 'center' : 'space-between'}
       style={{
         height: 56,
-        paddingInline: collapsed ? 0 : 20,
+        paddingInline: collapsed ? 0 : 16,
         borderBottom: `1px solid ${borderColor}`,
         flexShrink: 0,
       }}
     >
-      <Flex
-        align="center"
-        justify="center"
-        style={{
-          width: 32,
-          height: 32,
-          borderRadius: 8,
-          background: 'rgba(255, 255, 255, 0.85)',
-          color: '#0f172a',
-          fontSize: 18,
-          flexShrink: 0,
-          border: '1px solid rgba(255, 255, 255, 0.9)',
-          boxShadow: '0 1px 4px rgba(0, 0, 0, 0.04)',
-        }}
-      >
-        <SafetyCertificateFilled />
-      </Flex>
-      {!collapsed && (
-        <Flex vertical style={{ lineHeight: 1.2, overflow: 'hidden' }}>
-          <Flex align="center" gap={6}>
-            <Typography.Text strong style={{ fontSize: 16, fontWeight: 700, letterSpacing: -0.2, color: '#0f172a' }}>
+      <Flex align="center" gap={12}>
+        <Flex
+          align="center"
+          justify="center"
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: 8,
+            background: 'rgba(255, 255, 255, 0.12)',
+            color: 'var(--app-on-dark)',
+            fontSize: 18,
+            flexShrink: 0,
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.2)',
+          }}
+        >
+          <SafetyCertificateFilled />
+        </Flex>
+        {!collapsed && (
+          <Flex vertical style={{ lineHeight: 1.2, overflow: 'hidden' }}>
+            <Typography.Text strong style={{ fontSize: 16, fontWeight: 800, letterSpacing: -0.2, color: 'var(--app-on-dark)' }}>
               KSVH QC
             </Typography.Text>
-            <Tag style={{ fontSize: 10, lineHeight: '16px', padding: '0 4px', margin: 0, borderRadius: 4, background: 'rgba(255, 255, 255, 0.8)', color: '#475569', border: '1px solid rgba(0, 0, 0, 0.08)', fontWeight: 600 }}>
-              PRO
-            </Tag>
+            <Typography.Text style={{ fontSize: 11, whiteSpace: 'nowrap', color: 'var(--app-on-dark-secondary)' }}>
+              Kiểm soát vận hành
+            </Typography.Text>
           </Flex>
-          <Typography.Text style={{ fontSize: 11, whiteSpace: 'nowrap', color: '#64748b' }}>
-            Kiểm soát vận hành
-          </Typography.Text>
-        </Flex>
+        )}
+      </Flex>
+      {onClose && (
+        <Button
+          type="text"
+          shape="circle"
+          icon={<CloseOutlined style={{ color: 'var(--app-on-dark-secondary)', fontSize: 16 }} />}
+          onClick={onClose}
+          aria-label="Đóng thanh điều hướng"
+        />
       )}
     </Flex>
   )
@@ -89,10 +103,10 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
           collapsible
           collapsed={collapsed}
           trigger={null}
-          theme="light"
+          theme="dark"
           width={280}
           collapsedWidth={76}
-          className="apple-frosted-sidebar"
+          className="bitrix-frosted-sidebar"
           style={{
             position: 'sticky',
             top: 0,
@@ -103,7 +117,7 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
           }}
         >
           <Flex vertical style={{ height: '100%', overflow: 'hidden' }}>
-            <BrandHeader collapsed={collapsed} borderColor="rgba(0, 0, 0, 0.08)" />
+            <BrandHeader collapsed={collapsed} borderColor="var(--app-on-dark-border)" />
             <div style={{ flex: 1, overflowY: 'auto' }}>
               <Sidebar menu={menu} />
             </div>
@@ -122,11 +136,11 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
           onClose={() => setMobileOpen(false)}
           size={280}
           closable={false}
-          className="apple-frosted-sidebar"
+          className="bitrix-frosted-sidebar"
           styles={{ body: { padding: 0 } }}
         >
           <Flex vertical style={{ height: '100%' }}>
-            <BrandHeader collapsed={false} borderColor="rgba(0, 0, 0, 0.08)" />
+            <BrandHeader collapsed={false} borderColor="var(--app-on-dark-border)" onClose={() => setMobileOpen(false)} />
             <div style={{ flex: 1, overflowY: 'auto' }}>
               <Sidebar menu={menu} onSelect={() => setMobileOpen(false)} />
             </div>
@@ -142,11 +156,11 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
 
       <Layout style={{ minWidth: 0, background: 'transparent', position: 'relative', zIndex: 1 }}>
         <Layout.Header
-          className="apple-frosted-header"
+          className="bitrix-frosted-header"
           style={{
             paddingInline: isDesktop ? 20 : 16,
-            height: 50,
-            lineHeight: '50px',
+            height: 52,
+            lineHeight: '52px',
             position: 'sticky',
             top: 0,
             zIndex: 10,
@@ -158,10 +172,17 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
             menu={menu}
           />
         </Layout.Header>
-        <Layout.Content style={{ padding: isDesktop ? '14px 20px 24px' : '10px 12px 18px' }}>
-          <Suspense fallback={<LoadingState />}>
-            <Outlet />
-          </Suspense>
+        <Layout.Content
+          style={{
+            padding: isDesktop ? '18px 24px 32px' : '12px 14px 20px',
+            minHeight: 'calc(100vh - 52px)',
+          }}
+        >
+          <ContentErrorBoundary>
+            <Suspense fallback={<LoadingState />}>
+              <Outlet />
+            </Suspense>
+          </ContentErrorBoundary>
         </Layout.Content>
       </Layout>
     </Layout>

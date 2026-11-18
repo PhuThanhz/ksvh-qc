@@ -61,8 +61,8 @@ export function CompanyFormModal({ open, company, onClose }: CompanyFormModalPro
       <Form layout="vertical" onFinish={() => void onSubmit()}>
         {/* Nút submit ẩn: nhấn Enter trong ô nhập sẽ lưu (nút Lưu nằm ở footer, ngoài form). */}
         <button type="submit" hidden />
-        <FormInput control={control} name="code" label="Mã công ty" required maxLength={30} autoFocus />
-        <FormInput control={control} name="name" label="Tên công ty" required maxLength={200} />
+        <FormInput control={control} name="code" label="Mã công ty" required maxLength={30} autoFocus placeholder="VD: LOTUS" />
+        <FormInput control={control} name="name" label="Tên công ty" required maxLength={200} placeholder="VD: Công ty Cổ phần Tập đoàn Lotus" />
         <FormSwitch control={control} name="active" label="Đang hoạt động" />
       </Form>
     </Modal>

@@ -1,10 +1,10 @@
-import { Flex, Segmented, Space, Typography } from 'antd'
+import { Flex, Segmented, Typography } from 'antd'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { useSession } from '@/features/auth'
+import { ApprovalQueueSection } from '@/features/dashboard/components/ApprovalQueueSection'
 import { CatalogSection } from '@/features/dashboard/components/CatalogSection'
-import { CreateMenu } from '@/features/dashboard/components/CreateMenu'
 import { OperationsSection } from '@/features/dashboard/components/OperationsSection'
 import { PERMISSIONS, usePermission } from '@/permissions'
 
@@ -18,40 +18,53 @@ const PERIODS = [
 
 function SectionTitle({ children }: { children: string }) {
   return (
-    <Flex align="center" gap={12} style={{ marginTop: 4 }}>
-      <Typography.Text style={{ fontSize: 13, fontWeight: 600, color: '#3a3936', whiteSpace: 'nowrap' }}>{children}</Typography.Text>
-      <div style={{ flex: 1, height: 1, background: 'rgba(0, 0, 0, 0.08)' }} />
+    <Flex align="center" gap={12} style={{ marginTop: 8, marginBottom: 4 }}>
+      <Typography.Text style={{ fontSize: 15, fontWeight: 600, color: 'var(--app-text)' }}>
+        {children}
+      </Typography.Text>
+      <div style={{ flex: 1, height: 1, background: 'var(--app-border)' }} />
     </Flex>
   )
 }
 
-/** Trang Tổng quan: số liệu vận hành (nếu có quyền xem báo cáo) và tình hình danh mục. */
+/** Trang Tổng quan: Số liệu điều hành vận hành QC thật và tình hình danh mục thiết lập. */
 export function DashboardPage() {
   const { user } = useSession()
   const { canAny } = usePermission()
   const canOps = canAny([PERMISSIONS.REPORT.READ, PERMISSIONS.INSPECTION.READ_ALL])
+  const canApprove = canAny([PERMISSIONS.PLAN.APPROVE, PERMISSIONS.FINDING.CONCLUDE_APPEAL])
   const [months, setMonths] = useState(6)
   const today = dayjs()
 
   return (
     <PageContainer
-      title="Tổng quan"
+      title="Tổng quan vận hành"
       subtitle={`Xin chào ${user?.fullName ?? ''} · ${capitalize(today.format('dddd, DD/MM/YYYY'))}`}
       extra={
-        <Space size={8}>
-          {canOps && <Segmented size="middle" options={PERIODS} value={months} onChange={(v) => setMonths(Number(v))} />}
-          <CreateMenu />
-        </Space>
+        canOps ? (
+          <Segmented
+            size="middle"
+            options={PERIODS}
+            value={months}
+            onChange={(v) => setMonths(Number(v))}
+          />
+        ) : undefined
       }
     >
-      <Flex vertical gap={16} style={{ paddingBottom: 24 }}>
+      <Flex vertical gap={20} style={{ paddingBottom: 24 }}>
+        {canApprove && (
+          <>
+            <SectionTitle>Hàng chờ xử lý & phê duyệt</SectionTitle>
+            <ApprovalQueueSection />
+          </>
+        )}
         {canOps && (
           <>
-            <SectionTitle>Hoạt động kiểm soát</SectionTitle>
+            <SectionTitle>Chỉ số hoạt động & Xu hướng kiểm soát vận hành</SectionTitle>
             <OperationsSection months={months} />
           </>
         )}
-        <SectionTitle>Danh mục</SectionTitle>
+        <SectionTitle>Danh mục & Cấu hình kiểm soát</SectionTitle>
         <CatalogSection />
       </Flex>
     </PageContainer>

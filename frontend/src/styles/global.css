@@ -1,31 +1,102 @@
+@import './tokens.css';
+
+/* ==========================================================================
+   BIẾN MÀU DÙNG CHUNG — đổi màu toàn hệ thống chỉ cần sửa ở đây.
+   Màu nhấn dạng "R, G, B" để dùng được với rgba(var(--x), độ trong).
+   ========================================================================== */
+:root {
+  /* Chữ trên nền sáng */
+  --app-text: #0f172a;
+  --app-text-body: #475569;
+  --app-text-secondary: #64748b;
+  --app-text-muted: #94a3b8;
+
+  /* Nền & viền trên vùng sáng */
+  --app-surface: #ffffff;
+  --app-surface-muted: #f8fafc;
+  --app-surface-sunken: #f1f5f9;
+  --app-border: #e2e8f0;
+  --app-border-strong: #cbd5e1;
+  --app-focus-border: #94a3b8;
+  --app-focus-ring: rgba(100, 116, 139, 0.15);
+
+  /* Chữ & viền trên khung tối (sidebar, header, logo) */
+  /* Nền khung tối đặc (trang đăng nhập, khung mobile) */
+  --app-chrome-solid: #0f172a;
+  --app-chrome-solid-light: #1e293b;
+  --app-chrome-solid-mid: #334155;
+
+  --app-on-dark: #ffffff;
+  --app-on-dark-secondary: rgba(255, 255, 255, 0.75);
+  --app-on-dark-muted: rgba(255, 255, 255, 0.55);
+  --app-on-dark-faint: rgba(255, 255, 255, 0.40);
+  --app-on-dark-border: rgba(255, 255, 255, 0.18);
+  --app-on-dark-glass: rgba(255, 255, 255, 0.14);
+  --app-on-dark-glass-border: rgba(255, 255, 255, 0.28);
+
+  /* Màu trạng thái (chữ / nền nhạt / viền) */
+  --app-success: #16a34a;
+  --app-success-bg: #f0fdf4;
+  --app-success-border: #bbf7d0;
+  --app-warning: #d97706;
+  --app-warning-bg: #fffbeb;
+  --app-warning-border: #fde68a;
+  --app-danger: #dc2626;
+  --app-danger-bg: #fef2f2;
+  --app-danger-border: #fecaca;
+  --app-info: #2563eb;
+  --app-info-bg: #eff6ff;
+  --app-info-border: #bfdbfe;
+  --app-excel: #1d6f42;
+
+  /* Kính */
+  --app-glass-bg: rgba(255, 255, 255, 0.90);
+  --app-glass-border: rgba(255, 255, 255, 0.70);
+  --app-chrome-bg: rgba(12, 12, 14, 0.55); /* sidebar + header trên ảnh nền */
+
+  /* antd-mobile đồng bộ ngôn ngữ thương hiệu KSVH QC */
+  --adm-color-primary: #1677ff;
+  --adm-border-radius: 12px;
+  --adm-font-size-main: 14px;
+
+  /* Màu nhấn theo ý nghĩa */
+  --tint-neutral: 15, 23, 42;
+  --tint-view: 37, 99, 235;
+  --tint-add: 22, 163, 74;
+  --tint-edit: 217, 119, 6;
+  --tint-delete: 220, 38, 38;
+  --tint-excel: 16, 124, 65;
+}
+
 * { box-sizing: border-box; }
 html, body, #root { margin: 0; min-height: 100%; }
 
 body {
-  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-family-apple);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   background-color: transparent;
-  color: #1d1d1f;
+  color: var(--apple-text-primary);
+}
+
+code, kbd, samp, pre, .font-code {
+  font-family: var(--font-family-code) !important;
 }
 
 .compact-table-form .ant-form-item { margin-bottom: 0; }
 .compact-table-form .ant-table-cell { vertical-align: top; }
 
-/* Sidebar kính mờ Apple nhẹ nhàng, thanh thoát (macOS Frosted Glass Sidebar) */
+/* Sidebar kính Apple nhẹ nhàng, thanh thoát (macOS Sidebar) */
 .apple-frosted-sidebar {
-  background: rgba(255, 255, 255, 0.58) !important;
-  backdrop-filter: blur(24px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-  border-inline-end: 1px solid rgba(255, 255, 255, 0.45) !important;
-  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.03) !important;
+  background: #ffffff !important;
+  border-inline-end: 1px solid var(--app-border) !important;
+  box-shadow: 1px 0 3px rgba(0, 0, 0, 0.02) !important;
 }
 
 .apple-frosted-header {
-  background: rgba(255, 255, 255, 0.58) !important;
-  backdrop-filter: blur(24px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.45) !important;
-  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.02) !important;
+  background: #ffffff !important;
+  border-bottom: 1px solid var(--app-border) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
 }
 
 .apple-frosted-sidebar .ant-menu {
@@ -96,15 +167,13 @@ body {
   box-shadow: none !important;
 }
 
-/* Selected: Viên nang kính mờ sáng trắng tinh khôi, nhẹ nhàng, trong suốt */
+/* Selected: Viên nang sáng trắng tinh khôi, nhẹ nhàng */
 .apple-frosted-sidebar .ant-menu-item-selected {
-  background: rgba(255, 255, 255, 0.82) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
+  background: #f1f5f9 !important;
   color: #0f172a !important;
   font-weight: 600 !important;
-  border: 1px solid rgba(255, 255, 255, 0.88) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+  border: 1px solid var(--app-border) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
 }
 
 .apple-frosted-sidebar .ant-menu-item-selected .ant-menu-item-icon,
@@ -115,28 +184,28 @@ body {
 
 .apple-frosted-sidebar .ant-menu-sub { background: transparent !important; }
 
-/* Thẻ Card nội dung: Chuẩn Apple Frosted Glass */
+/* Thẻ Card nội dung: Nền trắng phẳng, sắc nét, không mờ kính 3D */
 .ant-card:not(.ant-card-bordered-none) {
-  background: rgba(255, 255, 255, 0.82) !important;
-  backdrop-filter: blur(20px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.65) !important;
-  border-radius: 14px !important;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.02) !important;
+  background: #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 
-/* Bảng dữ liệu chuẩn xác, thanh thoát trên nền kính mờ */
+/* Bảng dữ liệu: Trắng phẳng, rõ nét, dễ đọc */
 .ant-table-wrapper .ant-table {
-  background: rgba(255, 255, 255, 0.82) !important;
-  backdrop-filter: blur(16px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
-  border-radius: 12px !important;
+  background: #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-radius: 10px !important;
 }
 
 .ant-table-wrapper .ant-table-thead > tr > th {
-  background: rgba(248, 250, 252, 0.82) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
+  background: #f8fafc !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   color: #475569 !important;
   font-size: 12px !important;
   font-weight: 600 !important;
@@ -162,6 +231,56 @@ body {
   background: rgba(15, 23, 42, 0.04) !important;
 }
 
+/* Cột cố định (Fixed Columns) của bảng: BẮT BUỘC nền trắng đặc 100% để chữ cuộn phía sau không bị đè/lộ qua */
+.ant-table-wrapper .ant-table-cell-fix-left,
+.ant-table-wrapper .ant-table-cell-fix-right {
+  background: #ffffff !important;
+  z-index: 2 !important;
+}
+
+.ant-table-wrapper .ant-table-thead > tr > th.ant-table-cell-fix-left,
+.ant-table-wrapper .ant-table-thead > tr > th.ant-table-cell-fix-right {
+  background: #f8fafc !important;
+  z-index: 3 !important;
+}
+
+.ant-table-wrapper .ant-table-tbody > tr:hover > td.ant-table-cell-fix-left,
+.ant-table-wrapper .ant-table-tbody > tr:hover > td.ant-table-cell-fix-right {
+  background: #f1f5f9 !important;
+}
+
+/* Cột thao tác của bảng: vừa vặn nội dung (fit-content), không ngắt dòng làm vỡ nút */
+.ant-table-cell:has(.action-btn),
+.ant-table-cell:has([class*="action-btn"]),
+th.ant-table-cell:last-child,
+td.ant-table-cell:last-child {
+  white-space: nowrap !important;
+}
+
+/* Tiêu đề cột bảng: tuyệt đối không ngắt dòng thành hàng dọc 1 chữ cái */
+.ant-table-wrapper .ant-table-thead > tr > th {
+  white-space: nowrap !important;
+  font-size: 13.5px !important;
+}
+
+.ant-table-wrapper .ant-table-tbody > tr > td {
+  word-break: normal !important;
+}
+
+/* Đổ bóng ngăn cách cột fixed-right khỏi các cột đang cuộn phía sau */
+.ant-table-wrapper .ant-table-cell-fix-right-first::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: -1px;
+  left: 0;
+  width: 30px;
+  transform: translateX(-100%);
+  pointer-events: none;
+  box-shadow: inset -10px 0 8px -8px rgba(0, 0, 0, 0.12) !important;
+  transition: box-shadow 0.2s ease;
+}
+
 /* Ô nhập liệu kính mờ */
 .ant-input, .ant-select-selector {
   border-radius: 8px !important;
@@ -170,64 +289,76 @@ body {
 }
 
 .ant-input:focus, .ant-input-focused, .ant-select-focused .ant-select-selector {
-  border-color: #0f172a !important;
-  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.12) !important;
+  border-color: var(--app-focus-border) !important;
+  box-shadow: 0 0 0 3px var(--app-focus-ring) !important;
 }
 
-/* Nút bấm chuẩn Apple Obsidian / Dark Slate */
-.ant-btn-primary {
-  background: #0f172a !important;
-  border-color: #0f172a !important;
+/* Nút chính: Chuẩn xanh dương #2563eb, tuyệt đối không dùng màu đen */
+.ant-btn-primary:not(:disabled) {
+  background: #2563eb !important;
+  border: 1px solid #2563eb !important;
+  color: #ffffff !important;
   border-radius: 8px !important;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2) !important;
-  font-weight: 500 !important;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25) !important;
+  font-weight: 600 !important;
+}
+.ant-btn-primary:not(:disabled):hover {
+  background: #1d4ed8 !important;
+  border-color: #1d4ed8 !important;
   color: #ffffff !important;
 }
-.ant-btn-primary:hover {
-  background: #334155 !important;
-  border-color: #334155 !important;
+.ant-btn-primary.ant-btn-dangerous:not(:disabled) {
+  background: rgba(220, 38, 38, 0.1) !important;
+  border-color: rgba(220, 38, 38, 0.3) !important;
+  color: #b91c1c !important;
+}
+
+/* Nút chính trên header tối */
+.bitrix-frosted-header .ant-btn-primary:not(:disabled) {
+  background: rgba(255, 255, 255, 0.14) !important;
+  border: 1px solid rgba(255, 255, 255, 0.24) !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+.bitrix-frosted-header .ant-btn-primary:not(:disabled):hover {
+  background: rgba(255, 255, 255, 0.22) !important;
+  border-color: rgba(255, 255, 255, 0.36) !important;
   color: #ffffff !important;
 }
 
-/* Modal & Toast kính mờ chuẩn sắc */
+/* Modal & Toast sắc nét, hiệu năng cao */
 .ant-modal-content {
-  background: rgba(255, 255, 255, 0.92) !important;
-  backdrop-filter: blur(24px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  background: #ffffff !important;
   border-radius: 16px !important;
-  box-shadow: 0 24px 50px -12px rgba(0, 0, 0, 0.18), 0 0 1px rgba(0, 0, 0, 0.12) !important;
-  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 20px 48px -10px rgba(0, 0, 0, 0.18) !important;
+  border: 1px solid var(--app-border) !important;
   padding: 24px !important;
 }
 .ant-modal-title { font-size: 16px !important; font-weight: 600 !important; letter-spacing: -0.01em !important; color: #0f172a !important; }
 
 .ant-notification-notice {
-  background: rgba(255, 255, 255, 0.92) !important;
-  backdrop-filter: blur(24px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  background: #ffffff !important;
   border-radius: 14px !important;
   padding: 16px 20px !important;
-  border: 1px solid rgba(255, 255, 255, 0.8) !important;
-  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid var(--app-border) !important;
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.15) !important;
 }
 .ant-notification-notice-message, .ant-notification-notice-title { font-size: 14.5px !important; font-weight: 600 !important; color: #0f172a !important; }
 .ant-notification-notice-icon { font-size: 18px !important; margin-top: 2px !important; }
 
-/* Tabs điều hướng kính mờ */
+/* Tabs điều hướng */
 .ant-tabs-nav {
-  background: rgba(255, 255, 255, 0.82) !important;
-  backdrop-filter: blur(20px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-  border-radius: 12px !important;
+  background: #ffffff !important;
+  border-radius: 10px !important;
   padding: 4px 6px !important;
   margin-bottom: 12px !important;
-  border: 1px solid rgba(255, 255, 255, 0.65) !important;
-  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid var(--app-border) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
 }
 .ant-tabs-nav::before { display: none !important; }
-.ant-tabs-tab { font-size: 13.5px !important; font-weight: 500 !important; padding: 6px 14px !important; color: #64748b !important; border-radius: 8px !important; transition: all 0.15s ease !important; }
+.ant-tabs-tab { font-size: 13.5px !important; font-weight: 500 !important; padding: 6px 14px !important; color: #64748b !important; border-radius: 6px !important; transition: all 0.15s ease !important; }
 .ant-tabs-tab:hover { color: #0f172a !important; }
-.ant-tabs-tab-active { background: #ffffff !important; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important; }
+.ant-tabs-tab-active { background: #f1f5f9 !important; box-shadow: none !important; }
 .ant-tabs-tab-active .ant-tabs-tab-btn { font-weight: 600 !important; color: #0f172a !important; }
 .ant-tabs-ink-bar { display: none !important; }
 
@@ -240,3 +371,522 @@ body {
 .apple-frosted-sidebar ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.45); }
 
 @media (max-width: 900px) { .auth-hero-pane { display: none !important; } }
+
+/* ==========================================================================
+   KHUNG ADMIN: sidebar + header kính mờ trung tính (đen trong), hợp mọi ảnh nền
+   ========================================================================== */
+
+/* ==========================================================================
+   ĐẶC TẢ NỀN HEADER & SIDEBAR — KÍNH MỜ PRE-BLURRED (Bitrix Glass)
+   - Nền: Bỏ hẳn #0f172a / #111c34, thay bằng ảnh nền đã mờ sẵn + lớp phủ đen
+   - Viền: rgba(255, 255, 255, 0.18)
+   - Chữ: trắng, text-shadow nhẹ 0 1px 2px rgba(0, 0, 0, 0.25)
+   - Menu đang chọn: ô kính rgba(255, 255, 255, 0.22) + viền 1px solid rgba(255, 255, 255, 0.35), bo 12px
+   - Hover: rgba(255, 255, 255, 0.12)
+   - Không lag: không dùng backdrop-filter, dùng background-attachment: fixed trên ảnh mờ
+   - Fallback: rgba(15, 23, 42, 0.55)
+   ========================================================================== */
+
+.bitrix-frosted-sidebar,
+.glass-chrome-sidebar {
+  background: rgba(15, 23, 42, 0.55) !important; /* Fallback an toàn */
+  border-inline-end: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow: none !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Lớp ảnh mờ dựng sẵn - khớp đúng vị trí ảnh nền phía sau */
+.bitrix-frosted-sidebar::before,
+.glass-chrome-sidebar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: var(--ambient-bg-blur, var(--ambient-bg-image));
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+}
+
+/* Lớp phủ tối 18-28% để chữ menu trắng luôn tương phản rõ */
+.bitrix-frosted-sidebar::after,
+.glass-chrome-sidebar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.18));
+  pointer-events: none;
+}
+
+/* Đảm bảo nội dung sidebar nằm trên các lớp nền */
+.bitrix-frosted-sidebar > *,
+.glass-chrome-sidebar > * {
+  position: relative;
+  z-index: 1;
+}
+
+.bitrix-frosted-sidebar .ant-menu {
+  background: transparent !important;
+  border-inline-end: none !important;
+  position: relative;
+  z-index: 1;
+}
+
+.bitrix-frosted-sidebar .ant-menu-item,
+.bitrix-frosted-sidebar .ant-menu-submenu-title {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  border-radius: 10px !important;
+  margin-inline: 10px !important;
+  margin-block: 3px !important;
+  border: 1px solid transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease !important;
+}
+
+.bitrix-frosted-sidebar .ant-menu-item .ant-menu-item-icon,
+.bitrix-frosted-sidebar .ant-menu-submenu-title .ant-menu-item-icon {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-size: 16px !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
+}
+
+.bitrix-frosted-sidebar .ant-menu-item:hover,
+.bitrix-frosted-sidebar .ant-menu-submenu-title:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: none !important;
+}
+
+.bitrix-frosted-sidebar .ant-menu-item:hover .ant-menu-item-icon,
+.bitrix-frosted-sidebar .ant-menu-submenu-title:hover .ant-menu-item-icon {
+  color: #ffffff !important;
+}
+
+/* Selected: Viên kính sáng hơn có viền trắng mảnh bo 12px theo ảnh mẫu */
+.bitrix-frosted-sidebar .ant-menu-item-selected {
+  background: rgba(255, 255, 255, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  border-radius: 12px !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+.bitrix-frosted-sidebar .ant-menu-item-selected .ant-menu-item-icon,
+.bitrix-frosted-sidebar .ant-menu-item-selected a,
+.bitrix-frosted-sidebar .ant-menu-item-selected .ant-menu-title-content {
+  color: #ffffff !important;
+}
+
+/* Header kính mờ */
+.bitrix-frosted-header,
+.glass-chrome-header {
+  background: rgba(15, 23, 42, 0.55) !important; /* Fallback */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow: none !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.bitrix-frosted-header::before,
+.glass-chrome-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: var(--ambient-bg-blur, var(--ambient-bg-image));
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+}
+
+.bitrix-frosted-header::after,
+.glass-chrome-header::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: rgba(0, 0, 0, 0.22);
+  pointer-events: none;
+}
+
+.bitrix-frosted-header > *,
+.glass-chrome-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Nút trên header và các pill kính */
+.glass-pill-btn,
+.bitrix-frosted-header .ant-btn:not(.ant-btn-link) {
+  background: rgba(255, 255, 255, 0.14) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+  backdrop-filter: none !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
+  transition: all 0.18s ease !important;
+}
+.glass-pill-btn:hover,
+.bitrix-frosted-header .ant-btn:not(.ant-btn-link):hover {
+  background: rgba(255, 255, 255, 0.22) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  color: #ffffff !important;
+}
+
+/* Thẻ hồ sơ đáy sidebar */
+.glass-profile-card {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-radius: 14px !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
+}
+
+.bitrix-badge-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 1px 5px;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  box-shadow: 0 1px 4px rgba(239, 68, 68, 0.5);
+  margin-left: 6px;
+}
+
+.bitrix-stream-card {
+  background: #ffffff !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bitrix-stream-card:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12) !important;
+}
+
+.bitrix-right-widget {
+  background: #ffffff !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.07) !important;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+}
+
+.bitrix-date-badge {
+  display: flex;
+  flex-direction: column;
+  width: 44px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.bitrix-date-badge-top {
+  background: #00bcd4;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  padding: 2px 0;
+  text-transform: uppercase;
+}
+
+.bitrix-date-badge-bottom {
+  background: #f8fafc;
+  color: #0f172a;
+  font-size: 18px;
+  font-weight: 800;
+  text-align: center;
+  padding: 2px 0 4px;
+  border: 1px solid #e2e8f0;
+  border-top: none;
+}
+
+/* ==========================================================================
+   NÚT THAO TÁC CÓ MÀU TOÀN BỘ PHẦN MỀM (XEM - SỬA - XOÁ - THÊM - BẬT/TẮT)
+   Quy chuẩn Apple Minimalist: 32x32px, bo góc 6px, nền nhạt tương phản cao.
+   ========================================================================== */
+
+.action-btn {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  transition: all 0.15s ease !important;
+}
+
+/* Nút theo hệ thống token Master Blueprint */
+.action-btn-view, .table-action-view {
+  color: var(--action-view) !important;
+  background: var(--action-view-bg) !important;
+  border: 1px solid rgba(37, 99, 235, 0.22) !important;
+}
+.action-btn-view:hover:not(:disabled), .table-action-view:hover:not(:disabled) {
+  background: rgba(37, 99, 235, 0.16) !important;
+  border-color: rgba(37, 99, 235, 0.4) !important;
+}
+
+.action-btn-edit, .table-action-edit {
+  color: var(--action-edit) !important;
+  background: var(--action-edit-bg) !important;
+  border: 1px solid rgba(234, 88, 12, 0.22) !important;
+}
+.action-btn-edit:hover:not(:disabled), .table-action-edit:hover:not(:disabled) {
+  background: rgba(234, 88, 12, 0.16) !important;
+  border-color: rgba(234, 88, 12, 0.4) !important;
+}
+
+.action-btn-delete, .table-action-delete, .action-btn-danger {
+  color: var(--action-danger) !important;
+  background: var(--action-danger-bg) !important;
+  border: 1px solid rgba(220, 38, 38, 0.22) !important;
+}
+.action-btn-delete:hover:not(:disabled), .table-action-delete:hover:not(:disabled), .action-btn-danger:hover:not(:disabled) {
+  background: rgba(220, 38, 38, 0.16) !important;
+  border-color: rgba(220, 38, 38, 0.4) !important;
+}
+
+.action-btn-on, .table-action-on {
+  color: var(--action-on) !important;
+  background: var(--action-on-bg) !important;
+  border: 1px solid rgba(5, 150, 105, 0.22) !important;
+}
+.action-btn-on:hover:not(:disabled), .table-action-on:hover:not(:disabled) {
+  background: rgba(5, 150, 105, 0.16) !important;
+  border-color: rgba(5, 150, 105, 0.4) !important;
+}
+
+.action-btn-add, .table-action-add {
+  color: var(--status-up-text) !important;
+  background: var(--status-up-bg) !important;
+  border: 1px solid rgba(16, 185, 129, 0.22) !important;
+}
+.action-btn-add:hover:not(:disabled), .table-action-add:hover:not(:disabled) {
+  background: rgba(16, 185, 129, 0.16) !important;
+  border-color: rgba(16, 185, 129, 0.4) !important;
+}
+
+.action-btn-neutral {
+  color: var(--apple-text-secondary) !important;
+  background: rgba(118, 118, 128, 0.08) !important;
+  border: 1px solid var(--apple-border) !important;
+}
+.action-btn-neutral:hover:not(:disabled) {
+  background: rgba(118, 118, 128, 0.16) !important;
+  border-color: var(--apple-border-strong) !important;
+}
+
+.btn-tint-excel {
+  color: #107c41 !important;
+  background: #ecfdf5 !important;
+  border: 1px solid rgba(16, 124, 65, 0.22) !important;
+}
+.btn-tint-excel:hover:not(:disabled) {
+  background: rgba(16, 124, 65, 0.16) !important;
+  border-color: rgba(16, 124, 65, 0.4) !important;
+}
+
+
+/* Khối nền trắng dùng chung cho vùng Bộ lọc (AdvancedFilter) và vùng Bảng (TableCard): hiệu năng cao 60-120 FPS. */
+.glass-panel {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid var(--app-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* Các lớp tiện ích chuẩn hoá style lặp (Plan O2.5) */
+.app-subtext,
+.app-caption {
+  font-size: 12px !important;
+  color: var(--app-text-secondary) !important;
+  line-height: 1.4 !important;
+}
+
+.app-secondary-text {
+  font-size: 13px !important;
+  color: var(--app-text-secondary) !important;
+}
+
+.app-danger-text {
+  color: var(--app-danger) !important;
+}
+
+.app-warning-text {
+  color: var(--app-warning) !important;
+}
+
+.app-success-text {
+  color: var(--app-success) !important;
+}
+
+.app-mobile-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: all 0.15s ease;
+}
+
+.app-stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: var(--app-surface-muted);
+  border: 1px solid var(--app-border);
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
+/* Focus thấy rõ khi dùng bàn phím (P6.2) */
+:focus-visible {
+  outline: 2px solid var(--app-primary, #1677ff) !important;
+  outline-offset: 1px !important;
+}
+
+/* Đồng bộ thẻ & thanh điều hướng antd-mobile (P3.1) */
+.adm-card {
+  border-radius: 12px !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid var(--app-border, rgba(0, 0, 0, 0.06)) !important;
+  background: var(--app-surface, #ffffff) !important;
+}
+
+/* ==========================================================================
+   MASTER BLUEPRINT — APPLE GLASS & MINIMALIST BUTTONS & MODALS
+   ========================================================================== */
+.btn-primary-apple {
+  background: var(--brand-cta) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  border: none !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: var(--brand-cta-shadow) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.btn-primary-apple:hover:not(:disabled) {
+  background: var(--brand-cta-hover) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+.btn-primary-apple:active:not(:disabled) {
+  background: var(--brand-cta-active) !important;
+  transform: translateY(0);
+}
+
+.btn-secondary-apple {
+  background: rgba(118, 118, 128, 0.12) !important;
+  color: var(--apple-text-primary) !important;
+  font-weight: 500 !important;
+  border: none !important;
+  border-radius: var(--radius-sm) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.btn-secondary-apple:hover:not(:disabled) {
+  background: rgba(118, 118, 128, 0.2) !important;
+  color: var(--apple-text-primary) !important;
+}
+
+/* Modal theo phong cách Apple Glass */
+.apple-glass-modal .ant-modal-content {
+  border-radius: var(--radius-xl) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: var(--apple-shadow-modal) !important;
+  overflow: hidden !important;
+  padding: 24px !important;
+}
+.apple-glass-modal .ant-modal-mask {
+  background: var(--apple-mask-bg) !important;
+  backdrop-filter: var(--apple-mask-blur) !important;
+  -webkit-backdrop-filter: var(--apple-mask-blur) !important;
+}
+
+/* Code monospace */
+.code-badge {
+  font-family: var(--font-family-code) !important;
+  background: rgba(15, 23, 42, 0.05);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 12.5px;
+  letter-spacing: -0.01em;
+}
+
+
+.adm-nav-bar {
+  background: var(--app-surface, #ffffff) !important;
+  border-bottom: 1px solid var(--app-border, rgba(0, 0, 0, 0.06)) !important;
+}
+
+.adm-tab-bar {
+  background: var(--app-surface, #ffffff) !important;
+  border-top: 1px solid var(--app-border, rgba(0, 0, 0, 0.06)) !important;
+}
+
+@media (max-width: 767px) {
+  .app-header-breadcrumb-group {
+    display: none !important;
+  }
+
+  /* Modal toàn màn hình trên điện thoại với nút đáy cố định (P2.6) */
+  .ant-modal {
+    max-width: 100vw !important;
+    width: 100vw !important;
+    top: 0 !important;
+    padding-bottom: 0 !important;
+    margin: 0 !important;
+  }
+  .ant-modal .ant-modal-content {
+    min-height: 100vh !important;
+    border-radius: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 16px !important;
+  }
+  .ant-modal .ant-modal-body {
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    max-height: calc(100vh - 120px) !important;
+  }
+  .ant-modal .ant-modal-footer {
+    position: sticky !important;
+    bottom: 0 !important;
+    background: inherit !important;
+    padding-top: 10px !important;
+    border-top: 1px solid var(--app-border) !important;
+    margin-top: auto !important;
+    z-index: 10 !important;
+  }
+
+  /* Ô tìm kiếm & lọc co dãn full width trên màn nhỏ (P2.5) */
+  .ant-input-affix-wrapper {
+    width: 100% !important;
+  }
+}

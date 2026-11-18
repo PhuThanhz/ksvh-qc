@@ -16,4 +16,7 @@ public interface FindingOccurrenceRepository extends JpaRepository<FindingOccurr
 
     /** Lấy toàn bộ occurrence của các tiêu chí thuộc nhà hàng trong 1 lần query để tối ưu batch. */
     List<FindingOccurrence> findByRestaurantIdAndCriterionIdIn(Long restaurantId, Collection<Long> criterionIds);
+
+    /** Lấy toàn bộ lịch sử phát sinh tần suất lỗi của một nhà hàng, sắp xếp mới nhất trước. */
+    List<FindingOccurrence> findByRestaurantIdOrderByOccurredAtDesc(Long restaurantId);
 }

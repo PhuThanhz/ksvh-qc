@@ -44,18 +44,28 @@ public record FindingResponse(
         String appealConcludedByName,
         AppealConclusion appealConclusion,
         Instant createdAt,
+        int appealRound,
+        List<AppealReviewResponse> appealReviews,
         List<FindingEventResponse> history
 ) {
     public static FindingResponse from(Finding f, String inspectionCode, String restaurantName,
                                        String criterionCode, String criterionName,
                                        String verifiedByName, String appealConcludedByName) {
-        return from(f, inspectionCode, restaurantName, criterionCode, criterionName, verifiedByName, appealConcludedByName, List.of());
+        return from(f, inspectionCode, restaurantName, criterionCode, criterionName, verifiedByName, appealConcludedByName, List.of(), List.of());
     }
 
     public static FindingResponse from(Finding f, String inspectionCode, String restaurantName,
                                        String criterionCode, String criterionName,
                                        String verifiedByName, String appealConcludedByName,
                                        List<FindingEventResponse> history) {
+        return from(f, inspectionCode, restaurantName, criterionCode, criterionName, verifiedByName, appealConcludedByName, history, List.of());
+    }
+
+    public static FindingResponse from(Finding f, String inspectionCode, String restaurantName,
+                                       String criterionCode, String criterionName,
+                                       String verifiedByName, String appealConcludedByName,
+                                       List<FindingEventResponse> history,
+                                       List<AppealReviewResponse> appealReviews) {
         return new FindingResponse(
                 f.getId(),
                 f.getInspectionId(),
@@ -92,7 +102,9 @@ public record FindingResponse(
                 appealConcludedByName,
                 f.getAppealConclusion(),
                 f.getCreatedAt(),
-                history
+                f.getAppealRound(),
+                appealReviews != null ? appealReviews : List.of(),
+                history != null ? history : List.of()
         );
     }
 }

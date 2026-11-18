@@ -1,5 +1,7 @@
 package vn.ksvh.qc.employee.domain;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -15,4 +17,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
     boolean existsByUserIdAndIdNot(Long userId, Long id);
 
     Optional<Employee> findByEmployeeCodeIgnoreCase(String code);
+
+    Optional<Employee> findByUserId(Long userId);
+
+    List<Employee> findByUserIdIn(Collection<Long> userIds);
 }

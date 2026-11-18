@@ -1,7 +1,8 @@
 import { PlusOutlined } from '@ant-design/icons'
-import { Button, Card, Flex, Space, Table, Tag, Typography } from 'antd'
+import { Button, Flex, Space, Table, Tag, Typography } from 'antd'
 import { useState } from 'react'
 import { TableActions } from '@/components/data-display/TableActions'
+import { TableCard } from '@/components/data-display/TableCard'
 import { ErrorState } from '@/components/feedback/ErrorState'
 import { useConfirm } from '@/hooks/useConfirm'
 import { useNotify } from '@/hooks/useNotify'
@@ -50,7 +51,7 @@ export function RoleListPage() {
         </ProtectedAction>
       }
     >
-      <Card>
+      <TableCard>
         {roles.error && !roles.data ? (
           <ErrorState onRetry={() => void roles.refetch()} />
         ) : (
@@ -75,7 +76,7 @@ export function RoleListPage() {
                   <Flex vertical>
                     <Space size={6}>
                       <Typography.Text strong>{name}</Typography.Text>
-                      {r.systemRole && <Tag color="blue">Gốc</Tag>}
+                      {r.systemRole && <Tag>Gốc</Tag>}
                     </Space>
                     <Typography.Text type="secondary" code>{r.code}</Typography.Text>
                   </Flex>
@@ -97,7 +98,7 @@ export function RoleListPage() {
               {
                 title: 'Thao tác',
                 key: 'actions',
-                width: 120,
+                width: 140,
                 fixed: 'right',
                 render: (_: unknown, r) => (
                   <TableActions
@@ -120,7 +121,7 @@ export function RoleListPage() {
             ]}
           />
         )}
-      </Card>
+      </TableCard>
       <RoleFormModal open={editing.open} role={editing.role} onClose={() => setEditing({ open: false })} />
       <RoleDetailModal open={Boolean(viewing)} role={viewing} onClose={() => setViewing(undefined)} />
     </PageContainer>

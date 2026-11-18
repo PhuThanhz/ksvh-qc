@@ -16,7 +16,6 @@ import { escalationSchema, type EscalationFormValues } from '@/features/criteria
 import { applyFieldErrors, getErrorMessage } from '@/lib/http'
 import { PERMISSIONS, ProtectedAction } from '@/permissions'
 import { formatDate, formatDateTime } from '@/utils/format-date'
-import { CurrentSummary } from '@/features/criteria/components/CurrentSummary'
 
 /** Danh mục 9: quy tắc nâng mức ảnh hưởng khi lỗi lặp lại, theo phiên bản ngày hiệu lực. */
 export function EscalationCard() {
@@ -61,6 +60,7 @@ export function EscalationCard() {
       extra={
         <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
           <Button
+            type="primary"
             icon={<PlusOutlined />}
             onClick={() => {
               reset({
@@ -80,16 +80,11 @@ export function EscalationCard() {
       }
     >
       {current && (
-        <CurrentSummary
-          since={formatDate(current.effectiveFrom)}
-          text={
-            <>
-              Lỗi từ <b>{current.thresholdCount} lần</b> trong kỳ đếm → mức ảnh hưởng <b>+{current.stepIncrease} bậc</b> (tối đa mức{' '}
-              <b>{current.maxImpact}</b>). Đủ <b>{current.resetPeriodMonths} tháng</b> liên tục không lỗi → về mức gốc. Chỉ áp dụng cho
-              nhà hàng tái phạm.
-            </>
-          }
-        />
+        <Typography.Paragraph type="secondary" style={{ marginBottom: 12 }}>
+          Đang áp dụng từ {formatDate(current.effectiveFrom)}: lỗi từ {current.thresholdCount} lần trong kỳ đếm thì mức ảnh
+          hưởng +{current.stepIncrease} bậc (tối đa mức {current.maxImpact}); {current.resetPeriodMonths} tháng liên tục
+          không lỗi thì về mức gốc.
+        </Typography.Paragraph>
       )}
       <Table<EscalationRule>
         rowKey="id"

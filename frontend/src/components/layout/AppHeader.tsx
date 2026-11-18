@@ -5,6 +5,7 @@ import {
 import { Button, Flex } from 'antd'
 import { useLocation } from 'react-router'
 import type { MenuEntry } from '@/components/layout/menu.types'
+import { NotificationBell } from '@/features/notifications'
 
 export interface AppHeaderProps {
   collapsed?: boolean
@@ -21,43 +22,54 @@ export function AppHeader({ collapsed, onToggleSidebar, menu }: AppHeaderProps) 
 
   return (
     <Flex align="center" justify="space-between" style={{ height: '100%', width: '100%' }}>
-      <Flex align="center" gap={12}>
+      <Flex align="center" gap={12} style={{ minWidth: 0, overflow: 'hidden' }}>
         {onToggleSidebar && (
           <Button
             type="text"
+            className="glass-pill-btn"
             icon={
               collapsed ? (
-                <MenuUnfoldOutlined style={{ color: '#1d1d1f', fontSize: 16 }} />
+                <MenuUnfoldOutlined style={{ color: '#ffffff', fontSize: 16 }} />
               ) : (
-                <MenuFoldOutlined style={{ color: '#1d1d1f', fontSize: 16 }} />
+                <MenuFoldOutlined style={{ color: '#ffffff', fontSize: 16 }} />
               )
             }
             onClick={onToggleSidebar}
             aria-label={collapsed ? 'Mở thanh điều hướng' : 'Thu gọn thanh điều hướng'}
             style={{
-              width: 32,
-              height: 32,
+              width: 34,
+              height: 34,
               borderRadius: 8,
-              background: 'rgba(255, 255, 255, 0.5)',
-              backdropFilter: 'blur(8px)',
-              border: '1px solid rgba(255, 255, 255, 0.7)',
+              flexShrink: 0,
             }}
           />
         )}
 
         {activeEntry && (
-          <Flex align="center" gap={6} style={{ fontSize: 13.5, userSelect: 'none' }}>
+          <Flex align="center" gap={6} style={{ fontSize: 13.5, userSelect: 'none', minWidth: 0, overflow: 'hidden' }}>
             {activeEntry.group && (
-              <>
-                <span style={{ color: 'rgba(29, 29, 31, 0.65)', fontWeight: 500 }}>{activeEntry.group}</span>
-                <span style={{ color: 'rgba(29, 29, 31, 0.35)' }}>/</span>
-              </>
+              <span className="app-header-breadcrumb-group" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                <span style={{ color: 'var(--app-on-dark-secondary)', fontWeight: 500 }}>{activeEntry.group}</span>
+                <span style={{ color: 'var(--app-on-dark-faint)' }}>/</span>
+              </span>
             )}
-            <span style={{ color: '#1d1d1f', fontWeight: 600 }}>
+            <span
+              style={{
+                color: 'var(--app-on-dark)',
+                fontWeight: 600,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
               {activeEntry.label}
             </span>
           </Flex>
         )}
+      </Flex>
+
+      <Flex align="center" gap={10}>
+        <NotificationBell />
       </Flex>
     </Flex>
   )

@@ -1,14 +1,9 @@
-import {
-  AuditOutlined,
-  CheckCircleOutlined,
-  EyeOutlined,
-  FileDoneOutlined,
-  FormOutlined,
-  RollbackOutlined,
-} from '@ant-design/icons'
-import { Button, Space, Table, Tag, Tooltip } from 'antd'
+import { Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
+import { StatusBadge } from '@/components/data-display/StatusBadge'
+import { FINDING_STATUS_META } from '../constants/status'
+import { FindingActionButtons } from '@/features/inspections/components/FindingActionButtons'
 import type { FindingActionType } from '@/features/inspections/components/FindingActionModal'
 import type { FindingResponse, FindingStatus } from '@/features/inspections/inspection.types'
 import { formatDate } from '@/utils/format-date'
@@ -20,19 +15,11 @@ interface Props {
   currentPage?: number
   pageSize?: number
   totalItems?: number
+  selectedRowKeys?: React.Key[]
+  onSelectRowKeys?: (keys: React.Key[]) => void
   onPageChange?: (page: number, pageSize: number) => void
   onAction: (finding: FindingResponse, action: FindingActionType) => void
   onView?: (finding: FindingResponse) => void
-}
-
-const STATUS_TAG: Record<FindingStatus, { color: string; label: string }> = {
-  OPEN: { color: 'warning', label: 'Chờ phản hồi' },
-  CONFIRMED: { color: 'blue', label: 'Đã xác nhận' },
-  APPEALED: { color: 'purple', label: 'Đang khiếu nại' },
-  REMEDIATING: { color: 'orange', label: 'Đang khắc phục' },
-  PENDING_VERIFICATION: { color: 'cyan', label: 'Chờ nghiệm thu' },
-  CLOSED: { color: 'success', label: 'Đã đóng' },
-  DISMISSED: { color: 'default', label: 'Đã huỷ bỏ' },
 }
 
 export function FindingTable({
@@ -41,6 +28,8 @@ export function FindingTable({
   currentPage = 0,
   pageSize = 20,
   totalItems,
+  selectedRowKeys,
+  onSelectRowKeys,
   onPageChange,
   onAction,
   onView,
@@ -62,25 +51,27 @@ export function FindingTable({
     {
       title: 'Nhà hàng & Phiếu',
       key: 'res',
+      width: 200,
       render: (_, r) => (
         <div>
           <div style={{ fontWeight: 600 }}>{r.restaurantName}</div>
-          <div style={{ fontSize: 12, color: '#8c8c8c' }}>Phiếu: {r.inspectionCode}</div>
+          <div style={{ fontSize: 12, color: 'var(--app-text-secondary)' }}>Phiếu: {r.inspectionCode}</div>
         </div>
       ),
     },
     {
       title: 'Tiêu chí vi phạm',
       key: 'crit',
+      width: 320,
       render: (_, r) => (
         <div>
           <div style={{ fontWeight: 500 }}>{r.criterionName}</div>
-          <div style={{ fontSize: 12, color: '#cf1322' }}>{r.description}</div>
+          <div style={{ fontSize: 12, color: 'var(--app-text-body)' }}>{r.description}</div>
           {r.appealReason && (
-            <div style={{ fontSize: 12, color: '#722ed1', marginTop: 2 }}>Khiếu nại: {r.appealReason}</div>
+            <div style={{ fontSize: 12, color: 'var(--app-text-secondary)', marginTop: 2 }}>Khiếu nại: {r.appealReason}</div>
           )}
           {r.remediationPlan && (
-            <div style={{ fontSize: 12, color: '#d46b08', marginTop: 2 }}>KH khắc phục: {r.remediationPlan}</div>
+            <div style={{ fontSize: 12, color: 'var(--app-text-secondary)', marginTop: 2 }}>KH khắc phục: {r.remediationPlan}</div>
           )}
         </div>
       ),
@@ -96,12 +87,12 @@ export function FindingTable({
           </Tag>
           {r.effectiveImpact != null && r.effectiveImpact > r.baseImpact && (
             <div>
-              <Tag color="orange" style={{ margin: '2px 0 0', fontSize: 11 }}>
+              <Tag color="warning" style={{ margin: '2px 0 0', fontSize: 11 }}>
                 ▲ Nâng mức {r.baseImpact}→{r.effectiveImpact}
               </Tag>
             </div>
           )}
-          <div style={{ fontSize: 12, color: '#8c8c8c', marginTop: 2 }}>
+          <div style={{ fontSize: 12, color: 'var(--app-text-secondary)', marginTop: 2 }}>
             Điểm: {r.calculatedScore} (lặp lại {r.violationCount} lần)
           </div>
         </div>
@@ -134,84 +125,24 @@ export function FindingTable({
       dataIndex: 'status',
       key: 'status',
       width: 130,
-      render: (st: FindingStatus) => <Tag color={STATUS_TAG[st]?.color}>{STATUS_TAG[st]?.label}</Tag>,
+      render: (st: FindingStatus) => <StatusBadge status={st} meta={FINDING_STATUS_META} />,
     },
     {
       title: 'Thao tác',
       key: 'actions',
-      width: 170,
+      width: 175,
       align: 'center',
+      fixed: 'right',
       render: (_, r) => (
-        <Space size="small">
-          {onView && (
-            <Tooltip title="Xem chi tiết & lịch sử">
-              <Button
-                type="text"
-                icon={<EyeOutlined />}
-                onClick={() => onView(r)}
-              />
-            </Tooltip>
-          )}
-
-          {r.status === 'OPEN' && canRespond && (
-            <>
-              <Tooltip title="Xác nhận nhận lỗi">
-                <Button
-                  type="text"
-                  icon={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
-                  onClick={() => onAction(r, 'CONFIRM')}
-                />
-              </Tooltip>
-              <Tooltip title="Khiếu nại">
-                <Button
-                  type="text"
-                  icon={<RollbackOutlined style={{ color: '#722ed1' }} />}
-                  onClick={() => onAction(r, 'APPEAL')}
-                />
-              </Tooltip>
-            </>
-          )}
-
-          {r.status === 'APPEALED' && canConclude && (
-            <Tooltip title="Thẩm định khiếu nại">
-              <Button
-                type="text"
-                icon={<AuditOutlined style={{ color: '#1677ff' }} />}
-                onClick={() => onAction(r, 'CONCLUDE_APPEAL')}
-              />
-            </Tooltip>
-          )}
-
-          {r.status === 'CONFIRMED' && canRemediate && (
-            <Tooltip title="Lập kế hoạch khắc phục">
-              <Button
-                type="text"
-                icon={<FormOutlined style={{ color: '#fa8c16' }} />}
-                onClick={() => onAction(r, 'REMEDIATION_PLAN')}
-              />
-            </Tooltip>
-          )}
-
-          {r.status === 'REMEDIATING' && canRemediate && (
-            <Tooltip title="Nộp bằng chứng khắc phục">
-              <Button
-                type="text"
-                icon={<FileDoneOutlined style={{ color: '#13c2c2' }} />}
-                onClick={() => onAction(r, 'SUBMIT_REMEDIATION')}
-              />
-            </Tooltip>
-          )}
-
-          {r.status === 'PENDING_VERIFICATION' && canVerify && (
-            <Tooltip title="Nghiệm thu đóng lỗi">
-              <Button
-                type="text"
-                icon={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
-                onClick={() => onAction(r, 'VERIFY')}
-              />
-            </Tooltip>
-          )}
-        </Space>
+        <FindingActionButtons
+          finding={r}
+          canRespond={canRespond}
+          canConclude={canConclude}
+          canRemediate={canRemediate}
+          canVerify={canVerify}
+          onAction={onAction}
+          onView={onView}
+        />
       ),
     },
   ]
@@ -222,6 +153,15 @@ export function FindingTable({
       dataSource={data}
       rowKey="id"
       loading={loading}
+      scroll={{ x: 1350 }}
+      rowSelection={
+        onSelectRowKeys
+          ? {
+              selectedRowKeys,
+              onChange: (keys) => onSelectRowKeys(keys),
+            }
+          : undefined
+      }
       onRow={(record) => ({
         onDoubleClick: () => onView?.(record),
         style: { cursor: 'pointer' },

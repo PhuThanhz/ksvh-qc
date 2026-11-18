@@ -21,3 +21,6 @@ export const IMAGE_JPEG_QUALITY = 0.85
 
 /** Số lần TanStack Query thử lại khi lỗi mạng/5xx (không thử lại lỗi 4xx). */
 export const QUERY_MAX_RETRIES = 2
+
+/** Thời gian giữ dữ liệu danh mục ít thay đổi (công ty, nhà hàng, mẫu phiếu, cấu hình rủi ro, vai trò). */
+export const STALE_CATALOG_MS = 5 * 60_000

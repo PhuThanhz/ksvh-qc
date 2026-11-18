@@ -3,11 +3,12 @@ import {
   DownOutlined,
   LogoutOutlined,
 } from '@ant-design/icons'
-import { Avatar, Button, Dropdown, Flex, Tag, Tooltip, Typography, type MenuProps } from 'antd'
-import { useState } from 'react'
+import { Avatar, Button, Dropdown, Flex, Tooltip, Typography, type MenuProps } from 'antd'
+import { lazy, Suspense, useState } from 'react'
 import type { LayoutUser } from '@/components/layout/menu.types'
-import { ThemeModal } from '@/features/theme'
 import { roleLabel } from '@/permissions'
+
+const ThemeModal = lazy(() => import('@/features/theme').then((m) => ({ default: m.ThemeModal })))
 
 export interface SidebarProfileProps {
   user: LayoutUser | null
@@ -32,15 +33,16 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
       disabled: true,
       style: { cursor: 'default', opacity: 1 },
       label: (
-        <Flex vertical gap={4} style={{ paddingBlock: 2 }}>
-          <Typography.Text strong>{user?.fullName ?? 'Người dùng'}</Typography.Text>
-          <Flex gap={4} wrap>
-            {user?.roles.map((r) => (
-              <Tag key={r} style={{ margin: 0, borderRadius: 4, background: '#f1f5f9', color: '#334155', border: '1px solid #e2e8f0' }}>
-                {roleLabel(r)}
-              </Tag>
-            ))}
-          </Flex>
+        <Flex vertical gap={2} style={{ padding: '4px 2px', maxWidth: 260 }}>
+          <Typography.Text strong style={{ fontSize: 13.5, color: 'var(--app-text)' }}>
+            {user?.fullName ?? 'Người dùng'}
+          </Typography.Text>
+          <Typography.Text
+            type="secondary"
+            style={{ fontSize: 12, lineHeight: 1.4, color: 'var(--app-text-muted)' }}
+          >
+            {user?.roles.map(roleLabel).join(' · ')}
+          </Typography.Text>
         </Flex>
       ),
     },
@@ -66,7 +68,7 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
       size={collapsed ? 36 : 34}
       style={{
         background: 'rgba(255, 255, 255, 0.85)',
-        color: '#0f172a',
+        color: 'var(--app-text)',
         fontWeight: 700,
         fontSize: 14,
         flexShrink: 0,
@@ -82,7 +84,7 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
     <div
       style={{
         padding: collapsed ? '12px 0' : '10px 12px',
-        borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+        borderTop: '1px solid var(--app-on-dark-border)',
         marginTop: 'auto',
         background: 'transparent',
       }}
@@ -98,10 +100,11 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
           <Button
             type="text"
             block
+            className="glass-profile-card"
             style={{
               height: 'auto',
-              padding: '6px 8px',
-              borderRadius: 8,
+              padding: '8px 10px',
+              borderRadius: 14,
               textAlign: 'left',
               display: 'flex',
               alignItems: 'center',
@@ -110,19 +113,23 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
             <Flex align="center" gap={10} style={{ width: '100%', overflow: 'hidden' }}>
               {avatar}
               <Flex vertical style={{ flex: 1, minWidth: 0, lineHeight: 1.25 }}>
-                <Typography.Text strong ellipsis style={{ fontSize: 13, color: '#0f172a' }}>
+                <Typography.Text strong ellipsis style={{ fontSize: 13, color: 'var(--app-on-dark)' }}>
                   {user?.fullName ?? 'Người dùng'}
                 </Typography.Text>
-                <Typography.Text ellipsis style={{ fontSize: 11, color: '#64748b' }}>
+                <Typography.Text ellipsis style={{ fontSize: 11, color: 'var(--app-on-dark-secondary)' }}>
                   {user?.roles.map(roleLabel).join(', ')}
                 </Typography.Text>
               </Flex>
-              <DownOutlined style={{ fontSize: 10, color: '#94a3b8', flexShrink: 0 }} />
+              <DownOutlined style={{ fontSize: 10, color: 'var(--app-on-dark-muted)', flexShrink: 0 }} />
             </Flex>
           </Button>
         )}
       </Dropdown>
-      <ThemeModal open={themeOpen} onClose={() => setThemeOpen(false)} />
+      {themeOpen && (
+        <Suspense fallback={null}>
+          <ThemeModal open={themeOpen} onClose={() => setThemeOpen(false)} />
+        </Suspense>
+      )}
     </div>
   )
 }

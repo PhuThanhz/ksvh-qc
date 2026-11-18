@@ -18,6 +18,8 @@ import vn.ksvh.qc.security.permission.PermissionCodes;
 import vn.ksvh.qc.shared.web.ApiPaths;
 import vn.ksvh.qc.shared.web.PageResponse;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(ApiPaths.V1 + "/findings")
 @RequiredArgsConstructor
@@ -37,10 +39,30 @@ public class FindingController {
         return service.search(keyword, restaurantId, inspectionId, status, pageable, CurrentUser.from(jwt));
     }
 
+    @GetMapping("/pending-reviews")
+    @PreAuthorize("hasAnyAuthority('" + PermissionCodes.FINDING_REVIEW_APPEAL + "')")
+    public List<FindingResponse> getPendingReviews(@AuthenticationPrincipal Jwt jwt) {
+        return service.getPendingReviews(CurrentUser.from(jwt));
+    }
+
+    @GetMapping("/verification-candidates")
+    @PreAuthorize("hasAnyAuthority('" + PermissionCodes.PLAN_CREATE + "', '" + PermissionCodes.INSPECTION_PERFORM + "', '" + PermissionCodes.INSPECTION_READ_ALL + "', '" + PermissionCodes.INSPECTION_READ_OWN + "', '" + PermissionCodes.FINDING_VERIFY + "')")
+    public List<CandidateFindingResponse> getVerificationCandidates(@RequestParam Long restaurantId,
+                                                                   @AuthenticationPrincipal Jwt jwt) {
+        return service.listCandidatesForVerification(restaurantId, CurrentUser.from(jwt));
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('" + PermissionCodes.INSPECTION_READ_ALL + "', '" + PermissionCodes.INSPECTION_READ_OWN + "', '" + PermissionCodes.FINDING_RESPOND + "', '" + PermissionCodes.FINDING_VERIFY + "')")
     public FindingResponse get(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
         return service.get(id, CurrentUser.from(jwt));
+    }
+
+    @GetMapping("/{id}/candidate-reviewers")
+    @PreAuthorize("hasAnyAuthority('" + PermissionCodes.FINDING_RESPOND + "', '" + PermissionCodes.INSPECTION_READ_ALL + "', '" + PermissionCodes.INSPECTION_READ_OWN + "')")
+    public List<CandidateReviewerResponse> getCandidateReviewers(@PathVariable Long id,
+                                                                 @AuthenticationPrincipal Jwt jwt) {
+        return service.getCandidateReviewers(id, CurrentUser.from(jwt));
     }
 
     @PostMapping("/{id}/confirm")
@@ -54,6 +76,13 @@ public class FindingController {
     public FindingResponse appeal(@PathVariable Long id, @Valid @RequestBody FindingAppealRequest req,
                                   @AuthenticationPrincipal Jwt jwt) {
         return service.appeal(id, req, CurrentUser.from(jwt));
+    }
+
+    @PostMapping("/{id}/appeal-reviews")
+    @PreAuthorize("hasAnyAuthority('" + PermissionCodes.FINDING_REVIEW_APPEAL + "')")
+    public FindingResponse submitAppealReview(@PathVariable Long id, @Valid @RequestBody AppealReviewRequest req,
+                                              @AuthenticationPrincipal Jwt jwt) {
+        return service.submitAppealReview(id, req, CurrentUser.from(jwt));
     }
 
     @PostMapping("/{id}/conclude-appeal")
@@ -82,5 +111,29 @@ public class FindingController {
     public FindingResponse verify(@PathVariable Long id, @Valid @RequestBody FindingVerifyRequest req,
                                   @AuthenticationPrincipal Jwt jwt) {
         return service.verify(id, req, CurrentUser.from(jwt));
+    }
+
+    @PostMapping("/batch-confirm")
+    @PreAuthorize("hasAnyAuthority('" + PermissionCodes.FINDING_RESPOND + "')")
+    public BatchActionResultResponse batchConfirm(@Valid @RequestBody BatchFindingConfirmRequest req,
+                                                  @AuthenticationPrincipal Jwt jwt) {
+        int count = service.batchConfirm(req, CurrentUser.from(jwt));
+        return new BatchActionResultResponse(count, "Đã xác nhận thành công " + count + " lỗi");
+    }
+
+    @PostMapping("/batch-remediation-plan")
+    @PreAuthorize("hasAnyAuthority('" + PermissionCodes.FINDING_REMEDIATE + "')")
+    public BatchActionResultResponse batchSetRemediationPlan(@Valid @RequestBody BatchRemediationPlanRequest req,
+                                                            @AuthenticationPrincipal Jwt jwt) {
+        int count = service.batchSetRemediationPlan(req, CurrentUser.from(jwt));
+        return new BatchActionResultResponse(count, "Đã lập kế hoạch khắc phục thành công cho " + count + " lỗi");
+    }
+
+    @PostMapping("/batch-verify")
+    @PreAuthorize("hasAnyAuthority('" + PermissionCodes.FINDING_VERIFY + "')")
+    public BatchActionResultResponse batchVerify(@Valid @RequestBody BatchFindingVerifyRequest req,
+                                                @AuthenticationPrincipal Jwt jwt) {
+        int count = service.batchVerify(req, CurrentUser.from(jwt));
+        return new BatchActionResultResponse(count, "Đã nghiệm thu thành công " + count + " lỗi");
     }
 }

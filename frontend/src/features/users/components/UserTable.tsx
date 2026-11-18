@@ -1,8 +1,8 @@
 import { KeyOutlined } from '@ant-design/icons'
-import { Button, Space, Tag, Tooltip } from 'antd'
+import { Space, Tag } from 'antd'
 import { DataTable, type DataTableProps } from '@/components/data-display/DataTable'
 import { StatusBadge, type BadgeTone } from '@/components/data-display/StatusBadge'
-import { TableActions } from '@/components/data-display/TableActions'
+import { ActionButton, TableActions } from '@/components/data-display/TableActions'
 import type { User } from '@/features/users/users.types'
 import { PERMISSIONS } from '@/permissions'
 import { formatDateTime } from '@/utils/format-date'
@@ -26,17 +26,18 @@ export function UserTable({ roleName, onView, onEdit, onDelete, onResetPassword,
     <DataTable<User>
       {...props}
       rowKey="id"
+      scroll={{ x: 800 }}
       columns={[
         {
           title: '#',
           key: 'index',
-          width: 60,
+          width: 56,
           align: 'center',
           render: (_: unknown, __: unknown, index: number) =>
             ((props.params?.page ?? 0) * (props.params?.size ?? 20)) + index + 1,
         },
-        { title: 'Tên đăng nhập', dataIndex: 'username', key: 'username', sorter: true },
-        { title: 'Họ tên', dataIndex: 'fullName', key: 'fullName', sorter: true },
+        { title: 'Tên đăng nhập', dataIndex: 'username', key: 'username', sorter: true, width: 150 },
+        { title: 'Họ tên', dataIndex: 'fullName', key: 'fullName', sorter: true, width: 180 },
         {
           title: 'Vai trò',
           dataIndex: 'roles',
@@ -57,7 +58,7 @@ export function UserTable({ roleName, onView, onEdit, onDelete, onResetPassword,
         {
           title: 'Thao tác',
           key: 'actions',
-          width: 150,
+          width: 175,
           fixed: 'right',
           render: (_: unknown, u: User) => (
             <TableActions
@@ -68,14 +69,13 @@ export function UserTable({ roleName, onView, onEdit, onDelete, onResetPassword,
               deleteAccess={PERMISSIONS.USER.MANAGE}
               recordName={u.fullName}
               extra={
-                <Tooltip title="Đặt lại mật khẩu">
-                  <Button
-                    type="text"
-                    icon={<KeyOutlined />}
-                    aria-label={`Đặt lại mật khẩu ${u.username}`}
-                    onClick={() => onResetPassword(u)}
-                  />
-                </Tooltip>
+                <ActionButton
+                  tone="edit"
+                  icon={<KeyOutlined />}
+                  tooltip="Đặt lại mật khẩu"
+                  ariaLabel={`Đặt lại mật khẩu cho ${u.username}`}
+                  onClick={() => onResetPassword(u)}
+                />
               }
             />
           ),

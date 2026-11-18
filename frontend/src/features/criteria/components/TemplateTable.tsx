@@ -22,11 +22,12 @@ export function TemplateTable({ onView, onEdit, onDelete, ...props }: TemplateTa
     <DataTable<Template>
       {...props}
       rowKey="id"
+      scroll={{ x: 950 }}
       columns={[
         {
           title: '#',
           key: 'index',
-          width: 60,
+          width: 56,
           align: 'center',
           render: (_: unknown, __: unknown, index: number) =>
             ((props.params?.page ?? 0) * (props.params?.size ?? 20)) + index + 1,
@@ -44,6 +45,7 @@ export function TemplateTable({ onView, onEdit, onDelete, ...props }: TemplateTa
           dataIndex: 'name',
           key: 'name',
           sorter: true,
+          width: 240,
           render: (name: string, t: Template) => (
             <Flex vertical>
               <Typography.Link onClick={() => onView(t)} style={{ fontWeight: 500 }}>
@@ -60,7 +62,7 @@ export function TemplateTable({ onView, onEdit, onDelete, ...props }: TemplateTa
           width: 170,
           render: (companyName: string | null | undefined) =>
             companyName ? (
-              <Tag color="blue">{companyName}</Tag>
+              <Tag>{companyName}</Tag>
             ) : (
               <Tag color="default">Dùng chung toàn hệ thống</Tag>
             ),
@@ -87,7 +89,7 @@ export function TemplateTable({ onView, onEdit, onDelete, ...props }: TemplateTa
         {
           title: 'Thao tác',
           key: 'actions',
-          width: 120,
+          width: 140,
           fixed: 'right',
           render: (_: unknown, t: Template) => (
             <TableActions

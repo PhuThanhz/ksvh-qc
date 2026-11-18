@@ -1,618 +1,78 @@
 package vn.ksvh.qc.inspection.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-import vn.ksvh.qc.criteria.api.CriteriaLookupApi;
-import vn.ksvh.qc.criteria.api.CriterionGroupRef;
-import vn.ksvh.qc.criteria.api.CriterionRef;
 import vn.ksvh.qc.criteria.api.TemplateRef;
-import vn.ksvh.qc.inspection.domain.*;
+import vn.ksvh.qc.inspection.domain.Inspection;
+import vn.ksvh.qc.inspection.domain.InspectionPlan;
+import vn.ksvh.qc.inspection.domain.InspectionStatus;
+import vn.ksvh.qc.inspection.domain.PlanAssignment;
 import vn.ksvh.qc.inspection.dto.*;
-import vn.ksvh.qc.organization.api.OrgUnitLookupApi;
 import vn.ksvh.qc.organization.api.OrgUnitRef;
-import vn.ksvh.qc.risk.RiskAssessment;
-import vn.ksvh.qc.risk.RiskBand;
-import vn.ksvh.qc.risk.RiskRules;
 import vn.ksvh.qc.security.CurrentUser;
-import vn.ksvh.qc.security.permission.PermissionCodes;
-import vn.ksvh.qc.shared.error.BusinessException;
-import vn.ksvh.qc.shared.error.ErrorCode;
-import vn.ksvh.qc.shared.error.NotFoundException;
-import vn.ksvh.qc.shared.util.BusinessDates;
-import vn.ksvh.qc.shared.util.GeoUtils;
 import vn.ksvh.qc.shared.web.PageResponse;
-import vn.ksvh.qc.user.api.UserAccountApi;
-import vn.ksvh.qc.user.api.UserSummary;
 
-import java.time.Clock;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
 
+/**
+ * Facade service for inspection management: delegating querying, creation, and execution
+ * to dedicated specialized domain services.
+ */
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class InspectionService {
 
-    private final InspectionRepository inspectionRepository;
-    private final InspectionItemRepository itemRepository;
-    private final InspectionPlanRepository planRepository;
-    private final FindingRepository findingRepository;
-    private final FindingOccurrenceRepository occurrenceRepository;
-    private final CriteriaLookupApi criteriaLookupApi;
-    private final OrgUnitLookupApi orgUnitLookupApi;
-    private final FindingEventRepository eventRepository;
-    private final UserAccountApi userAccountApi;
-    private final InspectionAccess access;
-    private final RiskAssessor riskAssessor;
-    private final Clock clock;
+    private final InspectionQueryService queryService;
+    private final InspectionCreationService creationService;
+    private final InspectionExecutionService executionService;
 
     public PageResponse<InspectionResponse> search(String keyword, Long restaurantId, Long inspectorId,
                                                   InspectionStatus status, Pageable pageable, CurrentUser user) {
-        Specification<Inspection> spec = Specification.unrestricted();
-        Specification<Inspection> scope = access.inspectionScope(user);
-        if (scope != null) {
-            spec = spec.and(scope);
-        }
-        if (StringUtils.hasText(keyword)) {
-            String kw = "%" + keyword.trim().toLowerCase(Locale.ROOT) + "%";
-            spec = spec.and((root, q, cb) -> cb.or(
-                    cb.like(cb.lower(root.get("code")), kw),
-                    cb.like(cb.lower(root.get("inspectionType")), kw)
-            ));
-        }
-        if (restaurantId != null) {
-            spec = spec.and((root, q, cb) -> cb.equal(root.get("restaurantId"), restaurantId));
-        }
-        if (inspectorId != null) {
-            spec = spec.and((root, q, cb) -> cb.equal(root.get("inspectorId"), inspectorId));
-        }
-        if (status != null) {
-            spec = spec.and((root, q, cb) -> cb.equal(root.get("status"), status));
-        }
-
-        var page = inspectionRepository.findAll(spec, pageable);
-
-        var restaurantIds = page.getContent().stream().map(Inspection::getRestaurantId).distinct().toList();
-        var inspectorIds = page.getContent().stream().map(Inspection::getInspectorId).distinct().toList();
-        var templateIds = page.getContent().stream().map(Inspection::getTemplateId).distinct().toList();
-        var inspectionIds = page.getContent().stream().map(Inspection::getId).toList();
-        var allTopicGroupIds = page.getContent().stream()
-                .flatMap(ins -> ins.getTopicGroupIds().stream())
-                .distinct()
-                .toList();
-
-        Map<Long, OrgUnitRef> restaurants = orgUnitLookupApi.findRefs(restaurantIds);
-        Map<Long, UserSummary> inspectors = userAccountApi.findSummaries(inspectorIds);
-        Map<Long, TemplateRef> templates = criteriaLookupApi.findTemplates(templateIds);
-        Map<Long, CriterionGroupRef> topicGroups = criteriaLookupApi.findGroups(allTopicGroupIds);
-
-        Map<Long, Integer> riskScoreMap = new HashMap<>();
-        Map<Long, String> maxRiskMap = new HashMap<>();
-        if (!inspectionIds.isEmpty()) {
-            for (Object[] row : findingRepository.findRiskSummariesByInspectionIds(inspectionIds)) {
-                Long insId = ((Number) row[0]).longValue();
-                int sumScore = ((Number) row[1]).intValue();
-                String maxCode = (String) row[2];
-                riskScoreMap.put(insId, sumScore);
-                maxRiskMap.put(insId, maxCode);
-            }
-        }
-
-        return PageResponse.of(page, i -> {
-            String rName = restaurants.containsKey(i.getRestaurantId()) ? restaurants.get(i.getRestaurantId()).name() : null;
-            String tName = i.getTemplateId() != null && templates.containsKey(i.getTemplateId()) ? templates.get(i.getTemplateId()).name() : null;
-            String insName = inspectors.containsKey(i.getInspectorId()) ? inspectors.get(i.getInspectorId()).fullName() : null;
-            int totalRisk = riskScoreMap.getOrDefault(i.getId(), 0);
-            String maxRisk = maxRiskMap.get(i.getId());
-            List<String> tNames = i.getTopicGroupIds().stream()
-                    .map(topicGroups::get)
-                    .filter(Objects::nonNull)
-                    .map(CriterionGroupRef::name)
-                    .toList();
-            return InspectionResponse.from(i, rName, tName, insName, totalRisk, maxRisk, tNames, false);
-        });
+        return queryService.search(keyword, restaurantId, inspectorId, status, pageable, user);
     }
 
     public List<InspectionResponse> listMyInspections(Long inspectorId) {
-        List<Inspection> list = inspectionRepository.findByInspectorIdAndStatusIn(
-                inspectorId,
-                List.of(InspectionStatus.ASSIGNED, InspectionStatus.IN_PROGRESS)
-        );
-        var restaurantIds = list.stream().map(Inspection::getRestaurantId).distinct().toList();
-        var templateIds = list.stream().map(Inspection::getTemplateId).distinct().toList();
-        var allTopicGroupIds = list.stream()
-                .flatMap(ins -> ins.getTopicGroupIds().stream())
-                .distinct()
-                .toList();
-
-        Map<Long, OrgUnitRef> restaurants = orgUnitLookupApi.findRefs(restaurantIds);
-        Map<Long, TemplateRef> templates = criteriaLookupApi.findTemplates(templateIds);
-        Map<Long, UserSummary> inspectors = userAccountApi.findSummaries(List.of(inspectorId));
-        Map<Long, CriterionGroupRef> topicGroups = criteriaLookupApi.findGroups(allTopicGroupIds);
-        String insName = inspectors.containsKey(inspectorId) ? inspectors.get(inspectorId).fullName() : null;
-
-        return list.stream().map(i -> {
-            String rName = restaurants.containsKey(i.getRestaurantId()) ? restaurants.get(i.getRestaurantId()).name() : null;
-            String tName = i.getTemplateId() != null && templates.containsKey(i.getTemplateId()) ? templates.get(i.getTemplateId()).name() : null;
-            List<String> tNames = i.getTopicGroupIds().stream()
-                    .map(topicGroups::get)
-                    .filter(Objects::nonNull)
-                    .map(CriterionGroupRef::name)
-                    .toList();
-            return InspectionResponse.from(i, rName, tName, insName, 0, null, tNames, false);
-        }).toList();
+        return queryService.listMyInspections(inspectorId);
     }
 
     public InspectionResponse get(Long id, CurrentUser user) {
-        Inspection i = load(id);
-        access.requireRead(i, user);
-        return toResponse(i);
-    }
-
-    private InspectionResponse toResponse(Inspection i) {
-        Long id = i.getId();
-        var rest = orgUnitLookupApi.findRefs(List.of(i.getRestaurantId())).get(i.getRestaurantId());
-        var ins = userAccountApi.findSummaries(List.of(i.getInspectorId())).get(i.getInspectorId());
-        var tpl = i.getTemplateId() == null ? null : criteriaLookupApi.findTemplate(i.getTemplateId()).orElse(null);
-        Map<Long, CriterionGroupRef> topicGroups = criteriaLookupApi.findGroups(i.getTopicGroupIds());
-        List<String> topicNames = i.getTopicGroupIds().stream().map(topicGroups::get).filter(Objects::nonNull).map(CriterionGroupRef::name).toList();
-
-        List<Finding> findings = findingRepository.findByInspectionId(id).stream()
-                .filter(f -> f.getStatus() != FindingStatus.DISMISSED)
-                .toList();
-        int totalRisk = findings.stream().mapToInt(Finding::getCalculatedScore).sum();
-        String maxRisk = findings.stream()
-                .map(Finding::getRiskLevelCode)
-                .max(Comparator.naturalOrder())
-                .orElse(null);
-
-        return InspectionResponse.from(i,
-                rest != null ? rest.name() : null,
-                tpl != null ? tpl.name() : null,
-                ins != null ? ins.fullName() : null,
-                totalRisk,
-                maxRisk,
-                topicNames
-        );
+        return queryService.get(id, user);
     }
 
     public List<InspectionItemResponse> listItems(Long id, CurrentUser user) {
-        Inspection inspection = load(id);
-        access.requireRead(inspection, user);
-        return inspection.getItems().stream()
-                .map(InspectionItemResponse::from)
-                .toList();
+        return queryService.listItems(id, user);
     }
 
-    @Transactional
     public InspectionResponse create(InspectionCreateRequest req, CurrentUser user) {
-        String code = req.code().trim();
-        if (inspectionRepository.existsByCodeIgnoreCase(code)) {
-            throw codeTaken(code);
-        }
-        if (req.planId() != null) {
-            InspectionPlan plan = planRepository.findById(req.planId())
-                    .orElseThrow(() -> new NotFoundException("Không tìm thấy kế hoạch #" + req.planId()));
-            if (plan.getStatus() != PlanStatus.APPROVED) {
-                throw new BusinessException(ErrorCode.VALIDATION_FAILED,
-                        "Kế hoạch '%s' chưa được phê duyệt (trạng thái: %s)".formatted(plan.getTitle(), plan.getStatus()));
-            }
-        }
-        // Người không có quyền lập kế hoạch chỉ được tạo phiếu cho chính mình.
-        if (!user.has(PermissionCodes.PLAN_CREATE) && !Objects.equals(req.inspectorId(), user.id())) {
-            throw new BusinessException(ErrorCode.ACCESS_DENIED, "Bạn chỉ được tạo phiếu chấm cho chính mình");
-        }
-        OrgUnitRef restaurant = orgUnitLookupApi.findRefs(List.of(req.restaurantId())).get(req.restaurantId());
-        if (restaurant == null || !"RESTAURANT".equals(restaurant.unitType()) || !restaurant.active()) {
-            throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Nhà hàng không tồn tại hoặc đã ngừng hoạt động");
-        }
-
-        InspectionKind kind = req.inspectionType();
-        InspectionMode mode = req.inspectionMode() != null ? req.inspectionMode() : InspectionMode.ON_SITE;
-        List<CriterionRef> criteria;
-        Long templateId = null;
-        List<Long> topics = List.of();
-        if (kind == InspectionKind.PERIODIC) {
-            // Định kỳ tháng: thực tế tại nhà hàng, đủ mọi tiêu chí đang dùng của mẫu phiếu.
-            if (mode != InspectionMode.ON_SITE) {
-                throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Kiểm tra định kỳ tháng phải thực hiện thực tế tại nhà hàng");
-            }
-            if (req.templateId() == null) {
-                throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Kiểm tra định kỳ phải chọn mẫu phiếu chấm");
-            }
-            TemplateRef template = criteriaLookupApi.findTemplate(req.templateId())
-                    .orElseThrow(() -> new NotFoundException("Không tìm thấy mẫu phiếu #" + req.templateId()));
-            validateTemplateForRestaurant(template, restaurant);
-            if (template.items().isEmpty()) {
-                throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Mẫu phiếu này không còn tiêu chí nào đang hoạt động");
-            }
-            templateId = template.id();
-            criteria = template.items();
-        } else {
-            // Đột xuất: chỉ các tiêu chí thuộc chuyên đề (nhóm tiêu chí) được kích hoạt, không kiểm lại toàn bộ.
-            topics = req.topicGroupIds() == null ? List.of() : req.topicGroupIds().stream().filter(Objects::nonNull).distinct().toList();
-            if (topics.isEmpty()) {
-                throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Kiểm tra đột xuất phải chọn ít nhất một chuyên đề (nhóm tiêu chí)");
-            }
-            validateTopics(topics, restaurant);
-            criteria = criteriaLookupApi.findActiveCriteriaInGroups(topics);
-            if (criteria.isEmpty()) {
-                throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Các chuyên đề đã chọn chưa có tiêu chí nào đang hoạt động");
-            }
-        }
-
-        Inspection inspection = new Inspection();
-        inspection.setCode(code);
-        inspection.setPlanId(req.planId());
-        inspection.setRestaurantId(req.restaurantId());
-        inspection.setTemplateId(templateId);
-        inspection.setInspectorId(req.inspectorId());
-        inspection.setInspectionType(kind);
-        inspection.setInspectionMode(mode);
-        inspection.getTopicGroupIds().addAll(topics);
-        inspection.setNotes(StringUtils.hasText(req.notes()) ? req.notes().trim() : null);
-        inspection.setStatus(InspectionStatus.ASSIGNED);
-        inspection.setCreatedBy(user.id());
-
-        int order = 1;
-        for (CriterionRef c : criteria) {
-            InspectionItem item = new InspectionItem();
-            item.setInspection(inspection);
-            item.setCriterionId(c.id());
-            item.setCriterionCode(c.code());
-            item.setCriterionName(c.name());
-            item.setGroupName(c.groupName());
-            item.setBaseImpact((short) c.baseImpact());
-            item.setSortOrder(order++);
-            item.setResult(ItemResult.UNRATED);
-            inspection.getItems().add(item);
-        }
-
-        try {
-            return toResponse(inspectionRepository.saveAndFlush(inspection));
-        } catch (DataIntegrityViolationException e) {
-            throw codeTaken(code); // hai người tạo cùng mã cùng lúc: unique index chặn lại
-        }
+        return creationService.create(req, user);
     }
 
-    @Transactional
+    public InspectionResponse createFromPlanAssignment(InspectionPlan plan, PlanAssignment a, String restaurantCode, Long actorId) {
+        return creationService.createFromPlanAssignment(plan, a, restaurantCode, actorId);
+    }
+
     public List<InspectionResponse> createBatch(InspectionBatchCreateRequest req, CurrentUser user) {
-        if (!user.has(PermissionCodes.PLAN_CREATE) && !Objects.equals(req.inspectorId(), user.id())) {
-            throw new BusinessException(ErrorCode.ACCESS_DENIED, "Bạn chỉ được tạo phiếu chấm cho chính mình");
-        }
-        if (req.planId() != null) {
-            InspectionPlan plan = planRepository.findById(req.planId())
-                    .orElseThrow(() -> new NotFoundException("Không tìm thấy kế hoạch #" + req.planId()));
-            if (plan.getStatus() != PlanStatus.APPROVED) {
-                throw new BusinessException(ErrorCode.VALIDATION_FAILED,
-                        "Kế hoạch '%s' chưa được phê duyệt (trạng thái: %s)".formatted(plan.getTitle(), plan.getStatus()));
-            }
-        }
-        List<Long> restaurantIds = req.restaurantIds().stream().filter(Objects::nonNull).distinct().toList();
-        if (restaurantIds.isEmpty()) {
-            throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Vui lòng chọn ít nhất một nhà hàng");
-        }
-
-        Map<Long, OrgUnitRef> restaurants = orgUnitLookupApi.findRefs(restaurantIds);
-        for (Long rId : restaurantIds) {
-            OrgUnitRef r = restaurants.get(rId);
-            if (r == null || !"RESTAURANT".equals(r.unitType()) || !r.active()) {
-                throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Nhà hàng #" + rId + " không tồn tại hoặc đã ngừng hoạt động");
-            }
-        }
-
-        InspectionKind kind = req.inspectionType();
-        InspectionMode mode = req.inspectionMode() != null ? req.inspectionMode() : InspectionMode.ON_SITE;
-        List<CriterionRef> criteria;
-        Long templateId = null;
-        List<Long> topics = List.of();
-
-        if (kind == InspectionKind.PERIODIC) {
-            if (mode != InspectionMode.ON_SITE) {
-                throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Kiểm tra định kỳ tháng phải thực hiện thực tế tại nhà hàng");
-            }
-            if (req.templateId() == null) {
-                throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Kiểm tra định kỳ phải chọn mẫu phiếu chấm");
-            }
-            TemplateRef template = criteriaLookupApi.findTemplate(req.templateId())
-                    .orElseThrow(() -> new NotFoundException("Không tìm thấy mẫu phiếu #" + req.templateId()));
-            for (Long rId : restaurantIds) {
-                validateTemplateForRestaurant(template, restaurants.get(rId));
-            }
-            if (template.items().isEmpty()) {
-                throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Mẫu phiếu này không còn tiêu chí nào đang hoạt động");
-            }
-            templateId = template.id();
-            criteria = template.items();
-        } else {
-            topics = req.topicGroupIds() == null ? List.of() : req.topicGroupIds().stream().filter(Objects::nonNull).distinct().toList();
-            if (topics.isEmpty()) {
-                throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Kiểm tra đột xuất phải chọn ít nhất một chuyên đề (nhóm tiêu chí)");
-            }
-            for (Long rId : restaurantIds) {
-                validateTopics(topics, restaurants.get(rId));
-            }
-            criteria = criteriaLookupApi.findActiveCriteriaInGroups(topics);
-            if (criteria.isEmpty()) {
-                throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Các chuyên đề đã chọn chưa có tiêu chí nào đang hoạt động");
-            }
-        }
-
-        String prefix = req.codePrefix().trim().toUpperCase(Locale.ROOT);
-        List<Inspection> createdList = new ArrayList<>();
-        Set<String> allocatedCodes = new HashSet<>();
-
-        for (Long rId : restaurantIds) {
-            OrgUnitRef rest = restaurants.get(rId);
-            String storeCode = StringUtils.hasText(rest.code()) ? rest.code().trim().toUpperCase(Locale.ROOT) : ("R" + rest.id());
-            String candidateCode = prefix + "-" + storeCode;
-            int suffix = 1;
-            while (allocatedCodes.contains(candidateCode) || inspectionRepository.existsByCodeIgnoreCase(candidateCode)) {
-                candidateCode = prefix + "-" + storeCode + "-" + suffix++;
-            }
-            allocatedCodes.add(candidateCode);
-
-            Inspection inspection = new Inspection();
-            inspection.setCode(candidateCode);
-            inspection.setPlanId(req.planId());
-            inspection.setRestaurantId(rId);
-            inspection.setTemplateId(templateId);
-            inspection.setInspectorId(req.inspectorId());
-            inspection.setInspectionType(kind);
-            inspection.setInspectionMode(mode);
-            inspection.getTopicGroupIds().addAll(topics);
-            inspection.setNotes(StringUtils.hasText(req.notes()) ? req.notes().trim() : null);
-            inspection.setStatus(InspectionStatus.ASSIGNED);
-            inspection.setCreatedBy(user.id());
-
-            int order = 1;
-            for (CriterionRef c : criteria) {
-                InspectionItem item = new InspectionItem();
-                item.setInspection(inspection);
-                item.setCriterionId(c.id());
-                item.setCriterionCode(c.code());
-                item.setCriterionName(c.name());
-                item.setGroupName(c.groupName());
-                item.setBaseImpact((short) c.baseImpact());
-                item.setSortOrder(order++);
-                item.setResult(ItemResult.UNRATED);
-                inspection.getItems().add(item);
-            }
-            createdList.add(inspection);
-        }
-
-        try {
-            inspectionRepository.saveAllAndFlush(createdList);
-        } catch (DataIntegrityViolationException e) {
-            throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Lỗi trùng lặp mã phiếu hoặc dữ liệu không hợp lệ trong đợt tạo hàng loạt");
-        }
-
-        return createdList.stream().map(this::toResponse).toList();
+        return creationService.createBatch(req, user);
     }
 
-    /** Mẫu phải đang hoạt động và là mẫu dùng chung hoặc của đúng công ty của nhà hàng. */
-    private static void validateTemplateForRestaurant(TemplateRef template, OrgUnitRef restaurant) {
-        if (!template.active()) {
-            throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Mẫu phiếu '%s' đã ngưng hoạt động".formatted(template.name()));
-        }
-        if (template.companyId() != null && !template.companyId().equals(restaurant.companyId())) {
-            throw new BusinessException(ErrorCode.VALIDATION_FAILED,
-                    "Mẫu phiếu '%s' thuộc công ty khác, không dùng được cho nhà hàng '%s'".formatted(template.name(), restaurant.name()));
-        }
-    }
-
-    /** Chuyên đề phải tồn tại, đang hoạt động, là nhóm dùng chung hoặc của đúng công ty của nhà hàng. */
-    private void validateTopics(List<Long> topics, OrgUnitRef restaurant) {
-        Map<Long, CriterionGroupRef> groups = criteriaLookupApi.findGroups(topics);
-        for (Long id : topics) {
-            CriterionGroupRef g = groups.get(id);
-            if (g == null || !g.active()) {
-                throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Chuyên đề #%d không tồn tại hoặc đã ngưng hoạt động".formatted(id));
-            }
-            if (g.companyId() != null && !g.companyId().equals(restaurant.companyId())) {
-                throw new BusinessException(ErrorCode.VALIDATION_FAILED,
-                        "Chuyên đề '%s' thuộc công ty khác, không dùng được cho nhà hàng '%s'".formatted(g.name(), restaurant.name()));
-            }
-        }
-    }
-
-    private static BusinessException codeTaken(String code) {
-        return new BusinessException(ErrorCode.INSPECTION_CODE_TAKEN, "Mã phiếu chấm '%s' đã tồn tại".formatted(code));
-    }
-
-    @Transactional
     public InspectionResponse checkin(Long id, InspectionCheckinRequest req, CurrentUser user) {
-        Inspection inspection = load(id);
-        access.requireAssignedInspector(inspection, user);
-        if (inspection.getStatus() != InspectionStatus.ASSIGNED) {
-            throw new BusinessException(ErrorCode.INSPECTION_INVALID_STATE, "Phiếu này đã check-in hoặc đã kết thúc");
-        }
-
-        OrgUnitRef rest = orgUnitLookupApi.findRefs(List.of(inspection.getRestaurantId())).get(inspection.getRestaurantId());
-        if (rest == null) {
-            throw new NotFoundException("Không tìm thấy thông tin nhà hàng #" + inspection.getRestaurantId());
-        }
-        // Vị trí chỉ ghi nhận, không chặn (GPS chưa bắt buộc – chốt 16/11/2026). Server tự tính khoảng cách.
-        boolean hasFix = req.latitude() != null && req.longitude() != null;
-        if (hasFix) {
-            inspection.setCheckinLat(req.latitude());
-            inspection.setCheckinLng(req.longitude());
-        }
-        if (inspection.getInspectionMode() == InspectionMode.REMOTE) {
-            inspection.setLocationStatus(LocationStatus.REMOTE);
-        } else if (hasFix && rest.latitude() != null && rest.longitude() != null) {
-            double distance = GeoUtils.distanceMeters(req.latitude(), req.longitude(), rest.latitude(), rest.longitude());
-            inspection.setCheckinDistanceM(distance);
-            inspection.setLocationStatus(rest.checkinRadiusM() == null ? LocationStatus.UNVERIFIED
-                    : distance <= rest.checkinRadiusM() ? LocationStatus.VERIFIED : LocationStatus.OUTSIDE_RADIUS);
-        } else {
-            inspection.setLocationStatus(LocationStatus.UNVERIFIED);
-        }
-        inspection.setCheckinAt(clock.instant());
-        inspection.setStatus(InspectionStatus.IN_PROGRESS);
-
-        return toResponse(inspectionRepository.saveAndFlush(inspection));
+        return executionService.checkin(id, req, user);
     }
 
-    @Transactional
     public InspectionResponse submit(Long id, InspectionSubmitRequest req, CurrentUser user) {
-        Inspection inspection = load(id);
-        access.requireAssignedInspector(inspection, user);
-        if (inspection.getStatus() != InspectionStatus.IN_PROGRESS) {
-            throw new BusinessException(ErrorCode.INSPECTION_INVALID_STATE,
-                    "Phiếu chưa check-in GPS hoặc đã gửi, không thể gửi kết quả");
-        }
-
-        Map<Long, InspectionSubmitItemRequest> submitMap = validateSubmission(inspection, req);
-
-        Instant now = clock.instant();
-        LocalDate today = BusinessDates.today(clock);
-
-        List<InspectionSubmitItemRequest> failedSubs = submitMap.values().stream()
-                .filter(s -> s.result() == ItemResult.FAIL)
-                .toList();
-        boolean hasFail = !failedSubs.isEmpty();
-
-        RiskRules rules = hasFail ? RiskRules.from(criteriaLookupApi.riskConfigAt(today)) : null;
-        Map<Long, List<LocalDate>> occurrencesByCriterion = Map.of();
-        if (hasFail) {
-            List<Long> failedCritIds = failedSubs.stream().map(InspectionSubmitItemRequest::criterionId).distinct().toList();
-            occurrencesByCriterion = occurrenceRepository.findByRestaurantIdAndCriterionIdIn(inspection.getRestaurantId(), failedCritIds).stream()
-                    .collect(Collectors.groupingBy(
-                            FindingOccurrence::getCriterionId,
-                            Collectors.mapping(o -> o.getOccurredAt().atZone(BusinessDates.ZONE).toLocalDate(), Collectors.toList())
-                    ));
-        }
-
-        List<FindingEvent> eventsToSave = new ArrayList<>();
-
-        for (InspectionItem item : inspection.getItems()) {
-            InspectionSubmitItemRequest sub = submitMap.get(item.getCriterionId());
-            item.setResult(sub.result());
-            item.setComment(trimToNull(sub.comment()));
-            item.setEvidenceUrls(trimToNull(sub.evidenceUrls()));
-            item.setEvaluatedAt(now);
-
-            if (sub.result() != ItemResult.FAIL) {
-                continue;
-            }
-
-            // Tần suất, nâng mức, mức rủi ro theo cấu hình đang hiệu lực (DOMAIN_SPEC §6).
-            List<LocalDate> previous = occurrencesByCriterion.getOrDefault(item.getCriterionId(), List.of());
-            RiskAssessment risk = riskAssessor.assess(item.getBaseImpact(), previous, today, rules);
-            RiskBand level = risk.band();
-
-            Finding finding = new Finding();
-            finding.setInspectionId(inspection.getId());
-            finding.setInspectionItemId(item.getId());
-            finding.setRestaurantId(inspection.getRestaurantId());
-            finding.setCriterionId(item.getCriterionId());
-            finding.setBaseImpact(item.getBaseImpact());
-            finding.setEffectiveImpact((short) risk.effectiveImpact());
-            finding.setViolationCount(risk.frequency());
-            finding.setCalculatedScore(risk.score());
-            finding.setRiskLevelCode(level.code());
-            finding.setRiskLevelName(level.name());
-            finding.setRemediationDays(level.remediationDays());
-            finding.setDeadlineDate(today.plusDays(level.remediationDays()));
-            finding.setStatus(FindingStatus.OPEN);
-            finding.setDescription(item.getComment());
-            finding.setEvidenceUrls(item.getEvidenceUrls());
-
-            Finding saved = findingRepository.save(finding);
-            eventsToSave.add(new FindingEvent(saved.getId(), FindingEventAction.CREATED, null,
-                    FindingStatus.OPEN, user.id(), null, now));
-        }
-
-        if (!eventsToSave.isEmpty()) {
-            eventRepository.saveAll(eventsToSave);
-        }
-
-        inspection.setSubmittedAt(now);
-        if (StringUtils.hasText(req.notes())) {
-            inspection.setNotes(req.notes().trim());
-        }
-        if (hasFail) {
-            inspection.setStatus(InspectionStatus.SUBMITTED);
-        } else {
-            inspection.setStatus(InspectionStatus.COMPLETED);
-            inspection.setCompletedAt(now);
-        }
-
-        return toResponse(inspectionRepository.saveAndFlush(inspection));
+        return executionService.submit(id, req, user);
     }
 
-    /** Kiểm tra toàn bộ trước khi ghi: đủ tiêu chí, không trùng, đủ mô tả/bằng chứng theo DOMAIN_SPEC bước 2. */
-    private Map<Long, InspectionSubmitItemRequest> validateSubmission(Inspection inspection, InspectionSubmitRequest req) {
-        Map<Long, InspectionItem> items = new HashMap<>();
-        inspection.getItems().forEach(it -> items.put(it.getCriterionId(), it));
-
-        Map<Long, InspectionSubmitItemRequest> submitMap = new HashMap<>();
-        for (InspectionSubmitItemRequest sub : req.items()) {
-            InspectionItem item = items.get(sub.criterionId());
-            if (item == null) {
-                throw new BusinessException(ErrorCode.VALIDATION_FAILED,
-                        "Tiêu chí #%d không thuộc phiếu chấm này".formatted(sub.criterionId()));
-            }
-            if (submitMap.putIfAbsent(sub.criterionId(), sub) != null) {
-                throw new BusinessException(ErrorCode.VALIDATION_FAILED,
-                        "Tiêu chí '%s' bị gửi trùng".formatted(item.getCriterionName()));
-            }
-            if (sub.result() == ItemResult.UNRATED) {
-                throw new BusinessException(ErrorCode.INSPECTION_INCOMPLETE,
-                        "Tiêu chí '%s' chưa được chấm".formatted(item.getCriterionName()));
-            }
-            if (sub.result() == ItemResult.FAIL && !StringUtils.hasText(sub.comment())) {
-                throw new BusinessException(ErrorCode.VALIDATION_FAILED,
-                        "Tiêu chí '%s' không đạt bắt buộc phải ghi mô tả lỗi".formatted(item.getCriterionName()));
-            }
-            if (sub.result() == ItemResult.FAIL && !StringUtils.hasText(sub.evidenceUrls())) {
-                throw new BusinessException(ErrorCode.VALIDATION_FAILED,
-                        "Tiêu chí '%s' không đạt bắt buộc có ít nhất 1 ảnh/video bằng chứng".formatted(item.getCriterionName()));
-            }
-            if (sub.result() == ItemResult.NA && !StringUtils.hasText(sub.comment())) {
-                throw new BusinessException(ErrorCode.VALIDATION_FAILED,
-                        "Tiêu chí '%s' chọn N/A bắt buộc ghi lý do".formatted(item.getCriterionName()));
-            }
-        }
-
-        List<String> missing = items.values().stream()
-                .filter(it -> !submitMap.containsKey(it.getCriterionId()))
-                .sorted(Comparator.comparingInt(InspectionItem::getSortOrder))
-                .map(InspectionItem::getCriterionName)
-                .toList();
-        if (!missing.isEmpty()) {
-            throw new BusinessException(ErrorCode.INSPECTION_INCOMPLETE,
-                    "Còn %d tiêu chí chưa chấm: %s".formatted(missing.size(), String.join(", ", missing)));
-        }
-        return submitMap;
+    public InspectionResponse acknowledge(Long id, CurrentUser user) {
+        return executionService.acknowledge(id, user);
     }
 
-    private static String trimToNull(String s) {
-        return StringUtils.hasText(s) ? s.trim() : null;
-    }
-
-    @Transactional
     public InspectionResponse cancel(Long id, InspectionCancelRequest req, CurrentUser user) {
-        Inspection inspection = load(id);
-        // Phiếu đã gửi là bất biến (quy tắc 4): lỗi đã sinh ra phải đi hết quy trình, không huỷ ngang.
-        if (inspection.getStatus() != InspectionStatus.ASSIGNED && inspection.getStatus() != InspectionStatus.IN_PROGRESS) {
-            throw new BusinessException(ErrorCode.INSPECTION_INVALID_STATE, "Chỉ huỷ được phiếu chưa gửi kết quả");
-        }
-        inspection.setStatus(InspectionStatus.CANCELLED);
-        inspection.setCancelReason(req.reason().trim());
-        return toResponse(inspectionRepository.saveAndFlush(inspection));
+        return executionService.cancel(id, req, user);
     }
 
-    private Inspection load(Long id) {
-        return inspectionRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Không tìm thấy phiếu chấm #" + id));
+    public static void validateTemplateForAssignment(TemplateRef template, OrgUnitRef restaurant) {
+        InspectionCreationService.validateTemplateForAssignment(template, restaurant);
     }
 }

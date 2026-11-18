@@ -1,5 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons'
-import { Button, Card, Flex, Space } from 'antd'
+import { Button, Flex, Space } from 'antd'
 import { useCallback, useMemo, useState } from 'react'
 import { AdvancedFilter, type FilterTagItem } from '@/components/data-entry/AdvancedFilter'
 import { FilterSelect } from '@/components/data-entry/FilterSelect'
@@ -98,38 +98,36 @@ export function UserListPage() {
         </Space>
       }
     >
-      <Card>
-        <Flex vertical gap={16}>
-          <AdvancedFilter
-            search={{ value: filters.keyword ?? '', placeholder: 'Tìm theo tên đăng nhập hoặc họ tên', onSearch }}
-            activeCount={activeFilterCount}
-            onReset={resetFilters}
-            activeTags={activeTags}
-          >
-            <FilterSelect<string>
-              placeholder="Vai trò"
-              width={200}
-              value={filters.role}
-              options={(roles.data ?? []).map((r) => ({ value: r.code, label: r.name }))}
-              onChange={(v) => setFilter('role', v)}
-            />
-            <ActiveFilter value={filters.active} onChange={(v) => setFilter('active', v)} />
-          </AdvancedFilter>
-          <UserTable
-            data={users.data}
-            loading={users.isFetching}
-            error={users.error}
-            onRetry={() => void users.refetch()}
-            params={params}
-            onParamsChange={onTableChange}
-            roleName={roleName}
-            onView={setViewing}
-            onEdit={setEditing}
-            onDelete={onDelete}
-            onResetPassword={setResetting}
+      <Flex vertical gap={16}>
+        <AdvancedFilter
+          search={{ value: filters.keyword ?? '', placeholder: 'Tìm theo tên đăng nhập hoặc họ tên', onSearch }}
+          activeCount={activeFilterCount}
+          onReset={resetFilters}
+          activeTags={activeTags}
+        >
+          <FilterSelect<string>
+            placeholder="Vai trò"
+            width={200}
+            value={filters.role}
+            options={(roles.data ?? []).map((r) => ({ value: r.code, label: r.name }))}
+            onChange={(v) => setFilter('role', v)}
           />
-        </Flex>
-      </Card>
+          <ActiveFilter value={filters.active} onChange={(v) => setFilter('active', v)} />
+        </AdvancedFilter>
+        <UserTable
+          data={users.data}
+          loading={users.isFetching}
+          error={users.error}
+          onRetry={() => void users.refetch()}
+          params={params}
+          onParamsChange={onTableChange}
+          roleName={roleName}
+          onView={setViewing}
+          onEdit={setEditing}
+          onDelete={onDelete}
+          onResetPassword={setResetting}
+        />
+      </Flex>
       <UserCreateModal open={creating} onClose={() => setCreating(false)} />
       <UserDetailModal
         open={Boolean(viewing)}

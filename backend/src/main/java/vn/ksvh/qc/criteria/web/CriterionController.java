@@ -87,6 +87,13 @@ public class CriterionController {
         return service.create(req, CurrentUser.from(jwt).id());
     }
 
+    @PostMapping("/criteria/batch")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize(CAN_MANAGE)
+    public List<CriterionResponse> createBatch(@Valid @RequestBody List<CriterionRequest> reqs, @AuthenticationPrincipal Jwt jwt) {
+        return service.createBatch(reqs, CurrentUser.from(jwt).id());
+    }
+
     @PutMapping("/criteria/{id}")
     @PreAuthorize(CAN_MANAGE)
     public CriterionResponse update(@PathVariable Long id, @Valid @RequestBody CriterionRequest req,

@@ -1,7 +1,9 @@
 import { CheckOutlined } from '@ant-design/icons'
-import { Alert, Card, Flex, Input, Table, Tag, Typography, theme } from 'antd'
+import { Alert, Flex, Table, Tag, Typography, theme } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { useMemo, useState } from 'react'
+import { TableCard } from '@/components/data-display/TableCard'
+import { AdvancedFilter } from '@/components/data-entry/AdvancedFilter'
 import { ErrorState } from '@/components/feedback/ErrorState'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { usePermissionCatalog, useRoles } from '@/features/roles/hooks/useRoles'
@@ -71,33 +73,29 @@ export function PermissionListPage() {
 
   return (
     <PageContainer title="Quyền (Permission)" subtitle="Danh mục quyền của hệ thống và vai trò nào đang có quyền đó">
-      <Card>
-        <Flex vertical gap={16}>
-          <Alert
-            type="info"
-            showIcon
-            title="Quyền được định nghĩa trong code (backend kiểm tra bằng @PreAuthorize) nên chỉ xem ở đây. Muốn gán / bỏ quyền cho vai trò, vào trang Vai trò."
-          />
-          <Flex justify="space-between" align="center" wrap="wrap" gap={12}>
-            <Input.Search
-              placeholder="Tìm theo tên quyền, mã code hoặc nhóm module..."
-              allowClear
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              style={{ maxWidth: 380 }}
-            />
+      <Flex vertical gap={16}>
+        <Alert
+          type="info"
+          showIcon
+          title="Quyền được định nghĩa trong code (backend kiểm tra bằng @PreAuthorize) nên chỉ xem ở đây. Muốn gán / bỏ quyền cho vai trò, vào trang Vai trò."
+        />
+        <AdvancedFilter
+          search={{ value: keyword, placeholder: 'Tìm theo tên quyền, mã code hoặc nhóm module...', maxWidth: 380, onSearch: setKeyword }}
+          extra={
             <Typography.Text type="secondary">
               Hiển thị <strong>{filteredList.length}</strong> / {catalog.data?.length ?? 0} quyền
             </Typography.Text>
-          </Flex>
-          {error ? (
-            <ErrorState
-              onRetry={() => {
-                void catalog.refetch()
-                void roles.refetch()
-              }}
-            />
-          ) : (
+          }
+        />
+        {error ? (
+          <ErrorState
+            onRetry={() => {
+              void catalog.refetch()
+              void roles.refetch()
+            }}
+          />
+        ) : (
+          <TableCard>
             <Table<PermissionInfo>
               rowKey="code"
               bordered
@@ -109,9 +107,9 @@ export function PermissionListPage() {
               scroll={{ x: 'max-content' }}
               sticky={{ offsetHeader: 64 }}
             />
-          )}
-        </Flex>
-      </Card>
+          </TableCard>
+        )}
+      </Flex>
     </PageContainer>
   )
 }

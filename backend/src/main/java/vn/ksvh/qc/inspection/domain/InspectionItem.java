@@ -22,6 +22,9 @@ public class InspectionItem {
     @JoinColumn(name = "inspection_id", nullable = false)
     private Inspection inspection;
 
+    @Column(name = "finding_id")
+    private Long findingId;
+
     @Column(name = "criterion_id", nullable = false)
     private Long criterionId;
 

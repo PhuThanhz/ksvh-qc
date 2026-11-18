@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { STALE_CATALOG_MS } from '@/constants/app.constants'
 import { templatesApi } from '@/features/criteria/api/criteria.api'
 import { criteriaKeys } from '@/features/criteria/api/criteria.keys'
 import type { TemplateListParams, TemplatePayload } from '@/features/criteria/criteria.types'
@@ -14,7 +15,12 @@ export function useTemplates(params: TemplateListParams) {
 
 /** Mọi mẫu phiếu (rút gọn, không phân trang) cho ô chọn mẫu. */
 export function useTemplateOptions(enabled = true) {
-  return useQuery({ queryKey: criteriaKeys.templateOptions(), queryFn: templatesApi.options, enabled })
+  return useQuery({
+    queryKey: criteriaKeys.templateOptions(),
+    queryFn: templatesApi.options,
+    enabled,
+    staleTime: STALE_CATALOG_MS,
+  })
 }
 
 export function useTemplate(id: Id | undefined) {

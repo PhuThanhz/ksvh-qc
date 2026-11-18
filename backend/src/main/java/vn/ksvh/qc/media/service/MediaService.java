@@ -20,7 +20,16 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MediaService {
 
-    private static final Map<String, String> EXT = Map.of("image/jpeg", "jpg", "image/png", "png", "image/webp", "webp");
+    private static final Map<String, String> EXT = Map.of(
+            "image/jpeg", "jpg",
+            "image/png", "png",
+            "image/webp", "webp",
+            "video/mp4", "mp4",
+            "video/quicktime", "mov"
+    );
+
+    /** Giới hạn dung lượng video mặc định 50 MB (~60s), chờ KSVH xác nhận */
+    public static final long MAX_VIDEO_BYTES = 52428800L;
 
     private final S3Presigner presigner;
     private final StorageProperties props;
@@ -28,11 +37,17 @@ public class MediaService {
 
     /** Link upload một lần. Object key do server sinh, client không tự đặt đường dẫn. */
     public PresignUploadResponse presignUpload(PresignUploadRequest req, Long userId) {
-        if (req.sizeBytes() > props.maxUploadBytes()) {
-            throw new BusinessException(ErrorCode.PAYLOAD_TOO_LARGE, "Ảnh vượt quá dung lượng cho phép");
+        boolean isVideo = req.contentType() != null && req.contentType().startsWith("video/");
+        long maxBytes = isVideo ? MAX_VIDEO_BYTES : props.maxUploadBytes();
+        if (req.sizeBytes() > maxBytes) {
+            String msg = isVideo
+                    ? "Video vượt quá dung lượng cho phép (tối đa 50MB, ~60 giây, chờ KSVH xác nhận)"
+                    : "Ảnh vượt quá dung lượng cho phép (tối đa 10MB)";
+            throw new BusinessException(ErrorCode.PAYLOAD_TOO_LARGE, msg);
         }
         LocalDate today = LocalDate.ofInstant(clock.instant(), ZoneOffset.UTC);
-        String key = "photos/%d/%02d/u%d/%s.%s".formatted(today.getYear(), today.getMonthValue(), userId,
+        String folder = isVideo ? "videos" : "photos";
+        String key = "%s/%d/%02d/u%d/%s.%s".formatted(folder, today.getYear(), today.getMonthValue(), userId,
                 UUID.randomUUID(), EXT.get(req.contentType()));
 
         PutObjectRequest put = PutObjectRequest.builder()

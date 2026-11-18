@@ -13,4 +13,7 @@ public interface EscalationRuleRepository extends JpaRepository<EscalationRule, 
     boolean existsByEffectiveFrom(LocalDate date);
 
     Optional<EscalationRule> findFirstByEffectiveFromLessThanEqualOrderByEffectiveFromDesc(LocalDate date);
+
+    /** Phiên bản có hiệu lực ngay trước ngày date (không tính bản đúng ngày date). */
+    Optional<EscalationRule> findFirstByEffectiveFromLessThanOrderByEffectiveFromDesc(LocalDate date);
 }

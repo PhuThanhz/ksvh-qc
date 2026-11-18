@@ -21,4 +21,8 @@ public record RiskRules(FrequencyRule frequency, EscalationRule escalation, List
     public RiskAssessment assess(int baseImpact, List<LocalDate> previous, LocalDate at) {
         return RiskCalculator.assess(baseImpact, previous, at, frequency, escalation, bands);
     }
+
+    public CurrentCriterionRisk evaluateCurrentRisk(int baseImpact, List<LocalDate> occurrences, LocalDate asOfDate) {
+        return RiskCalculator.evaluateCurrentRisk(baseImpact, occurrences, asOfDate, frequency, escalation, bands);
+    }
 }

@@ -19,13 +19,11 @@ export function PageContainer({ title, subtitle, extra, children }: PageContaine
     <Flex vertical gap={12}>
       <div
         style={{
-          background: 'rgba(255, 255, 255, 0.82)',
-          backdropFilter: 'blur(20px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-          borderRadius: 14,
-          padding: '12px 20px',
-          boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.02)',
-          border: '1px solid rgba(255, 255, 255, 0.65)',
+          background: 'var(--app-surface)',
+          borderRadius: 10,
+          padding: '14px 20px',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+          border: '1px solid var(--app-border)',
         }}
       >
         <Flex justify="space-between" align="center" gap={12} wrap>
@@ -34,7 +32,7 @@ export function PageContainer({ title, subtitle, extra, children }: PageContaine
               level={4}
               style={{
                 margin: 0,
-                color: '#0f172a',
+                color: 'var(--app-text)',
                 fontWeight: 700,
                 letterSpacing: '-0.015em',
                 fontSize: 18,
@@ -45,7 +43,7 @@ export function PageContainer({ title, subtitle, extra, children }: PageContaine
             {subtitle && (
               <Typography.Text
                 style={{
-                  color: '#64748b',
+                  color: 'var(--app-text-secondary)',
                   fontSize: 13,
                   marginTop: 2,
                   display: 'block',
@@ -55,7 +53,11 @@ export function PageContainer({ title, subtitle, extra, children }: PageContaine
               </Typography.Text>
             )}
           </div>
-          {extra}
+          {extra && (
+            <Flex align="center" gap={8} wrap style={{ maxWidth: '100%' }}>
+              {extra}
+            </Flex>
+          )}
         </Flex>
       </div>
       {children}

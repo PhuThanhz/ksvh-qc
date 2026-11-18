@@ -19,15 +19,15 @@ export function SeverityTag({ code, name, index, total }: SeverityTagProps) {
         gap: 6,
         padding: '2px 10px 2px 8px',
         borderRadius: 999,
-        border: '1px solid #e5e4df',
-        background: '#fff',
+        border: '1px solid var(--app-border)',
+        background: 'var(--app-surface)',
         fontSize: 12.5,
         whiteSpace: 'nowrap',
       }}
     >
       <span style={{ width: 8, height: 8, borderRadius: 999, background: color }} />
       <b>{code}</b>
-      {name && <span style={{ color: '#52514e' }}>{name}</span>}
+      {name && <span style={{ color: 'var(--app-text-body)' }}>{name}</span>}
     </span>
   )
 }

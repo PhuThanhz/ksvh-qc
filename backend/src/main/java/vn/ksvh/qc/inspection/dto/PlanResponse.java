@@ -4,6 +4,7 @@ import vn.ksvh.qc.inspection.domain.InspectionPlan;
 import vn.ksvh.qc.inspection.domain.PlanStatus;
 
 import java.time.Instant;
+import java.util.List;
 import java.time.LocalDate;
 
 public record PlanResponse(
@@ -21,9 +22,13 @@ public record PlanResponse(
         String approvedByName,
         Instant approvedAt,
         Instant createdAt,
-        Instant updatedAt
+        Instant updatedAt,
+        int assignmentCount,
+        /** Chi tiết phân công: chỉ trả ở API xem chi tiết; danh sách để rỗng. */
+        List<PlanAssignmentResponse> assignments
 ) {
-    public static PlanResponse from(InspectionPlan p, String createdByName, String approvedByName) {
+    public static PlanResponse from(InspectionPlan p, String createdByName, String approvedByName,
+                                    int assignmentCount, List<PlanAssignmentResponse> assignments) {
         return new PlanResponse(
                 p.getId(),
                 p.getPlanCode(),
@@ -39,7 +44,9 @@ public record PlanResponse(
                 approvedByName,
                 p.getApprovedAt(),
                 p.getCreatedAt(),
-                p.getUpdatedAt()
+                p.getUpdatedAt(),
+                assignmentCount,
+                assignments
         );
     }
 }

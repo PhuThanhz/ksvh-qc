@@ -105,4 +105,7 @@ public class Finding extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "appeal_conclusion", length = 30)
     private AppealConclusion appealConclusion;
+
+    @Column(name = "appeal_round", nullable = false)
+    private int appealRound = 1;
 }

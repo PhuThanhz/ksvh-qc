@@ -93,6 +93,7 @@ export function GroupFormModal({ open, group, nextOrder, onClose }: GroupFormMod
           label="Công ty áp dụng"
           placeholder="Dùng chung toàn hệ thống (mọi công ty)"
           allowClear
+          showSearch={{ optionFilterProp: 'label' }}
           options={companyOptions}
           loading={companies.isLoading}
           extra="Để trống nếu nhóm này dùng chung cho toàn bộ các công ty trong hệ thống"

@@ -80,7 +80,14 @@ public class UserService {
         user.setActive(req.active());
         user.getRoles().addAll(resolveRoles(req.roles()));
         user.setUpdatedBy(actorId);
-        return UserResponse.from(userRepository.saveAndFlush(user));
+        User saved = userRepository.saveAndFlush(user);
+        if (events != null) {
+            events.publishEvent(vn.ksvh.qc.shared.audit.AuditLogEvent.of(
+                    actorId, "USER_CREATE", "USER", saved.getUsername(),
+                    "Tạo tài khoản người dùng " + saved.getFullName() + " (" + saved.getUsername() + ")"
+            ));
+        }
+        return UserResponse.from(saved);
     }
 
     @Transactional
@@ -109,6 +116,12 @@ public class UserService {
         if (deactivated) {
             events.publishEvent(new UserSessionsInvalidated(id));
         }
+        if (events != null) {
+            events.publishEvent(vn.ksvh.qc.shared.audit.AuditLogEvent.of(
+                    actorId, "USER_UPDATE", "USER", saved.getUsername(),
+                    "Cập nhật tài khoản " + saved.getFullName() + " (" + saved.getUsername() + ", active=" + saved.isActive() + ")"
+            ));
+        }
         return UserResponse.from(saved);
     }
 
@@ -120,6 +133,12 @@ public class UserService {
         user.setUpdatedBy(actorId);
         userRepository.saveAndFlush(user);
         events.publishEvent(new UserSessionsInvalidated(id));
+        if (events != null) {
+            events.publishEvent(vn.ksvh.qc.shared.audit.AuditLogEvent.of(
+                    actorId, "USER_RESET_PASSWORD", "USER", user.getUsername(),
+                    "Đặt lại mật khẩu cho tài khoản " + user.getUsername()
+            ));
+        }
     }
 
     @Transactional
@@ -134,6 +153,12 @@ public class UserService {
         }
         events.publishEvent(new UserSessionsInvalidated(id));
         userRepository.delete(user);
+        if (events != null) {
+            events.publishEvent(vn.ksvh.qc.shared.audit.AuditLogEvent.of(
+                    actorId, "USER_DELETE", "USER", user.getUsername(),
+                    "Xoá tài khoản " + user.getFullName() + " (" + user.getUsername() + ")"
+            ));
+        }
     }
 
     private Set<Role> resolveRoles(Set<String> codes) {

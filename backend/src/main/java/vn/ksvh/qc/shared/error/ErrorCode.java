@@ -13,6 +13,7 @@ public enum ErrorCode {
     AUTH_INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED),
     AUTH_SESSION_EXPIRED(HttpStatus.UNAUTHORIZED),
     AUTH_CSRF_REJECTED(HttpStatus.FORBIDDEN),
+    AUTH_ACCOUNT_LOCKED(HttpStatus.TOO_MANY_REQUESTS),
     ACCESS_DENIED(HttpStatus.FORBIDDEN),
     NOT_FOUND(HttpStatus.NOT_FOUND),
     CONFLICT(HttpStatus.CONFLICT),
@@ -48,6 +49,10 @@ public enum ErrorCode {
     FINDING_INVALID_STATE(HttpStatus.CONFLICT),
     CONFIG_EFFECTIVE_DATE_INVALID(HttpStatus.BAD_REQUEST),
     CONFIG_ALREADY_EFFECTIVE(HttpStatus.BAD_REQUEST),
+    /** Phiên bản cấu hình mới giống hệt phiên bản có hiệu lực ngay trước nó (không thay đổi gì). */
+    CONFIG_UNCHANGED(HttpStatus.BAD_REQUEST),
+    /** Ảnh bằng chứng không do server cấp key, không phải của người gửi, hoặc không tồn tại trên kho. */
+    EVIDENCE_INVALID(HttpStatus.BAD_REQUEST),
     INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final HttpStatus status;

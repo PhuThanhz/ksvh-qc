@@ -24,15 +24,17 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokens;
+    private final LoginAttemptService loginAttempts;
     /** Hash thật của chuỗi ngẫu nhiên: so với nó khi user không tồn tại để thời gian phản hồi như nhau. */
     private final String dummyHash;
 
     public AuthService(UserAccountApi users, PasswordEncoder passwordEncoder, JwtService jwtService,
-                       RefreshTokenService refreshTokens) {
+                       RefreshTokenService refreshTokens, LoginAttemptService loginAttempts) {
         this.users = users;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.refreshTokens = refreshTokens;
+        this.loginAttempts = loginAttempts;
         this.dummyHash = passwordEncoder.encode(UUID.randomUUID().toString());
     }
 
@@ -42,6 +44,9 @@ public class AuthService {
 
     @Transactional
     public AuthResult login(String username, String password, ClientInfo client) {
+        String ip = client != null ? client.ipAddress() : null;
+        loginAttempts.checkAllowed(username, ip);
+
         UserAccount account = users.findByUsername(username.trim()).orElse(null);
         String hash = account != null ? account.passwordHash() : dummyHash;
         boolean matches = passwordEncoder.matches(password, hash);
@@ -50,8 +55,10 @@ public class AuthService {
             matches = passwordEncoder.matches(capitalized, hash);
         }
         if (account == null || !matches || !account.active()) {
+            loginAttempts.recordFailure(username, ip);
             throw new BusinessException(ErrorCode.AUTH_INVALID_CREDENTIALS, INVALID);
         }
+        loginAttempts.recordSuccess(username, ip);
         RefreshTokenService.Issued issued = refreshTokens.issueNewFamily(account.id(), client);
         return new AuthResult(session(account), issued.rawToken());
     }

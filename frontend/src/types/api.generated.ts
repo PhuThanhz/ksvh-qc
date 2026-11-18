@@ -68,6 +68,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/notifications/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lấy cấu hình kênh nhận thông báo của người dùng hiện tại */
+        get: operations["getPreferences"];
+        /** Cập nhật cấu hình kênh nhận thông báo của người dùng hiện tại */
+        put: operations["updatePreferences"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/inspection-templates/{id}": {
         parameters: {
             query?: never;
@@ -260,6 +278,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/notifications/{id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Đánh dấu thông báo đã đọc */
+        post: operations["markAsRead"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/read-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Đánh dấu tất cả thông báo của tôi là đã đọc */
+        post: operations["markAllAsRead"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/media/presign-upload": {
         parameters: {
             query?: never;
@@ -334,6 +386,38 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspections/{id}/acknowledge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["acknowledge"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspections/batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createBatch"];
         delete?: never;
         options?: never;
         head?: never;
@@ -548,6 +632,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/findings/{id}/appeal-reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["submitAppealReview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/escalation-rules": {
         parameters: {
             query?: never;
@@ -638,6 +738,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["importCriteria"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/criteria/batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createBatch_1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -756,6 +872,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/risk/escalated-criteria": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Danh sách toàn bộ các tiêu chí đang bị nâng mức rủi ro trên toàn hệ thống */
+        get: operations["getEscalatedCriteria"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/risk-levels/versions": {
         parameters: {
             query?: never;
@@ -772,6 +905,193 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/restaurants/{restaurantId}/risk-profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Xem hồ sơ rủi ro chi tiết của nhà hàng (tần suất trong kỳ, mức hiệu lực, ngày dự kiến hạ mức) */
+        get: operations["getRestaurantRiskProfile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/restaurant-rankings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Báo cáo xếp hạng nhà hàng theo điểm rủi ro và tỷ lệ tuân thủ */
+        get: operations["restaurantRankings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/restaurant-rankings/export-excel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Xuất Excel báo cáo xếp hạng nhà hàng */
+        get: operations["exportRestaurantRankingsExcel"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/remediations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Báo cáo tình trạng khắc phục: đúng hạn, quá hạn, đang mở theo nhà hàng và CHT */
+        get: operations["remediations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/remediations/export-excel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Xuất Excel báo cáo tình trạng khắc phục lỗi */
+        get: operations["exportRemediationsExcel"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/monthly-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Báo cáo tổng hợp phiếu chấm theo tháng (số phiếu, % tuân thủ, lỗi M1-M4) */
+        get: operations["monthlySummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/monthly-summary/export-excel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Xuất Excel báo cáo tổng hợp phiếu chấm theo tháng */
+        get: operations["exportMonthlySummaryExcel"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/inspector-productivity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Báo cáo năng suất chuyên viên KSVH: số phiếu, thời gian chấm, số lỗi phát hiện */
+        get: operations["inspectorProductivity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/inspector-productivity/export-excel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Xuất Excel báo cáo năng suất chuyên viên */
+        get: operations["exportInspectorProductivityExcel"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/inspections/{id}/export-pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Xuất PDF phiếu kiểm tra đầy đủ (kèm checkin GPS, kết quả từng tiêu chí và lỗi phát hiện) */
+        get: operations["exportInspectionPdf"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/findings/{id}/export-m4-pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Xuất PDF biên bản ghi nhận sự cố / vi phạm đặc biệt nghiêm trọng M4 */
+        get: operations["exportM4FindingPdf"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/reports/dashboard": {
         parameters: {
             query?: never;
@@ -780,6 +1100,40 @@ export interface paths {
             cookie?: never;
         };
         get: operations["dashboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/criteria-violations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Báo cáo phân tích lỗi vi phạm theo tiêu chí và nhóm tiêu chí (Pareto) */
+        get: operations["criteriaViolations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/criteria-violations/export-excel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Xuất Excel báo cáo lỗi theo tiêu chí */
+        get: operations["exportCriteriaViolationsExcel"];
         put?: never;
         post?: never;
         delete?: never;
@@ -836,6 +1190,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Danh sách thông báo của người dùng hiện tại (phân trang) */
+        get: operations["getMyNotifications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Đếm số thông báo chưa đọc của người dùng hiện tại */
+        get: operations["getUnreadCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/inspections/{id}": {
         parameters: {
             query?: never;
@@ -860,6 +1248,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["getItems"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspections/surprise-suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getSurpriseSuggestions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -932,6 +1336,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/inspection-plans/restaurant-warnings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getRestaurantWarning"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/findings": {
         parameters: {
             query?: never;
@@ -956,6 +1376,54 @@ export interface paths {
             cookie?: never;
         };
         get: operations["get_9"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/findings/{id}/candidate-reviewers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getCandidateReviewers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/findings/verification-candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getVerificationCandidates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/findings/pending-reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getPendingReviews"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1052,6 +1520,74 @@ export interface paths {
             cookie?: never;
         };
         get: operations["me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit-logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Tìm kiếm nhật ký hệ thống phân trang */
+        get: operations["search_9"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit-logs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Xem chi tiết một bản ghi nhật ký */
+        get: operations["get_10"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit-logs/target-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Danh sách các loại đối tượng bị tác động */
+        get: operations["getTargetTypes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit-logs/actions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Danh sách các loại thao tác đã ghi nhận */
+        get: operations["getActions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1225,6 +1761,23 @@ export interface components {
             username: string;
             fullName: string;
         };
+        NotificationPreferenceRequest: {
+            emailEnabled: boolean;
+            zaloEnabled: boolean;
+            /** Format: email */
+            customEmail: string;
+            customPhone: string;
+        };
+        NotificationPreferenceResponse: {
+            /** Format: int64 */
+            userId: number;
+            emailEnabled: boolean;
+            zaloEnabled: boolean;
+            customEmail: string;
+            customPhone: string;
+            resolvedEmail: string;
+            resolvedPhone: string;
+        };
         TemplateRequest: {
             code: string;
             name: string;
@@ -1279,6 +1832,16 @@ export interface components {
             updatedAt: string;
             criteria: components["schemas"]["CriterionResponse"][];
         };
+        PlanAssignmentRequest: {
+            /** Format: int64 */
+            restaurantId: number;
+            /** Format: int64 */
+            inspectorId: number;
+            /** Format: int64 */
+            templateId: number;
+            /** Format: date */
+            scheduledDate: string;
+        };
         PlanUpdateRequest: {
             title: string;
             /** Format: date */
@@ -1286,6 +1849,30 @@ export interface components {
             /** Format: date */
             endDate: string;
             notes?: string;
+            assignments?: components["schemas"]["PlanAssignmentRequest"][];
+        };
+        PlanAssignmentResponse: {
+            /** Format: int64 */
+            id: number;
+            /** Format: int64 */
+            restaurantId: number;
+            restaurantCode: string;
+            restaurantName: string;
+            /** Format: int64 */
+            inspectorId: number;
+            inspectorName: string;
+            /** Format: int64 */
+            templateId: number;
+            templateName: string;
+            /** Format: date */
+            scheduledDate: string;
+            /** Format: int64 */
+            inspectionId: number | null;
+            inspectionCode: string | null;
+            /** @enum {string|null} */
+            inspectionStatus: "ASSIGNED" | "IN_PROGRESS" | "SUBMITTED" | "AWAITING_ACK" | "COMPLETED" | "CANCELLED" | null;
+            /** Format: int32 */
+            priorUnresolvedCount: number;
         };
         PlanResponse: {
             /** Format: int64 */
@@ -1312,6 +1899,9 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+            /** Format: int32 */
+            assignmentCount: number;
+            assignments: components["schemas"]["PlanAssignmentResponse"][];
         };
         EmployeeRequest: {
             employeeCode: string;
@@ -1426,6 +2016,20 @@ export interface components {
             column: string | null;
             message: string;
         };
+        NotificationResponse: {
+            /** Format: int64 */
+            id: number;
+            /** @enum {string} */
+            type: "PLAN_SUBMITTED" | "PLAN_APPROVED" | "PLAN_REJECTED" | "INSPECTION_ASSIGNED" | "INSPECTION_SUBMITTED" | "FINDING_APPEALED" | "APPEAL_MEETING_REQUIRED" | "FINDING_APPEAL_CONCLUDED" | "REMEDIATION_SUBMITTED" | "FINDING_VERIFIED" | "FINDING_REMINDER_DUE" | "FINDING_OVERDUE" | "FINDING_M4_ALERT" | "SYSTEM";
+            title: string;
+            body: string;
+            link: string;
+            /** Format: date-time */
+            readAt: string;
+            read: boolean;
+            /** Format: date-time */
+            createdAt: string;
+        };
         PresignUploadRequest: {
             contentType: string;
             /** Format: int64 */
@@ -1448,11 +2052,12 @@ export interface components {
             /** Format: int64 */
             inspectorId: number;
             /** @enum {string} */
-            inspectionType: "PERIODIC" | "SURPRISE";
+            inspectionType: "PERIODIC" | "SURPRISE" | "VERIFICATION";
             /** @enum {string} */
             inspectionMode?: "ON_SITE" | "REMOTE";
             topicGroupIds?: number[];
             notes?: string;
+            findingIds?: number[];
         };
         InspectionItemResponse: {
             /** Format: int64 */
@@ -1472,6 +2077,12 @@ export interface components {
             sortOrder: number;
             /** Format: date-time */
             evaluatedAt: string;
+            /** Format: int64 */
+            findingId: number;
+            findingDescription: string;
+            findingEvidenceUrls: string;
+            remediationPlan: string;
+            remediationEvidenceUrls: string;
         };
         InspectionResponse: {
             /** Format: int64 */
@@ -1489,14 +2100,14 @@ export interface components {
             inspectorId: number;
             inspectorName: string;
             /** @enum {string} */
-            inspectionType: "PERIODIC" | "SURPRISE";
+            inspectionType: "PERIODIC" | "SURPRISE" | "VERIFICATION";
             /** @enum {string} */
             inspectionMode: "ON_SITE" | "REMOTE";
             /** @enum {string|null} */
             locationStatus: "VERIFIED" | "OUTSIDE_RADIUS" | "UNVERIFIED" | "REMOTE" | null;
             topicNames: string[];
             /** @enum {string} */
-            status: "ASSIGNED" | "IN_PROGRESS" | "SUBMITTED" | "COMPLETED" | "CANCELLED";
+            status: "ASSIGNED" | "IN_PROGRESS" | "SUBMITTED" | "AWAITING_ACK" | "COMPLETED" | "CANCELLED";
             cancelReason: string;
             /** Format: double */
             checkinLat: number;
@@ -1510,6 +2121,8 @@ export interface components {
             submittedAt: string;
             /** Format: date-time */
             completedAt: string;
+            /** Format: date-time */
+            acknowledgedAt: string | null;
             /** Format: int32 */
             totalCriteria: number;
             /** Format: int32 */
@@ -1529,11 +2142,15 @@ export interface components {
         };
         InspectionSubmitItemRequest: {
             /** Format: int64 */
+            itemId?: number;
+            /** Format: int64 */
             criterionId: number;
             /** @enum {string} */
             result: "UNRATED" | "PASS" | "FAIL" | "NA";
             comment?: string;
             evidenceUrls?: string;
+            /** Format: int64 */
+            findingId?: number;
         };
         InspectionSubmitRequest: {
             items: components["schemas"]["InspectionSubmitItemRequest"][];
@@ -1548,6 +2165,22 @@ export interface components {
         InspectionCancelRequest: {
             reason: string;
         };
+        InspectionBatchCreateRequest: {
+            codePrefix: string;
+            /** Format: int64 */
+            planId?: number;
+            restaurantIds: number[];
+            /** Format: int64 */
+            templateId?: number;
+            /** Format: int64 */
+            inspectorId: number;
+            /** @enum {string} */
+            inspectionType: "PERIODIC" | "SURPRISE" | "VERIFICATION";
+            /** @enum {string} */
+            inspectionMode?: "ON_SITE" | "REMOTE";
+            topicGroupIds?: number[];
+            notes?: string;
+        };
         PlanCreateRequest: {
             planCode: string;
             title: string;
@@ -1556,6 +2189,7 @@ export interface components {
             /** Format: date */
             endDate: string;
             notes?: string;
+            assignments?: components["schemas"]["PlanAssignmentRequest"][];
         };
         PlanRejectRequest: {
             reason: string;
@@ -1585,15 +2219,34 @@ export interface components {
             passed: boolean;
             comment?: string;
         };
+        AppealReviewResponse: {
+            /** Format: int64 */
+            id: number;
+            /** Format: int64 */
+            findingId: number;
+            /** Format: int64 */
+            reviewerId: number;
+            reviewerName: string;
+            ksvhRep: boolean;
+            /** @enum {string} */
+            verdict: "PENDING" | "FINDING_VALID" | "FINDING_INVALID";
+            comment: string | null;
+            /** Format: date-time */
+            reviewedAt: string | null;
+            /** Format: int32 */
+            appealRound: number;
+            /** Format: date-time */
+            createdAt: string;
+        };
         FindingEventResponse: {
             /** Format: int64 */
             id: number;
             /** @enum {string} */
-            action: "CREATED" | "CONFIRMED" | "APPEALED" | "APPEAL_UPHELD" | "APPEAL_DISMISSED" | "REMEDIATION_PLANNED" | "REMEDIATION_SUBMITTED" | "VERIFY_PASSED" | "VERIFY_FAILED";
+            action: "CREATED" | "CONFIRMED" | "APPEALED" | "APPEAL_REVIEWED" | "APPEAL_MEETING" | "APPEAL_UPHELD" | "APPEAL_DISMISSED" | "REMEDIATION_PLANNED" | "REMEDIATION_SUBMITTED" | "VERIFY_PASSED" | "VERIFY_FAILED" | "OVERDUE";
             /** @enum {string} */
-            fromStatus: "OPEN" | "CONFIRMED" | "APPEALED" | "REMEDIATING" | "PENDING_VERIFICATION" | "CLOSED" | "DISMISSED";
+            fromStatus: "OPEN" | "CONFIRMED" | "APPEALED" | "APPEAL_MEETING" | "REMEDIATING" | "PENDING_VERIFICATION" | "CLOSED" | "DISMISSED";
             /** @enum {string} */
-            toStatus: "OPEN" | "CONFIRMED" | "APPEALED" | "REMEDIATING" | "PENDING_VERIFICATION" | "CLOSED" | "DISMISSED";
+            toStatus: "OPEN" | "CONFIRMED" | "APPEALED" | "APPEAL_MEETING" | "REMEDIATING" | "PENDING_VERIFICATION" | "CLOSED" | "DISMISSED";
             /** Format: int64 */
             actorId: number;
             actorName: string;
@@ -1631,7 +2284,7 @@ export interface components {
             /** Format: date */
             deadlineDate: string;
             /** @enum {string} */
-            status: "OPEN" | "CONFIRMED" | "APPEALED" | "REMEDIATING" | "PENDING_VERIFICATION" | "CLOSED" | "DISMISSED";
+            status: "OPEN" | "CONFIRMED" | "APPEALED" | "APPEAL_MEETING" | "REMEDIATING" | "PENDING_VERIFICATION" | "CLOSED" | "DISMISSED";
             description: string;
             evidenceUrls: string;
             remediationPlan: string;
@@ -1657,6 +2310,9 @@ export interface components {
             appealConclusion: "UPHELD" | "DISMISSED";
             /** Format: date-time */
             createdAt: string;
+            /** Format: int32 */
+            appealRound: number;
+            appealReviews: components["schemas"]["AppealReviewResponse"][];
             history: components["schemas"]["FindingEventResponse"][];
         };
         FindingSubmitRemediationRequest: {
@@ -1670,10 +2326,17 @@ export interface components {
         FindingConcludeAppealRequest: {
             /** @enum {string} */
             conclusion: "UPHELD" | "DISMISSED";
+            meetingNotes?: string;
         };
         FindingAppealRequest: {
             appealReason: string;
             appealEvidenceUrls?: string;
+            reviewerIds: number[];
+        };
+        AppealReviewRequest: {
+            /** @enum {string} */
+            verdict: "PENDING" | "FINDING_VALID" | "FINDING_INVALID";
+            comment?: string;
         };
         EscalationRuleRequest: {
             /** Format: int32 */
@@ -1768,6 +2431,197 @@ export interface components {
             /** Format: int32 */
             remediationDays: number | null;
         };
+        EscalatedCriterionSummary: {
+            /** Format: int64 */
+            restaurantId: number;
+            restaurantCode: string;
+            restaurantName: string;
+            companyName: string;
+            /** Format: int64 */
+            criterionId: number;
+            criterionCode: string;
+            criterionName: string;
+            groupName: string;
+            /** Format: int32 */
+            baseImpact: number;
+            /** Format: int32 */
+            effectiveImpact: number;
+            /** Format: int32 */
+            frequencyInPeriod: number;
+            /** Format: date */
+            lastViolationDate: string;
+            /** Format: date */
+            expectedResetDate: string;
+            /** Format: int64 */
+            cleanMonthsCount: number;
+        };
+        CriterionRiskProfileItem: {
+            /** Format: int64 */
+            criterionId: number;
+            criterionCode: string;
+            criterionName: string;
+            groupName: string;
+            /** Format: int32 */
+            baseImpact: number;
+            /** Format: int32 */
+            effectiveImpact: number;
+            isEscalated: boolean;
+            /** Format: int32 */
+            frequencyInPeriod: number;
+            /** Format: int32 */
+            totalHistoricalViolations: number;
+            /** Format: date */
+            lastViolationDate: string;
+            /** Format: date */
+            expectedResetDate: string;
+            /** Format: int64 */
+            cleanMonthsCount: number;
+            /** Format: int64 */
+            openFindingsCount: number;
+            occurrences: components["schemas"]["OccurrenceSummary"][];
+        };
+        OccurrenceSummary: {
+            /** Format: date */
+            occurredAt: string;
+            source: string;
+            /** Format: int64 */
+            findingId: number;
+        };
+        RestaurantRiskProfileResponse: {
+            /** Format: int64 */
+            restaurantId: number;
+            restaurantCode: string;
+            restaurantName: string;
+            companyName: string;
+            storeManagerName: string;
+            /** Format: date */
+            asOfDate: string;
+            /** Format: int32 */
+            periodMonths: number;
+            /** Format: date */
+            periodStart: string;
+            /** Format: int32 */
+            resetPeriodMonths: number;
+            /** Format: int32 */
+            totalEscalatedCriteria: number;
+            /** Format: int32 */
+            totalActiveFindings: number;
+            criteria: components["schemas"]["CriterionRiskProfileItem"][];
+        };
+        ReportFilter: {
+            /** Format: date */
+            from: string;
+            /** Format: date */
+            to: string;
+            /** Format: int64 */
+            companyId: number;
+            /** Format: int64 */
+            restaurantId: number;
+            /** Format: int64 */
+            inspectorId: number;
+            /** Format: int64 */
+            groupId: number;
+        };
+        RestaurantRankingItem: {
+            /** Format: int64 */
+            restaurantId: number;
+            restaurantCode: string;
+            restaurantName: string;
+            companyName: string;
+            storeManagerName: string;
+            /** Format: int64 */
+            inspectionCount: number;
+            /** Format: double */
+            averageScore: number;
+            /** Format: double */
+            complianceRate: number;
+            /** Format: int64 */
+            openFindingsCount: number;
+            /** Format: int64 */
+            m1Count: number;
+            /** Format: int64 */
+            m2Count: number;
+            /** Format: int64 */
+            m3Count: number;
+            /** Format: int64 */
+            m4Count: number;
+            rankCategory: string;
+        };
+        RestaurantRankingReportResponse: {
+            items: components["schemas"]["RestaurantRankingItem"][];
+        };
+        RemediationStatusItem: {
+            /** Format: int64 */
+            restaurantId: number;
+            restaurantCode: string;
+            restaurantName: string;
+            companyName: string;
+            storeManagerName: string;
+            /** Format: int64 */
+            totalFindings: number;
+            /** Format: int64 */
+            resolvedOnTimeCount: number;
+            /** Format: int64 */
+            resolvedOverdueCount: number;
+            /** Format: int64 */
+            overdueOpenCount: number;
+            /** Format: int64 */
+            inProgressCount: number;
+            /** Format: double */
+            onTimeRate: number;
+        };
+        RemediationStatusReportResponse: {
+            items: components["schemas"]["RemediationStatusItem"][];
+            summary: components["schemas"]["RemediationStatusItem"];
+        };
+        MonthlySummaryItem: {
+            month: string;
+            /** Format: int64 */
+            totalInspections: number;
+            /** Format: int64 */
+            periodicCount: number;
+            /** Format: int64 */
+            adHocCount: number;
+            /** Format: int64 */
+            completedCount: number;
+            /** Format: double */
+            complianceRate: number;
+            /** Format: int64 */
+            totalFindings: number;
+            /** Format: int64 */
+            m1Count: number;
+            /** Format: int64 */
+            m2Count: number;
+            /** Format: int64 */
+            m3Count: number;
+            /** Format: int64 */
+            m4Count: number;
+        };
+        MonthlySummaryReportResponse: {
+            items: components["schemas"]["MonthlySummaryItem"][];
+            summary: components["schemas"]["MonthlySummaryItem"];
+        };
+        InspectorProductivityItem: {
+            /** Format: int64 */
+            inspectorId: number;
+            inspectorUsername: string;
+            inspectorFullName: string;
+            /** Format: int64 */
+            totalAssigned: number;
+            /** Format: int64 */
+            completedInspections: number;
+            /** Format: double */
+            avgDurationMinutes: number;
+            /** Format: int64 */
+            totalFindingsFound: number;
+            /** Format: int64 */
+            m3m4Count: number;
+            /** Format: double */
+            avgFindingsPerInspection: number;
+        };
+        InspectorProductivityReportResponse: {
+            items: components["schemas"]["InspectorProductivityItem"][];
+        };
         CountItem: {
             key: string;
             label: string;
@@ -1781,28 +2635,20 @@ export interface components {
             findingsByStatus: components["schemas"]["CountItem"][];
             topRestaurants: components["schemas"]["RestaurantRisk"][];
             topCriteria: components["schemas"]["CountItem"][];
-            restaurantCompliance?: components["schemas"]["RestaurantCompliance"][];
-        };
-        RestaurantCompliance: {
-            /** Format: int64 */
-            id: number;
-            code: string;
-            name: string;
-            complianceScore: number | null;
-            attention: boolean;
+            restaurantCompliance: components["schemas"]["RestaurantCompliance"][];
         };
         Kpis: {
-            complianceRate?: number | null;
+            complianceRate: number | null;
             /** Format: int64 */
-            highRiskFindings?: number;
+            openFindings: number;
+            /** Format: int64 */
+            highRiskFindings: number;
             /** Format: int64 */
             inspectionsThisMonth: number;
             /** Format: int64 */
             inspectionsLastMonth: number;
             /** Format: int64 */
             restaurantsInspectedThisMonth: number;
-            /** Format: int64 */
-            openFindings: number;
             /** Format: int64 */
             overdueFindings: number;
             onTimeRate: number | null;
@@ -1814,6 +2660,14 @@ export interface components {
             /** Format: int64 */
             findings: number;
         };
+        RestaurantCompliance: {
+            /** Format: int64 */
+            id: number;
+            code: string;
+            name: string;
+            complianceScore: number | null;
+            attention: boolean;
+        };
         RestaurantRisk: {
             /** Format: int64 */
             id: number;
@@ -1823,6 +2677,32 @@ export interface components {
             openFindings: number;
             /** Format: int64 */
             riskScore: number;
+        };
+        CriteriaViolationItem: {
+            /** Format: int64 */
+            criterionId: number;
+            criterionCode: string;
+            criterionName: string;
+            groupName: string;
+            /** Format: int32 */
+            baseImpact: number;
+            /** Format: int64 */
+            violationCount: number;
+            /** Format: int64 */
+            restaurantCount: number;
+            /** Format: int64 */
+            repeatCount: number;
+            /** Format: int64 */
+            openCount: number;
+            /** Format: int64 */
+            closedCount: number;
+            /** Format: double */
+            paretoPercentage: number;
+        };
+        CriteriaViolationReportResponse: {
+            items: components["schemas"]["CriteriaViolationItem"][];
+            /** Format: int64 */
+            totalViolations: number;
         };
         PermissionResponse: {
             code: string;
@@ -1841,6 +2721,28 @@ export interface components {
             /** Format: int32 */
             totalPages: number;
         };
+        Pageable: {
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            size: number;
+            sort: string[];
+        };
+        PageResponseNotificationResponse: {
+            items: components["schemas"]["NotificationResponse"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            size: number;
+            /** Format: int64 */
+            totalItems: number;
+            /** Format: int32 */
+            totalPages: number;
+        };
+        UnreadCountResponse: {
+            /** Format: int64 */
+            unreadCount: number;
+        };
         PageResponseInspectionResponse: {
             items: components["schemas"]["InspectionResponse"][];
             /** Format: int32 */
@@ -1851,6 +2753,29 @@ export interface components {
             totalItems: number;
             /** Format: int32 */
             totalPages: number;
+        };
+        SurpriseInspectionSuggestion: {
+            /** Format: int64 */
+            restaurantId: number;
+            restaurantCode: string;
+            restaurantName: string;
+            /** Format: int64 */
+            companyId: number;
+            companyName: string;
+            /** Format: int32 */
+            totalRiskScore: number;
+            highestRiskLevel: string;
+            /** Format: int32 */
+            m4Count: number;
+            /** Format: int32 */
+            m3Count: number;
+            /** Format: int32 */
+            openFindingCount: number;
+            /** Format: int32 */
+            escalatedCriteriaCount: number;
+            primaryReason: string;
+            suggestedTopicGroupIds: number[];
+            suggestedTopicGroupNames: string[];
         };
         PageResponseTemplateResponse: {
             items: components["schemas"]["TemplateResponse"][];
@@ -1883,6 +2808,17 @@ export interface components {
             /** Format: int32 */
             totalPages: number;
         };
+        PriorFindingsWarning: {
+            /** Format: int64 */
+            restaurantId: number;
+            restaurantCode: string;
+            restaurantName: string;
+            /** Format: int32 */
+            unverifiedCount: number;
+            /** Format: int32 */
+            totalUnresolvedCount: number;
+            warningDetails: string[];
+        };
         PageResponseFindingResponse: {
             items: components["schemas"]["FindingResponse"][];
             /** Format: int32 */
@@ -1893,6 +2829,43 @@ export interface components {
             totalItems: number;
             /** Format: int32 */
             totalPages: number;
+        };
+        CandidateReviewerResponse: {
+            /** Format: int64 */
+            id: number;
+            username: string;
+            fullName: string;
+            ksvhRep: boolean;
+            roles: string[];
+        };
+        CandidateFindingResponse: {
+            /** Format: int64 */
+            id: number;
+            /** Format: int64 */
+            inspectionId: number;
+            inspectionCode: string;
+            /** Format: int64 */
+            criterionId: number;
+            criterionCode: string;
+            criterionName: string;
+            groupName: string;
+            /** Format: int32 */
+            baseImpact: number;
+            /** Format: int32 */
+            effectiveImpact: number;
+            riskLevelCode: string;
+            /** Format: int32 */
+            calculatedScore: number;
+            /** @enum {string} */
+            status: "OPEN" | "CONFIRMED" | "APPEALED" | "APPEAL_MEETING" | "REMEDIATING" | "PENDING_VERIFICATION" | "CLOSED" | "DISMISSED";
+            description: string;
+            evidenceUrls: string;
+            remediationPlan: string;
+            remediationEvidenceUrls: string;
+            /** Format: date-time */
+            remediationSubmittedAt: string;
+            /** Format: date */
+            deadlineDate: string;
         };
         PageResponseEmployeeResponse: {
             items: components["schemas"]["EmployeeResponse"][];
@@ -1927,6 +2900,56 @@ export interface components {
             /** Format: int32 */
             totalPages: number;
         };
+        AuditLogResponse: {
+            /** Format: int64 */
+            id: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: int64 */
+            userId: number;
+            username: string;
+            userFullName: string;
+            action: string;
+            targetType: string;
+            targetId: string;
+            summary: string;
+            ipAddress: string;
+            details: string;
+        };
+        PageAuditLogResponse: {
+            /** Format: int32 */
+            totalPages: number;
+            /** Format: int64 */
+            totalElements: number;
+            /** Format: int32 */
+            size: number;
+            content: components["schemas"]["AuditLogResponse"][];
+            /** Format: int32 */
+            number: number;
+            sort: components["schemas"]["SortObject"];
+            pageable: components["schemas"]["PageableObject"];
+            /** Format: int32 */
+            numberOfElements: number;
+            first: boolean;
+            last: boolean;
+            empty: boolean;
+        };
+        PageableObject: {
+            /** Format: int64 */
+            offset: number;
+            paged: boolean;
+            /** Format: int32 */
+            pageNumber: number;
+            /** Format: int32 */
+            pageSize: number;
+            sort: components["schemas"]["SortObject"];
+            unpaged: boolean;
+        };
+        SortObject: {
+            empty: boolean;
+            sorted: boolean;
+            unsorted: boolean;
+        };
     };
     responses: never;
     parameters: never;
@@ -1944,11 +2967,15 @@ export type RiskLevelVersionResponse = components['schemas']['RiskLevelVersionRe
 export type OrgUnitRequest = components['schemas']['OrgUnitRequest'];
 export type OrgUnitResponse = components['schemas']['OrgUnitResponse'];
 export type UserRef = components['schemas']['UserRef'];
+export type NotificationPreferenceRequest = components['schemas']['NotificationPreferenceRequest'];
+export type NotificationPreferenceResponse = components['schemas']['NotificationPreferenceResponse'];
 export type TemplateRequest = components['schemas']['TemplateRequest'];
 export type CriterionResponse = components['schemas']['CriterionResponse'];
 export type CriterionTemplateRef = components['schemas']['CriterionTemplateRef'];
 export type TemplateResponse = components['schemas']['TemplateResponse'];
+export type PlanAssignmentRequest = components['schemas']['PlanAssignmentRequest'];
 export type PlanUpdateRequest = components['schemas']['PlanUpdateRequest'];
+export type PlanAssignmentResponse = components['schemas']['PlanAssignmentResponse'];
 export type PlanResponse = components['schemas']['PlanResponse'];
 export type EmployeeRequest = components['schemas']['EmployeeRequest'];
 export type EmployeeResponse = components['schemas']['EmployeeResponse'];
@@ -1961,6 +2988,7 @@ export type UserCreateRequest = components['schemas']['UserCreateRequest'];
 export type PasswordResetRequest = components['schemas']['PasswordResetRequest'];
 export type ImportResult = components['schemas']['ImportResult'];
 export type ImportRowError = components['schemas']['ImportRowError'];
+export type NotificationResponse = components['schemas']['NotificationResponse'];
 export type PresignUploadRequest = components['schemas']['PresignUploadRequest'];
 export type PresignUploadResponse = components['schemas']['PresignUploadResponse'];
 export type InspectionCreateRequest = components['schemas']['InspectionCreateRequest'];
@@ -1970,17 +2998,20 @@ export type InspectionSubmitItemRequest = components['schemas']['InspectionSubmi
 export type InspectionSubmitRequest = components['schemas']['InspectionSubmitRequest'];
 export type InspectionCheckinRequest = components['schemas']['InspectionCheckinRequest'];
 export type InspectionCancelRequest = components['schemas']['InspectionCancelRequest'];
+export type InspectionBatchCreateRequest = components['schemas']['InspectionBatchCreateRequest'];
 export type PlanCreateRequest = components['schemas']['PlanCreateRequest'];
 export type PlanRejectRequest = components['schemas']['PlanRejectRequest'];
 export type FrequencyConfigRequest = components['schemas']['FrequencyConfigRequest'];
 export type FrequencyConfigResponse = components['schemas']['FrequencyConfigResponse'];
 export type FindingVerifyRequest = components['schemas']['FindingVerifyRequest'];
+export type AppealReviewResponse = components['schemas']['AppealReviewResponse'];
 export type FindingEventResponse = components['schemas']['FindingEventResponse'];
 export type FindingResponse = components['schemas']['FindingResponse'];
 export type FindingSubmitRemediationRequest = components['schemas']['FindingSubmitRemediationRequest'];
 export type FindingRemediationPlanRequest = components['schemas']['FindingRemediationPlanRequest'];
 export type FindingConcludeAppealRequest = components['schemas']['FindingConcludeAppealRequest'];
 export type FindingAppealRequest = components['schemas']['FindingAppealRequest'];
+export type AppealReviewRequest = components['schemas']['AppealReviewRequest'];
 export type EscalationRuleRequest = components['schemas']['EscalationRuleRequest'];
 export type EscalationRuleResponse = components['schemas']['EscalationRuleResponse'];
 export type Permission = components['schemas']['Permission'];
@@ -1989,21 +3020,48 @@ export type SessionUser = components['schemas']['SessionUser'];
 export type LoginRequest = components['schemas']['LoginRequest'];
 export type PageResponseUserResponse = components['schemas']['PageResponseUserResponse'];
 export type RiskPreviewResponse = components['schemas']['RiskPreviewResponse'];
+export type EscalatedCriterionSummary = components['schemas']['EscalatedCriterionSummary'];
+export type CriterionRiskProfileItem = components['schemas']['CriterionRiskProfileItem'];
+export type OccurrenceSummary = components['schemas']['OccurrenceSummary'];
+export type RestaurantRiskProfileResponse = components['schemas']['RestaurantRiskProfileResponse'];
+export type ReportFilter = components['schemas']['ReportFilter'];
+export type RestaurantRankingItem = components['schemas']['RestaurantRankingItem'];
+export type RestaurantRankingReportResponse = components['schemas']['RestaurantRankingReportResponse'];
+export type RemediationStatusItem = components['schemas']['RemediationStatusItem'];
+export type RemediationStatusReportResponse = components['schemas']['RemediationStatusReportResponse'];
+export type MonthlySummaryItem = components['schemas']['MonthlySummaryItem'];
+export type MonthlySummaryReportResponse = components['schemas']['MonthlySummaryReportResponse'];
+export type InspectorProductivityItem = components['schemas']['InspectorProductivityItem'];
+export type InspectorProductivityReportResponse = components['schemas']['InspectorProductivityReportResponse'];
 export type CountItem = components['schemas']['CountItem'];
 export type DashboardResponse = components['schemas']['DashboardResponse'];
 export type Kpis = components['schemas']['Kpis'];
 export type MonthPoint = components['schemas']['MonthPoint'];
+export type RestaurantCompliance = components['schemas']['RestaurantCompliance'];
 export type RestaurantRisk = components['schemas']['RestaurantRisk'];
+export type CriteriaViolationItem = components['schemas']['CriteriaViolationItem'];
+export type CriteriaViolationReportResponse = components['schemas']['CriteriaViolationReportResponse'];
 export type PermissionResponse = components['schemas']['PermissionResponse'];
 export type PageResponseOrgUnitResponse = components['schemas']['PageResponseOrgUnitResponse'];
+export type Pageable = components['schemas']['Pageable'];
+export type PageResponseNotificationResponse = components['schemas']['PageResponseNotificationResponse'];
+export type UnreadCountResponse = components['schemas']['UnreadCountResponse'];
 export type PageResponseInspectionResponse = components['schemas']['PageResponseInspectionResponse'];
+export type SurpriseInspectionSuggestion = components['schemas']['SurpriseInspectionSuggestion'];
 export type PageResponseTemplateResponse = components['schemas']['PageResponseTemplateResponse'];
 export type TemplateOption = components['schemas']['TemplateOption'];
 export type PageResponsePlanResponse = components['schemas']['PageResponsePlanResponse'];
+export type PriorFindingsWarning = components['schemas']['PriorFindingsWarning'];
 export type PageResponseFindingResponse = components['schemas']['PageResponseFindingResponse'];
+export type CandidateReviewerResponse = components['schemas']['CandidateReviewerResponse'];
+export type CandidateFindingResponse = components['schemas']['CandidateFindingResponse'];
 export type PageResponseEmployeeResponse = components['schemas']['PageResponseEmployeeResponse'];
 export type PageResponseCriterionResponse = components['schemas']['PageResponseCriterionResponse'];
 export type PageResponseCompanyResponse = components['schemas']['PageResponseCompanyResponse'];
+export type AuditLogResponse = components['schemas']['AuditLogResponse'];
+export type PageAuditLogResponse = components['schemas']['PageAuditLogResponse'];
+export type PageableObject = components['schemas']['PageableObject'];
+export type SortObject = components['schemas']['SortObject'];
 export type $defs = Record<string, never>;
 export interface operations {
     get: {
@@ -2251,6 +3309,50 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    getPreferences: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["NotificationPreferenceResponse"];
+                };
+            };
+        };
+    };
+    updatePreferences: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NotificationPreferenceRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["NotificationPreferenceResponse"];
+                };
             };
         };
     };
@@ -2855,6 +3957,46 @@ export interface operations {
             };
         };
     };
+    markAsRead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["NotificationResponse"];
+                };
+            };
+        };
+    };
+    markAllAsRead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     presignUpload: {
         parameters: {
             query?: never;
@@ -2885,7 +4027,7 @@ export interface operations {
                 keyword?: string;
                 restaurantId?: number;
                 inspectorId?: number;
-                status?: "ASSIGNED" | "IN_PROGRESS" | "SUBMITTED" | "COMPLETED" | "CANCELLED";
+                status?: "ASSIGNED" | "IN_PROGRESS" | "SUBMITTED" | "AWAITING_ACK" | "COMPLETED" | "CANCELLED";
                 /** @description Zero-based page index (0..N) */
                 page?: number;
                 /** @description The size of the page to be returned */
@@ -3008,6 +4150,52 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["InspectionResponse"];
+                };
+            };
+        };
+    };
+    acknowledge: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["InspectionResponse"];
+                };
+            };
+        };
+    };
+    createBatch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InspectionBatchCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["InspectionResponse"][];
                 };
             };
         };
@@ -3414,6 +4602,32 @@ export interface operations {
             };
         };
     };
+    submitAppealReview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AppealReviewRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["FindingResponse"];
+                };
+            };
+        };
+    };
     escalationRules: {
         parameters: {
             query?: never;
@@ -3672,6 +4886,30 @@ export interface operations {
             };
         };
     };
+    createBatch_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CriterionRequest"][];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CriterionResponse"][];
+                };
+            };
+        };
+    };
     search_7: {
         parameters: {
             query?: {
@@ -3851,6 +5089,28 @@ export interface operations {
             };
         };
     };
+    getEscalatedCriteria: {
+        parameters: {
+            query?: {
+                asOfDate?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EscalatedCriterionSummary"][];
+                };
+            };
+        };
+    };
     riskLevelVersions: {
         parameters: {
             query?: never;
@@ -3867,6 +5127,250 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["RiskLevelVersionResponse"][];
+                };
+            };
+        };
+    };
+    getRestaurantRiskProfile: {
+        parameters: {
+            query?: {
+                asOfDate?: string;
+            };
+            header?: never;
+            path: {
+                restaurantId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RestaurantRiskProfileResponse"];
+                };
+            };
+        };
+    };
+    restaurantRankings: {
+        parameters: {
+            query: {
+                filter: components["schemas"]["ReportFilter"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RestaurantRankingReportResponse"];
+                };
+            };
+        };
+    };
+    exportRestaurantRankingsExcel: {
+        parameters: {
+            query: {
+                filter: components["schemas"]["ReportFilter"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
+                };
+            };
+        };
+    };
+    remediations: {
+        parameters: {
+            query: {
+                filter: components["schemas"]["ReportFilter"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RemediationStatusReportResponse"];
+                };
+            };
+        };
+    };
+    exportRemediationsExcel: {
+        parameters: {
+            query: {
+                filter: components["schemas"]["ReportFilter"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
+                };
+            };
+        };
+    };
+    monthlySummary: {
+        parameters: {
+            query: {
+                filter: components["schemas"]["ReportFilter"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["MonthlySummaryReportResponse"];
+                };
+            };
+        };
+    };
+    exportMonthlySummaryExcel: {
+        parameters: {
+            query: {
+                filter: components["schemas"]["ReportFilter"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
+                };
+            };
+        };
+    };
+    inspectorProductivity: {
+        parameters: {
+            query: {
+                filter: components["schemas"]["ReportFilter"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["InspectorProductivityReportResponse"];
+                };
+            };
+        };
+    };
+    exportInspectorProductivityExcel: {
+        parameters: {
+            query: {
+                filter: components["schemas"]["ReportFilter"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
+                };
+            };
+        };
+    };
+    exportInspectionPdf: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
+                };
+            };
+        };
+    };
+    exportM4FindingPdf: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
                 };
             };
         };
@@ -3889,6 +5393,50 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["DashboardResponse"];
+                };
+            };
+        };
+    };
+    criteriaViolations: {
+        parameters: {
+            query: {
+                filter: components["schemas"]["ReportFilter"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CriteriaViolationReportResponse"];
+                };
+            };
+        };
+    };
+    exportCriteriaViolationsExcel: {
+        parameters: {
+            query: {
+                filter: components["schemas"]["ReportFilter"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
                 };
             };
         };
@@ -3953,6 +5501,48 @@ export interface operations {
             };
         };
     };
+    getMyNotifications: {
+        parameters: {
+            query: {
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageResponseNotificationResponse"];
+                };
+            };
+        };
+    };
+    getUnreadCount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UnreadCountResponse"];
+                };
+            };
+        };
+    };
     get_8: {
         parameters: {
             query?: never;
@@ -3993,6 +5583,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["InspectionItemResponse"][];
+                };
+            };
+        };
+    };
+    getSurpriseSuggestions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SurpriseInspectionSuggestion"][];
                 };
             };
         };
@@ -4077,12 +5687,36 @@ export interface operations {
             };
         };
     };
+    getRestaurantWarning: {
+        parameters: {
+            query: {
+                restaurantId: number;
+                beforeDate?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PriorFindingsWarning"];
+                };
+            };
+        };
+    };
     search_8: {
         parameters: {
             query?: {
+                keyword?: string;
                 restaurantId?: number;
                 inspectionId?: number;
-                status?: "OPEN" | "CONFIRMED" | "APPEALED" | "REMEDIATING" | "PENDING_VERIFICATION" | "CLOSED" | "DISMISSED";
+                status?: "OPEN" | "CONFIRMED" | "APPEALED" | "APPEAL_MEETING" | "REMEDIATING" | "PENDING_VERIFICATION" | "CLOSED" | "DISMISSED";
                 /** @description Zero-based page index (0..N) */
                 page?: number;
                 /** @description The size of the page to be returned */
@@ -4125,6 +5759,70 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["FindingResponse"];
+                };
+            };
+        };
+    };
+    getCandidateReviewers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CandidateReviewerResponse"][];
+                };
+            };
+        };
+    };
+    getVerificationCandidates: {
+        parameters: {
+            query: {
+                restaurantId: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CandidateFindingResponse"][];
+                };
+            };
+        };
+    };
+    getPendingReviews: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["FindingResponse"][];
                 };
             };
         };
@@ -4245,6 +5943,96 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["SessionUser"];
+                };
+            };
+        };
+    };
+    search_9: {
+        parameters: {
+            query: {
+                keyword?: string;
+                action?: string;
+                targetType?: string;
+                userId?: number;
+                fromDate?: string;
+                toDate?: string;
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageAuditLogResponse"];
+                };
+            };
+        };
+    };
+    get_10: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AuditLogResponse"];
+                };
+            };
+        };
+    };
+    getTargetTypes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string[];
+                };
+            };
+        };
+    };
+    getActions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string[];
                 };
             };
         };

@@ -42,6 +42,7 @@ public class CriterionService {
     private final CriterionRepository criterionRepository;
     private final InspectionTemplateRepository templateRepository;
     private final CompanyLookupApi companyLookupApi;
+    private final org.springframework.context.ApplicationEventPublisher eventPublisher;
 
     // ---- Nhóm ----
 
@@ -79,6 +80,12 @@ public class CriterionService {
         applyGroup(g, req, code, actorId);
         CriterionGroup saved = groupRepository.saveAndFlush(g);
         String cName = resolveCompanyName(saved.getCompanyId());
+        if (eventPublisher != null) {
+            eventPublisher.publishEvent(vn.ksvh.qc.shared.audit.AuditLogEvent.of(
+                    actorId, "CRITERION_GROUP_CREATE", "CRITERION_GROUP", saved.getCode(),
+                    "Tạo nhóm tiêu chí " + saved.getName() + " (" + saved.getCode() + ")"
+            ));
+        }
         return CriterionGroupResponse.from(saved, 0, cName);
     }
 
@@ -101,6 +108,12 @@ public class CriterionService {
         long count = criterionRepository.count((root, q, cb) -> cb.equal(root.get("group").get("id"), id));
         CriterionGroup saved = groupRepository.saveAndFlush(g);
         String cName = resolveCompanyName(saved.getCompanyId());
+        if (eventPublisher != null) {
+            eventPublisher.publishEvent(vn.ksvh.qc.shared.audit.AuditLogEvent.of(
+                    actorId, "CRITERION_GROUP_UPDATE", "CRITERION_GROUP", saved.getCode(),
+                    "Cập nhật nhóm tiêu chí " + saved.getName() + " (" + saved.getCode() + ")"
+            ));
+        }
         return CriterionGroupResponse.from(saved, count, cName);
     }
 
@@ -203,7 +216,25 @@ public class CriterionService {
         if (req.templateIds() != null) {
             syncTemplateCriteria(saved, req.templateIds(), actorId);
         }
+        if (eventPublisher != null) {
+            eventPublisher.publishEvent(vn.ksvh.qc.shared.audit.AuditLogEvent.of(
+                    actorId, "CRITERION_CREATE", "CRITERION", saved.getCode(),
+                    "Tạo tiêu chí " + saved.getName() + " (" + saved.getCode() + ", ảnh hưởng=" + saved.getBaseImpact() + ")"
+            ));
+        }
         return get(saved.getId());
+    }
+
+    @Transactional
+    public List<CriterionResponse> createBatch(List<CriterionRequest> requests, Long actorId) {
+        if (requests == null || requests.isEmpty()) {
+            return List.of();
+        }
+        List<CriterionResponse> result = new ArrayList<>(requests.size());
+        for (CriterionRequest req : requests) {
+            result.add(create(req, actorId));
+        }
+        return result;
     }
 
     @Transactional
@@ -228,6 +259,12 @@ public class CriterionService {
         if (req.templateIds() != null) {
             syncTemplateCriteria(saved, req.templateIds(), actorId);
         }
+        if (eventPublisher != null) {
+            eventPublisher.publishEvent(vn.ksvh.qc.shared.audit.AuditLogEvent.of(
+                    actorId, "CRITERION_CREATE", "CRITERION", saved.getCode(),
+                    "Tạo tiêu chí " + saved.getName() + " (" + saved.getCode() + ", ảnh hưởng=" + saved.getBaseImpact() + ")"
+            ));
+        }
         return get(saved.getId());
     }
 
@@ -248,6 +285,12 @@ public class CriterionService {
         try {
             criterionRepository.delete(c);
             criterionRepository.flush();
+            if (eventPublisher != null) {
+                eventPublisher.publishEvent(vn.ksvh.qc.shared.audit.AuditLogEvent.of(
+                        null, "CRITERION_DELETE", "CRITERION", c.getCode(),
+                        "Xoá tiêu chí " + c.getName() + " (" + c.getCode() + ")"
+                ));
+            }
         } catch (DataIntegrityViolationException e) {
             throw new BusinessException(ErrorCode.CRITERIA_IN_USE,
                     "Tiêu chí đã được dùng trong phiếu chấm, không thể xoá. Hãy chuyển sang Ngưng hoạt động để giữ lịch sử");

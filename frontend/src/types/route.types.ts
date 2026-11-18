@@ -21,6 +21,9 @@ export type MenuIconKey =
   | 'plans'
   | 'inspections'
   | 'findings'
+  | 'riskProfiles'
+  | 'reports'
+  | 'auditLogs'
   | 'checkin'
   | 'home'
 

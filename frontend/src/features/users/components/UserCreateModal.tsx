@@ -52,8 +52,8 @@ export function UserCreateModal({ open, onClose }: { open: boolean; onClose: () 
       <Form layout="vertical" onFinish={() => void onSubmit()}>
         {/* Nút submit ẩn: nhấn Enter trong ô nhập sẽ lưu (nút Lưu nằm ở footer, ngoài form). */}
         <button type="submit" hidden />
-        <FormInput control={control} name="username" label="Tên đăng nhập" required autoComplete="off" maxLength={50} />
-        <FormInput control={control} name="fullName" label="Họ tên" required maxLength={150} />
+        <FormInput control={control} name="username" label="Tên đăng nhập" required autoComplete="off" maxLength={50} placeholder="VD: nguyen.van.a" />
+        <FormInput control={control} name="fullName" label="Họ tên" required maxLength={150} placeholder="VD: Nguyễn Văn A" />
         <FormInput
           control={control}
           name="password"

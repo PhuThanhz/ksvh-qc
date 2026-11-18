@@ -47,9 +47,21 @@ export const templateSchema = z.object({
 })
 export type TemplateFormValues = z.infer<typeof templateSchema>
 
+/** Giới hạn kỳ đếm tần suất (tháng) – khớp @Min/@Max của FrequencyConfigRequest và CHECK trong DB. */
+export const FREQUENCY_PERIOD_MIN = 1
+export const FREQUENCY_PERIOD_MAX = 24
+/** Gợi ý chọn nhanh trên form; người dùng vẫn nhập được số bất kỳ trong giới hạn. */
+export const FREQUENCY_PERIOD_PRESETS = [3, 6, 12] as const
+
+const PERIOD_RANGE_MSG = `Kỳ đếm từ ${FREQUENCY_PERIOD_MIN} đến ${FREQUENCY_PERIOD_MAX} tháng`
+
 /** Khớp FrequencyConfigRequest. */
 export const frequencySchema = z.object({
-  periodMonths: z.union([z.literal(3), z.literal(6)], { error: 'Kỳ đếm chỉ được 3 hoặc 6 tháng' }),
+  periodMonths: z
+    .number({ error: 'Vui lòng nhập kỳ đếm' })
+    .int('Kỳ đếm phải là số tháng nguyên')
+    .min(FREQUENCY_PERIOD_MIN, PERIOD_RANGE_MSG)
+    .max(FREQUENCY_PERIOD_MAX, PERIOD_RANGE_MSG),
   effectiveFrom: z.string({ error: 'Vui lòng chọn ngày hiệu lực' }).min(1, 'Vui lòng chọn ngày hiệu lực'),
   note: z.string().trim().max(500, 'Ghi chú tối đa 500 ký tự'),
 })

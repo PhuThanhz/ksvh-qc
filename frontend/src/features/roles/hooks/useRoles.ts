@@ -1,15 +1,24 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { STALE_CATALOG_MS } from '@/constants/app.constants'
 import { rolesApi } from '@/features/roles/api/roles.api'
 import { roleKeys } from '@/features/roles/api/roles.keys'
 import type { RolePayload } from '@/features/roles/roles.types'
 import type { Id } from '@/types/common.types'
 
 export function useRoles() {
-  return useQuery({ queryKey: roleKeys.list(), queryFn: rolesApi.list })
+  return useQuery({
+    queryKey: roleKeys.list(),
+    queryFn: rolesApi.list,
+    staleTime: STALE_CATALOG_MS,
+  })
 }
 
 export function usePermissionCatalog() {
-  return useQuery({ queryKey: roleKeys.permissions(), queryFn: rolesApi.permissions })
+  return useQuery({
+    queryKey: roleKeys.permissions(),
+    queryFn: rolesApi.permissions,
+    staleTime: STALE_CATALOG_MS,
+  })
 }
 
 /** Đổi quyền của vai trò làm thay đổi cả ma trận permission → làm mới toàn bộ module. */

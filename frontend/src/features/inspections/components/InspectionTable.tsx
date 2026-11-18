@@ -1,6 +1,9 @@
-import { CloseCircleOutlined, EyeOutlined } from '@ant-design/icons'
-import { Button, Space, Table, Tag, Tooltip } from 'antd'
+import { CloseCircleOutlined } from '@ant-design/icons'
+import { Table, Tag, Tooltip, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
+import { ActionButton, TableActions } from '@/components/data-display/TableActions'
+import { StatusBadge } from '@/components/data-display/StatusBadge'
+import { INSPECTION_STATUS_META } from '../constants/status'
 import type { InspectionResponse, InspectionStatus } from '@/features/inspections/inspection.types'
 import { formatDate } from '@/utils/format-date'
 import { INSPECTION_KIND_LABEL, INSPECTION_MODE_LABEL, type InspectionKind } from '@/features/inspections/inspection.types'
@@ -16,14 +19,6 @@ interface Props {
   onPageChange?: (page: number, pageSize: number) => void
   onView: (ins: InspectionResponse) => void
   onCancel: (ins: InspectionResponse) => void
-}
-
-const STATUS_TAG: Record<InspectionStatus, { color: string; label: string }> = {
-  ASSIGNED: { color: 'blue', label: 'Đã phân công' },
-  IN_PROGRESS: { color: 'processing', label: 'Đang chấm' },
-  SUBMITTED: { color: 'purple', label: 'Đã nộp' },
-  COMPLETED: { color: 'success', label: 'Hoàn thành' },
-  CANCELLED: { color: 'default', label: 'Đã huỷ' },
 }
 
 export function InspectionTable({
@@ -53,14 +48,10 @@ export function InspectionTable({
       key: 'code',
       width: 140,
       render: (v, r) => (
-        <Tooltip title="Nhấp để xem chi tiết phiếu chấm">
-          <Button
-            type="link"
-            style={{ padding: 0, height: 'auto', fontWeight: 600 }}
-            onClick={() => onView(r)}
-          >
+        <Tooltip title="Xem chi tiết phiếu chấm">
+          <Typography.Link style={{ fontWeight: 600 }} onClick={() => onView(r)}>
             {v}
-          </Button>
+          </Typography.Link>
         </Tooltip>
       ),
     },
@@ -68,10 +59,11 @@ export function InspectionTable({
       title: 'Nhà hàng',
       dataIndex: 'restaurantName',
       key: 'restaurantName',
+      width: 220,
       render: (v, r) => (
         <div>
           <div style={{ fontWeight: 500 }}>{v || '—'}</div>
-          <div style={{ fontSize: 12, color: '#8c8c8c' }}>{r.templateName ?? 'Theo chuyên đề'}</div>
+          <div style={{ fontSize: 12, color: 'var(--app-text-secondary)' }}>{r.templateName ?? 'Theo chuyên đề'}</div>
         </div>
       ),
     },
@@ -83,7 +75,7 @@ export function InspectionTable({
       render: (k: InspectionKind, r) => (
         <div>
           <Tag color={k === 'SURPRISE' ? 'orange' : 'blue'} style={{ margin: 0 }}>{INSPECTION_KIND_LABEL[k]}</Tag>
-          <div style={{ fontSize: 12, color: '#8c8c8c', marginTop: 2 }}>{INSPECTION_MODE_LABEL[r.inspectionMode]}</div>
+          <div style={{ fontSize: 12, color: 'var(--app-text-secondary)', marginTop: 2 }}>{INSPECTION_MODE_LABEL[r.inspectionMode]}</div>
         </div>
       ),
     },
@@ -99,13 +91,10 @@ export function InspectionTable({
       key: 'progress',
       width: 150,
       render: (_, r) => (
-        <div style={{ fontSize: 13 }}>
-          <span style={{ color: '#52c41a', fontWeight: 600 }}>{r.passedCriteria} Đạt</span>
-          {' · '}
-          <span style={{ color: '#ff4d4f', fontWeight: 600 }}>{r.failedCriteria} Lỗi</span>
-          {' / '}
-          <span>{r.totalCriteria} mục</span>
-        </div>
+        <span style={{ fontSize: 13 }}>
+          <strong style={{ color: 'var(--app-success)' }}>{r.passedCriteria} Đạt</strong> ·{' '}
+          <strong style={{ color: 'var(--app-danger)' }}>{r.failedCriteria} Lỗi</strong> / {r.totalCriteria} mục
+        </span>
       ),
     },
     {
@@ -118,7 +107,7 @@ export function InspectionTable({
             {r.maxRiskLevel} ({r.totalRiskScore} đ)
           </Tag>
         ) : (
-          <span style={{ color: '#8c8c8c' }}>0 đ</span>
+          <span style={{ color: 'var(--app-text-secondary)' }}>0 đ</span>
         ),
     },
     {
@@ -131,10 +120,8 @@ export function InspectionTable({
         const grade = getComplianceGrade(v, r.maxRiskLevel)
         return (
           <div>
-            <div style={{ fontWeight: 600 }}>{v.toLocaleString('vi-VN')}%</div>
-            <Tag color={grade.color} style={{ fontSize: 11, margin: 0, marginTop: 2 }}>
-              {grade.label}
-            </Tag>
+            <strong>{v.toLocaleString('vi-VN')}%</strong>
+            <div><Tag color={grade.color} style={{ fontSize: 11, margin: '2px 0 0' }}>{grade.label}</Tag></div>
           </div>
         )
       },
@@ -144,7 +131,7 @@ export function InspectionTable({
       dataIndex: 'status',
       key: 'status',
       width: 130,
-      render: (st: InspectionStatus) => <Tag color={STATUS_TAG[st]?.color}>{STATUS_TAG[st]?.label}</Tag>,
+      render: (st: InspectionStatus) => <StatusBadge status={st} meta={INSPECTION_STATUS_META} />,
     },
     {
       title: 'Thời gian',
@@ -152,33 +139,33 @@ export function InspectionTable({
       key: 'createdAt',
       width: 150,
       render: (v, r) => {
-        const duration = formatInspectionDuration(r.checkinAt, r.submittedAt)
-        return (
-          <div>
-            <div>{formatDate(v)}</div>
-            {duration !== '—' && (
-              <div style={{ fontSize: 11, color: '#8c8c8c' }}>Thời lượng: {duration}</div>
-            )}
-          </div>
-        )
+        const d = formatInspectionDuration(r.checkinAt, r.submittedAt)
+        return <div><div>{formatDate(v)}</div>{d !== '—' && <div style={{ fontSize: 11, color: 'var(--app-text-secondary)' }}>Thời lượng: {d}</div>}</div>
       },
     },
     {
       title: 'Thao tác',
       key: 'actions',
-      width: 110,
+      width: 120,
       align: 'center',
+      fixed: 'right',
       render: (_, r) => (
-        <Space size="small">
-          <Tooltip title="Xem chi tiết">
-            <Button type="text" icon={<EyeOutlined />} onClick={() => onView(r)} />
-          </Tooltip>
-          {(r.status === 'ASSIGNED' || r.status === 'IN_PROGRESS') && canCancel && (
-            <Tooltip title="Huỷ phiếu">
-              <Button type="text" danger icon={<CloseCircleOutlined />} onClick={() => onCancel(r)} />
-            </Tooltip>
-          )}
-        </Space>
+        <TableActions
+          recordName={r.code}
+          onView={() => onView(r)}
+          viewLabel="Xem chi tiết phiếu chấm"
+          extra={
+            (r.status === 'ASSIGNED' || r.status === 'IN_PROGRESS') && canCancel ? (
+              <ActionButton
+                tone="delete"
+                icon={<CloseCircleOutlined />}
+                tooltip="Huỷ phiếu"
+                ariaLabel={`Huỷ phiếu chấm ${r.code}`}
+                onClick={() => onCancel(r)}
+              />
+            ) : null
+          }
+        />
       ),
     },
   ]
@@ -189,6 +176,7 @@ export function InspectionTable({
       dataSource={data}
       rowKey="id"
       loading={loading}
+      scroll={{ x: 1250 }}
       onRow={(r) => ({
         onDoubleClick: () => onView(r),
         style: { cursor: 'pointer' },

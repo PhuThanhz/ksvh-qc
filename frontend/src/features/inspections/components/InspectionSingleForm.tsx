@@ -1,11 +1,16 @@
-import { Alert, Button, Flex, Form, Input, Radio, Select, Space } from 'antd'
+import { Button, Flex, Form, Input, Radio, Select, Space } from 'antd'
 import dayjs from 'dayjs'
 import { useEffect, useMemo } from 'react'
 import { useSession } from '@/features/auth'
 import { useCriterionGroups } from '@/features/criteria/hooks/useCriteria'
 import { useTemplates } from '@/features/criteria/hooks/useTemplates'
+import { InspectionScopeSelector } from '@/features/inspections/components/InspectionScopeSelector'
 import { useInspectionMutations, usePlans } from '@/features/inspections/hooks/useInspectionData'
-import { INSPECTION_KIND_LABEL, INSPECTION_MODE_LABEL, type InspectionCreateRequest } from '@/features/inspections/inspection.types'
+import {
+  INSPECTION_KIND_LABEL,
+  INSPECTION_MODE_LABEL,
+  type InspectionCreateRequest,
+} from '@/features/inspections/inspection.types'
 import { useOrgUnits } from '@/features/organizations/hooks/useOrganizations'
 import { useUsers } from '@/features/users/hooks/useUsers'
 import { useNotify } from '@/hooks/useNotify'
@@ -14,9 +19,10 @@ import { PERMISSIONS, ROLES, usePermission } from '@/permissions'
 interface Props {
   onSuccess: () => void
   onCancel: () => void
+  initialValues?: Partial<InspectionCreateRequest>
 }
 
-export function InspectionSingleForm({ onSuccess, onCancel }: Props) {
+export function InspectionSingleForm({ onSuccess, onCancel, initialValues }: Props) {
   const [form] = Form.useForm<InspectionCreateRequest>()
   const { create } = useInspectionMutations()
   const notify = useNotify()
@@ -29,10 +35,12 @@ export function InspectionSingleForm({ onSuccess, onCancel }: Props) {
   const templates = useTemplates({ page: 0, size: 200, active: true })
   const users = useUsers({ page: 0, size: 200, active: true, role: ROLES.KSVH_INSPECTOR })
   const groups = useCriterionGroups()
-  const kind = Form.useWatch('inspectionType', form)
-  const isPeriodic = kind !== 'SURPRISE'
+  const kind = Form.useWatch('inspectionType', form) ?? 'PERIODIC'
+  const isPeriodic = kind === 'PERIODIC'
+  const isVerification = kind === 'VERIFICATION'
 
   const restaurantId = Form.useWatch('restaurantId', form)
+  const findingIds = Form.useWatch('findingIds', form)
   const selectedRestaurant = useMemo(
     () => restaurants.data?.items.find((r) => r.id === restaurantId),
     [restaurants.data, restaurantId],
@@ -56,33 +64,32 @@ export function InspectionSingleForm({ onSuccess, onCancel }: Props) {
     if (curTemplateId && !filteredTemplates.some((t) => t.id === curTemplateId)) {
       form.setFieldValue('templateId', undefined)
     }
-    const curTopics = form.getFieldValue('topicGroupIds') as number[] | undefined
-    if (curTopics && curTopics.length > 0) {
-      const validTopicIds = curTopics.filter((id) => filteredGroups.some((g) => g.id === id))
-      if (validTopicIds.length !== curTopics.length) {
-        form.setFieldValue('topicGroupIds', validTopicIds)
-      }
-    }
-  }, [restaurantId, selectedRestaurant, filteredTemplates, filteredGroups, form])
+  }, [restaurantId, selectedRestaurant, filteredTemplates, form])
 
   useEffect(() => {
     const initialInspectorId = !canPlan && user?.id ? user.id : undefined
+    const pfx = initialValues?.inspectionType === 'VERIFICATION' ? 'VER' : 'PC'
     form.setFieldsValue({
-      code: `PC-${dayjs().format('YYYYMM')}-${Math.floor(1000 + Math.random() * 9000)}`,
+      code: `${pfx}-${dayjs().format('YYYYMM')}-${Math.floor(1000 + Math.random() * 9000)}`,
       inspectionType: 'PERIODIC',
       inspectionMode: 'ON_SITE',
       inspectorId: initialInspectorId,
+      ...initialValues,
     })
-  }, [form, canPlan, user])
+  }, [form, canPlan, user, initialValues])
 
   const onSubmit = async () => {
     try {
       const vals = await form.validateFields()
-      await create.mutateAsync(
-        isPeriodic
-          ? { ...vals, inspectionMode: 'ON_SITE', topicGroupIds: undefined }
-          : { ...vals, templateId: undefined },
-      )
+      let payload: InspectionCreateRequest
+      if (vals.inspectionType === 'PERIODIC') {
+        payload = { ...vals, inspectionMode: 'ON_SITE', topicGroupIds: undefined, findingIds: undefined }
+      } else if (vals.inspectionType === 'SURPRISE') {
+        payload = { ...vals, templateId: undefined, findingIds: undefined }
+      } else {
+        payload = { ...vals, templateId: undefined, topicGroupIds: undefined, planId: undefined }
+      }
+      await create.mutateAsync(payload)
       notify.success('Tạo phiếu chấm và phân công chuyên viên thành công')
       onSuccess()
     } catch (err: unknown) {
@@ -96,13 +103,36 @@ export function InspectionSingleForm({ onSuccess, onCancel }: Props) {
         <Input placeholder="VD: PC-202611-001" />
       </Form.Item>
 
-      <Form.Item name="planId" label="Kế hoạch kiểm tra (tuỳ chọn)">
-        <Select
-          allowClear
-          placeholder="Chọn kế hoạch đã duyệt..."
-          options={plans.data?.items.map((p) => ({ value: p.id, label: `${p.planCode} - ${p.title}` }))}
+      <Form.Item name="inspectionType" label="Loại kiểm tra" rules={[{ required: true }]}>
+        <Radio.Group
+          optionType="button"
+          buttonStyle="solid"
+          options={(['PERIODIC', 'SURPRISE', 'VERIFICATION'] as const).map((k) => ({
+            value: k,
+            label: INSPECTION_KIND_LABEL[k],
+          }))}
+          onChange={(e) => {
+            const newKind = e.target.value
+            if (newKind === 'PERIODIC') form.setFieldValue('inspectionMode', 'ON_SITE')
+            const pfx = newKind === 'VERIFICATION' ? 'VER' : 'PC'
+            form.setFieldValue('code', `${pfx}-${dayjs().format('YYYYMM')}-${Math.floor(1000 + Math.random() * 9000)}`)
+          }}
         />
       </Form.Item>
+
+      {!isVerification && (
+        <Form.Item
+          name="planId"
+          label={isPeriodic ? 'Kế hoạch kiểm tra (bắt buộc với định kỳ)' : 'Kế hoạch kiểm tra (tuỳ chọn)'}
+          rules={isPeriodic ? [{ required: true, message: 'Kiểm tra định kỳ bắt buộc chọn kế hoạch đã duyệt' }] : []}
+        >
+          <Select
+            allowClear
+            placeholder="Chọn kế hoạch đã duyệt..."
+            options={plans.data?.items.map((p) => ({ value: p.id, label: `${p.planCode} - ${p.title}` }))}
+          />
+        </Form.Item>
+      )}
 
       <Form.Item name="restaurantId" label="Nhà hàng / Cửa hàng" rules={[{ required: true, message: 'Vui lòng chọn nhà hàng' }]}>
         <Select
@@ -113,71 +143,26 @@ export function InspectionSingleForm({ onSuccess, onCancel }: Props) {
         />
       </Form.Item>
 
-      <Form.Item name="inspectionType" label="Loại kiểm tra" rules={[{ required: true }]}>
-        <Radio.Group
-          optionType="button"
-          buttonStyle="solid"
-          options={(['PERIODIC', 'SURPRISE'] as const).map((k) => ({ value: k, label: INSPECTION_KIND_LABEL[k] }))}
-          onChange={(e) => {
-            if (e.target.value === 'PERIODIC') form.setFieldValue('inspectionMode', 'ON_SITE')
-          }}
-        />
-      </Form.Item>
+      <InspectionScopeSelector
+        kind={kind}
+        selectedRestaurant={selectedRestaurant}
+        restaurantId={restaurantId}
+        filteredTemplates={filteredTemplates}
+        filteredGroups={filteredGroups}
+        findingIds={findingIds}
+        onChangeFindingIds={(ids) => form.setFieldValue('findingIds', ids)}
+      />
 
-      {isPeriodic ? (
-        <>
-          <Alert
-            type="info"
-            showIcon
-            style={{ marginBottom: 16 }}
-            title="Định kỳ tháng: thực hiện thực tế tại nhà hàng và chấm đủ mọi tiêu chí của mẫu phiếu."
-          />
-          <Form.Item
-            name="templateId"
-            label="Mẫu phiếu chấm"
-            rules={[{ required: true, message: 'Vui lòng chọn mẫu phiếu' }]}
-            extra={selectedRestaurant?.companyName ? `Lọc mẫu áp dụng cho: ${selectedRestaurant.companyName}` : undefined}
-          >
-            <Select
-              showSearch
-              placeholder={selectedRestaurant ? 'Chọn mẫu phiếu đánh giá...' : 'Chọn nhà hàng trước để lọc mẫu phù hợp'}
-              filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
-              options={filteredTemplates.map((t) => ({
-                value: t.id,
-                label: `${t.code} - ${t.name} (${t.criterionCount} tiêu chí) ${t.companyName ? `[${t.companyName}]` : '[Dùng chung]'}`,
-              }))}
-            />
-          </Form.Item>
-        </>
-      ) : (
-        <>
-          <Form.Item
-            name="topicGroupIds"
-            label="Chuyên đề kiểm tra"
-            extra={selectedRestaurant?.companyName ? `Lọc chuyên đề áp dụng cho: ${selectedRestaurant.companyName}` : 'Chỉ chấm các tiêu chí thuộc nhóm đã chọn, không kiểm lại toàn bộ.'}
-            rules={[{ required: true, message: 'Chọn ít nhất một chuyên đề' }]}
-          >
-            <Select
-              mode="multiple"
-              placeholder={selectedRestaurant ? 'VD: Tồn kho, Quản lý tiền...' : 'Chọn nhà hàng trước để lọc chuyên đề'}
-              optionFilterProp="label"
-              options={filteredGroups.map((g) => ({
-                value: g.id,
-                label: `${g.name} (${g.criterionCount} tiêu chí) ${g.companyName ? `[${g.companyName}]` : '[Dùng chung]'}`,
-              }))}
-            />
-          </Form.Item>
-          <Form.Item name="inspectionMode" label="Hình thức" rules={[{ required: true }]}>
-            <Radio.Group options={(['ON_SITE', 'REMOTE'] as const).map((m) => ({ value: m, label: INSPECTION_MODE_LABEL[m] }))} />
-          </Form.Item>
-        </>
+      {!isPeriodic && (
+        <Form.Item name="inspectionMode" label="Hình thức" rules={[{ required: true }]}>
+          <Radio.Group options={(['ON_SITE', 'REMOTE'] as const).map((m) => ({ value: m, label: INSPECTION_MODE_LABEL[m] }))} />
+        </Form.Item>
       )}
 
       <Form.Item
         name="inspectorId"
         label="Chuyên viên KSVH"
         rules={[{ required: true, message: 'Vui lòng phân công chuyên viên' }]}
-        extra={!canPlan ? 'Bạn chỉ có quyền tự tạo phiếu chấm cho chính mình' : undefined}
       >
         <Select
           showSearch

@@ -1,19 +1,22 @@
 import { NavBar, SafeArea, TabBar } from 'antd-mobile'
 import { Suspense, useEffect, type ReactNode } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router'
+import { ContentErrorBoundary } from '@/components/feedback/ContentErrorBoundary'
 import { LoadingState } from '@/components/feedback/LoadingState'
 import type { MenuEntry } from '@/components/layout/menu.types'
 import { usePermission } from '@/permissions'
 
 export interface MobileLayoutProps {
-  title: string
+  title: ReactNode
+  documentTitle?: string
   rootPath: string
   tabs: readonly MenuEntry[]
   headerRight?: ReactNode
+  footer?: ReactNode
 }
 
 /** Khung giao diện điện thoại: thanh tiêu đề + tab dưới đáy, thao tác một tay, tránh tai thỏ/thanh home. */
-export function MobileLayout({ title, rootPath, tabs, headerRight }: MobileLayoutProps) {
+export function MobileLayout({ title, documentTitle, rootPath, tabs, headerRight, footer }: MobileLayoutProps) {
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const { allows } = usePermission()
@@ -22,14 +25,15 @@ export function MobileLayout({ title, rootPath, tabs, headerRight }: MobileLayou
   const activeLabel = visibleTabs.find((t) => t.path === active)?.label
 
   useEffect(() => {
-    document.title = activeLabel ? `${activeLabel} · ${title}` : title
-  }, [activeLabel, title])
+    const base = documentTitle || (typeof title === 'string' ? title : 'KSVH QC')
+    document.title = activeLabel ? `${activeLabel} · ${base}` : base
+  }, [activeLabel, title, documentTitle])
 
   return (
     <div
       style={{
         minHeight: '100vh',
-        background: '#0f172a',
+        background: 'var(--app-chrome-solid)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'stretch',
@@ -42,7 +46,7 @@ export function MobileLayout({ title, rootPath, tabs, headerRight }: MobileLayou
           minHeight: '100vh',
           display: 'flex',
           flexDirection: 'column',
-          background: '#ffffff',
+          background: 'var(--app-surface)',
           boxShadow: '0 20px 40px rgba(0, 0, 0, 0.35)',
           position: 'relative',
         }}
@@ -51,18 +55,22 @@ export function MobileLayout({ title, rootPath, tabs, headerRight }: MobileLayou
         <NavBar backIcon={pathname !== rootPath} onBack={() => navigate(-1)} right={headerRight}>
           {title}
         </NavBar>
-        <main style={{ flex: 1, overflowY: 'auto', background: '#f5f5f5' }}>
-          <Suspense fallback={<LoadingState />}>
-            <Outlet />
-          </Suspense>
+        <main style={{ flex: 1, overflowY: 'auto', background: 'var(--app-surface-sunken)' }}>
+          <ContentErrorBoundary>
+            <Suspense fallback={<LoadingState />}>
+              <Outlet />
+            </Suspense>
+          </ContentErrorBoundary>
         </main>
-        {visibleTabs.length > 1 && (
+        {footer !== undefined ? (
+          footer
+        ) : visibleTabs.length > 1 ? (
           <TabBar activeKey={active} onChange={(key) => navigate(key)}>
             {visibleTabs.map((t) => (
               <TabBar.Item key={t.path} icon={t.icon} title={t.label} />
             ))}
           </TabBar>
-        )}
+        ) : null}
         <SafeArea position="bottom" />
       </div>
     </div>

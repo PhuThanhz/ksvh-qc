@@ -19,6 +19,9 @@ import {
   AuditOutlined,
   CalendarOutlined,
   AlertOutlined,
+  BarChartOutlined,
+  FireOutlined,
+  HistoryOutlined,
 } from '@ant-design/icons'
 import type { ReactNode } from 'react'
 import type { MenuEntry } from '@/components/layout/menu.types'
@@ -43,6 +46,9 @@ const MENU_ICONS: Record<MenuIconKey, ReactNode> = {
   plans: <CalendarOutlined />,
   inspections: <AuditOutlined />,
   findings: <AlertOutlined />,
+  riskProfiles: <FireOutlined />,
+  reports: <BarChartOutlined />,
+  auditLogs: <HistoryOutlined />,
   checkin: <EnvironmentOutlined />,
   home: <HomeOutlined />,
 }

@@ -222,9 +222,22 @@ class CriteriaCatalogApiTests extends ApiTestSupport {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("CONFIG_EFFECTIVE_DATE_INVALID"));
 
+        // Kỳ đếm ngoài khoảng 1–24 tháng bị từ chối
         mvc.perform(withJson(post("/api/v1/frequency-configs"),
-                        Map.of("periodMonths", 4, "effectiveFrom", TODAY.plusDays(30).toString())).with(as(1L, MANAGE)))
+                        Map.of("periodMonths", 25, "effectiveFrom", TODAY.plusDays(30).toString())).with(as(1L, MANAGE)))
                 .andExpect(status().isBadRequest());
+        mvc.perform(withJson(post("/api/v1/frequency-configs"),
+                        Map.of("periodMonths", 0, "effectiveFrom", TODAY.plusDays(30).toString())).with(as(1L, MANAGE)))
+                .andExpect(status().isBadRequest());
+
+        // Kỳ đếm không còn bó buộc 3/6: 12 tháng hợp lệ
+        String yearly = mvc.perform(withJson(post("/api/v1/frequency-configs"),
+                        Map.of("periodMonths", 12, "effectiveFrom", TODAY.plusDays(40).toString())).with(as(1L, MANAGE)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.periodMonths").value(12))
+                .andReturn().getResponse().getContentAsString();
+        mvc.perform(delete("/api/v1/frequency-configs/" + read(yearly).get("id").asLong()).with(as(1L, MANAGE)))
+                .andExpect(status().isNoContent());
 
         String res = mvc.perform(withJson(post("/api/v1/frequency-configs"),
                         Map.of("periodMonths", 3, "effectiveFrom", TODAY.plusDays(30).toString())).with(as(1L, MANAGE)))
@@ -261,6 +274,45 @@ class CriteriaCatalogApiTests extends ApiTestSupport {
                         .with(as(1L, MANAGE)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors.maxImpact").value("Mức trần từ 1 đến 5"));
+    }
+
+    @Test
+    void identicalVersionToThePreviousOneIsRejected() throws Exception {
+        // Tần suất: bản +50 ngày = 9 tháng, bản +60 ngày cũng 9 tháng → chặn
+        long freq = read(mvc.perform(withJson(post("/api/v1/frequency-configs"),
+                        Map.of("periodMonths", 9, "effectiveFrom", TODAY.plusDays(50).toString())).with(as(1L, MANAGE)))
+                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString()).get("id").asLong();
+        mvc.perform(withJson(post("/api/v1/frequency-configs"),
+                        Map.of("periodMonths", 9, "effectiveFrom", TODAY.plusDays(60).toString())).with(as(1L, MANAGE)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("CONFIG_UNCHANGED"));
+        mvc.perform(delete("/api/v1/frequency-configs/" + freq).with(as(1L, MANAGE))).andExpect(status().isNoContent());
+
+        // Nâng mức: giống cả 4 thông số → chặn; khác 1 thông số → cho phép
+        Map<String, Object> rule = Map.of("thresholdCount", 7, "stepIncrease", 2, "maxImpact", 4,
+                "resetPeriodMonths", 9, "effectiveFrom", TODAY.plusDays(50).toString());
+        long esc = read(mvc.perform(withJson(post("/api/v1/escalation-rules"), rule).with(as(1L, MANAGE)))
+                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString()).get("id").asLong();
+        Map<String, Object> same = new HashMap<>(rule);
+        same.put("effectiveFrom", TODAY.plusDays(60).toString());
+        mvc.perform(withJson(post("/api/v1/escalation-rules"), same).with(as(1L, MANAGE)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("CONFIG_UNCHANGED"));
+        same.put("maxImpact", 5);
+        long esc2 = read(mvc.perform(withJson(post("/api/v1/escalation-rules"), same).with(as(1L, MANAGE)))
+                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString()).get("id").asLong();
+        mvc.perform(delete("/api/v1/escalation-rules/" + esc2).with(as(1L, MANAGE))).andExpect(status().isNoContent());
+        mvc.perform(delete("/api/v1/escalation-rules/" + esc).with(as(1L, MANAGE))).andExpect(status().isNoContent());
+
+        // Bảng mức: bản +60 ngày giống bản +50 ngày → chặn
+        List<Map<String, Object>> levels = List.of(level("L1", 0, 8, 20), level("L2", 8, null, 2));
+        LocalDate first = TODAY.plusDays(50);
+        mvc.perform(withJson(put("/api/v1/risk-levels"), version(first, levels)).with(as(1L, MANAGE)))
+                .andExpect(status().isOk());
+        mvc.perform(withJson(put("/api/v1/risk-levels"), version(TODAY.plusDays(60), levels)).with(as(1L, MANAGE)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("CONFIG_UNCHANGED"));
+        mvc.perform(delete("/api/v1/risk-levels/versions/" + first).with(as(1L, MANAGE))).andExpect(status().isNoContent());
     }
 
     @Test

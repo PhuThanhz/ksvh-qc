@@ -1,19 +1,16 @@
-import { Alert, Button, Flex, Form, Input, Radio, Select, Space, Tag } from 'antd'
+import { Alert, Button, Flex, Form, Input, Radio, Select, Space } from 'antd'
 import dayjs from 'dayjs'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect } from 'react'
 import { useSession } from '@/features/auth'
 import { useCriterionGroups } from '@/features/criteria/hooks/useCriteria'
 import { useTemplates } from '@/features/criteria/hooks/useTemplates'
 import { useInspectionMutations, usePlans } from '@/features/inspections/hooks/useInspectionData'
-import {
-  INSPECTION_KIND_LABEL,
-  INSPECTION_MODE_LABEL,
-  type InspectionBatchCreateRequest,
-} from '@/features/inspections/inspection.types'
+import { INSPECTION_KIND_LABEL, INSPECTION_MODE_LABEL, type InspectionBatchCreateRequest } from '@/features/inspections/inspection.types'
 import { useOrgUnits } from '@/features/organizations/hooks/useOrganizations'
 import { useUsers } from '@/features/users/hooks/useUsers'
 import { useNotify } from '@/hooks/useNotify'
 import { PERMISSIONS, ROLES, usePermission } from '@/permissions'
+import { BatchRestaurantSelector } from './batch/BatchRestaurantSelector'
 
 interface Props {
   onSuccess: () => void
@@ -35,38 +32,7 @@ export function InspectionBatchForm({ onSuccess, onCancel }: Props) {
   const groups = useCriterionGroups()
   const kind = Form.useWatch('inspectionType', form)
   const isPeriodic = kind !== 'SURPRISE'
-
   const selectedRestaurantIds = Form.useWatch('restaurantIds', form) ?? []
-  const [companyFilter, setCompanyFilter] = useState<number | undefined>(undefined)
-
-  const allActiveRestaurants = useMemo(
-    () => (restaurants.data?.items ?? []).filter((r) => r.active),
-    [restaurants.data],
-  )
-
-  const companies = useMemo(() => {
-    const map = new Map<number, string>()
-    allActiveRestaurants.forEach((r) => {
-      if (r.companyId && r.companyName) {
-        map.set(r.companyId, r.companyName)
-      }
-    })
-    return Array.from(map.entries()).map(([id, name]) => ({ id, name }))
-  }, [allActiveRestaurants])
-
-  const availableRestaurants = useMemo(() => {
-    if (!companyFilter) return allActiveRestaurants
-    return allActiveRestaurants.filter((r) => r.companyId === companyFilter)
-  }, [allActiveRestaurants, companyFilter])
-
-  const selectAll = () => {
-    const ids = availableRestaurants.map((r) => r.id)
-    form.setFieldValue('restaurantIds', ids)
-  }
-
-  const clearSelection = () => {
-    form.setFieldValue('restaurantIds', [])
-  }
 
   useEffect(() => {
     const initialInspectorId = !canPlan && user?.id ? user.id : undefined
@@ -100,7 +66,7 @@ export function InspectionBatchForm({ onSuccess, onCancel }: Props) {
         type="info"
         showIcon
         style={{ marginBottom: 16 }}
-        message="Tạo đợt kiểm tra hàng loạt cho nhiều nhà hàng đồng thời cùng tiêu chí và chuyên viên."
+        title="Tạo đợt kiểm tra hàng loạt cho nhiều nhà hàng đồng thời cùng tiêu chí và chuyên viên."
       />
 
       <Form.Item
@@ -112,7 +78,11 @@ export function InspectionBatchForm({ onSuccess, onCancel }: Props) {
         <Input placeholder="VD: KT-202611" />
       </Form.Item>
 
-      <Form.Item name="planId" label="Kế hoạch kiểm tra (tuỳ chọn)">
+      <Form.Item
+        name="planId"
+        label={isPeriodic ? 'Kế hoạch kiểm tra (bắt buộc với định kỳ)' : 'Kế hoạch kiểm tra (tuỳ chọn)'}
+        rules={isPeriodic ? [{ required: true, message: 'Kiểm tra định kỳ bắt buộc chọn kế hoạch đã duyệt' }] : []}
+      >
         <Select
           allowClear
           placeholder="Chọn kế hoạch đã duyệt..."
@@ -120,47 +90,7 @@ export function InspectionBatchForm({ onSuccess, onCancel }: Props) {
         />
       </Form.Item>
 
-      <Form.Item
-        label={
-          <Flex justify="space-between" align="center" style={{ width: '100%' }}>
-            <span>Danh sách nhà hàng kiểm tra</span>
-            <Space size={4}>
-              <Button size="small" type="link" onClick={selectAll}>Chọn tất cả ({availableRestaurants.length})</Button>
-              <Button size="small" type="link" danger onClick={clearSelection}>Bỏ chọn</Button>
-            </Space>
-          </Flex>
-        }
-        name="restaurantIds"
-        rules={[{ required: true, message: 'Vui lòng chọn ít nhất một nhà hàng' }]}
-        extra={
-          <Flex justify="space-between" align="center" style={{ marginTop: 4 }}>
-            <span>
-              Lọc thương hiệu:{' '}
-              <Select
-                size="small"
-                allowClear
-                style={{ width: 160 }}
-                placeholder="Tất cả thương hiệu"
-                value={companyFilter}
-                onChange={setCompanyFilter}
-                options={companies.map((c) => ({ value: c.id, label: c.name }))}
-              />
-            </span>
-            {selectedRestaurantIds.length > 0 && <Tag color="processing">Đã chọn: {selectedRestaurantIds.length} nhà hàng</Tag>}
-          </Flex>
-        }
-      >
-        <Select
-          mode="multiple"
-          maxTagCount="responsive"
-          placeholder="Chọn các nhà hàng cần kiểm tra..."
-          filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
-          options={availableRestaurants.map((r) => ({
-            value: r.id,
-            label: `${r.code} - ${r.name}${r.companyName ? ` [${r.companyName}]` : ''}`,
-          }))}
-        />
-      </Form.Item>
+      <BatchRestaurantSelector form={form} restaurants={restaurants.data?.items ?? []} />
 
       <Form.Item name="inspectionType" label="Loại kiểm tra" rules={[{ required: true }]}>
         <Radio.Group

@@ -1,32 +1,121 @@
-# Hạ tầng cho dev/staging. Trên máy dev hiện tại Postgres chạy bằng Homebrew,
-# nên có thể chỉ cần: docker compose up -d minio minio-init
+# ==============================================================================
+# Docker Compose cho Toàn Bộ Hệ Thống KSVH QC
+# Chạy toàn bộ hệ thống: docker compose up -d --build
+# ==============================================================================
+
 services:
   postgres:
-    image: postgres:17
+    image: postgres:17-alpine
+    container_name: ksvh-postgres
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: ksvh_qc
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports: ["5432:5432"]
-    volumes: [pgdata:/var/lib/postgresql/data]
+      POSTGRES_DB: ${DB_NAME:-ksvh_qc}
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres_strong_password_change_me}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres} -d ${DB_NAME:-ksvh_qc}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ksvh-network
 
   minio:
     image: minio/minio:latest
+    container_name: ksvh-minio
+    restart: unless-stopped
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    ports: ["9000:9000", "9001:9001"]   # 9001 = giao diện quản lý MinIO
-    volumes: [miniodata:/data]
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:-minioadmin_secret_change_me}
+    ports:
+      - "${S3_PORT:-9000}:9000"
+      - "${S3_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - miniodata:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ksvh-network
 
-  # Tạo sẵn bucket ksvh-qc một lần
   minio-init:
     image: minio/mc:latest
-    depends_on: [minio]
+    container_name: ksvh-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
     entrypoint: >
-      /bin/sh -c "until mc alias set local http://minio:9000 minioadmin minioadmin; do sleep 1; done;
-      mc mb --ignore-existing local/ksvh-qc"
+      /bin/sh -c "
+      until mc alias set local http://minio:9000 ${S3_ACCESS_KEY:-minioadmin} ${S3_SECRET_KEY:-minioadmin_secret_change_me}; do sleep 1; done;
+      mc mb --ignore-existing local/${S3_BUCKET:-ksvh-qc};
+      mc anonymous set download local/${S3_BUCKET:-ksvh-qc} || true;
+      exit 0;
+      "
+    networks:
+      - ksvh-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ksvh-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      DB_URL: jdbc:postgresql://postgres:5432/${DB_NAME:-ksvh_qc}
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres_strong_password_change_me}
+      JWT_SECRET: ${JWT_SECRET:-ksvh-production-secret-key-must-be-at-least-32-chars-long-12345}
+      APP_CLIENT_URL: ${APP_CLIENT_URL:-https://qc.ksvh.vn}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-https://qc.ksvh.vn,http://localhost:5273}
+      AUTH_ALLOWED_ORIGINS: ${AUTH_ALLOWED_ORIGINS:-https://qc.ksvh.vn,http://localhost:5273}
+      S3_ENDPOINT: http://minio:9000
+      S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT:-https://qc.ksvh.vn/storage}
+      S3_BUCKET: ${S3_BUCKET:-ksvh-qc}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-minioadmin}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-minioadmin_secret_change_me}
+      NOTIFICATION_MAIL_ENABLED: ${NOTIFICATION_MAIL_ENABLED:-false}
+      NOTIFICATION_MAIL_FROM: ${NOTIFICATION_MAIL_FROM:-noreply@ksvh.vn}
+      MAIL_HOST: ${MAIL_HOST:-}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      NOTIFICATION_ZALO_ENABLED: ${NOTIFICATION_ZALO_ENABLED:-false}
+    ports:
+      - "${BACKEND_PORT:-8088}:8088"
+    networks:
+      - ksvh-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ksvh-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    networks:
+      - ksvh-network
 
 volumes:
   pgdata:
   miniodata:
+
+networks:
+  ksvh-network:
+    driver: bridge

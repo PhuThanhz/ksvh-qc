@@ -24,11 +24,12 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
     <DataTable<Criterion>
       {...props}
       rowKey="id"
+      scroll={{ x: 1000 }}
       columns={[
         {
           title: '#',
           key: 'index',
-          width: 60,
+          width: 56,
           align: 'center',
           render: (_: unknown, __: unknown, index: number) =>
             ((props.params?.page ?? 0) * (props.params?.size ?? 20)) + index + 1,
@@ -43,7 +44,6 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
           render: (groupName: string, c: Criterion) => (
             <Tooltip title={onFilterGroup ? `Nhấp để lọc nhóm: ${groupName}` : undefined}>
               <Tag
-                color="cyan"
                 style={{ cursor: onFilterGroup ? 'pointer' : 'default', fontWeight: 500 }}
                 onClick={onFilterGroup ? () => onFilterGroup(c.groupId) : undefined}
               >
@@ -57,6 +57,7 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
           dataIndex: 'name',
           key: 'name',
           sorter: true,
+          width: 260,
           render: (name: string, c: Criterion) => (
             <Flex vertical style={{ maxWidth: 360 }}>
               <Typography.Link onClick={() => onView(c)} style={{ fontWeight: 500 }}>
@@ -83,7 +84,6 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
                 {templates.map((t) => (
                   <Tooltip key={t.id} title={`Nhấp để lọc mẫu: ${t.name}`}>
                     <Tag
-                      color="geekblue"
                       style={{ cursor: onFilterTemplate ? 'pointer' : 'default' }}
                       onClick={onFilterTemplate ? () => onFilterTemplate(t.id) : undefined}
                     >
@@ -105,7 +105,7 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
         {
           title: 'Thao tác',
           key: 'actions',
-          width: 120,
+          width: 140,
           fixed: 'right',
           render: (_: unknown, c: Criterion) => (
             <TableActions

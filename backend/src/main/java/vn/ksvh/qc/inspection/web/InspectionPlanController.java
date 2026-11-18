@@ -12,15 +12,19 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import vn.ksvh.qc.inspection.domain.PlanStatus;
+import vn.ksvh.qc.inspection.dto.PlanAssignmentRequest;
 import vn.ksvh.qc.inspection.dto.PlanCreateRequest;
 import vn.ksvh.qc.inspection.dto.PlanRejectRequest;
 import vn.ksvh.qc.inspection.dto.PlanResponse;
 import vn.ksvh.qc.inspection.dto.PlanUpdateRequest;
+import vn.ksvh.qc.inspection.dto.PriorFindingsWarning;
 import vn.ksvh.qc.inspection.service.InspectionPlanService;
 import vn.ksvh.qc.security.CurrentUser;
 import vn.ksvh.qc.security.permission.PermissionCodes;
 import vn.ksvh.qc.shared.web.ApiPaths;
 import vn.ksvh.qc.shared.web.PageResponse;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(ApiPaths.V1 + "/inspection-plans")
@@ -42,6 +46,23 @@ public class InspectionPlanController {
     @PreAuthorize("hasAnyAuthority('" + PermissionCodes.PLAN_READ + "')")
     public PlanResponse get(@PathVariable Long id) {
         return service.get(id);
+    }
+
+    @GetMapping("/{id}/copyable-assignments")
+    @PreAuthorize("hasAnyAuthority('" + PermissionCodes.PLAN_READ + "', '" + PermissionCodes.PLAN_CREATE + "')")
+    public List<PlanAssignmentRequest> getCopyableAssignments(
+            @PathVariable Long id,
+            @RequestParam java.time.LocalDate targetStartDate,
+            @RequestParam java.time.LocalDate targetEndDate) {
+        return service.getCopyableAssignments(id, targetStartDate, targetEndDate);
+    }
+
+    @GetMapping("/restaurant-warnings")
+    @PreAuthorize("hasAnyAuthority('" + PermissionCodes.PLAN_READ + "', '" + PermissionCodes.PLAN_CREATE + "')")
+    public PriorFindingsWarning getRestaurantWarning(
+            @RequestParam Long restaurantId,
+            @RequestParam(required = false) java.time.LocalDate beforeDate) {
+        return service.getRestaurantWarning(restaurantId, beforeDate);
     }
 
     @PostMapping

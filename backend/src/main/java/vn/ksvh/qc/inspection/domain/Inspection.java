@@ -86,6 +86,13 @@ public class Inspection extends BaseEntity {
     @Column(name = "completed_at")
     private Instant completedAt;
 
+    /** CHT xác nhận đã xem (phiếu không có lỗi). */
+    @Column(name = "acknowledged_by")
+    private Long acknowledgedBy;
+
+    @Column(name = "acknowledged_at")
+    private Instant acknowledgedAt;
+
     @Column(length = 1000)
     private String notes;
 

@@ -71,7 +71,7 @@ export function RestaurantComplianceChart({ data, loading, onSelectRestaurant }:
           label: {
             show: true,
             position: 'top',
-            formatter: '{c}%',
+            formatter: (p: { value: number }) => (p.value > 0 ? `${p.value}%` : ''),
             color: CHART_COLORS.text,
             fontWeight: 600,
             fontSize: 12,

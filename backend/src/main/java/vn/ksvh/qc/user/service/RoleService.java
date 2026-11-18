@@ -43,6 +43,7 @@ public class RoleService {
 
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
+    private final org.springframework.context.ApplicationEventPublisher eventPublisher;
 
     public List<RoleResponse> list() {
         Map<Long, Long> counts = userCounts();
@@ -80,14 +81,28 @@ public class RoleService {
         role.setCode(code);
         role.setSystemRole(false);
         apply(role, req, actorId);
-        return toResponse(roleRepository.saveAndFlush(role));
+        RoleResponse res = toResponse(roleRepository.saveAndFlush(role));
+        if (eventPublisher != null) {
+            eventPublisher.publishEvent(vn.ksvh.qc.shared.audit.AuditLogEvent.of(
+                    actorId, "ROLE_CREATE", "ROLE", role.getCode(),
+                    "Tạo vai trò " + role.getName() + " (" + role.getCode() + ")"
+            ));
+        }
+        return res;
     }
 
     @Transactional
     public RoleResponse update(Long id, RoleRequest req, Long actorId) {
         Role role = load(id);
         apply(role, req, actorId);
-        return toResponse(roleRepository.saveAndFlush(role));
+        RoleResponse res = toResponse(roleRepository.saveAndFlush(role));
+        if (eventPublisher != null) {
+            eventPublisher.publishEvent(vn.ksvh.qc.shared.audit.AuditLogEvent.of(
+                    actorId, "ROLE_UPDATE", "ROLE", role.getCode(),
+                    "Cập nhật vai trò " + role.getName() + " (" + role.getCode() + ") với " + role.getPermissions().size() + " quyền"
+            ));
+        }
+        return res;
     }
 
     @Transactional
@@ -103,6 +118,12 @@ public class RoleService {
                     "Vai trò '%s' đang được gán cho %d người dùng, hãy gỡ trước khi xoá".formatted(role.getName(), users));
         }
         roleRepository.delete(role);
+        if (eventPublisher != null) {
+            eventPublisher.publishEvent(vn.ksvh.qc.shared.audit.AuditLogEvent.of(
+                    null, "ROLE_DELETE", "ROLE", role.getCode(),
+                    "Xoá vai trò " + role.getName() + " (" + role.getCode() + ")"
+            ));
+        }
     }
 
     private void apply(Role role, RoleRequest req, Long actorId) {

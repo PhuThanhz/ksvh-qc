@@ -17,3 +17,10 @@ export function parseMediaUrls(urls?: string | null): string[] {
   if (!urls) return []
   return urls.split(',').map((u) => u.trim()).filter(Boolean)
 }
+
+/** Kiểm tra tệp có phải là video (mp4, mov) hay không */
+export function isVideoUrl(url?: string | null): boolean {
+  if (!url) return false
+  const lower = url.toLowerCase()
+  return lower.endsWith('.mp4') || lower.endsWith('.mov') || lower.includes('/videos/')
+}

@@ -36,7 +36,7 @@ export function CriterionDetailModal({ open, criterion, onClose, onEdit }: Crite
       children: (
         <Space>
           <ImpactTag value={criterion.baseImpact} />
-          <span style={{ color: 'rgba(0,0,0,0.45)', fontSize: 13 }}>
+          <span style={{ color: 'var(--app-text-secondary)', fontSize: 13 }}>
             (Điểm rủi ro = mức ảnh hưởng × tần suất lỗi)
           </span>
         </Space>

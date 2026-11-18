@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import vn.ksvh.qc.inspection.domain.InspectionStatus;
 import vn.ksvh.qc.inspection.dto.*;
 import vn.ksvh.qc.inspection.service.InspectionService;
+import vn.ksvh.qc.inspection.service.SurpriseInspectionSuggestionService;
 import vn.ksvh.qc.security.CurrentUser;
 import vn.ksvh.qc.security.permission.PermissionCodes;
 import vn.ksvh.qc.shared.web.ApiPaths;
@@ -27,6 +28,13 @@ import java.util.List;
 public class InspectionController {
 
     private final InspectionService service;
+    private final SurpriseInspectionSuggestionService suggestionService;
+
+    @GetMapping("/surprise-suggestions")
+    @PreAuthorize("hasAnyAuthority('" + PermissionCodes.PLAN_CREATE + "', '" + PermissionCodes.INSPECTION_PERFORM + "', '" + PermissionCodes.INSPECTION_READ_ALL + "', '" + PermissionCodes.INSPECTION_READ_OWN + "')")
+    public List<SurpriseInspectionSuggestion> getSurpriseSuggestions(@AuthenticationPrincipal Jwt jwt) {
+        return suggestionService.getSuggestions(CurrentUser.from(jwt));
+    }
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('" + PermissionCodes.INSPECTION_READ_ALL + "', '" + PermissionCodes.INSPECTION_READ_OWN + "')")
@@ -84,6 +92,13 @@ public class InspectionController {
     public InspectionResponse submit(@PathVariable Long id, @Valid @RequestBody InspectionSubmitRequest req,
                                      @AuthenticationPrincipal Jwt jwt) {
         return service.submit(id, req, CurrentUser.from(jwt));
+    }
+
+    /** CHT xác nhận đã xem phiếu không có lỗi (AWAITING_ACK → COMPLETED). */
+    @PostMapping("/{id}/acknowledge")
+    @PreAuthorize("hasAuthority('" + PermissionCodes.FINDING_RESPOND + "')")
+    public InspectionResponse acknowledge(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
+        return service.acknowledge(id, CurrentUser.from(jwt));
     }
 
     @PostMapping("/{id}/cancel")

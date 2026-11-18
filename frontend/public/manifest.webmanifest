@@ -1,0 +1,25 @@
+{
+  "name": "KSVH QC - Kiểm soát vận hành",
+  "short_name": "KSVH QC",
+  "description": "Phần mềm Kiểm soát Vận hành & Quản trị Chất lượng",
+  "start_url": "/qc",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0f172a",
+  "theme_color": "#1677ff",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

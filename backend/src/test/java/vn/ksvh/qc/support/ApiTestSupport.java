@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
+import vn.ksvh.qc.media.service.ObjectStore;
 import vn.ksvh.qc.security.jwt.JwtService;
 
 import java.util.Arrays;
@@ -39,6 +41,10 @@ public abstract class ApiTestSupport {
 
     protected MockMvc mvc;
 
+    /** Kho ảnh giả: test không cần MinIO. Mặc định mọi object "tồn tại"; test có thể đổi để thử ảnh không tồn tại. */
+    @MockitoBean
+    protected ObjectStore objectStore;
+
     /** Hậu tố ngẫu nhiên để dữ liệu test không trùng với dữ liệu dev đang có trong DB. */
     protected String suffix;
 
@@ -48,6 +54,12 @@ public abstract class ApiTestSupport {
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
         suffix = UUID.randomUUID().toString().substring(0, 8).toLowerCase();
+        org.mockito.Mockito.when(objectStore.exists(org.mockito.ArgumentMatchers.anyString())).thenReturn(true);
+    }
+
+    /** Object key hợp lệ như server cấp qua presign-upload cho user uploaderId. */
+    protected static String evidenceKey(long uploaderId) {
+        return "photos/2026/11/u%d/%s.jpg".formatted(uploaderId, UUID.randomUUID());
     }
 
     /** Access token giả lập của user uid với các permission cho trước. */

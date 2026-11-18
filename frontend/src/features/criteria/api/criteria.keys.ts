@@ -13,7 +13,6 @@ export const criteriaKeys = {
   templateOptions: () => [...criteriaKeys.templates(), 'options'] as const,
   template: (id: Id) => [...criteriaKeys.templates(), 'detail', id] as const,
   riskLevels: () => [...criteriaKeys.all, 'risk-levels'] as const,
-  riskPreview: (baseImpact: number, violations: number) => [...criteriaKeys.all, 'risk-preview', baseImpact, violations] as const,
   riskLevelVersions: () => [...criteriaKeys.riskLevels(), 'versions'] as const,
   frequency: () => [...criteriaKeys.all, 'frequency'] as const,
   escalation: () => [...criteriaKeys.all, 'escalation'] as const,
