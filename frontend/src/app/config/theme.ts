@@ -25,6 +25,7 @@ export const antdTheme: ThemeConfig = {
 
     colorTextBase: '#0f172a',
     colorTextSecondary: '#475569',
+    colorTextPlaceholder: '#64748b',
     colorBorder: 'rgba(15, 23, 42, 0.08)',
     colorBorderSecondary: 'rgba(15, 23, 42, 0.05)',
     colorBgLayout: 'transparent',

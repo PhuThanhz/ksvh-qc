@@ -76,14 +76,11 @@
 .app-shell--themed .app-sidebar .ant-menu-item-selected :is(.ant-menu-item-icon, a, .ant-menu-title-content) { color: #ffffff !important; }
 
 /* ---------- 3. Tiêu đề trang & Nút hành động (Page Header & Actions) ---------- */
-.app-shell--themed .page-header h2.ant-typography {
+.app-shell--themed .page-header h2.ant-typography { color: #ffffff !important; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6) !important; font-weight: 700 !important; }
+.app-shell--themed .page-header :is(.page-subtitle, .page-header__subtitle) {
   color: #ffffff !important;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5) !important;
-  font-weight: 700 !important;
-}
-.app-shell--themed .page-header .page-header__subtitle {
-  color: rgba(255, 255, 255, 0.88) !important;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) !important;
+  font-weight: 500 !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.75), 0 2px 8px rgba(0, 0, 0, 0.5) !important;
 }
 
 /* Nút phụ góc phải tiêu đề: kính trong suốt phản chiếu hình nền */
@@ -134,9 +131,24 @@
   -webkit-backdrop-filter: none !important;
   border: 1px solid rgba(0, 0, 0, 0.08) !important;
   border-radius: 14px !important;
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.05),
-    0 8px 24px -10px rgba(0, 0, 0, 0.35) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 8px 24px -10px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Ô nhập liệu & Placeholder: Sắc nét, tương phản cao, dễ đọc */
+.app-shell--themed ::placeholder,
+.app-shell--themed .ant-select-selection-placeholder {
+  color: #64748b !important;
+  opacity: 1 !important;
+}
+.app-shell--themed .glass-panel :is(.ant-input, .ant-select-selector, .ant-picker) {
+  background: #f8fafc !important;
+  border: 1px solid rgba(15, 23, 42, 0.16) !important;
+  border-radius: 8px !important;
+}
+.app-shell--themed .glass-panel :is(.ant-input:focus, .ant-select-focused .ant-select-selector, .ant-picker-focused) {
+  background: #ffffff !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.14) !important;
 }
 
 /* Bảng dữ liệu trong khối trắng */
@@ -145,23 +157,8 @@
   border-radius: 10px !important;
 }
 
-.app-shell--themed .ant-table-wrapper .ant-table-thead > tr > th {
-  background: #f8fafc !important;
-  color: #475569 !important;
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.03em !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
-  padding: 10px 14px !important;
-}
-
-.app-shell--themed .ant-table-wrapper .ant-table-tbody > tr > td {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
-  padding: 11px 14px !important;
-  font-size: 13.5px !important;
-  color: #0f172a !important;
-}
+.app-shell--themed .ant-table-wrapper thead th { background: #f8fafc !important; color: #475569 !important; font-size: 12px !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.03em !important; border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important; padding: 10px 14px !important; }
+.app-shell--themed .ant-table-wrapper tbody td { border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important; padding: 11px 14px !important; font-size: 13.5px !important; color: #0f172a !important; }
 
 /* Cột cố định (Fixed Columns) của bảng: BẮT BUỘC nền trắng đặc 100% */
 .app-shell--themed .ant-table-wrapper :is(.ant-table-cell-fix-left, .ant-table-cell-fix-right) { background: #ffffff !important; z-index: 2 !important; }
@@ -181,16 +178,7 @@
   box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.16) !important;
 }
 .app-shell--themed .ant-tabs-nav::before { display: none !important; }
-.app-shell--themed .ant-tabs-tab {
-  color: rgba(255, 255, 255, 0.82) !important;
-  font-size: 13.5px !important;
-  font-weight: 500 !important;
-  padding: 7px 18px !important;
-  border-radius: 8px !important;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  border: none !important;
-  margin: 0 2px !important;
-}
+.app-shell--themed .ant-tabs-tab { color: rgba(255, 255, 255, 0.82) !important; font-size: 13.5px !important; font-weight: 500 !important; padding: 7px 18px !important; border-radius: 8px !important; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important; border: none !important; margin: 0 2px !important; }
 .app-shell--themed .ant-tabs-tab:hover { color: #ffffff !important; background: rgba(255, 255, 255, 0.12) !important; }
 .app-shell--themed .ant-tabs-tab-active {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 55%, #1d4ed8 100%) !important;

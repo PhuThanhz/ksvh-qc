@@ -38,11 +38,12 @@ export function PageContainer({ title, subtitle, extra, children }: PageContaine
               <Typography.Text
                 className="page-subtitle"
                 style={{
-                  color: 'rgba(255, 255, 255, 0.86)',
+                  color: '#ffffff',
+                  fontWeight: 500,
                   fontSize: 13.5,
                   marginTop: 4,
                   display: 'block',
-                  textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
+                  textShadow: '0 1px 4px rgba(0, 0, 0, 0.75), 0 2px 8px rgba(0, 0, 0, 0.5)',
                 }}
               >
                 {subtitle}
