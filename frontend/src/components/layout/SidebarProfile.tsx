@@ -100,10 +100,11 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
           <Button
             type="text"
             block
+            className="glass-profile-card"
             style={{
               height: 'auto',
-              padding: '6px 8px',
-              borderRadius: 8,
+              padding: '8px 10px',
+              borderRadius: 14,
               textAlign: 'left',
               display: 'flex',
               alignItems: 'center',

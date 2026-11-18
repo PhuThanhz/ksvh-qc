@@ -1,3 +1,4 @@
+import '@fontsource-variable/inter'
 import dayjs from 'dayjs'
 import 'dayjs/locale/vi'
 import { StrictMode } from 'react'

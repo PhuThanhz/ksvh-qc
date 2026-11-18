@@ -27,10 +27,10 @@
   --app-chrome-solid-mid: #334155;
 
   --app-on-dark: #ffffff;
-  --app-on-dark-secondary: rgba(255, 255, 255, 0.65);
-  --app-on-dark-muted: rgba(255, 255, 255, 0.45);
-  --app-on-dark-faint: rgba(255, 255, 255, 0.35);
-  --app-on-dark-border: rgba(255, 255, 255, 0.08);
+  --app-on-dark-secondary: rgba(255, 255, 255, 0.75);
+  --app-on-dark-muted: rgba(255, 255, 255, 0.55);
+  --app-on-dark-faint: rgba(255, 255, 255, 0.40);
+  --app-on-dark-border: rgba(255, 255, 255, 0.18);
   --app-on-dark-glass: rgba(255, 255, 255, 0.14);
   --app-on-dark-glass-border: rgba(255, 255, 255, 0.28);
 
@@ -364,46 +364,93 @@ td.ant-table-cell:last-child {
    KHUNG ADMIN: sidebar + header kính mờ trung tính (đen trong), hợp mọi ảnh nền
    ========================================================================== */
 
-.bitrix-frosted-sidebar {
-  background: #0f172a !important;
-  border-inline-end: 1px solid rgba(255, 255, 255, 0.08) !important;
+/* ==========================================================================
+   ĐẶC TẢ NỀN HEADER & SIDEBAR — KÍNH MỜ PRE-BLURRED (Bitrix Glass)
+   - Nền: Bỏ hẳn #0f172a / #111c34, thay bằng ảnh nền đã mờ sẵn + lớp phủ đen
+   - Viền: rgba(255, 255, 255, 0.18)
+   - Chữ: trắng, text-shadow nhẹ 0 1px 2px rgba(0, 0, 0, 0.25)
+   - Menu đang chọn: ô kính rgba(255, 255, 255, 0.22) + viền 1px solid rgba(255, 255, 255, 0.35), bo 12px
+   - Hover: rgba(255, 255, 255, 0.12)
+   - Không lag: không dùng backdrop-filter, dùng background-attachment: fixed trên ảnh mờ
+   - Fallback: rgba(15, 23, 42, 0.55)
+   ========================================================================== */
+
+.bitrix-frosted-sidebar,
+.glass-chrome-sidebar {
+  background: rgba(15, 23, 42, 0.55) !important; /* Fallback an toàn */
+  border-inline-end: 1px solid rgba(255, 255, 255, 0.18) !important;
   box-shadow: none !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Lớp ảnh mờ dựng sẵn - khớp đúng vị trí ảnh nền phía sau */
+.bitrix-frosted-sidebar::before,
+.glass-chrome-sidebar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: var(--ambient-bg-blur, var(--ambient-bg-image));
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+}
+
+/* Lớp phủ tối 18-28% để chữ menu trắng luôn tương phản rõ */
+.bitrix-frosted-sidebar::after,
+.glass-chrome-sidebar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.18));
+  pointer-events: none;
+}
+
+/* Đảm bảo nội dung sidebar nằm trên các lớp nền */
+.bitrix-frosted-sidebar > *,
+.glass-chrome-sidebar > * {
+  position: relative;
+  z-index: 1;
 }
 
 .bitrix-frosted-sidebar .ant-menu {
   background: transparent !important;
   border-inline-end: none !important;
+  position: relative;
+  z-index: 1;
 }
 
 .bitrix-frosted-sidebar .ant-menu-item,
 .bitrix-frosted-sidebar .ant-menu-submenu-title {
-  color: rgba(255, 255, 255, 0.75) !important;
-  font-size: 13.5px !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-size: 14px !important;
   font-weight: 500 !important;
-  border-radius: 6px !important;
-  margin-inline: 8px !important;
-  margin-block: 2px !important;
-  border: none !important;
+  border-radius: 10px !important;
+  margin-inline: 10px !important;
+  margin-block: 3px !important;
+  border: 1px solid transparent !important;
   outline: none !important;
   box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  transition: all 0.15s ease !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease !important;
 }
 
 .bitrix-frosted-sidebar .ant-menu-item .ant-menu-item-icon,
 .bitrix-frosted-sidebar .ant-menu-submenu-title .ant-menu-item-icon {
-  color: rgba(255, 255, 255, 0.7) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
   font-size: 16px !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
 }
 
 .bitrix-frosted-sidebar .ant-menu-item:hover,
 .bitrix-frosted-sidebar .ant-menu-submenu-title:hover {
-  background: rgba(255, 255, 255, 0.08) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
   color: #ffffff !important;
-  border: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
   box-shadow: none !important;
-  backdrop-filter: none !important;
 }
 
 .bitrix-frosted-sidebar .ant-menu-item:hover .ant-menu-item-icon,
@@ -411,16 +458,14 @@ td.ant-table-cell:last-child {
   color: #ffffff !important;
 }
 
-/* Selected: Phẳng, trong suốt nhẹ nhàng, không viền và không bóng 3D */
+/* Selected: Viên kính sáng hơn có viền trắng mảnh bo 12px theo ảnh mẫu */
 .bitrix-frosted-sidebar .ant-menu-item-selected {
-  background: rgba(255, 255, 255, 0.16) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+  background: rgba(255, 255, 255, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  border-radius: 12px !important;
   color: #ffffff !important;
   font-weight: 600 !important;
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
 }
 
 .bitrix-frosted-sidebar .ant-menu-item-selected .ant-menu-item-icon,
@@ -429,10 +474,69 @@ td.ant-table-cell:last-child {
   color: #ffffff !important;
 }
 
-.bitrix-frosted-header {
-  background: #111c34 !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12) !important;
+/* Header kính mờ */
+.bitrix-frosted-header,
+.glass-chrome-header {
+  background: rgba(15, 23, 42, 0.55) !important; /* Fallback */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow: none !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.bitrix-frosted-header::before,
+.glass-chrome-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: var(--ambient-bg-blur, var(--ambient-bg-image));
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+}
+
+.bitrix-frosted-header::after,
+.glass-chrome-header::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: rgba(0, 0, 0, 0.22);
+  pointer-events: none;
+}
+
+.bitrix-frosted-header > *,
+.glass-chrome-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Nút trên header và các pill kính */
+.glass-pill-btn,
+.bitrix-frosted-header .ant-btn:not(.ant-btn-link) {
+  background: rgba(255, 255, 255, 0.14) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+  backdrop-filter: none !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
+  transition: all 0.18s ease !important;
+}
+.glass-pill-btn:hover,
+.bitrix-frosted-header .ant-btn:not(.ant-btn-link):hover {
+  background: rgba(255, 255, 255, 0.22) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  color: #ffffff !important;
+}
+
+/* Thẻ hồ sơ đáy sidebar */
+.glass-profile-card {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-radius: 14px !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
 }
 
 .bitrix-badge-count {

@@ -26,21 +26,20 @@ export function AppHeader({ collapsed, onToggleSidebar, menu }: AppHeaderProps) 
         {onToggleSidebar && (
           <Button
             type="text"
+            className="glass-pill-btn"
             icon={
               collapsed ? (
-                <MenuUnfoldOutlined style={{ color: 'var(--app-on-dark)', fontSize: 16 }} />
+                <MenuUnfoldOutlined style={{ color: '#ffffff', fontSize: 16 }} />
               ) : (
-                <MenuFoldOutlined style={{ color: 'var(--app-on-dark)', fontSize: 16 }} />
+                <MenuFoldOutlined style={{ color: '#ffffff', fontSize: 16 }} />
               )
             }
             onClick={onToggleSidebar}
             aria-label={collapsed ? 'Mở thanh điều hướng' : 'Thu gọn thanh điều hướng'}
             style={{
-              width: 32,
-              height: 32,
+              width: 34,
+              height: 34,
               borderRadius: 8,
-              background: 'rgba(255, 255, 255, 0.12)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
               flexShrink: 0,
             }}
           />
