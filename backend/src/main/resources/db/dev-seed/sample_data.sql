@@ -9,9 +9,7 @@
 
 -- 1. Công ty
 INSERT INTO companies (code, name) VALUES
-    ('LOTUS',  'CÔNG TY CP TẬP ĐOÀN LOTUS (V-Lotus Holdings F&B)'),
-    ('GGG',    'CÔNG TY CP THƯƠNG MẠI DỊCH VỤ CỔNG VÀNG (Golden Gate Group)'),
-    ('REDSUN', 'CÔNG TY CP ĐẦU TƯ THƯƠNG MẠI QUỐC TẾ MẶT TRỜI ĐỎ (Redsun ITI)')
+    ('LOTUS',  'CÔNG TY CP TẬP ĐOÀN LOTUS (V-Lotus Holdings F&B)')
 ON CONFLICT DO NOTHING;
 
 -- 2. Nhà hàng & phòng ban (CHT = tài khoản store, OBM = tài khoản obm)
@@ -20,13 +18,10 @@ SELECT c.id, v.unit_type, v.code, v.name, v.address, v.lat, v.lng, v.radius,
        CASE WHEN v.unit_type = 'RESTAURANT' THEN (SELECT id FROM users WHERE username = 'store') END,
        CASE WHEN v.unit_type = 'RESTAURANT' THEN (SELECT id FROM users WHERE username = 'obm') END
 FROM (VALUES
-    ('GGG',    'RESTAURANT', 'KICHI-01',  'Kichi-Kichi Vincom Đồng Khởi', 'Tầng B3-01, Vincom Center, 72 Lê Thánh Tôn, Bến Nghé, Quận 1, TP.HCM', 10.7774, 106.7022, 100),
-    ('GGG',    'RESTAURANT', 'GOGI-01',   'Gogi House Nguyễn Thị Thập', '521 Nguyễn Thị Thập, Tân Phong, Quận 7, TP.HCM', 10.7381, 106.7115, 100),
-    ('REDSUN', 'RESTAURANT', 'KBBQ-01',   'King BBQ Diamond Plaza', 'Tầng 4, Diamond Plaza, 34 Lê Duẩn, Bến Nghé, Quận 1, TP.HCM', 10.7801, 106.6994, 100),
-    ('REDSUN', 'RESTAURANT', 'HPS-01',    'Hotpot Story Saigon Centre', 'Tầng 5, Saigon Centre, 65 Lê Lợi, Bến Nghé, Quận 1, TP.HCM', 10.7738, 106.7011, 100),
-    ('GGG',    'RESTAURANT', 'MANWAH-01', 'Manwah Taiwanese Hotpot Aeon Mall Tân Phú', 'Tầng 1, Aeon Mall, 30 Bờ Bao Tân Thắng, Sơn Kỳ, Tân Phú, TP.HCM', 10.8009, 106.6156, 120),
-    ('GGG',    'RESTAURANT', 'ISUSHI-01', 'iSushi Buffet Nhật Bản Landmark 81', 'Tầng B1, Vinhomes Central Park, 720A Điện Biên Phủ, Bình Thạnh, TP.HCM', 10.7951, 106.7218, 100),
-    ('GGG',    'DEPARTMENT', 'PK-SVH',    'Phòng Kiểm Soát Vận Hành', 'Trụ sở Golden Gate Tower, 60 Giang Văn Minh, Ba Đình, Hà Nội', NULL, NULL, NULL)
+    ('LOTUS', 'DEPARTMENT', 'LOTUS-HQ', 'Trụ sở Tập đoàn V-Lotus Holdings', 'Tầng 15, Vincom Center, 72 Lê Thánh Tôn, Bến Nghé, Quận 1, TP.HCM', NULL, NULL, NULL),
+    ('LOTUS', 'DEPARTMENT', 'LOTUS-QC', 'Phòng Đảm bảo Chất lượng & KSVH V-Lotus', 'Tầng 15, Vincom Center, 72 Lê Thánh Tôn, Bến Nghé, Quận 1, TP.HCM', NULL, NULL, NULL),
+    ('LOTUS', 'RESTAURANT', 'MK-BT',    'Marukame Udon Bến Thành', '215-217 Lý Tự Trọng, Bến Thành, Quận 1, TP.HCM', 10.7725, 106.6961, 100),
+    ('LOTUS', 'RESTAURANT', 'COCO-LM81', 'CoCo Ichibanya Landmark 81', 'Tầng B1, Vincom Landmark 81, 720A Điện Biên Phủ, Bình Thạnh, TP.HCM', 10.7951, 106.7218, 100)
 ) AS v(company_code, unit_type, code, name, address, lat, lng, radius)
 JOIN companies c ON lower(c.code) = lower(v.company_code)
 ON CONFLICT DO NOTHING;
@@ -35,13 +30,13 @@ ON CONFLICT DO NOTHING;
 INSERT INTO employees (employee_code, full_name, email, phone, job_title, org_unit_id, user_id)
 SELECT v.code, v.full_name, v.email, v.phone, v.job_title, ou.id, u.id
 FROM (VALUES
-    ('NV001', 'Quản trị hệ thống Demo', 'admin@ksvh.vn', '0901234567', 'Chuyên viên Quản trị Hệ thống', 'PK-SVH', 'admin'),
-    ('NV002', 'Quản trị nghiệp vụ Demo', 'bizadmin@ksvh.vn', '0902345678', 'Chuyên viên Quản lý Tiêu chuẩn F&B', 'PK-SVH', 'bizadmin'),
-    ('NV003', 'Trưởng nhóm KSVH Demo', 'lead@ksvh.vn', '0903456789', 'Trưởng nhóm Kiểm Soát Vận Hành', 'PK-SVH', 'lead'),
-    ('NV004', 'Quản lý KSVH Demo', 'manager@ksvh.vn', '0904567890', 'Trưởng phòng KSVH & Đảm bảo Chất lượng', 'PK-SVH', 'manager'),
-    ('NV005', 'Chuyên viên KSVH Demo', 'inspector@ksvh.vn', '0905678901', 'Thanh tra viên KSVH', 'PK-SVH', 'inspector'),
-    ('NV006', 'Cửa hàng trưởng Demo', 'store@ksvh.vn', '0906789012', 'Cửa hàng trưởng Nhà hàng', 'KBBQ-01', 'store'),
-    ('NV007', 'OBM Vận hành Demo', 'obm@ksvh.vn', '0907890123', 'Giám sát Vận hành Vùng (OBM)', 'PK-SVH', 'obm')
+    ('NV001', 'Quản trị hệ thống Demo', 'admin@ksvh.vn', '0901234567', 'Chuyên viên Quản trị Hệ thống', 'LOTUS-QC', 'admin'),
+    ('NV002', 'Quản trị nghiệp vụ Demo', 'bizadmin@ksvh.vn', '0902345678', 'Chuyên viên Quản lý Tiêu chuẩn F&B', 'LOTUS-QC', 'bizadmin'),
+    ('NV003', 'Trưởng nhóm KSVH Demo', 'lead@ksvh.vn', '0903456789', 'Trưởng nhóm Kiểm Soát Vận Hành', 'LOTUS-QC', 'lead'),
+    ('NV004', 'Quản lý KSVH Demo', 'manager@ksvh.vn', '0904567890', 'Trưởng phòng KSVH & Đảm bảo Chất lượng', 'LOTUS-QC', 'manager'),
+    ('NV005', 'Chuyên viên KSVH Demo', 'inspector@ksvh.vn', '0905678901', 'Thanh tra viên KSVH', 'LOTUS-QC', 'inspector'),
+    ('NV006', 'Cửa hàng trưởng Demo', 'store@ksvh.vn', '0906789012', 'Cửa hàng trưởng Nhà hàng', 'MK-BT', 'store'),
+    ('NV007', 'OBM Vận hành Demo', 'obm@ksvh.vn', '0907890123', 'Giám sát Vận hành Vùng (OBM)', 'LOTUS-QC', 'obm')
 ) AS v(code, full_name, email, phone, job_title, unit_code, username)
 LEFT JOIN org_units ou ON lower(ou.code) = lower(v.unit_code)
 LEFT JOIN users u ON u.username = v.username
