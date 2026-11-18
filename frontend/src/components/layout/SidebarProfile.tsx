@@ -3,7 +3,7 @@ import {
   DownOutlined,
   LogoutOutlined,
 } from '@ant-design/icons'
-import { Avatar, Button, Dropdown, Flex, Tag, Tooltip, Typography, type MenuProps } from 'antd'
+import { Avatar, Button, Dropdown, Flex, Tooltip, Typography, type MenuProps } from 'antd'
 import { lazy, Suspense, useState } from 'react'
 import type { LayoutUser } from '@/components/layout/menu.types'
 import { roleLabel } from '@/permissions'
@@ -33,15 +33,16 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
       disabled: true,
       style: { cursor: 'default', opacity: 1 },
       label: (
-        <Flex vertical gap={4} style={{ paddingBlock: 2 }}>
-          <Typography.Text strong>{user?.fullName ?? 'Người dùng'}</Typography.Text>
-          <Flex gap={4} wrap>
-            {user?.roles.map((r) => (
-              <Tag key={r} style={{ margin: 0, borderRadius: 4, background: 'var(--app-surface-sunken)', color: 'var(--app-text-body)', border: '1px solid var(--app-border)' }}>
-                {roleLabel(r)}
-              </Tag>
-            ))}
-          </Flex>
+        <Flex vertical gap={2} style={{ padding: '4px 2px', maxWidth: 260 }}>
+          <Typography.Text strong style={{ fontSize: 13.5, color: 'var(--app-text)' }}>
+            {user?.fullName ?? 'Người dùng'}
+          </Typography.Text>
+          <Typography.Text
+            type="secondary"
+            style={{ fontSize: 12, lineHeight: 1.4, color: 'var(--app-text-muted)' }}
+          >
+            {user?.roles.map(roleLabel).join(' · ')}
+          </Typography.Text>
         </Flex>
       ),
     },
