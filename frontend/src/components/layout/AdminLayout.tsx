@@ -116,7 +116,7 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
           }}
         >
           <Flex vertical style={{ height: '100%', overflow: 'hidden' }}>
-            <BrandHeader collapsed={collapsed} borderColor="var(--app-border)" />
+            <BrandHeader collapsed={collapsed} borderColor="rgba(255, 255, 255, 0.45)" />
             <div style={{ flex: 1, overflowY: 'auto' }}>
               <Sidebar menu={menu} />
             </div>
@@ -139,7 +139,7 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
           styles={{ body: { padding: 0 } }}
         >
           <Flex vertical style={{ height: '100%' }}>
-            <BrandHeader collapsed={false} borderColor="var(--app-border)" onClose={() => setMobileOpen(false)} />
+            <BrandHeader collapsed={false} borderColor="rgba(255, 255, 255, 0.45)" onClose={() => setMobileOpen(false)} />
             <div style={{ flex: 1, overflowY: 'auto' }}>
               <Sidebar menu={menu} onSelect={() => setMobileOpen(false)} />
             </div>

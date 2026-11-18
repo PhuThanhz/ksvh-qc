@@ -95,7 +95,7 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
     <div
       style={{
         padding: collapsed ? '12px 0' : '10px 12px',
-        borderTop: '1px solid var(--app-border)',
+        borderTop: '1px solid rgba(255, 255, 255, 0.45)',
         marginTop: 'auto',
         background: 'transparent',
       }}
@@ -119,6 +119,10 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
               textAlign: 'left',
               display: 'flex',
               alignItems: 'center',
+              background: 'rgba(255, 255, 255, 0.45)',
+              border: '1px solid rgba(255, 255, 255, 0.65)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
             }}
           >
             <Flex align="center" gap={10} style={{ width: '100%', overflow: 'hidden' }}>

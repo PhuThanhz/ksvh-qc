@@ -86,21 +86,21 @@ code, kbd, samp, pre, .font-code {
 .compact-table-form .ant-form-item { margin-bottom: 0; }
 .compact-table-form .ant-table-cell { vertical-align: top; }
 
-/* Sidebar kính Apple nhẹ nhàng, thanh thoát (macOS Sidebar) */
+/* Sidebar kính mờ Apple nhẹ nhàng, trong suốt thanh thoát (macOS Frosted Glass Sidebar) */
 .apple-frosted-sidebar {
-  background: rgba(255, 255, 255, 0.88) !important;
-  backdrop-filter: blur(20px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-  border-inline-end: 1px solid rgba(255, 255, 255, 0.6) !important;
-  box-shadow: 1px 0 12px rgba(0, 0, 0, 0.04) !important;
+  background: rgba(255, 255, 255, 0.52) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  border-inline-end: 1px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.04) !important;
 }
 
 .apple-frosted-header {
-  background: rgba(255, 255, 255, 0.85) !important;
-  backdrop-filter: blur(20px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.6) !important;
-  box-shadow: 0 1px 12px rgba(0, 0, 0, 0.04) !important;
+  background: rgba(255, 255, 255, 0.52) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.03) !important;
 }
 
 .apple-frosted-sidebar .ant-menu {
