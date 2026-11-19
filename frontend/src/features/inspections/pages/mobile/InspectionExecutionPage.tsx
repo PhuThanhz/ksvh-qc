@@ -1,17 +1,15 @@
-import { Dialog, NavBar, Space, Toast } from 'antd-mobile'
-import { useEffect } from 'react'
+import { Card, Dialog, NavBar, ProgressBar, Segmented, Space, Toast } from 'antd-mobile'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
-import { ExecutionCheckinCard } from '@/features/inspections/components/mobile/ExecutionCheckinCard'
-import { ExecutionCriteriaList } from '@/features/inspections/components/mobile/ExecutionCriteriaList'
-import { ExecutionHeaderCard } from '@/features/inspections/components/mobile/ExecutionHeaderCard'
-import { ExecutionStatusBanner } from '@/features/inspections/components/mobile/ExecutionStatusBanner'
-import { ExecutionStickyProgress } from '@/features/inspections/components/mobile/ExecutionStickyProgress'
-import { ExecutionSubmitBar } from '@/features/inspections/components/mobile/ExecutionSubmitBar'
-import { useInspectionDraft } from '@/features/inspections/hooks/useInspectionDraft'
-import { useInspection, useInspectionItems, useInspectionMutations } from '@/features/inspections/hooks/useInspectionData'
-import type { InspectionSubmitItemRequest } from '@/features/inspections/inspection.types'
-import { LOCATION_STATUS_META } from '@/features/inspections/inspection.types'
 import { useGeolocation } from '@/hooks/useGeolocation'
+import { useInspection, useInspectionItems, useInspectionMutations } from '@/features/inspections/hooks/useInspectionData'
+import { InspectionCriterionCard } from '@/features/inspections/components/InspectionCriterionCard'
+import type { InspectionSubmitItemRequest, ItemResult } from '@/features/inspections/inspection.types'
+import { LOCATION_STATUS_META } from '@/features/inspections/inspection.types'
+import { useInspectionDraft } from '@/features/inspections/hooks/useInspectionDraft'
+import { ExecutionCheckinCard } from '@/features/inspections/components/mobile/ExecutionCheckinCard'
+import { ExecutionHeaderCard } from '@/features/inspections/components/mobile/ExecutionHeaderCard'
+import { ExecutionSubmitBar } from '@/features/inspections/components/mobile/ExecutionSubmitBar'
 
 export function InspectionExecutionPage() {
   const { id } = useParams<{ id: string }>()
@@ -104,14 +102,16 @@ export function InspectionExecutionPage() {
     try {
       await submit.mutateAsync({ id: insId, body: { items: submitItems } })
       clearDraft()
-      Toast.show({ icon: 'success', content: 'Nộp phiếu chấm thành công!' })
+      Toast.show({ icon: 'success', content: 'Nộp biên bản kiểm tra thành công!' })
       navigate('/qc')
     } catch (err: unknown) {
-      Toast.show({ content: (err as { message?: string })?.message ?? 'Lỗi khi nộp phiếu', position: 'bottom' })
+      Toast.show({ content: (err as { message?: string })?.message ?? 'Lỗi khi nộp biên bản', position: 'bottom' })
     }
   }
 
-  if (isLoading || !ins) return <div style={{ padding: 24, textAlign: 'center' }}>Đang tải thông tin phiếu chấm...</div>
+  const [filterMode, setFilterMode] = useState<'all' | 'unrated' | 'fail'>('all')
+
+  if (isLoading || !ins) return <div style={{ padding: 24, textAlign: 'center' }}>Đang tải thông tin biên bản kiểm tra...</div>
 
   const totalCriteria = items?.length ?? 0
   const ratedCount = items?.filter((it) => getRating(it).result !== 'UNRATED').length ?? 0
@@ -121,30 +121,49 @@ export function InspectionExecutionPage() {
   const progressPercent = totalCriteria > 0 ? Math.round((ratedCount / totalCriteria) * 100) : 0
   const gpsString = geoFix ? `GPS ${geoFix.lat.toFixed(6)}, ${geoFix.lng.toFixed(6)}` : undefined
 
+  const displayedItems = (items ?? []).filter((it) => {
+    if (filterMode === 'unrated') return getRating(it).result === 'UNRATED'
+    if (filterMode === 'fail') return getRating(it).result === 'FAIL'
+    return true
+  })
+
   return (
     <div style={{ paddingBottom: 80, minHeight: '100vh', background: 'var(--app-surface-sunken)' }}>
       <NavBar onBack={() => navigate('/qc')}>{ins.code}</NavBar>
 
-      {ins.status === 'IN_PROGRESS' && (
-        <ExecutionStickyProgress
-          ratedCount={ratedCount}
-          totalCriteria={totalCriteria}
-          progressPercent={progressPercent}
-          passCount={passCount}
-          failCount={failCount}
-          naCount={naCount}
-        />
+      {ins.status === 'IN_PROGRESS' && totalCriteria > 0 && (
+        <div
+          style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 40,
+            background: 'var(--app-surface)',
+            borderBottom: '1px solid var(--app-border)',
+            padding: '8px 16px',
+            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.05)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
+            <span>
+              Tiến độ: <b>{ratedCount}/{totalCriteria}</b> ({progressPercent}%)
+            </span>
+            <span>
+              <span style={{ color: 'var(--app-success)', fontWeight: 600 }}>{passCount} Đạt</span> ·{' '}
+              <span style={{ color: 'var(--app-danger)', fontWeight: 600 }}>{failCount} Lỗi</span> ·{' '}
+              <span>{naCount} N/A</span>
+            </span>
+          </div>
+          <ProgressBar percent={progressPercent} />
+        </div>
       )}
 
       <div style={{ padding: 12 }}>
-        <ExecutionStatusBanner
-          isOnline={isOnline}
-          pendingCount={pendingCount}
-          isSyncing={isSyncing}
-          status={ins.status}
-          cancelReason={ins.cancelReason}
-        />
-
+        {(!isOnline || pendingCount > 0) && (
+          <div style={{ background: '#fffbe6', border: '1px solid #ffe58f', padding: '6px 12px', borderRadius: 8, marginBottom: 8, fontSize: 12, color: '#d46b08' }}>
+            {!isOnline ? '⚠️ Đang offline. ' : ''}
+            {pendingCount > 0 ? `Còn ${pendingCount} tệp chờ tải lên.${isSyncing ? ' Đang đồng bộ...' : ''}` : 'Dữ liệu được lưu nháp an toàn.'}
+          </div>
+        )}
         <ExecutionHeaderCard
           inspection={ins}
           totalCriteria={totalCriteria}
@@ -166,21 +185,49 @@ export function InspectionExecutionPage() {
           />
         ) : (
           <Space direction="vertical" block>
-            <ExecutionCriteriaList
-              items={items}
-              totalCriteria={totalCriteria}
-              ratedCount={ratedCount}
-              failCount={failCount}
-              insId={insId}
-              inspectorName={ins.inspectorName}
-              restaurantName={ins.restaurantName}
-              gpsCoords={gpsString}
-              readOnly={ins.status !== 'IN_PROGRESS'}
-              getRating={getRating}
-              onSetResult={setCriterionResult}
-              onSetComment={setCriterionComment}
-              onSetEvidence={setCriterionEvidence}
-            />
+            {ins.status !== 'IN_PROGRESS' && (
+              <Card style={{ borderRadius: 10, background: ins.status === 'CANCELLED' ? 'var(--app-danger-bg)' : 'var(--app-success-bg)', border: `1px solid ${ins.status === 'CANCELLED' ? 'var(--app-danger-border)' : 'var(--app-success-border)'}` }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: ins.status === 'CANCELLED' ? 'var(--app-danger)' : 'var(--app-success)' }}>
+                  {ins.status === 'SUBMITTED' && 'Phiếu chấm đã được nộp. Đang xử lý lỗi.'}
+                  {ins.status === 'AWAITING_ACK' && 'Phiếu không có lỗi. Chờ CHT xác nhận đã xem.'}
+                  {ins.status === 'COMPLETED' && 'Phiếu chấm đã hoàn thành toàn diện.'}
+                  {ins.status === 'CANCELLED' && `Phiếu đã bị huỷ${ins.cancelReason ? `: ${ins.cancelReason}` : ''}.`}
+                </div>
+              </Card>
+            )}
+
+            {ins.status === 'IN_PROGRESS' && totalCriteria > 5 && (
+              <Segmented
+                value={filterMode}
+                onChange={(v) => setFilterMode(v as 'all' | 'unrated' | 'fail')}
+                options={[
+                  { label: `Tất cả (${totalCriteria})`, value: 'all' },
+                  { label: `Chưa chấm (${totalCriteria - ratedCount})`, value: 'unrated' },
+                  { label: `Lỗi (${failCount})`, value: 'fail' },
+                ]}
+                style={{ marginBottom: 4 }}
+              />
+            )}
+
+            {displayedItems.map((it) => {
+              const originalIndex = (items ?? []).findIndex((orig) => orig.id === it.id) + 1
+              return (
+                <InspectionCriterionCard
+                  key={it.id}
+                  index={originalIndex}
+                  item={it}
+                  rating={getRating(it)}
+                  onSetResult={(res: ItemResult) => setCriterionResult(it.criterionId, res)}
+                  onSetComment={(comment: string) => setCriterionComment(it.criterionId, comment)}
+                  onSetEvidence={(urls: string) => setCriterionEvidence(it.criterionId, urls)}
+                  inspectionId={insId}
+                  inspectorName={ins.inspectorName}
+                  restaurantName={ins.restaurantName}
+                  gpsCoords={gpsString}
+                  readOnly={ins.status !== 'IN_PROGRESS'}
+                />
+              )
+            })}
           </Space>
         )}
       </div>

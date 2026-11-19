@@ -106,8 +106,8 @@ export function PlanListPage() {
 
   return (
     <PageContainer
-      title="Kế hoạch kiểm tra"
-      subtitle="Lập và quản lý kế hoạch kiểm soát vận hành định kỳ và đột xuất"
+      title="Kế hoạch kiểm soát vận hành"
+      subtitle="Lập kế hoạch, phân bổ lịch trình và phê duyệt đợt kiểm soát vận hành định kỳ và đột xuất"
       extra={
         <ProtectedAction access={PERMISSIONS.PLAN.CREATE}>
           <Button type="primary" icon={<PlusOutlined />} onClick={() => setModal({ open: true })}>

@@ -8,8 +8,8 @@ import { OrganizationExcelActions } from '@/features/organizations/components/Or
 export function OrganizationPage() {
   return (
     <PageContainer
-      title="Tổ chức"
-      subtitle="Quản lý danh mục nhà hàng, phòng ban và công ty trực thuộc"
+      title="Đơn vị & Cơ sở vận hành"
+      subtitle="Quản lý danh mục nhà hàng, phòng ban và các công ty thành viên"
       extra={<OrganizationExcelActions />}
     >
       <Tabs
@@ -18,7 +18,7 @@ export function OrganizationPage() {
         items={[
           {
             key: 'restaurants',
-            label: 'Nhà hàng',
+            label: 'Nhà hàng / Cơ sở',
             children: <OrgUnitTab fixedUnitType="RESTAURANT" />,
           },
           {
@@ -28,7 +28,7 @@ export function OrganizationPage() {
           },
           {
             key: 'companies',
-            label: 'Công ty',
+            label: 'Công ty thành viên',
             children: <CompanyTab />,
           },
         ]}

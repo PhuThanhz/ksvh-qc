@@ -1,11 +1,12 @@
 import { DeleteOutlined } from '@ant-design/icons'
-import { Button, Flex, Form, Table, Tooltip, Typography } from 'antd'
+import { Flex, Form, Table, Typography } from 'antd'
 import { severityColor } from '@/components/charts'
 import type { Control } from 'react-hook-form'
 import { FormInput } from '@/components/data-entry/FormInput'
 import { FormNumber } from '@/components/data-entry/FormNumber'
 import type { RiskLevel } from '@/features/criteria/criteria.types'
 import type { RiskLevelsFormValues } from '@/features/criteria/schemas/criteria.schema'
+import { ActionButton } from '@/components/data-display/TableActions'
 
 export interface RiskLevelTableProps {
   control: Control<RiskLevelsFormValues>
@@ -33,6 +34,7 @@ export function RiskLevelTable({
         columns={[
           {
             title: 'Mã mức',
+            className: 'col-code',
             width: 120,
             render: (_, __, i) => (
               <Flex align="center" gap={8}>
@@ -84,7 +86,7 @@ export function RiskLevelTable({
           },
           {
             title: 'Hạn khắc phục (ngày)',
-            width: 140,
+            width: 160,
             render: (_, __, i) => (
               <FormNumber
                 control={control}
@@ -98,14 +100,13 @@ export function RiskLevelTable({
           },
           {
             title: 'Hành động bắt buộc',
-            width: 280,
             render: (_, __, i) => (
               <FormInput
                 control={control}
                 name={`levels.${i}.action`}
                 disabled={!editable}
                 maxLength={500}
-                placeholder="Hành động khi vi phạm"
+                placeholder="Hành động khi vi phạm (VD: Lập biên bản, báo cáo lãnh đạo...)"
               />
             ),
           },
@@ -114,21 +115,16 @@ export function RiskLevelTable({
                 {
                   title: 'Thao tác',
                   key: 'remove',
-                  width: 90,
+                  width: 80,
+                  align: 'center' as const,
                   render: (_: unknown, __: unknown, i: number) => (
-                    <div style={{ lineHeight: '32px' }}>
-                      <Tooltip title={fields.length <= 1 ? 'Phải giữ ít nhất 1 mức' : 'Xoá mức này'}>
-                        <Button
-                          type="text"
-                          danger
-                          icon={<DeleteOutlined />}
-                          disabled={fields.length <= 1}
-                          onClick={() => onRemove(i)}
-                        >
-                          Xoá
-                        </Button>
-                      </Tooltip>
-                    </div>
+                    <ActionButton
+                      tone="delete"
+                      icon={<DeleteOutlined />}
+                      tooltip="Xoá mức này"
+                      disabledReason={fields.length <= 1 ? 'Phải giữ ít nhất 1 mức' : undefined}
+                      onClick={() => onRemove(i)}
+                    />
                   ),
                 },
               ]

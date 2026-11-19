@@ -24,8 +24,8 @@ const DETAIL_STATUS_OPTIONS: { value: FindingStatus; label: string }[] = [
   { value: 'APPEALED', label: 'Đang khiếu nại' },
   { value: 'APPEAL_MEETING', label: 'Họp khiếu nại' },
   { value: 'REMEDIATING', label: 'Đang khắc phục' },
-  { value: 'PENDING_VERIFICATION', label: 'Chờ nghiệm thu' },
-  { value: 'CLOSED', label: 'Đã đóng (Đạt)' },
+  { value: 'PENDING_VERIFICATION', label: 'Chờ thẩm tra' },
+  { value: 'CLOSED', label: 'Đã đóng (Đạt yêu cầu)' },
   { value: 'DISMISSED', label: 'Đã huỷ bỏ' },
 ]
 
@@ -53,7 +53,7 @@ export function FindingListFilterBar({
     { value: 'APPEALED', label: 'Đang khiếu nại' },
     { value: 'APPEAL_MEETING', label: 'Họp khiếu nại' },
     { value: 'REMEDIATING', label: 'Đang khắc phục' },
-    { value: 'PENDING_VERIFICATION', label: 'Chờ nghiệm thu' },
+    { value: 'PENDING_VERIFICATION', label: 'Chờ thẩm tra' },
     { value: 'CLOSED', label: 'Đã đóng' },
   ]
 
@@ -68,7 +68,7 @@ export function FindingListFilterBar({
         />
       }
       search={{
-        placeholder: 'Tìm kiếm mô tả lỗi, khiếu nại, khắc phục...',
+        placeholder: 'Tìm kiếm mô tả vi phạm, khiếu nại, biện pháp khắc phục...',
         maxWidth: 460,
         value: keyword,
         onSearch,
@@ -77,7 +77,7 @@ export function FindingListFilterBar({
       onReset={onReset}
     >
       <Select
-        placeholder="Nhà hàng"
+        placeholder="Cơ sở vận hành"
         allowClear
         showSearch
         value={restaurantId}

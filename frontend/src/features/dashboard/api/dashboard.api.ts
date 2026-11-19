@@ -33,6 +33,7 @@ const PATH = {
 } as const
 
 export const dashboardApi = {
-  summary: (months: number) => api.get<DashboardResponse>(PATH.summary, { params: { months } }).then((r) => r.data),
+  summary: (period: { from: string; to: string }) =>
+    api.get<DashboardResponse>(PATH.summary, { params: { from: period.from, to: period.to } }).then((r) => r.data),
   approvalQueue: () => api.get<ApprovalQueueResponse>(PATH.approvalQueue).then((r) => r.data),
 }

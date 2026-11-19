@@ -26,7 +26,7 @@ const TYPE_OPTIONS = (Object.keys(ORG_UNIT_TYPE_LABEL) as OrgUnitType[]).map((t)
 
 const EMPTY: OrgUnitFormValues = {
   companyId: null, unitType: 'RESTAURANT', code: '', name: '', address: '',
-  storeManagerUserId: null, obmUserId: null, latitude: null, longitude: null,
+  latitude: null, longitude: null,
   checkinRadiusM: DEFAULT_CHECKIN_RADIUS_M, active: true,
 }
 
@@ -37,8 +37,6 @@ function toFormValues(u: OrgUnit): OrgUnitFormValues {
     code: u.code,
     name: u.name,
     address: u.address ?? '',
-    storeManagerUserId: u.storeManager?.id ?? null,
-    obmUserId: u.obm?.id ?? null,
     latitude: u.latitude,
     longitude: u.longitude,
     checkinRadiusM: u.checkinRadiusM ?? DEFAULT_CHECKIN_RADIUS_M,
@@ -54,8 +52,6 @@ function toPayload(v: OrgUnitFormValues): OrgUnitPayload {
     code: v.code,
     name: v.name,
     address: v.address || undefined,
-    storeManagerUserId: v.storeManagerUserId ?? undefined,
-    obmUserId: v.obmUserId ?? undefined,
     latitude: v.latitude ?? undefined,
     longitude: v.longitude ?? undefined,
     checkinRadiusM: v.checkinRadiusM ?? undefined,

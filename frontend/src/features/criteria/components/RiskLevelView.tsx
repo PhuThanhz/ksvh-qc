@@ -1,4 +1,5 @@
 import { Table, Typography } from 'antd'
+import { RiskLevelTag } from '@/components/data-display/RiskLevelTag'
 import type { RiskLevel } from '@/features/criteria/criteria.types'
 
 const fmt = (n: number) => n.toLocaleString('vi-VN')
@@ -12,7 +13,12 @@ export function RiskLevelView({ levels }: { levels: readonly RiskLevel[] }) {
       pagination={false}
       dataSource={[...levels]}
       columns={[
-        { title: 'Mã', dataIndex: 'code', width: 80, render: (c: string) => <strong>{c}</strong> },
+        {
+          title: 'Mã',
+          dataIndex: 'code',
+          width: 80,
+          render: (c: string) => <RiskLevelTag code={c} />,
+        },
         { title: 'Mức rủi ro', dataIndex: 'name', width: 160 },
         {
           title: 'Khoảng điểm',

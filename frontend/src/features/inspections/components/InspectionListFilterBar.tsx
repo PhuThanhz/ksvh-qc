@@ -19,9 +19,9 @@ export interface InspectionListFilterBarProps {
 
 const STATUS_SELECT_OPTIONS: { value: InspectionStatus; label: string }[] = [
   { value: 'ASSIGNED', label: 'Đã phân công' },
-  { value: 'IN_PROGRESS', label: 'Đang chấm' },
+  { value: 'IN_PROGRESS', label: 'Đang đánh giá' },
   { value: 'SUBMITTED', label: 'Đã nộp' },
-  { value: 'AWAITING_ACK', label: 'Chờ CHT xác nhận' },
+  { value: 'AWAITING_ACK', label: 'Chờ xác nhận biên bản' },
   { value: 'COMPLETED', label: 'Hoàn thành' },
   { value: 'CANCELLED', label: 'Đã huỷ' },
 ]
@@ -49,7 +49,7 @@ export function InspectionListFilterBar({
         />
       }
       search={{
-        placeholder: 'Tìm theo mã phiếu, loại kiểm tra...',
+        placeholder: 'Tìm theo mã biên bản, loại kiểm tra...',
         value: keyword,
         onSearch,
       }}
@@ -57,7 +57,7 @@ export function InspectionListFilterBar({
       onReset={onReset}
     >
       <Select
-        placeholder="Nhà hàng"
+        placeholder="Cơ sở vận hành"
         allowClear
         showSearch
         value={restaurantId}

@@ -1,4 +1,4 @@
-import { Alert, Flex } from 'antd'
+import { Flex } from 'antd'
 import { useMemo, useState } from 'react'
 import { useNotify } from '@/components/feedback/useNotify'
 import type { CriterionGroup, CriterionPayload } from '@/features/criteria/criteria.types'
@@ -106,7 +106,7 @@ export function BatchCriterionContent({ group, onClose, onSuccess }: BatchCriter
   const handleSave = async () => {
     const validRows = items.filter((r) => r.name.trim() !== '')
     if (validRows.length === 0) {
-      notify.error('Vui lòng nhập ít nhất một tiêu chí con!')
+      notify.error('Vui lòng nhập ít nhất một tiêu chí kiểm soát!')
       return
     }
     const codes = new Set<string>()
@@ -137,7 +137,7 @@ export function BatchCriterionContent({ group, onClose, onSuccess }: BatchCriter
 
     try {
       await batchSave.mutateAsync(payloads)
-      notify.success(`Đã thêm thành công ${payloads.length} tiêu chí con vào nhóm "${group.name}"!`)
+      notify.success(`Đã thêm thành công ${payloads.length} tiêu chí kiểm soát vào nhóm "${group.name}"!`)
       onClose()
       onSuccess?.()
     } catch (err) {
@@ -149,11 +149,6 @@ export function BatchCriterionContent({ group, onClose, onSuccess }: BatchCriter
 
   return (
     <Flex vertical gap={12}>
-      <Alert
-        type="info"
-        showIcon
-        title="Nhập nhanh nhiều tiêu chí con cho nhóm. Bạn có thể gõ từng dòng hoặc dán nhanh danh sách từ Word/Excel."
-      />
       {showPasteBox && (
         <BatchPasteBox
           pasteText={pasteText}
@@ -173,6 +168,7 @@ export function BatchCriterionContent({ group, onClose, onSuccess }: BatchCriter
       <BatchActionBar
         showPasteBox={showPasteBox}
         validCount={validCount}
+        totalCount={items.length}
         isPending={batchSave.isPending}
         onAddRows={addRows}
         onAutoNumber={handleAutoNumber}

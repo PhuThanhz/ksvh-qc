@@ -36,12 +36,13 @@ export interface RiskLevelEditorProps {
   source: readonly RiskLevel[]
   /** Ngày hiệu lực ban đầu (sửa bản sắp áp dụng) hoặc undefined (phiên bản mới từ hôm nay). */
   effectiveFrom?: string
+  isModal?: boolean
   onCancel: () => void
   onSaved: (effectiveFrom: string) => void
 }
 
 /** Soạn một phiên bản bảng phân loại: chọn ngày hiệu lực, sửa các mức, lưu một lần. */
-export function RiskLevelEditor({ source, effectiveFrom, onCancel, onSaved }: RiskLevelEditorProps) {
+export function RiskLevelEditor({ source, effectiveFrom, isModal = false, onCancel, onSaved }: RiskLevelEditorProps) {
   const notify = useNotify()
   const confirm = useConfirm()
   const save = useSaveRiskLevelVersion()
@@ -69,6 +70,56 @@ export function RiskLevelEditor({ source, effectiveFrom, onCancel, onSaved }: Ri
     if (await confirm({ title: `Xoá mức ${rows?.[i]?.code ?? ''} khỏi phiên bản này?`, okText: 'Xoá', danger: true })) remove(i)
   }
 
+  const content = (
+    <Flex vertical gap={12}>
+      <Flex
+        align="center"
+        justify="flex-start"
+        wrap
+        gap={12}
+        style={{
+          padding: '10px 14px',
+          background: '#f8fafc',
+          borderRadius: 8,
+          border: '1px solid #e2e8f0',
+        }}
+      >
+        <Space size={8}>
+          <Typography.Text strong style={{ fontSize: 13, color: '#334155' }}>
+            Áp dụng từ ngày:
+          </Typography.Text>
+          <DatePicker
+            allowClear={false}
+            format="DD/MM/YYYY"
+            value={date}
+            onChange={(d) => d && setDate(d)}
+            disabledDate={(d) => d.isBefore(dayjs(), 'day')}
+          />
+        </Space>
+      </Flex>
+      <Typography.Text type="secondary" style={{ fontSize: 12.5 }}>
+        Nhập điểm “đến” cho từng mức; điểm “từ” tự lấy bằng điểm “đến” của mức trước. Mức cao nhất không giới hạn trên.
+      </Typography.Text>
+      {rootError && <Alert type="error" showIcon title={rootError} />}
+      <RiskLevelTable control={control} fields={fields} preview={preview} editable onRemove={(i) => void handleRemove(i)} />
+      <Flex justify="space-between" align="center" style={{ paddingTop: 10, borderTop: '1px solid #e2e8f0' }}>
+        <Button icon={<PlusOutlined />} onClick={() => append({ code: `M${fields.length + 1}`, name: '', maxScore: null, remediationDays: 7, action: '' })}>
+          Thêm mức
+        </Button>
+        <Space>
+          <Button onClick={onCancel}>Huỷ</Button>
+          <Button type="primary" loading={save.isPending} onClick={() => void onSubmit()}>
+            Lưu phiên bản
+          </Button>
+        </Space>
+      </Flex>
+    </Flex>
+  )
+
+  if (isModal) {
+    return content
+  }
+
   return (
     <Card
       title={effectiveFrom ? `Sửa phiên bản từ ${formatDate(effectiveFrom)}` : 'Phiên bản mới'}
@@ -80,25 +131,7 @@ export function RiskLevelEditor({ source, effectiveFrom, onCancel, onSaved }: Ri
         </Space>
       }
     >
-      <Flex vertical gap={12}>
-        <Typography.Text type="secondary" style={{ fontSize: 12.5 }}>
-          Nhập điểm “đến” cho từng mức; điểm “từ” tự lấy bằng điểm “đến” của mức trước. Điểm đúng bằng “đến” thuộc mức kế tiếp.
-          Mức cao nhất không giới hạn trên. Lỗi đã phát sinh giữ nguyên mức cũ.
-        </Typography.Text>
-        {rootError && <Alert type="error" showIcon title={rootError} />}
-        <RiskLevelTable control={control} fields={fields} preview={preview} editable onRemove={(i) => void handleRemove(i)} />
-        <Flex justify="space-between" align="center">
-          <Button icon={<PlusOutlined />} onClick={() => append({ code: `M${fields.length + 1}`, name: '', maxScore: null, remediationDays: 7, action: '' })}>
-            Thêm mức
-          </Button>
-          <Space>
-            <Button onClick={onCancel}>Huỷ</Button>
-            <Button type="primary" loading={save.isPending} onClick={() => void onSubmit()}>
-              Lưu phiên bản
-            </Button>
-          </Space>
-        </Flex>
-      </Flex>
+      {content}
     </Card>
   )
 }

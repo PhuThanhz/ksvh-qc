@@ -27,13 +27,13 @@ export function InspectionScopeSelector({
     return (
       <Form.Item
         name="templateId"
-        label="Mẫu phiếu chấm"
-        rules={[{ required: true, message: 'Vui lòng chọn mẫu phiếu' }]}
+        label="Mẫu phiếu kiểm tra"
+        rules={[{ required: true, message: 'Vui lòng chọn mẫu phiếu kiểm tra' }]}
         extra={selectedRestaurant?.companyName ? `Lọc mẫu áp dụng cho: ${selectedRestaurant.companyName}` : undefined}
       >
         <Select
           showSearch
-          placeholder={selectedRestaurant ? 'Chọn mẫu phiếu đánh giá...' : 'Chọn nhà hàng trước để lọc mẫu phù hợp'}
+          placeholder={selectedRestaurant ? 'Chọn mẫu phiếu đánh giá...' : 'Chọn cơ sở trước để lọc mẫu phù hợp'}
           filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
           options={filteredTemplates.map((t) => ({
             value: t.id,

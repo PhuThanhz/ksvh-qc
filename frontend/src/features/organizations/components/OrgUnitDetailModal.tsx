@@ -2,8 +2,8 @@ import { EditOutlined, EnvironmentOutlined } from '@ant-design/icons'
 import { Button, Space, Typography } from 'antd'
 import { DetailModal, type DetailField } from '@/components/feedback/DetailModal'
 import { ActiveBadge } from '@/features/organizations/components/ActiveBadge'
+import { OrgUnitTypeTag } from '@/features/organizations/components/OrgUnitTypeTag'
 import {
-  ORG_UNIT_TYPE_LABEL,
   type OrgUnit,
   type OrgUnitType,
   type UserRef,
@@ -29,11 +29,11 @@ export function OrgUnitDetailModal({ open, unit, fixedUnitType, onClose, onEdit 
   const mapUrl = hasCoords ? `https://www.google.com/maps?q=${unit.latitude},${unit.longitude}` : null
 
   const fields: DetailField[] = [
-    { label: 'Mã đơn vị', value: unit.code },
+    { label: 'Mã đơn vị', value: <span className="code-tag--blue">{unit.code}</span> },
     { label: 'Trạng thái', value: <ActiveBadge active={unit.active} /> },
     { label: 'Tên đơn vị', value: unit.name },
     { label: 'Công ty', value: `${unit.companyCode} – ${unit.companyName}` },
-    { label: 'Loại đơn vị', value: ORG_UNIT_TYPE_LABEL[unit.unitType] },
+    { label: 'Loại đơn vị', value: <OrgUnitTypeTag type={unit.unitType} /> },
   ]
 
   if (isDepartment) {

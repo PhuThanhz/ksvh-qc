@@ -11,12 +11,12 @@ export function CompanyPage() {
 
   return (
     <PageContainer
-      title="Công ty"
-      subtitle="Danh mục công ty pháp nhân trong hệ thống"
+      title="Công ty thành viên"
+      subtitle="Danh mục các công ty pháp nhân và thương hiệu trực thuộc hệ thống"
       extra={
         <ProtectedAction access={PERMISSIONS.ORGANIZATION.MANAGE}>
           <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>
-            Thêm công ty
+            Thêm công ty thành viên
           </Button>
         </ProtectedAction>
       }

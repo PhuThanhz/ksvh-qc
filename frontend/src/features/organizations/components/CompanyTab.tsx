@@ -73,9 +73,6 @@ export function CompanyTab({ createOpen, onCreateClose }: CompanyTabProps = {}) 
         activeCount={activeFilterCount}
         activeTags={activeTags}
         onReset={resetFilters}
-        advancedFilters={
-          <ActiveFilter value={filters.active} onChange={(v) => setFilter('active', v)} width={180} />
-        }
       >
         <ActiveFilter value={filters.active} onChange={(v) => setFilter('active', v)} />
       </AdvancedFilter>

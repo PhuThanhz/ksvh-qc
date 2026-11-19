@@ -19,6 +19,7 @@ import vn.ksvh.qc.security.permission.PermissionCodes;
 import vn.ksvh.qc.security.permission.RoleCodes;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -57,22 +58,73 @@ class OrganizationApiTests {
     }
 
     @Test
-    void createsRestaurantWithGpsAndAssigneesAndReturnsTheirNames() throws Exception {
+    void createsRestaurantWithGps() throws Exception {
         long companyId = createCompany("CTY-" + suffix);
-        long cht = insertUser("cht", RoleCodes.STORE_MANAGER);
-        long obm = insertUser("obm", RoleCodes.OBM);
 
-        Map<String, Object> body = restaurant(companyId, "NH-" + suffix);
-        body.put("storeManagerUserId", cht);
-        body.put("obmUserId", obm);
-
-        postOrgUnit(body, manager())
+        postOrgUnit(restaurant(companyId, "NH-" + suffix), manager())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.unitType").value("RESTAURANT"))
                 .andExpect(jsonPath("$.companyCode").value("CTY-" + suffix))
-                .andExpect(jsonPath("$.storeManager.fullName").value("Test cht " + suffix))
-                .andExpect(jsonPath("$.obm.fullName").value("Test obm " + suffix))
+                .andExpect(jsonPath("$.storeManager").value(nullValue()))
                 .andExpect(jsonPath("$.checkinRadiusM").value(100));
+    }
+
+    @Test
+    void assignsRestaurantsToUserAndUnitShowsTheirNames() throws Exception {
+        long companyId = createCompany("CTY-" + suffix);
+        long nh1 = createRestaurant(companyId, "NH1-" + suffix);
+        long nh2 = createRestaurant(companyId, "NH2-" + suffix);
+        long cht = insertUser("cht", RoleCodes.STORE_MANAGER);
+        long obm = insertUser("obm", RoleCodes.OBM);
+
+        putAssignment(cht, List.of(nh1, nh2), List.of())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.storeManagerOf.length()").value(2))
+                .andExpect(jsonPath("$.obmOf.length()").value(0));
+        putAssignment(obm, List.of(), List.of(nh1)).andExpect(status().isOk());
+
+        mvc.perform(get("/api/v1/org-units/{id}", nh1).with(manager()))
+                .andExpect(jsonPath("$.storeManager.fullName").value("Test cht " + suffix))
+                .andExpect(jsonPath("$.obm.fullName").value("Test obm " + suffix));
+        mvc.perform(get("/api/v1/org-units/assignments/{id}", cht).with(manager()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.storeManagerOf[0].code").value("NH1-" + suffix));
+    }
+
+    @Test
+    void reassigningMovesRestaurantFromPreviousManagerAndUncheckedOnesAreCleared() throws Exception {
+        long companyId = createCompany("CTY-" + suffix);
+        long nh1 = createRestaurant(companyId, "NH1-" + suffix);
+        long nh2 = createRestaurant(companyId, "NH2-" + suffix);
+        long chtA = insertUser("chta", RoleCodes.STORE_MANAGER);
+        long chtB = insertUser("chtb", RoleCodes.STORE_MANAGER);
+
+        putAssignment(chtA, List.of(nh1, nh2), List.of()).andExpect(status().isOk());
+        // B nhận NH1 → NH1 chuyển từ A sang B.
+        putAssignment(chtB, List.of(nh1), List.of()).andExpect(status().isOk());
+        mvc.perform(get("/api/v1/org-units/assignments/{id}", chtA).with(manager()))
+                .andExpect(jsonPath("$.storeManagerOf.length()").value(1))
+                .andExpect(jsonPath("$.storeManagerOf[0].id").value(nh2));
+
+        // A bỏ chọn hết → NH2 không còn CHT.
+        putAssignment(chtA, List.of(), List.of()).andExpect(status().isOk());
+        mvc.perform(get("/api/v1/org-units/{id}", nh2).with(manager()))
+                .andExpect(jsonPath("$.storeManager").value(nullValue()));
+    }
+
+    @Test
+    void editingRestaurantKeepsItsAssignees() throws Exception {
+        long companyId = createCompany("CTY-" + suffix);
+        long nh = createRestaurant(companyId, "NH-" + suffix);
+        long cht = insertUser("cht", RoleCodes.STORE_MANAGER);
+        putAssignment(cht, List.of(nh), List.of()).andExpect(status().isOk());
+
+        Map<String, Object> body = restaurant(companyId, "NH-" + suffix);
+        body.put("name", "Tên mới");
+        mvc.perform(put("/api/v1/org-units/{id}", nh).with(manager())
+                        .contentType(MediaType.APPLICATION_JSON).content(json(body)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.storeManager.fullName").value("Test cht " + suffix));
     }
 
     @Test
@@ -94,15 +146,37 @@ class OrganizationApiTests {
     }
 
     @Test
-    void storeManagerMustHaveStoreManagerRole() throws Exception {
+    void assigneeMustHaveMatchingRoleAndTargetsMustBeRestaurants() throws Exception {
         long companyId = createCompany("CTY-" + suffix);
+        long nh = createRestaurant(companyId, "NH-" + suffix);
+        Map<String, Object> dept = restaurant(companyId, "PB-" + suffix);
+        dept.put("unitType", "DEPARTMENT");
+        long pb = jsonMapper.readTree(postOrgUnit(dept, manager()).andReturn().getResponse().getContentAsString())
+                .get("id").asLong();
         long inspector = insertUser("cv", RoleCodes.KSVH_INSPECTOR);
-        Map<String, Object> body = restaurant(companyId, "NH-" + suffix);
-        body.put("storeManagerUserId", inspector);
+        long cht = insertUser("cht", RoleCodes.STORE_MANAGER);
 
-        postOrgUnit(body, manager())
+        putAssignment(inspector, List.of(nh), List.of())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("ORGANIZATION_INVALID_ASSIGNEE"));
+        putAssignment(cht, List.of(), List.of(nh))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("ORGANIZATION_INVALID_ASSIGNEE"));
+        putAssignment(cht, List.of(pb), List.of())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("ORGANIZATION_NOT_RESTAURANT"));
+        // Người không có vai trò vẫn được gửi danh sách rỗng (bỏ gán hết).
+        putAssignment(inspector, List.of(), List.of()).andExpect(status().isOk());
+    }
+
+    @Test
+    void assignmentNeedsManagePermission() throws Exception {
+        long cht = insertUser("cht", RoleCodes.STORE_MANAGER);
+        mvc.perform(put("/api/v1/org-units/assignments/{id}", cht)
+                        .with(jwt().authorities(new SimpleGrantedAuthority(PermissionCodes.ORGANIZATION_READ)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(Map.of("storeManagerRestaurantIds", List.of(), "obmRestaurantIds", List.of()))))
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -232,6 +306,19 @@ class OrganizationApiTests {
         return mvc.perform(post("/api/v1/org-units").with(auth)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json(body)));
+    }
+
+    private long createRestaurant(long companyId, String code) throws Exception {
+        String res = postOrgUnit(restaurant(companyId, code), manager())
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        return jsonMapper.readTree(res).get("id").asLong();
+    }
+
+    private ResultActions putAssignment(long userId, List<Long> chtOf, List<Long> obmOf) throws Exception {
+        return mvc.perform(put("/api/v1/org-units/assignments/{id}", userId).with(manager())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(Map.of("storeManagerRestaurantIds", chtOf, "obmRestaurantIds", obmOf))));
     }
 
     private static Map<String, Object> restaurant(long companyId, String code) {

@@ -12,8 +12,8 @@ export interface GroupTableProps {
   loading: boolean
   onEdit: (group: CriterionGroup) => void
   onAddCriterion: (group: CriterionGroup) => void
-  onBatchAddCriteria?: (group: CriterionGroup) => void
   onViewCriteria: (group: CriterionGroup) => void
+  onDelete: (group: CriterionGroup) => void
 }
 
 export function GroupTable({
@@ -21,11 +21,11 @@ export function GroupTable({
   loading,
   onEdit,
   onAddCriterion,
-  onBatchAddCriteria,
   onViewCriteria,
+  onDelete,
 }: GroupTableProps) {
   const isMobile = useIsMobile()
-  const columns = useGroupTableColumns({ onEdit, onAddCriterion, onBatchAddCriteria, onViewCriteria })
+  const columns = useGroupTableColumns({ onEdit, onAddCriterion, onViewCriteria, onDelete })
 
   if (isMobile) {
     return (
@@ -43,8 +43,8 @@ export function GroupTable({
                 index={idx}
                 onEdit={onEdit}
                 onAddCriterion={onAddCriterion}
-                onBatchAddCriteria={onBatchAddCriteria}
                 onViewCriteria={onViewCriteria}
+                onDelete={onDelete}
               />
             ))}
           </div>

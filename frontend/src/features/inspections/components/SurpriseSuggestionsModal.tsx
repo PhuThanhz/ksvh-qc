@@ -1,8 +1,9 @@
 import { AlertOutlined, ThunderboltOutlined } from '@ant-design/icons'
-import { Alert, Button, Empty, Flex, Modal, Spin, Table, Tag, Typography } from 'antd'
+import { Alert, Empty, Flex, Modal, Spin, Table, Tag, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { useSurpriseSuggestions } from '@/features/inspections/hooks/useVerificationAndSurprise'
 import type { SurpriseInspectionSuggestion } from '@/features/inspections/inspection.types'
+import { ActionButton } from '@/components/data-display/TableActions'
 
 interface Props {
   open: boolean
@@ -74,17 +75,15 @@ export function SurpriseSuggestionsModal({ open, onClose, onCreateSurprise }: Pr
       width: 160,
       align: 'center',
       render: (_, r) => (
-        <Button
-          type="primary"
+        <ActionButton
+          tone="add"
           icon={<ThunderboltOutlined />}
-          size="small"
+          tooltip="Tạo phiếu đột xuất"
           onClick={() => {
             onCreateSurprise(r)
             onClose()
           }}
-        >
-          Tạo phiếu đột xuất
-        </Button>
+        />
       ),
     },
   ]

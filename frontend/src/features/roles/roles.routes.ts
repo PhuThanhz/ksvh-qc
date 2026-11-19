@@ -8,7 +8,7 @@ const CAN_VIEW = { anyOf: [PERMISSIONS.USER.READ, PERMISSIONS.ROLE.MANAGE] } as 
 export const permissionsAdminRoutes: AppRoute[] = [
   {
     path: ROUTES.admin.permissions,
-    handle: { access: CAN_VIEW, menu: { label: 'Quyền (Permission)', icon: 'permissions', group: 'system' } },
+    handle: { access: CAN_VIEW, menu: { label: 'Phân quyền chức năng', icon: 'permissions', group: 'system' } },
     lazy: () => import('@/features/roles/pages/PermissionListPage').then((m) => ({ Component: m.PermissionListPage })),
   },
 ]
@@ -16,7 +16,7 @@ export const permissionsAdminRoutes: AppRoute[] = [
 export const rolesAdminRoutes: AppRoute[] = [
   {
     path: ROUTES.admin.roles,
-    handle: { access: CAN_VIEW, menu: { label: 'Vai trò (Role)', icon: 'roles', group: 'system' } },
+    handle: { access: CAN_VIEW, menu: { label: 'Vai trò người dùng', icon: 'roles', group: 'system' } },
     lazy: () => import('@/features/roles/pages/RoleListPage').then((m) => ({ Component: m.RoleListPage })),
   },
 ]

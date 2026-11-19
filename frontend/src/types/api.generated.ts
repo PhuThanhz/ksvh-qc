@@ -68,6 +68,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/org-units/assignments/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_3"];
+        put: operations["replace"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/notifications/preferences": {
         parameters: {
             query?: never;
@@ -93,7 +109,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_3"];
+        get: operations["get_4"];
         put: operations["update_3"];
         post?: never;
         delete: operations["delete_3"];
@@ -109,7 +125,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_4"];
+        get: operations["get_5"];
         put: operations["update_4"];
         post?: never;
         delete: operations["delete_4"];
@@ -125,7 +141,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_5"];
+        get: operations["get_6"];
         put: operations["update_5"];
         post?: never;
         delete: operations["delete_5"];
@@ -157,7 +173,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_6"];
+        get: operations["get_7"];
         put: operations["update_6"];
         post?: never;
         delete: operations["deleteCriterion"];
@@ -173,7 +189,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_7"];
+        get: operations["get_8"];
         put: operations["update_7"];
         post?: never;
         delete: operations["delete_6"];
@@ -642,6 +658,54 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["submitAppealReview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/findings/batch-verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["batchVerify"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/findings/batch-remediation-plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["batchSetRemediationPlan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/findings/batch-confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["batchConfirm"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1142,6 +1206,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/reports/approval-queue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["approvalQueue"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/permissions": {
         parameters: {
             query?: never;
@@ -1231,7 +1311,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_8"];
+        get: operations["get_9"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1336,6 +1416,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/inspection-plans/{id}/copyable-assignments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getCopyableAssignments"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/inspection-plans/restaurant-warnings": {
         parameters: {
             query?: never;
@@ -1375,7 +1471,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_9"];
+        get: operations["get_10"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1553,7 +1649,7 @@ export interface paths {
             cookie?: never;
         };
         /** Xem chi tiết một bản ghi nhật ký */
-        get: operations["get_10"];
+        get: operations["get_11"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1717,10 +1813,6 @@ export interface components {
             code: string;
             name: string;
             address?: string;
-            /** Format: int64 */
-            storeManagerUserId?: number;
-            /** Format: int64 */
-            obmUserId?: number;
             /** Format: double */
             latitude?: number;
             /** Format: double */
@@ -1760,6 +1852,22 @@ export interface components {
             id: number;
             username: string;
             fullName: string;
+        };
+        RestaurantAssignmentRequest: {
+            storeManagerRestaurantIds: number[];
+            obmRestaurantIds: number[];
+        };
+        AssignedRestaurant: {
+            /** Format: int64 */
+            id: number;
+            code: string;
+            name: string;
+        };
+        RestaurantAssignmentResponse: {
+            /** Format: int64 */
+            userId: number;
+            storeManagerOf: components["schemas"]["AssignedRestaurant"][];
+            obmOf: components["schemas"]["AssignedRestaurant"][];
         };
         NotificationPreferenceRequest: {
             emailEnabled: boolean;
@@ -2083,6 +2191,7 @@ export interface components {
             findingEvidenceUrls: string;
             remediationPlan: string;
             remediationEvidenceUrls: string;
+            findingStatus: string;
         };
         InspectionResponse: {
             /** Format: int64 */
@@ -2132,6 +2241,7 @@ export interface components {
             /** Format: int32 */
             naCriteria: number;
             complianceScore: number | null;
+            adjustedComplianceScore: number | null;
             /** Format: int32 */
             totalRiskScore: number;
             maxRiskLevel: string;
@@ -2337,6 +2447,34 @@ export interface components {
             /** @enum {string} */
             verdict: "PENDING" | "FINDING_VALID" | "FINDING_INVALID";
             comment?: string;
+        };
+        /** @description Yêu cầu nghiệm thu hàng loạt lỗi (dành cho Chuyên viên KSVH) */
+        BatchFindingVerifyRequest: {
+            items: components["schemas"]["BatchVerifyItem"][];
+        };
+        BatchVerifyItem: {
+            /** Format: int64 */
+            findingId: number;
+            passed: boolean;
+            comment?: string | null;
+        };
+        /** @description Kết quả thực hiện thao tác hàng loạt */
+        BatchActionResultResponse: {
+            /** Format: int32 */
+            successCount: number;
+            message: string;
+        };
+        /** @description Yêu cầu lập kế hoạch khắc phục cho nhiều lỗi cùng lúc */
+        BatchRemediationPlanRequest: {
+            findingIds: number[];
+            remediationPlan: string;
+            /** Format: date */
+            remediationDeadline: string;
+        };
+        /** @description Yêu cầu xác nhận nhận lỗi hàng loạt (dành cho CHT) */
+        BatchFindingConfirmRequest: {
+            findingIds: number[];
+            note?: string | null;
         };
         EscalationRuleRequest: {
             /** Format: int32 */
@@ -2704,6 +2842,39 @@ export interface components {
             /** Format: int64 */
             totalViolations: number;
         };
+        AppealMeetingItem: {
+            /** Format: int64 */
+            id: number;
+            /** Format: int64 */
+            inspectionId: number;
+            inspectionCode: string;
+            /** Format: int64 */
+            restaurantId: number;
+            restaurantName: string;
+            riskLevelCode: string;
+            appealReason: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        /** @description Hàng chờ duyệt dành cho Quản lý KSVH */
+        ApprovalQueueResponse: {
+            pendingPlans: components["schemas"]["PendingPlanItem"][];
+            appealMeetings: components["schemas"]["AppealMeetingItem"][];
+        };
+        PendingPlanItem: {
+            /** Format: int64 */
+            id: number;
+            planCode: string;
+            title: string;
+            /** Format: date */
+            startDate: string;
+            /** Format: date */
+            endDate: string;
+            /** Format: int32 */
+            restaurantCount: number;
+            /** Format: date-time */
+            createdAt: string;
+        };
         PermissionResponse: {
             code: string;
             module: string;
@@ -2967,6 +3138,9 @@ export type RiskLevelVersionResponse = components['schemas']['RiskLevelVersionRe
 export type OrgUnitRequest = components['schemas']['OrgUnitRequest'];
 export type OrgUnitResponse = components['schemas']['OrgUnitResponse'];
 export type UserRef = components['schemas']['UserRef'];
+export type RestaurantAssignmentRequest = components['schemas']['RestaurantAssignmentRequest'];
+export type AssignedRestaurant = components['schemas']['AssignedRestaurant'];
+export type RestaurantAssignmentResponse = components['schemas']['RestaurantAssignmentResponse'];
 export type NotificationPreferenceRequest = components['schemas']['NotificationPreferenceRequest'];
 export type NotificationPreferenceResponse = components['schemas']['NotificationPreferenceResponse'];
 export type TemplateRequest = components['schemas']['TemplateRequest'];
@@ -3012,6 +3186,11 @@ export type FindingRemediationPlanRequest = components['schemas']['FindingRemedi
 export type FindingConcludeAppealRequest = components['schemas']['FindingConcludeAppealRequest'];
 export type FindingAppealRequest = components['schemas']['FindingAppealRequest'];
 export type AppealReviewRequest = components['schemas']['AppealReviewRequest'];
+export type BatchFindingVerifyRequest = components['schemas']['BatchFindingVerifyRequest'];
+export type BatchVerifyItem = components['schemas']['BatchVerifyItem'];
+export type BatchActionResultResponse = components['schemas']['BatchActionResultResponse'];
+export type BatchRemediationPlanRequest = components['schemas']['BatchRemediationPlanRequest'];
+export type BatchFindingConfirmRequest = components['schemas']['BatchFindingConfirmRequest'];
 export type EscalationRuleRequest = components['schemas']['EscalationRuleRequest'];
 export type EscalationRuleResponse = components['schemas']['EscalationRuleResponse'];
 export type Permission = components['schemas']['Permission'];
@@ -3041,6 +3220,9 @@ export type RestaurantCompliance = components['schemas']['RestaurantCompliance']
 export type RestaurantRisk = components['schemas']['RestaurantRisk'];
 export type CriteriaViolationItem = components['schemas']['CriteriaViolationItem'];
 export type CriteriaViolationReportResponse = components['schemas']['CriteriaViolationReportResponse'];
+export type AppealMeetingItem = components['schemas']['AppealMeetingItem'];
+export type ApprovalQueueResponse = components['schemas']['ApprovalQueueResponse'];
+export type PendingPlanItem = components['schemas']['PendingPlanItem'];
 export type PermissionResponse = components['schemas']['PermissionResponse'];
 export type PageResponseOrgUnitResponse = components['schemas']['PageResponseOrgUnitResponse'];
 export type Pageable = components['schemas']['Pageable'];
@@ -3312,6 +3494,54 @@ export interface operations {
             };
         };
     };
+    get_3: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RestaurantAssignmentResponse"];
+                };
+            };
+        };
+    };
+    replace: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RestaurantAssignmentRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RestaurantAssignmentResponse"];
+                };
+            };
+        };
+    };
     getPreferences: {
         parameters: {
             query?: never;
@@ -3356,7 +3586,7 @@ export interface operations {
             };
         };
     };
-    get_3: {
+    get_4: {
         parameters: {
             query?: never;
             header?: never;
@@ -3424,7 +3654,7 @@ export interface operations {
             };
         };
     };
-    get_4: {
+    get_5: {
         parameters: {
             query?: never;
             header?: never;
@@ -3492,7 +3722,7 @@ export interface operations {
             };
         };
     };
-    get_5: {
+    get_6: {
         parameters: {
             query?: never;
             header?: never;
@@ -3586,7 +3816,7 @@ export interface operations {
             };
         };
     };
-    get_6: {
+    get_7: {
         parameters: {
             query?: never;
             header?: never;
@@ -3654,7 +3884,7 @@ export interface operations {
             };
         };
     };
-    get_7: {
+    get_8: {
         parameters: {
             query?: never;
             header?: never;
@@ -4628,6 +4858,78 @@ export interface operations {
             };
         };
     };
+    batchVerify: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BatchFindingVerifyRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BatchActionResultResponse"];
+                };
+            };
+        };
+    };
+    batchSetRemediationPlan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BatchRemediationPlanRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BatchActionResultResponse"];
+                };
+            };
+        };
+    };
+    batchConfirm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BatchFindingConfirmRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BatchActionResultResponse"];
+                };
+            };
+        };
+    };
     escalationRules: {
         parameters: {
             query?: never;
@@ -5378,7 +5680,8 @@ export interface operations {
     dashboard: {
         parameters: {
             query?: {
-                months?: number;
+                from?: string;
+                to?: string;
             };
             header?: never;
             path?: never;
@@ -5437,6 +5740,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": string;
+                };
+            };
+        };
+    };
+    approvalQueue: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ApprovalQueueResponse"];
                 };
             };
         };
@@ -5543,7 +5866,7 @@ export interface operations {
             };
         };
     };
-    get_8: {
+    get_9: {
         parameters: {
             query?: never;
             header?: never;
@@ -5687,6 +6010,31 @@ export interface operations {
             };
         };
     };
+    getCopyableAssignments: {
+        parameters: {
+            query: {
+                targetStartDate: string;
+                targetEndDate: string;
+            };
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PlanAssignmentRequest"][];
+                };
+            };
+        };
+    };
     getRestaurantWarning: {
         parameters: {
             query: {
@@ -5741,7 +6089,7 @@ export interface operations {
             };
         };
     };
-    get_9: {
+    get_10: {
         parameters: {
             query?: never;
             header?: never;
@@ -5975,7 +6323,7 @@ export interface operations {
             };
         };
     };
-    get_10: {
+    get_11: {
         parameters: {
             query?: never;
             header?: never;

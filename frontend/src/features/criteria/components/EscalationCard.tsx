@@ -16,6 +16,7 @@ import { escalationSchema, type EscalationFormValues } from '@/features/criteria
 import { applyFieldErrors, getErrorMessage } from '@/lib/http'
 import { PERMISSIONS, ProtectedAction } from '@/permissions'
 import { formatDate, formatDateTime } from '@/utils/format-date'
+import { ActionButton } from '@/components/data-display/TableActions'
 
 /** Danh mục 9: quy tắc nâng mức ảnh hưởng khi lỗi lặp lại, theo phiên bản ngày hiệu lực. */
 export function EscalationCard() {
@@ -56,7 +57,7 @@ export function EscalationCard() {
 
   return (
     <Card
-      title="Quy tắc nâng mức ảnh hưởng"
+      title="Quy tắc nâng mức ảnh hưởng khi tái phạm"
       extra={
         <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
           <Button
@@ -81,9 +82,7 @@ export function EscalationCard() {
     >
       {current && (
         <Typography.Paragraph type="secondary" style={{ marginBottom: 12 }}>
-          Đang áp dụng từ {formatDate(current.effectiveFrom)}: lỗi từ {current.thresholdCount} lần trong kỳ đếm thì mức ảnh
-          hưởng +{current.stepIncrease} bậc (tối đa mức {current.maxImpact}); {current.resetPeriodMonths} tháng liên tục
-          không lỗi thì về mức gốc.
+          Đang áp dụng từ {formatDate(current.effectiveFrom)}: Tiêu chí vi phạm từ {current.thresholdCount} lần trong chu kỳ theo dõi sẽ tự động nâng mức ảnh hưởng thêm +{current.stepIncrease} bậc (tối đa mức {current.maxImpact}); sau {current.resetPeriodMonths} tháng liên tục không phát sinh vi phạm sẽ hoàn nguyên về mức độ ảnh hưởng cơ sở.
         </Typography.Paragraph>
       )}
       <Table<EscalationRule>
@@ -94,10 +93,10 @@ export function EscalationCard() {
         pagination={false}
         scroll={{ x: 'max-content' }}
         columns={[
-          { title: 'Ngưỡng', dataIndex: 'thresholdCount', render: (n: number) => `${n} lần` },
-          { title: 'Nâng', dataIndex: 'stepIncrease', render: (n: number) => `+${n} bậc` },
-          { title: 'Mức trần', dataIndex: 'maxImpact' },
-          { title: 'Hạ lại sau', dataIndex: 'resetPeriodMonths', render: (n: number) => `${n} tháng` },
+          { title: 'Ngưỡng vi phạm', dataIndex: 'thresholdCount', render: (n: number) => `${n} lần` },
+          { title: 'Mức nâng', dataIndex: 'stepIncrease', render: (n: number) => `+${n} bậc` },
+          { title: 'Giới hạn mức trần', dataIndex: 'maxImpact' },
+          { title: 'Thời hạn hoàn nguyên', dataIndex: 'resetPeriodMonths', render: (n: number) => `${n} tháng` },
           { title: 'Hiệu lực từ', dataIndex: 'effectiveFrom', render: formatDate },
           { title: 'Trạng thái', dataIndex: 'status', render: (s: ConfigStatus) => <ConfigStatusTag status={s} /> },
           {
@@ -119,7 +118,7 @@ export function EscalationCard() {
             render: (_: unknown, r: EscalationRule) =>
               r.status === 'SCHEDULED' && (
                 <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-                  <Button type="text" danger icon={<DeleteOutlined />} aria-label="Xoá phiên bản" onClick={() => void onDelete(r)} />
+                  <ActionButton tone="delete" icon={<DeleteOutlined />} tooltip="Xoá phiên bản" onClick={() => void onDelete(r)} />
                 </ProtectedAction>
               ),
           },
@@ -127,7 +126,7 @@ export function EscalationCard() {
       />
       <Modal
         open={open}
-        title="Thêm phiên bản quy tắc nâng mức"
+        title="Thiết lập phiên bản quy tắc nâng mức ảnh hưởng"
         okText="Lưu"
         cancelText="Huỷ"
         centered
@@ -142,16 +141,16 @@ export function EscalationCard() {
           <button type="submit" hidden />
           <Row gutter={16}>
             <Col span={12}>
-              <FormNumber control={control} name="thresholdCount" label="Ngưỡng (số lần lỗi trong kỳ)" required min={2} max={50} precision={0} />
+              <FormNumber control={control} name="thresholdCount" label="Ngưỡng tái phạm (số lần vi phạm trong chu kỳ)" required min={2} max={50} precision={0} />
             </Col>
             <Col span={12}>
-              <FormNumber control={control} name="stepIncrease" label="Số bậc tăng" required min={1} max={4} precision={0} />
+              <FormNumber control={control} name="stepIncrease" label="Số bậc nâng mức (+)" required min={1} max={4} precision={0} />
             </Col>
             <Col span={12}>
-              <FormNumber control={control} name="maxImpact" label="Mức trần (1–5)" required min={1} max={5} precision={0} />
+              <FormNumber control={control} name="maxImpact" label="Mức độ ảnh hưởng tối đa (1–5)" required min={1} max={5} precision={0} />
             </Col>
             <Col span={12}>
-              <FormNumber control={control} name="resetPeriodMonths" label="Hạ lại sau (tháng không lỗi)" required min={1} max={24} precision={0} />
+              <FormNumber control={control} name="resetPeriodMonths" label="Thời hạn hoàn nguyên (tháng không vi phạm)" required min={1} max={24} precision={0} />
             </Col>
           </Row>
           <FormDatePicker

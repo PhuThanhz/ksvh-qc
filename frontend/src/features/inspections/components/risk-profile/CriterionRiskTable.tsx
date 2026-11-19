@@ -20,13 +20,14 @@ export function CriterionRiskTable({
   const columns: ColumnsType<CriterionRiskProfileItem> = [
     {
       title: 'Mã tiêu chí',
+      className: 'col-code',
       dataIndex: 'criterionCode',
       key: 'criterionCode',
       width: 120,
-      render: (v) => <b>{v}</b>,
+      render: (v) => <span className="code-tag--blue">{v}</span>,
     },
     {
-      title: 'Tên tiêu chí',
+      title: 'Nội dung tiêu chí kiểm soát',
       dataIndex: 'criterionName',
       key: 'criterionName',
       ellipsis: true,
@@ -38,12 +39,12 @@ export function CriterionRiskTable({
       ),
     },
     {
-      title: 'Mức ảnh hưởng',
+      title: 'Mức độ ảnh hưởng',
       key: 'impact',
       width: 160,
       render: (_, r) => (
         <Flex align="center" gap={6}>
-          <Tag>Gốc: Mức {r.baseImpact}</Tag>
+          <Tag>Cơ sở: Mức {r.baseImpact}</Tag>
           {r.isEscalated ? (
             <Tag color="error">▲ Hiệu lực: Mức {r.effectiveImpact}</Tag>
           ) : (
@@ -53,7 +54,7 @@ export function CriterionRiskTable({
       ),
     },
     {
-      title: 'Tần suất kỳ',
+      title: 'Tần suất vi phạm',
       dataIndex: 'frequencyInPeriod',
       key: 'frequencyInPeriod',
       width: 105,
@@ -61,31 +62,31 @@ export function CriterionRiskTable({
       render: (v: number) => (v > 0 ? <b style={{ color: v >= 3 ? '#ff4d4f' : '#fa8c16' }}>{v} lần</b> : '0'),
     },
     {
-      title: 'Lần lỗi gần nhất',
+      title: 'Vi phạm gần nhất',
       dataIndex: 'lastViolationDate',
       key: 'lastViolationDate',
       width: 130,
-      render: (v?: string) => (v ? formatDate(v) : 'Chưa có lỗi'),
+      render: (v?: string) => (v ? formatDate(v) : 'Chưa có vi phạm'),
     },
     {
-      title: 'Dự kiến hạ mức',
+      title: 'Dự kiến hoàn nguyên',
       key: 'reset',
       width: 210,
       render: (_, r) => {
         if (!r.isEscalated) {
-          return <Tag color="default">Đang ở mức gốc</Tag>
+          return <Tag color="default">Mức cơ sở</Tag>
         }
         return (
-          <Tooltip title={`Đã có ${r.cleanMonthsCount}/${resetPeriodMonths ?? 6} tháng sạch liên tục`}>
+          <Tooltip title={`Đã ghi nhận ${r.cleanMonthsCount}/${resetPeriodMonths ?? 6} tháng liên tục không vi phạm`}>
             <Tag color="warning">
-              Về mức {r.baseImpact} từ {formatDate(r.expectedResetDate)}
+              Hoàn nguyên mức {r.baseImpact} từ {formatDate(r.expectedResetDate)}
             </Tag>
           </Tooltip>
         )
       },
     },
     {
-      title: 'Lỗi đang mở',
+      title: 'Điểm chưa khắc phục',
       dataIndex: 'openFindingsCount',
       key: 'openFindingsCount',
       width: 110,

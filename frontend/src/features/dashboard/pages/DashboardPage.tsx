@@ -1,28 +1,27 @@
-import { Flex, Segmented, Typography } from 'antd'
+import { Flex, Typography } from 'antd'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { useSession } from '@/features/auth'
 import { ApprovalQueueSection } from '@/features/dashboard/components/ApprovalQueueSection'
 import { CatalogSection } from '@/features/dashboard/components/CatalogSection'
+import { DashboardPeriodPicker } from '@/features/dashboard/components/DashboardPeriodPicker'
 import { OperationsSection } from '@/features/dashboard/components/OperationsSection'
+import { defaultPeriod } from '@/features/dashboard/dashboard.period'
 import { PERMISSIONS, usePermission } from '@/permissions'
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
-const PERIODS = [
-  { label: '3 tháng', value: 3 },
-  { label: '6 tháng', value: 6 },
-  { label: '12 tháng', value: 12 },
-]
-
 function SectionTitle({ children }: { children: string }) {
   return (
     <Flex align="center" gap={12} style={{ marginTop: 8, marginBottom: 4 }}>
-      <Typography.Text style={{ fontSize: 15, fontWeight: 600, color: 'var(--app-text)' }}>
+      {/* Tiêu đề nằm trực tiếp trên nền ảnh tối → chữ trắng có bóng để dễ đọc */}
+      <Typography.Text
+        style={{ fontSize: 15, fontWeight: 600, color: '#ffffff', textShadow: '0 1px 2px rgba(0, 0, 0, 0.18)' }}
+      >
         {children}
       </Typography.Text>
-      <div style={{ flex: 1, height: 1, background: 'var(--app-border)' }} />
+      <div style={{ flex: 1, height: 1, background: 'rgba(255, 255, 255, 0.35)' }} />
     </Flex>
   )
 }
@@ -33,35 +32,23 @@ export function DashboardPage() {
   const { canAny } = usePermission()
   const canOps = canAny([PERMISSIONS.REPORT.READ, PERMISSIONS.INSPECTION.READ_ALL])
   const canApprove = canAny([PERMISSIONS.PLAN.APPROVE, PERMISSIONS.FINDING.CONCLUDE_APPEAL])
-  const [months, setMonths] = useState(6)
+  const [period, setPeriod] = useState(defaultPeriod)
   const today = dayjs()
 
   return (
     <PageContainer
       title="Tổng quan vận hành"
       subtitle={`Xin chào ${user?.fullName ?? ''} · ${capitalize(today.format('dddd, DD/MM/YYYY'))}`}
-      extra={
-        canOps ? (
-          <Flex align="center" gap={8}>
-            <span style={{ fontSize: 13, color: '#ffffff', fontWeight: 500, textShadow: '0 1px 4px rgba(0, 0, 0, 0.6)' }}>
-              Khoảng thời gian:
-            </span>
-            <Segmented
-              size="middle"
-              options={PERIODS}
-              value={months}
-              onChange={(v) => setMonths(Number(v))}
-            />
-          </Flex>
-        ) : undefined
-      }
+      // Kỳ thống kê tự chọn (góc phải như nút hành động các trang khác). Chỉ đổi số "theo kỳ";
+      // số "Hiện tại" (lỗi đang mở, rủi ro) không phụ thuộc kỳ.
+      extra={canOps ? <DashboardPeriodPicker value={period} onChange={setPeriod} /> : undefined}
     >
       <Flex vertical gap={20} style={{ paddingBottom: 24 }}>
         {/* 1. KHỐI CHỈ SỐ KPI & BIỂU ĐỒ: Luôn ưu tiên hiển thị đầu trang Dashboard */}
         {canOps && (
           <>
             <SectionTitle>Chỉ số KPI & Biểu đồ phân tích vận hành QC</SectionTitle>
-            <OperationsSection months={months} />
+            <OperationsSection period={period} />
           </>
         )}
 

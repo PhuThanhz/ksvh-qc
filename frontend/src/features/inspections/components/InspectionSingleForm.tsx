@@ -90,7 +90,7 @@ export function InspectionSingleForm({ onSuccess, onCancel, initialValues }: Pro
         payload = { ...vals, templateId: undefined, topicGroupIds: undefined, planId: undefined }
       }
       await create.mutateAsync(payload)
-      notify.success('Tạo phiếu chấm và phân công chuyên viên thành công')
+      notify.success('Khởi tạo đợt kiểm tra và phân công chuyên viên thành công')
       onSuccess()
     } catch (err: unknown) {
       notify.error((err as { message?: string })?.message ?? 'Đã xảy ra lỗi khi tạo phiếu')
@@ -99,7 +99,7 @@ export function InspectionSingleForm({ onSuccess, onCancel, initialValues }: Pro
 
   return (
     <Form form={form} layout="vertical" style={{ marginTop: 12 }}>
-      <Form.Item name="code" label="Mã phiếu chấm" rules={[{ required: true, message: 'Vui lòng nhập mã phiếu' }]}>
+      <Form.Item name="code" label="Mã biên bản kiểm tra" rules={[{ required: true, message: 'Vui lòng nhập mã biên bản' }]}>
         <Input placeholder="VD: PC-202611-001" />
       </Form.Item>
 
@@ -185,7 +185,7 @@ export function InspectionSingleForm({ onSuccess, onCancel, initialValues }: Pro
         <Space>
           <Button onClick={onCancel}>Hủy</Button>
           <Button type="primary" onClick={onSubmit} loading={create.isPending}>
-            Tạo phiếu chấm
+            Khởi tạo đợt kiểm tra
           </Button>
         </Space>
       </Flex>

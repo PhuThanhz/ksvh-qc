@@ -11,8 +11,8 @@ import jakarta.validation.constraints.Size;
 import vn.ksvh.qc.organization.domain.OrgUnitType;
 
 /**
- * Tạo / sửa nhà hàng hoặc phòng ban. Với phòng ban, server bỏ qua CHT, OBM, loại nhà hàng và toạ độ.
- * Với nhà hàng, toạ độ và bán kính là bắt buộc (kiểm tra ở service).
+ * Tạo / sửa nhà hàng hoặc phòng ban. Với phòng ban, server bỏ qua toạ độ và bán kính.
+ * CHT / OBM không gán ở đây mà qua {@code RestaurantAssignmentService} (màn Người dùng) hoặc file Excel.
  */
 public record OrgUnitRequest(
         @NotNull(message = "Vui lòng chọn công ty")
@@ -32,11 +32,6 @@ public record OrgUnitRequest(
 
         @Size(max = 500, message = "Địa chỉ tối đa 500 ký tự")
         String address,
-
-
-        Long storeManagerUserId,
-
-        Long obmUserId,
 
         @DecimalMin(value = "-90", message = "Vĩ độ phải từ -90 đến 90")
         @DecimalMax(value = "90", message = "Vĩ độ phải từ -90 đến 90")

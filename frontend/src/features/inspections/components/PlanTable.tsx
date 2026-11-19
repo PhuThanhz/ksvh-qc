@@ -1,4 +1,4 @@
-import { Table, Typography } from 'antd'
+import { Table } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { StatusBadge } from '@/components/data-display/StatusBadge'
 import { PLAN_STATUS_META } from '../constants/status'
@@ -6,6 +6,7 @@ import { PlanActionButtons } from '@/features/inspections/components/PlanActionB
 import type { PlanResponse, PlanStatus } from '@/features/inspections/inspection.types'
 import { formatDate } from '@/utils/format-date'
 import { PERMISSIONS, usePermission } from '@/permissions'
+import { actionColumnWidth } from '@/components/data-display/tableActions.utils'
 
 interface Props {
   data?: PlanResponse[]
@@ -50,10 +51,11 @@ export function PlanTable({
     },
     {
       title: 'Mã kế hoạch',
+      className: 'col-code',
       dataIndex: 'planCode',
       key: 'planCode',
       width: 120,
-      render: (v) => <span style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{v}</span>,
+      render: (v) => <span className="code-tag--blue">{v}</span>,
     },
     {
       title: 'Tiêu đề kế hoạch',
@@ -63,9 +65,9 @@ export function PlanTable({
       render: (t, r) => (
         <div>
           {onView ? (
-            <Typography.Link onClick={() => onView(r)} style={{ fontWeight: 500 }}>
+            <span className="cell-title-link" onClick={() => onView(r)}>
               {t}
-            </Typography.Link>
+            </span>
           ) : (
             <div style={{ fontWeight: 500 }}>{t}</div>
           )}
@@ -78,7 +80,7 @@ export function PlanTable({
       ),
     },
     {
-      title: 'Thời gian',
+      title: 'Thời hạn thực hiện',
       key: 'period',
       width: 180,
       render: (_, r) => `${formatDate(r.startDate)} - ${formatDate(r.endDate)}`,
@@ -87,14 +89,14 @@ export function PlanTable({
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
-      width: 120,
+      width: 160,
       render: (st: PlanStatus) => <StatusBadge status={st} meta={PLAN_STATUS_META} />,
     },
     {
-      title: 'Số phân công',
+      title: 'Số cơ sở phân công',
       dataIndex: 'assignmentCount',
       key: 'assignmentCount',
-      width: 120,
+      width: 150,
       align: 'center',
       render: (c?: number) => c ?? 0,
     },
@@ -115,8 +117,10 @@ export function PlanTable({
     {
       title: 'Thao tác',
       key: 'actions',
-      width: 150,
-      align: 'center',
+      width: actionColumnWidth(4),
+      // Ghim mép phải bằng CSS sticky (.col-actions), không làm đổi bố cục các cột khác.
+      className: 'col-actions',
+      align: 'center' as const,
       render: (_, r) => (
         <PlanActionButtons
           plan={r}
@@ -139,7 +143,7 @@ export function PlanTable({
       dataSource={data}
       rowKey="id"
       loading={loading}
-      scroll={{ x: 1230 }}
+      scroll={{ x: 1600 }}
       pagination={
         totalItems !== undefined
           ? {

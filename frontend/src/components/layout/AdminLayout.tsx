@@ -1,11 +1,13 @@
-import { CloseOutlined, SafetyCertificateFilled } from '@ant-design/icons'
+import { CloseOutlined } from '@ant-design/icons'
 import { Button, Drawer, Flex, Grid, Layout, Typography } from 'antd'
 import { Suspense, useState } from 'react'
-import { Outlet } from 'react-router'
+import { Outlet, useLocation } from 'react-router'
 import { ContentErrorBoundary } from '@/components/feedback/ContentErrorBoundary'
 import { LoadingState } from '@/components/feedback/LoadingState'
 import { AmbientCanvas } from '@/components/layout/AmbientCanvas'
 import { AppHeader } from '@/components/layout/AppHeader'
+import { AppLogo } from '@/components/layout/AppLogo'
+import { NavigationProgress } from '@/components/layout/NavigationProgress'
 import type { LayoutUser, MenuEntry } from '@/components/layout/menu.types'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { SidebarProfile } from '@/components/layout/SidebarProfile'
@@ -38,24 +40,7 @@ function BrandHeader({
       }}
     >
       <Flex align="center" gap={12}>
-        <Flex
-          align="center"
-          justify="center"
-          style={{
-            width: 34,
-            height: 34,
-            borderRadius: 10,
-            background: 'rgba(255, 255, 255, 0.16)',
-            color: '#ffffff',
-            fontSize: 18,
-            flexShrink: 0,
-            border: '1px solid rgba(255, 255, 255, 0.28)',
-            boxShadow: 'inset 0 0 0 1px rgba(255, 255, 255, 0.35), 0 6px 16px -6px rgba(0, 0, 0, 0.4)',
-            backdropFilter: 'blur(10px)',
-          }}
-        >
-          <SafetyCertificateFilled />
-        </Flex>
+        <AppLogo size={36} tile />
         {!collapsed && (
           <Flex vertical style={{ lineHeight: 1.15, overflow: 'hidden' }}>
             <Typography.Text
@@ -102,6 +87,7 @@ function BrandHeader({
 export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutProps) {
   const screens = Grid.useBreakpoint()
   const isDesktop = screens.lg ?? true
+  const { pathname } = useLocation()
 
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -123,7 +109,7 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
           collapsed={collapsed}
           trigger={null}
           theme="dark"
-          width={264}
+          width={296}
           collapsedWidth={72}
           className="app-sidebar"
           style={{
@@ -185,19 +171,23 @@ export function AdminLayout({ menu, user, onLogout, loggingOut }: AdminLayoutPro
             zIndex: 99,
           }}
         >
-          <AppHeader onToggleSidebar={handleToggle} collapsed={collapsed} menu={menu} />
+          <AppHeader onToggleSidebar={handleToggle} collapsed={collapsed} />
+          <NavigationProgress />
         </Layout.Header>
 
         <Layout.Content
           className="app-content"
           style={{
-            padding: isDesktop ? '20px 24px 32px' : '16px',
+            padding: isDesktop ? '10px 24px 32px' : '10px 16px 16px',
             minHeight: 'calc(100vh - 52px)',
           }}
         >
           <ContentErrorBoundary>
             <Suspense fallback={<LoadingState />}>
-              <Outlet />
+              {/* key theo đường dẫn: mỗi trang mới hiện ra với hiệu ứng mờ dần nhẹ */}
+              <div key={pathname} className="page-enter">
+                <Outlet />
+              </div>
             </Suspense>
           </ContentErrorBoundary>
         </Layout.Content>

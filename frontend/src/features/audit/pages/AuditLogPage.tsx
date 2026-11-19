@@ -1,5 +1,5 @@
 import { DownloadOutlined, EyeOutlined } from '@ant-design/icons'
-import { Button, DatePicker, Flex, Select, Table, Tooltip, Typography } from 'antd'
+import { Button, DatePicker, Flex, Select, Table, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import { useCallback, useState } from 'react'
@@ -13,6 +13,7 @@ import { ACTION_LABELS, TARGET_LABELS, type AuditLogResponse, type AuditLogSearc
 import { useListParams } from '@/hooks/useListParams'
 import { exportToCsv } from '@/utils/export-csv'
 import { formatDateTime } from '@/utils/format-date'
+import { ActionButton } from '@/components/data-display/TableActions'
 
 export function AuditLogPage() {
   const { params, filters, setFilter, onTableChange, resetFilters, activeFilterCount } =
@@ -95,9 +96,7 @@ export function AuditLogPage() {
       width: 60,
       align: 'center',
       render: (_, r) => (
-        <Tooltip title="Xem chi tiết">
-          <Button type="text" icon={<EyeOutlined />} onClick={() => setSelectedId(r.id)} />
-        </Tooltip>
+        <ActionButton tone="view" icon={<EyeOutlined />} tooltip="Xem chi tiết" onClick={() => setSelectedId(r.id)} />
       ),
     },
   ]

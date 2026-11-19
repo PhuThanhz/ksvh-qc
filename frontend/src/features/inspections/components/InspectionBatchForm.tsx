@@ -53,7 +53,7 @@ export function InspectionBatchForm({ onSuccess, onCancel }: Props) {
           ? { ...vals, inspectionMode: 'ON_SITE', topicGroupIds: undefined }
           : { ...vals, templateId: undefined },
       )
-      notify.success(`Đã khởi tạo thành công ${res.length} phiếu chấm kiểm soát!`)
+      notify.success(`Đã khởi tạo thành công ${res.length} biên bản kiểm tra KSVH!`)
       onSuccess()
     } catch (err: unknown) {
       notify.error((err as { message?: string })?.message ?? 'Đã xảy ra lỗi khi tạo đợt hàng loạt')
@@ -71,9 +71,9 @@ export function InspectionBatchForm({ onSuccess, onCancel }: Props) {
 
       <Form.Item
         name="codePrefix"
-        label="Tiền tố mã phiếu"
-        rules={[{ required: true, message: 'Vui lòng nhập tiền tố mã phiếu' }]}
-        extra="Mã phiếu tự động sinh: [Tiền tố]-[Mã nhà hàng] (VD: KT-202611-CH01)"
+        label="Tiền tố mã biên bản"
+        rules={[{ required: true, message: 'Vui lòng nhập tiền tố mã biên bản' }]}
+        extra="Mã biên bản tự động sinh: [Tiền tố]-[Mã cơ sở] (VD: KT-202611-CH01)"
       >
         <Input placeholder="VD: KT-202611" />
       </Form.Item>
@@ -106,8 +106,8 @@ export function InspectionBatchForm({ onSuccess, onCancel }: Props) {
       {isPeriodic ? (
         <Form.Item
           name="templateId"
-          label="Mẫu phiếu chấm áp dụng"
-          rules={[{ required: true, message: 'Vui lòng chọn mẫu phiếu' }]}
+          label="Mẫu phiếu kiểm tra áp dụng"
+          rules={[{ required: true, message: 'Vui lòng chọn mẫu phiếu kiểm tra' }]}
         >
           <Select
             showSearch
@@ -148,7 +148,7 @@ export function InspectionBatchForm({ onSuccess, onCancel }: Props) {
         name="inspectorId"
         label="Chuyên viên phụ trách đợt kiểm tra"
         rules={[{ required: true, message: 'Vui lòng chọn chuyên viên' }]}
-        extra={!canPlan ? 'Bạn chỉ có quyền tự tạo phiếu chấm cho chính mình' : undefined}
+        extra={!canPlan ? 'Bạn chỉ có quyền khởi tạo đợt kiểm tra cho chính mình' : undefined}
       >
         <Select
           showSearch

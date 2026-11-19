@@ -8,17 +8,17 @@ export type PermissionInfo = Schemas['PermissionResponse']
 
 /** Nhãn tiếng Việt của module (phần trước dấu ":" trong mã permission). */
 export const MODULE_LABEL: Record<string, string> = {
-  user: 'Người dùng',
-  role: 'Vai trò',
-  system: 'Hệ thống',
-  employee: 'Nhân viên',
-  organization: 'Tổ chức',
-  criteria: 'Tiêu chí & cấu hình rủi ro',
-  plan: 'Kế hoạch kiểm tra',
-  inspection: 'Phiếu chấm',
-  finding: 'Lỗi, khiếu nại & khắc phục',
-  report: 'Báo cáo',
-  media: 'Ảnh / video',
+  user: 'Tài khoản người dùng',
+  role: 'Vai trò người dùng',
+  system: 'Quản trị hệ thống',
+  employee: 'Hồ sơ nhân sự',
+  organization: 'Đơn vị & Cơ sở vận hành',
+  criteria: 'Tiêu chuẩn & Cấu hình rủi ro',
+  plan: 'Kế hoạch kiểm soát vận hành',
+  inspection: 'Biên bản kiểm tra KSVH',
+  finding: 'Khắc phục điểm không phù hợp',
+  report: 'Báo cáo & Phân tích kiểm soát',
+  media: 'Hồ sơ minh chứng (Ảnh/Video)',
 }
 
 export const moduleLabel = (module: string) => MODULE_LABEL[module] ?? module

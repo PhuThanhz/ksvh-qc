@@ -85,14 +85,14 @@ export function UserListPage() {
 
   return (
     <PageContainer
-      title="Người dùng"
-      subtitle="Tài khoản đăng nhập và vai trò"
+      title="Tài khoản người dùng"
+      subtitle="Quản lý danh sách tài khoản truy cập hệ thống, phân quyền vai trò và trạng thái hoạt động"
       extra={
         <Space size={8}>
           <UserExcelActions />
           <ProtectedAction access={PERMISSIONS.USER.MANAGE}>
             <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreating(true)}>
-              Tạo người dùng
+              Thêm tài khoản
             </Button>
           </ProtectedAction>
         </Space>

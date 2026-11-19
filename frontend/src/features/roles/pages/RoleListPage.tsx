@@ -14,6 +14,7 @@ import type { Role } from '@/features/roles/roles.types'
 import { getErrorMessage } from '@/lib/http'
 import { PERMISSIONS, ProtectedAction } from '@/permissions'
 import { formatDateTime } from '@/utils/format-date'
+import { actionColumnWidth } from '@/components/data-display/tableActions.utils'
 
 export function RoleListPage() {
   const roles = useRoles()
@@ -41,12 +42,12 @@ export function RoleListPage() {
 
   return (
     <PageContainer
-      title="Vai trò"
-      subtitle="Vai trò = chức danh; mỗi vai trò có một bộ quyền. Một người dùng có thể có nhiều vai trò."
+      title="Vai trò người dùng"
+      subtitle="Quản lý các nhóm vai trò và thiết lập tập quyền hạn tương ứng cho từng vị trí chức danh"
       extra={
         <ProtectedAction access={PERMISSIONS.ROLE.MANAGE}>
           <Button type="primary" icon={<PlusOutlined />} onClick={() => setEditing({ open: true })}>
-            Tạo vai trò
+            Thêm vai trò
           </Button>
         </ProtectedAction>
       }
@@ -100,7 +101,10 @@ export function RoleListPage() {
               {
                 title: 'Thao tác',
                 key: 'actions',
-                width: 130,
+                width: actionColumnWidth(3),
+                // Ghim mép phải bằng CSS sticky (.col-actions), không làm đổi bố cục các cột khác.
+      className: 'col-actions',
+                align: 'center' as const,
                 render: (_: unknown, r) => (
                   <TableActions
                     onView={() => setViewing(r)}

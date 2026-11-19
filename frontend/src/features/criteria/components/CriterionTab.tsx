@@ -29,7 +29,6 @@ const ASSIGNED_OPTIONS: { value: AssignedStatus; label: string }[] = [
 export interface CriterionTabProps {
   initialGroupId?: number
   onCreateCriterion?: (defaultGroupId?: number) => void
-  onBatchCreateCriterion?: (defaultGroupId?: number) => void
   onEditCriterion: (criterion: Criterion) => void
 }
 
@@ -100,7 +99,7 @@ export function CriterionTab({
           activeTags={activeTags}
         >
           <FilterSelect<number>
-            placeholder="Nhóm tiêu chí"
+            placeholder="Nhóm tiêu chuẩn"
             width={220}
             value={filters.groupId}
             showSearch={{ optionFilterProp: 'label' }}
@@ -111,7 +110,7 @@ export function CriterionTab({
             onChange={(v) => setFilter('groupId', v)}
           />
           <FilterSelect<number>
-            placeholder="Mẫu phiếu"
+            placeholder="Mẫu phiếu kiểm tra"
             width={200}
             value={filters.templateId}
             showSearch={{ optionFilterProp: 'label' }}
@@ -119,7 +118,7 @@ export function CriterionTab({
             onChange={(v) => setFilter('templateId', v)}
           />
           <FilterSelect<AssignedStatus>
-            placeholder="Tình trạng gán"
+            placeholder="Tình trạng gán mẫu"
             width={160}
             value={filters.assignedToTemplate === undefined ? undefined : filters.assignedToTemplate ? 'assigned' : 'unassigned'}
             options={ASSIGNED_OPTIONS}

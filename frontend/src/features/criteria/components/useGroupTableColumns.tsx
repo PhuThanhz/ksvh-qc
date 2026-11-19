@@ -1,14 +1,13 @@
 import {
-  AppstoreAddOutlined,
-  FolderOpenOutlined,
   RightOutlined,
 } from '@ant-design/icons'
-import { Tag, Tooltip, Typography } from 'antd'
+import { Tag, Tooltip } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import { ActionButton, TableActions } from '@/components/data-display/TableActions'
+import { TableActions } from '@/components/data-display/TableActions'
 import { StatusBadge } from '@/components/data-display/StatusBadge'
 import type { CriterionGroup } from '@/features/criteria/criteria.types'
-import { PERMISSIONS, ProtectedAction } from '@/permissions'
+import { PERMISSIONS } from '@/permissions'
+import { actionColumnWidth } from '@/components/data-display/tableActions.utils'
 
 const ACTIVE_META = {
   active: { label: 'Đang dùng', tone: 'success' as const },
@@ -18,15 +17,15 @@ const ACTIVE_META = {
 interface ColumnHandlers {
   onEdit: (group: CriterionGroup) => void
   onAddCriterion: (group: CriterionGroup) => void
-  onBatchAddCriteria?: (group: CriterionGroup) => void
   onViewCriteria: (group: CriterionGroup) => void
+  onDelete: (group: CriterionGroup) => void
 }
 
 export function useGroupTableColumns({
   onEdit,
   onAddCriterion,
-  onBatchAddCriteria,
   onViewCriteria,
+  onDelete,
 }: ColumnHandlers): ColumnsType<CriterionGroup> {
   return [
     {
@@ -38,32 +37,31 @@ export function useGroupTableColumns({
     },
     {
       title: 'Mã nhóm',
+      className: 'col-code',
       dataIndex: 'code',
       key: 'code',
+      sorter: true,
       width: 140,
-      render: (code: string) => <Typography.Text code strong>{code}</Typography.Text>,
+      render: (code: string) => <span className="code-tag--blue">{code}</span>,
     },
     {
-      title: 'Tên nhóm tiêu chí',
+      title: 'Tên nhóm tiêu chuẩn',
       dataIndex: 'name',
       key: 'name',
+      sorter: true,
       width: 280,
       render: (name: string, g: CriterionGroup) => (
-        <Tooltip title="Xem chi tiết nhóm và danh sách các tiêu chí con">
-          <Typography.Link
+        <Tooltip title="Xem chi tiết nhóm và danh sách tiêu chí kiểm soát">
+          <span
+            className="cell-title-link"
             onClick={() => onViewCriteria(g)}
             style={{
-              fontWeight: 600,
               fontSize: 13.5,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
               textDecoration: g.active ? 'none' : 'line-through',
             }}
           >
-            <FolderOpenOutlined style={{ fontSize: 16, color: 'var(--app-text-secondary)' }} />
-            <span>{name}</span>
-          </Typography.Link>
+            {name}
+          </span>
         </Tooltip>
       ),
     },
@@ -76,7 +74,7 @@ export function useGroupTableColumns({
         comp ? <Tag>{comp}</Tag> : <Tag color="default">Dùng chung toàn hệ thống</Tag>,
     },
     {
-      title: 'Số tiêu chí con',
+      title: 'Số lượng tiêu chí',
       dataIndex: 'criterionCount',
       key: 'criterionCount',
       width: 150,
@@ -102,37 +100,30 @@ export function useGroupTableColumns({
     {
       title: 'Trạng thái',
       dataIndex: 'active',
-      width: 120,
+      width: 160,
       render: (a: boolean) => <StatusBadge status={a ? 'active' : 'inactive'} meta={ACTIVE_META} />,
     },
     {
       title: 'Thao tác',
       key: 'actions',
-      width: 180,
+      width: actionColumnWidth(4),
+      // Ghim mép phải bằng CSS sticky (.col-actions), không làm đổi bố cục các cột khác.
+      className: 'col-actions',
+      align: 'center' as const,
       render: (_, g: CriterionGroup) => (
         <TableActions
           recordName={g.name}
           onView={() => onViewCriteria(g)}
-          viewLabel="Xem chi tiết nhóm"
+          viewLabel="Xem chi tiết nhóm tiêu chuẩn"
           onAdd={() => onAddCriterion(g)}
-          addLabel="Thêm 1 tiêu chí con"
+          addLabel="Thêm tiêu chí vào nhóm"
           addAccess={PERMISSIONS.CRITERIA.MANAGE}
           onEdit={() => onEdit(g)}
-          editLabel="Sửa thông tin nhóm"
+          editLabel="Chỉnh sửa nhóm tiêu chuẩn"
           editAccess={PERMISSIONS.CRITERIA.MANAGE}
-          extra={
-            onBatchAddCriteria && (
-              <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-                <ActionButton
-                  tone="add"
-                  icon={<AppstoreAddOutlined />}
-                  tooltip="Thêm nhanh nhiều tiêu chí con"
-                  ariaLabel={`Thêm nhanh nhiều tiêu chí vào ${g.name}`}
-                  onClick={() => onBatchAddCriteria(g)}
-                />
-              </ProtectedAction>
-            )
-          }
+          onDelete={() => onDelete(g)}
+          deleteLabel="Xoá nhóm tiêu chuẩn"
+          deleteAccess={PERMISSIONS.CRITERIA.MANAGE}
         />
       ),
     },

@@ -39,7 +39,7 @@ export function TemplateListPage() {
   const onDelete = useCallback(
     async (t: Template) => {
       const ok = await confirm({
-        title: 'Xoá mẫu phiếu chấm',
+        title: 'Xoá mẫu phiếu kiểm tra',
         content: `Bạn có chắc chắn muốn xoá mẫu phiếu "${t.name}" (${t.code})? Hành động này không thể hoàn tác.`,
         okText: 'Xoá',
         danger: true,
@@ -81,14 +81,14 @@ export function TemplateListPage() {
 
   return (
     <PageContainer
-      title="Mẫu phiếu chấm"
-      subtitle="Bộ tiêu chí dùng khi chấm, theo loại nhà hàng / loại kiểm tra"
+      title="Mẫu phiếu kiểm tra"
+      subtitle="Bộ tiêu chuẩn đánh giá áp dụng theo từng hình thức kiểm soát và mô hình vận hành"
       extra={
         <Space size={8}>
           <TemplateExcelActions />
           <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
             <Button type="primary" icon={<PlusOutlined />} onClick={() => setModal({ open: true })}>
-              Tạo mẫu phiếu
+              Tạo mẫu phiếu kiểm tra
             </Button>
           </ProtectedAction>
         </Space>

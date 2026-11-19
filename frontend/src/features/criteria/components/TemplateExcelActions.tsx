@@ -11,7 +11,7 @@ export function TemplateExcelActions() {
   const { can } = usePermission()
   return (
     <ExcelActions
-      importTitle="Nhập mẫu phiếu chấm từ Excel"
+      importTitle="Nhập mẫu phiếu kiểm tra từ Excel"
       sheets={['Mẫu phiếu', 'Tiêu chí trong mẫu']}
       onExport={criteriaExcelApi.exportTemplates}
       onDownloadTemplate={criteriaExcelApi.templatesTemplate}

@@ -69,8 +69,8 @@ export function ReportPage() {
 
   return (
     <PageContainer
-      title="Báo cáo & Thống kê kiểm soát"
-      subtitle="Tổng hợp số liệu điều hành, đánh giá tuân thủ và xuất báo cáo nghiệp vụ cho Phòng KSVH"
+      title="Báo cáo & Phân tích kiểm soát"
+      subtitle="Tổng hợp dữ liệu điều hành, đánh giá mức độ tuân thủ và phân tích chất lượng vận hành toàn hệ thống"
     >
       <Tabs
         activeKey={activeTab}

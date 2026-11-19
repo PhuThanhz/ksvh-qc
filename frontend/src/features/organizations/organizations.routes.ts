@@ -9,7 +9,7 @@ export const organizationsAdminRoutes: AppRoute[] = [
     path: ROUTES.admin.organizations,
     handle: {
       access: PERMISSIONS.ORGANIZATION.READ,
-      menu: { label: 'Đơn vị', icon: 'organizations', group: 'catalog' },
+      menu: { label: 'Đơn vị & Cơ sở vận hành', icon: 'organizations', group: 'catalog' },
     },
     lazy: () =>
       import('@/features/organizations/pages/OrgUnitPage').then((m) => ({ Component: m.OrgUnitPage })),
@@ -18,7 +18,7 @@ export const organizationsAdminRoutes: AppRoute[] = [
     path: ROUTES.admin.companies,
     handle: {
       access: PERMISSIONS.ORGANIZATION.READ,
-      menu: { label: 'Công ty', icon: 'companies', group: 'catalog' },
+      menu: { label: 'Công ty thành viên', icon: 'companies', group: 'catalog' },
     },
     lazy: () =>
       import('@/features/organizations/pages/CompanyPage').then((m) => ({ Component: m.CompanyPage })),

@@ -1,13 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Form, Modal } from 'antd'
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { FormField } from '@/components/data-entry/FormField'
 import { FormInput } from '@/components/data-entry/FormInput'
 import { FormSwitch } from '@/components/data-entry/FormSwitch'
 import { useNotify } from '@/components/feedback/useNotify'
+import { RestaurantAssignmentFields } from '@/features/users/components/RestaurantAssignmentFields'
 import { RoleSelect } from '@/features/users/components/RoleSelect'
 import { useCreateUser } from '@/features/users/hooks/useUserMutations'
+import { useUserRestaurantAssignment } from '@/features/users/hooks/useUserRestaurantAssignment'
 import { userCreateSchema, type UserCreateValues } from '@/features/users/schemas/user.schema'
 import { applyFieldErrors, getErrorMessage } from '@/lib/http'
 
@@ -21,14 +23,22 @@ export function UserCreateModal({ open, onClose }: { open: boolean; onClose: () 
     defaultValues: EMPTY,
   })
 
+  const roles = useWatch({ control, name: 'roles' })
+  const assignment = useUserRestaurantAssignment(undefined, open)
+
   useEffect(() => {
     if (open) reset(EMPTY)
   }, [open, reset])
 
   const onSubmit = handleSubmit((values) =>
     create.mutate(values, {
-      onSuccess: (u) => {
-        notify.success(`Đã tạo tài khoản ${u.username}`)
+      onSuccess: async (u) => {
+        try {
+          await assignment.save(u.id, values.roles, true)
+          notify.success(`Đã tạo tài khoản ${u.username}`)
+        } catch (err) {
+          notify.error(`Đã tạo tài khoản ${u.username} nhưng chưa gán được nhà hàng: ${getErrorMessage(err)}`)
+        }
         onClose()
       },
       onError: (err) => {
@@ -44,7 +54,7 @@ export function UserCreateModal({ open, onClose }: { open: boolean; onClose: () 
       okText="Tạo"
       cancelText="Huỷ"
       centered
-      confirmLoading={create.isPending}
+      confirmLoading={create.isPending || assignment.saving}
       onOk={() => void onSubmit()}
       onCancel={onClose}
       destroyOnHidden
@@ -70,6 +80,9 @@ export function UserCreateModal({ open, onClose }: { open: boolean; onClose: () 
           required
           render={(field) => <RoleSelect value={field.value as string[]} onChange={field.onChange} />}
         />
+        {assignment.canManage && (
+          <RestaurantAssignmentFields roles={roles} value={assignment.value} onChange={assignment.setValue} />
+        )}
         <FormSwitch control={control} name="active" label="Đang hoạt động" />
       </Form>
     </Modal>

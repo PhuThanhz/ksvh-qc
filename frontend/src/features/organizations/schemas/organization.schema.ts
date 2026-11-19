@@ -18,8 +18,6 @@ export const orgUnitSchema = z
     code: z.string().trim().min(1, 'Vui lòng nhập mã đơn vị').max(30, 'Mã đơn vị tối đa 30 ký tự').regex(CODE_RULE, CODE_MESSAGE),
     name: z.string().trim().min(1, 'Vui lòng nhập tên đơn vị').max(200, 'Tên đơn vị tối đa 200 ký tự'),
     address: z.string().trim().max(500, 'Địa chỉ tối đa 500 ký tự'),
-    storeManagerUserId: z.number().nullable(),
-    obmUserId: z.number().nullable(),
     latitude: z.number().min(-90, 'Vĩ độ phải từ -90 đến 90').max(90, 'Vĩ độ phải từ -90 đến 90').nullable(),
     longitude: z.number().min(-180, 'Kinh độ phải từ -180 đến 180').max(180, 'Kinh độ phải từ -180 đến 180').nullable(),
     checkinRadiusM: z.number().int('Bán kính là số nguyên').min(10, 'Bán kính tối thiểu 10 m').max(5000, 'Bán kính tối đa 5000 m').nullable(),

@@ -6,6 +6,7 @@ import { ActionButton, TableActions } from '@/components/data-display/TableActio
 import type { User } from '@/features/users/users.types'
 import { PERMISSIONS } from '@/permissions'
 import { formatDateTime } from '@/utils/format-date'
+import { actionColumnWidth } from '@/components/data-display/tableActions.utils'
 
 type ActiveKey = 'active' | 'inactive'
 const ACTIVE_META: Record<ActiveKey, { label: string; tone: BadgeTone }> = {
@@ -26,7 +27,7 @@ export function UserTable({ roleName, onView, onEdit, onDelete, onResetPassword,
     <DataTable<User>
       {...props}
       rowKey="id"
-      scroll={{ x: 1050 }}
+      scroll={{ x: 1380 }}
       columns={[
         {
           title: '#',
@@ -36,10 +37,10 @@ export function UserTable({ roleName, onView, onEdit, onDelete, onResetPassword,
           render: (_: unknown, __: unknown, index: number) =>
             ((props.params?.page ?? 0) * (props.params?.size ?? 20)) + index + 1,
         },
-        { title: 'Tên đăng nhập', dataIndex: 'username', key: 'username', sorter: true, width: 140 },
-        { title: 'Họ tên', dataIndex: 'fullName', key: 'fullName', sorter: true, width: 170 },
+        { title: 'Tên đăng nhập', dataIndex: 'username', key: 'username', sorter: true, width: 140, render: (u: string) => <span className="code-tag--blue">{u}</span> },
+        { title: 'Họ và tên', dataIndex: 'fullName', key: 'fullName', sorter: true, width: 170, render: (name: string, row: User) => <span className="cell-title-link" onClick={() => onEdit(row)}>{name}</span> },
         {
-          title: 'Vai trò',
+          title: 'Vai trò người dùng',
           dataIndex: 'roles',
           width: 250,
           render: (roles: User['roles']) => (
@@ -51,16 +52,19 @@ export function UserTable({ roleName, onView, onEdit, onDelete, onResetPassword,
           ),
         },
         {
-          title: 'Trạng thái',
+          title: 'Trạng thái hoạt động',
           dataIndex: 'active',
-          width: 130,
+          width: 160,
           render: (active: boolean) => <StatusBadge status={active ? 'active' : 'inactive'} meta={ACTIVE_META} />,
         },
-        { title: 'Ngày tạo', dataIndex: 'createdAt', key: 'createdAt', sorter: true, width: 150, render: formatDateTime },
+        { title: 'Thời gian khởi tạo', dataIndex: 'createdAt', key: 'createdAt', sorter: true, width: 150, render: formatDateTime },
         {
           title: 'Thao tác',
           key: 'actions',
-          width: 175,
+          width: actionColumnWidth(4),
+          // Ghim mép phải bằng CSS sticky (.col-actions), không làm đổi bố cục các cột khác.
+      className: 'col-actions',
+          align: 'center' as const,
           render: (_: unknown, u: User) => (
             <TableActions
               onView={() => onView(u)}

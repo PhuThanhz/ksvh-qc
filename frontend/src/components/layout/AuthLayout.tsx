@@ -1,6 +1,6 @@
-import { SafetyCertificateFilled } from '@ant-design/icons'
-import { Flex, Typography } from 'antd'
+import { Typography } from 'antd'
 import { useEffect, type ReactNode } from 'react'
+import { AppLogo } from '@/components/layout/AppLogo'
 
 export interface AuthLayoutProps {
   title: string
@@ -39,21 +39,7 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
       >
         {/* Brand Header */}
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <Flex
-            align="center"
-            justify="center"
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: 12,
-              background: '#eff6ff',
-              color: '#2563eb',
-              fontSize: 24,
-              margin: '0 auto 12px',
-            }}
-          >
-            <SafetyCertificateFilled />
-          </Flex>
+          <AppLogo size={56} style={{ marginBottom: 12 }} />
           <Typography.Title level={3} style={{ margin: 0, fontWeight: 700, color: '#0f172a' }}>
             {title}
           </Typography.Title>

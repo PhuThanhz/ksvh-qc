@@ -11,7 +11,8 @@ export interface TableCardProps {
  */
 export function TableCard({ children, style }: TableCardProps) {
   return (
-    <div className="glass-panel" style={{ padding: '6px 14px 14px', overflow: 'hidden', ...style }}>
+    // Bảng tràn sát mép khung (không lề trong) để không lộ viền trắng quanh tiêu đề bảng; lề phân trang đặt ở CSS .table-card.
+    <div className="glass-panel table-card" style={{ padding: 0, overflow: 'hidden', ...style }}>
       {children}
     </div>
   )

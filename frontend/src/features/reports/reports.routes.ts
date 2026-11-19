@@ -7,7 +7,7 @@ export const reportsAdminRoutes: AppRoute[] = [
     path: ROUTES.admin.reports,
     handle: {
       access: { anyOf: [PERMISSIONS.REPORT.READ, PERMISSIONS.INSPECTION.READ_ALL] },
-      menu: { label: 'Báo cáo & Thống kê', icon: 'reports', group: 'operations' },
+      menu: { label: 'Báo cáo & Phân tích kiểm soát', icon: 'reports', group: 'operations' },
     },
     lazy: () => import('@/features/reports/pages/ReportPage').then((m) => ({ Component: m.ReportPage })),
   },

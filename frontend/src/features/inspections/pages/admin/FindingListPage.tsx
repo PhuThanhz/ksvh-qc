@@ -88,8 +88,8 @@ export function FindingListPage() {
 
   return (
     <PageContainer
-      title="Quản lý lỗi & Khắc phục"
-      subtitle="Theo dõi chu trình xử lý lỗi vi phạm từ xác nhận, khiếu nại, khắc phục đến nghiệm thu đóng lỗi"
+      title="Khắc phục điểm không phù hợp"
+      subtitle="Theo dõi toàn diện chu trình xử lý điểm không phù hợp: phản hồi, biện pháp khắc phục, thẩm tra và đóng hồ sơ"
       extra={
         <Button
           icon={<DownloadOutlined />}

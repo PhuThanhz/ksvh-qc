@@ -1,6 +1,7 @@
 import { FilePdfOutlined } from '@ant-design/icons'
 import { Button, Card, Descriptions, Empty, Flex, Image, Modal, Space, Spin, Tag, Typography } from 'antd'
 import { useState } from 'react'
+import { RiskLevelTag } from '@/components/data-display/RiskLevelTag'
 import { FindingAppealReviewsCard } from '@/features/inspections/components/FindingAppealReviewsCard'
 import { FindingTimeline } from '@/features/inspections/components/FindingTimeline'
 import { FINDING_STATUS_TAG } from '@/features/inspections/finding.types'
@@ -79,7 +80,7 @@ export function FindingDetailModal({ open, findingId, onClose }: Props) {
       title={
         <Flex justify="space-between" align="center" style={{ paddingRight: 32 }}>
           <Space>
-            <span>Chi tiết lỗi vi phạm #{finding?.id}</span>
+            <span>Chi tiết điểm không phù hợp #{finding?.id}</span>
             {finding?.status && (
               <Tag color={FINDING_STATUS_TAG[finding.status]?.color}>
                 {FINDING_STATUS_TAG[finding.status]?.label}
@@ -112,11 +113,11 @@ export function FindingDetailModal({ open, findingId, onClose }: Props) {
         <Flex vertical gap={16} style={{ marginTop: 16 }}>
           <Descriptions size="small" bordered column={2}>
             <Descriptions.Item label="Nhà hàng">{finding.restaurantName}</Descriptions.Item>
-            <Descriptions.Item label="Mã phiếu kiểm tra">{finding.inspectionCode}</Descriptions.Item>
+            <Descriptions.Item label="Mã phiếu kiểm tra"><span className="code-tag--blue">{finding.inspectionCode}</span></Descriptions.Item>
             <Descriptions.Item label="Tiêu chí" span={2}>
               <div>
                 <b>{finding.criterionName}</b>
-                <span style={{ color: 'var(--app-text-secondary)', marginLeft: 8 }}>({finding.criterionCode})</span>
+                <span className="code-tag--blue" style={{ marginLeft: 8 }}>{finding.criterionCode}</span>
               </div>
             </Descriptions.Item>
             <Descriptions.Item label="Mức độ ảnh hưởng">
@@ -131,9 +132,7 @@ export function FindingDetailModal({ open, findingId, onClose }: Props) {
               Lặp lại <b>{finding.violationCount} lần</b>
             </Descriptions.Item>
             <Descriptions.Item label="Mức rủi ro">
-              <Tag color={finding.riskLevelCode === 'M4' ? 'error' : finding.riskLevelCode === 'M3' ? 'warning' : 'blue'}>
-                {finding.riskLevelCode} - {finding.riskLevelName} ({finding.calculatedScore} điểm)
-              </Tag>
+              <RiskLevelTag code={finding.riskLevelCode} name={finding.riskLevelName} showName /> ({finding.calculatedScore} điểm)
             </Descriptions.Item>
             <Descriptions.Item label="Hạn khắc phục">
               {formatDate(finding.deadlineDate)} ({finding.remediationDays} ngày)

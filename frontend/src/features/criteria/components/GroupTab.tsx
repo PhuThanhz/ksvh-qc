@@ -1,19 +1,20 @@
 import { Badge, Flex, Select, Tag } from 'antd'
 import { useMemo, useState } from 'react'
+import { useConfirm } from '@/components/feedback/useConfirm'
+import { useNotify } from '@/components/feedback/useNotify'
 import { AdvancedFilter } from '@/components/data-entry/AdvancedFilter'
-import { BatchCriterionModal } from '@/features/criteria/components/BatchCriterionModal'
 import { CriterionDetailModal } from '@/features/criteria/components/CriterionDetailModal'
 import { GroupDetailModal } from '@/features/criteria/components/GroupDetailModal'
 import { GroupFormModal } from '@/features/criteria/components/GroupFormModal'
 import { GroupTable } from '@/features/criteria/components/GroupTable'
 import type { Criterion, CriterionGroup } from '@/features/criteria/criteria.types'
-import { useCriterionGroups } from '@/features/criteria/hooks/useCriteria'
+import { useCriterionGroups, useDeleteCriterionGroup } from '@/features/criteria/hooks/useCriteria'
 import { useCompanies } from '@/features/organizations/hooks/useOrganizations'
+import { getErrorMessage } from '@/lib/http'
 
 export interface GroupTabProps {
   onSelectGroup: (groupId: number) => void
   onAddCriterionToGroup: (group: CriterionGroup) => void
-  onBatchAddCriteriaToGroup?: (group: CriterionGroup) => void
   onEditCriterion?: (criterion: Criterion) => void
   createOpen?: boolean
   onCreateClose?: () => void
@@ -21,7 +22,6 @@ export interface GroupTabProps {
 
 export function GroupTab({
   onAddCriterionToGroup,
-  onBatchAddCriteriaToGroup,
   onEditCriterion,
   createOpen,
   onCreateClose,
@@ -30,11 +30,13 @@ export function GroupTab({
   const [keyword, setKeyword] = useState('')
   const groups = useCriterionGroups(selectedCompanyId)
   const companies = useCompanies({ page: 0, size: 100, active: true })
+  const confirm = useConfirm()
+  const notify = useNotify()
+  const removeGroup = useDeleteCriterionGroup()
 
   // State điều khiển các modal
   const [formModal, setFormModal] = useState<{ open: boolean; group?: CriterionGroup }>({ open: false })
   const [detailModal, setDetailModal] = useState<{ open: boolean; group?: CriterionGroup }>({ open: false })
-  const [batchModal, setBatchModal] = useState<{ open: boolean; group?: CriterionGroup }>({ open: false })
   const [viewingCriterion, setViewingCriterion] = useState<Criterion | undefined>(undefined)
 
   const isFormOpen = createOpen || formModal.open
@@ -44,12 +46,24 @@ export function GroupTab({
     onCreateClose?.()
   }
 
-  const handleOpenBatch = (group: CriterionGroup) => {
-    if (onBatchAddCriteriaToGroup) {
-      onBatchAddCriteriaToGroup(group)
-    } else {
-      setBatchModal({ open: true, group })
+  const handleDeleteGroup = async (group: CriterionGroup) => {
+    if (group.criterionCount && group.criterionCount > 0) {
+      notify.error(
+        `Nhóm tiêu chuẩn "${group.name}" đang chứa ${group.criterionCount} tiêu chí. Vui lòng di chuyển hoặc xoá các tiêu chí này trước khi xoá nhóm.`,
+      )
+      return
     }
+    const ok = await confirm({
+      title: `Xoá nhóm tiêu chí "${group.name}"?`,
+      content: 'Hành động này không thể hoàn tác.',
+      okText: 'Xoá',
+      danger: true,
+    })
+    if (!ok) return
+    removeGroup.mutate(group.id, {
+      onSuccess: () => notify.success('Đã xoá nhóm tiêu chí'),
+      onError: (err) => notify.error(getErrorMessage(err)),
+    })
   }
 
   const nextOrder = Math.max(0, ...(groups.data ?? []).map((g) => g.sortOrder)) + 1
@@ -84,7 +98,12 @@ export function GroupTab({
   return (
     <Flex vertical gap={16}>
       <AdvancedFilter
-        search={{ value: keyword, placeholder: 'Tìm theo mã hoặc tên nhóm...', maxWidth: 380, onSearch: setKeyword }}
+        search={{ value: keyword, placeholder: 'Tìm theo mã hoặc tên nhóm...', onSearch: setKeyword }}
+        activeCount={selectedCompanyId ? 1 : 0}
+        onReset={() => {
+          setKeyword('')
+          setSelectedCompanyId(undefined)
+        }}
       >
         <Select
           allowClear
@@ -115,8 +134,8 @@ export function GroupTab({
         loading={groups.isFetching}
         onEdit={(group) => setFormModal({ open: true, group })}
         onAddCriterion={onAddCriterionToGroup}
-        onBatchAddCriteria={handleOpenBatch}
         onViewCriteria={(group) => setDetailModal({ open: true, group })}
+        onDelete={handleDeleteGroup}
       />
 
       {/* Modal tạo / sửa nhóm */}
@@ -134,17 +153,8 @@ export function GroupTab({
         onClose={() => setDetailModal({ open: false })}
         onEditGroup={(group) => setFormModal({ open: true, group })}
         onAddCriterion={onAddCriterionToGroup}
-        onBatchAddCriteria={handleOpenBatch}
         onViewCriterion={(criterion) => setViewingCriterion(criterion)}
         onEditCriterion={onEditCriterion}
-      />
-
-      {/* Modal thêm nhanh nhiều tiêu chí con vào nhóm */}
-      <BatchCriterionModal
-        open={batchModal.open}
-        group={batchModal.group}
-        groups={groups.data}
-        onClose={() => setBatchModal({ open: false, group: undefined })}
       />
 
       {/* Modal xem chi tiết tiêu chí nhỏ */}

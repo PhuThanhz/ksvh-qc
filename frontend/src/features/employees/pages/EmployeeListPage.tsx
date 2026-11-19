@@ -75,8 +75,8 @@ export function EmployeeListPage() {
 
   return (
     <PageContainer
-      title="Nhân viên"
-      subtitle="Hồ sơ nhân sự: mã NV, chức danh, đơn vị; có thể liên kết một tài khoản đăng nhập"
+      title="Hồ sơ nhân sự"
+      subtitle="Quản lý danh sách nhân sự, chức danh chuyên môn, đơn vị công tác và liên kết tài khoản hệ thống"
       extra={
         <Space size={8}>
           <EmployeeExcelActions />

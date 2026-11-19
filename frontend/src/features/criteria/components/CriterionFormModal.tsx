@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Col, Form, Modal, Row } from 'antd'
-import { useEffect, useMemo } from 'react'
+import { Col, Flex, Form, Modal, Row, Segmented } from 'antd'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { FormInput } from '@/components/data-entry/FormInput'
 import { FormNumber } from '@/components/data-entry/FormNumber'
@@ -13,6 +13,13 @@ import { useSaveCriterion } from '@/features/criteria/hooks/useCriteria'
 import { useTemplateOptions } from '@/features/criteria/hooks/useTemplates'
 import { criterionSchema, type CriterionFormValues } from '@/features/criteria/schemas/criteria.schema'
 import { applyFieldErrors, getErrorMessage } from '@/lib/http'
+import { CriterionBatchPane } from './CriterionBatchPane'
+
+type CreateMode = 'single' | 'batch'
+const MODE_OPTIONS = [
+  { label: 'Thiết lập đơn lẻ', value: 'single' },
+  { label: 'Nhập hàng loạt', value: 'batch' },
+]
 
 const IMPACT_LABELS: Record<number, string> = {
   1: 'Mức 1 – Rất nhẹ', 2: 'Mức 2 – Nhẹ', 3: 'Mức 3 – Trung bình', 4: 'Mức 4 – Nặng (ATTP)', 5: 'Mức 5 – Nghiêm trọng',
@@ -39,6 +46,15 @@ export function CriterionFormModal({ open, criterion, groups, defaultGroupId, on
   const notify = useNotify()
   const save = useSaveCriterion()
   const templates = useTemplateOptions(open)
+  // Khi thêm mới: chọn nhập một tiêu chí (form chi tiết) hoặc nhiều tiêu chí cùng lúc (bảng nhập nhanh).
+  const [mode, setMode] = useState<CreateMode>('single')
+  // Mỗi lần mở modal: quay về chế độ "Một tiêu chí" (điều chỉnh state theo props ngay khi render).
+  const [prevOpen, setPrevOpen] = useState(open)
+  if (open !== prevOpen) {
+    setPrevOpen(open)
+    if (open) setMode('single')
+  }
+  const batch = !criterion && mode === 'batch'
   const { control, handleSubmit, reset, setError } = useForm<CriterionFormValues>({
     resolver: zodResolver(criterionSchema),
     defaultValues: emptyValues(defaultGroupId),
@@ -72,7 +88,7 @@ export function CriterionFormModal({ open, criterion, groups, defaultGroupId, on
       },
       {
         onSuccess: () => {
-          notify.success(criterion ? 'Đã cập nhật tiêu chí' : 'Đã thêm tiêu chí')
+          notify.success(criterion ? 'Đã cập nhật tiêu chí kiểm soát' : 'Đã thêm tiêu chí kiểm soát')
           onClose()
         },
         onError: (err) => {
@@ -110,17 +126,39 @@ export function CriterionFormModal({ open, criterion, groups, defaultGroupId, on
   return (
     <Modal
       open={open}
-      title={criterion ? `Sửa tiêu chí ${criterion.code}` : 'Thêm tiêu chí'}
+      title={
+        criterion ? (
+          <Flex align="center" gap={8}>
+            <span style={{ fontSize: 16, fontWeight: 700 }}>Chỉnh sửa tiêu chí kiểm soát</span>
+            <span className="code-tag--blue">{criterion.code}</span>
+          </Flex>
+        ) : (
+          <Flex align="center" justify="space-between" wrap gap={12} style={{ paddingRight: 32 }}>
+            <span style={{ fontSize: 16, fontWeight: 700 }}>Thêm mới tiêu chí kiểm soát</span>
+            <Segmented
+              size="small"
+              options={MODE_OPTIONS}
+              value={mode}
+              onChange={(v) => setMode(v as CreateMode)}
+              style={{ fontWeight: 500 }}
+            />
+          </Flex>
+        )
+      }
       okText="Lưu"
       cancelText="Huỷ"
-      width={760}
+      width={batch ? 1060 : 760}
+      footer={batch ? null : undefined}
       centered
-      styles={{ body: { maxHeight: 'calc(100vh - 180px)', overflowY: 'auto', paddingRight: 4 } }}
+      styles={{ body: { maxHeight: 'calc(100vh - 160px)', overflowY: 'auto', paddingRight: 4 } }}
       confirmLoading={save.isPending}
       onOk={() => void onSubmit()}
       onCancel={onClose}
       destroyOnHidden
     >
+      {batch ? (
+        <CriterionBatchPane groups={groups} defaultGroupId={groupId ?? defaultGroupId} onClose={onClose} />
+      ) : (
       <Form layout="vertical" onFinish={() => void onSubmit()}>
         <button type="submit" hidden />
         <Row gutter={16}>
@@ -149,42 +187,42 @@ export function CriterionFormModal({ open, criterion, groups, defaultGroupId, on
             <FormNumber control={control} name="sortOrder" label="Thứ tự" required min={0} max={9999} precision={0} />
           </Col>
           <Col span={24}>
-            <FormInput control={control} name="name" label="Tên tiêu chí con" required maxLength={300} placeholder="VD: Sàn nhà sạch sẽ, khô ráo..." />
+            <FormInput control={control} name="name" label="Nội dung tiêu chí kiểm soát" required maxLength={300} placeholder="Nhập nội dung tiêu chí kiểm soát chi tiết..." />
           </Col>
           <Col span={24}>
             <FormSelect<CriterionFormValues, number[]>
               control={control}
               name="templateIds"
-              label="Mẫu phiếu áp dụng"
+              label="Mẫu phiếu kiểm tra áp dụng"
               mode="multiple"
               showSearch={{ optionFilterProp: 'label' }}
-              placeholder="Chọn các mẫu phiếu áp dụng tiêu chí này (tuỳ chọn)"
+              placeholder="Chọn các mẫu phiếu kiểm tra áp dụng tiêu chí này (tuỳ chọn)"
               options={templateOptions}
               allowClear
-              extra="Tiêu chí sẽ tự động được đưa vào danh sách kiểm tra của các mẫu phiếu đã chọn."
+              extra="Tiêu chí kiểm soát sẽ tự động được bổ sung vào danh mục đánh giá của các mẫu phiếu đã chọn."
             />
           </Col>
           <Col span={24}>
-            <FormTextarea control={control} name="checkMethod" label="Cách kiểm tra" autoSize={{ minRows: 2, maxRows: 6 }} maxLength={4000} />
+            <FormTextarea control={control} name="checkMethod" label="Phương pháp đánh giá" autoSize={{ minRows: 2, maxRows: 6 }} maxLength={4000} />
           </Col>
           <Col span={24}>
             <FormTextarea
               control={control}
               name="evidenceRequired"
-              label="Bằng chứng yêu cầu"
+              label="Hồ sơ / Bằng chứng minh chứng"
               autoSize={{ minRows: 2, maxRows: 6 }}
               maxLength={4000}
-              extra="Khi chấm Không đạt luôn bắt buộc mô tả lỗi và ảnh/video; ở đây ghi rõ cần chụp gì."
+              extra="Khi đánh giá Không đạt, bắt buộc cung cấp mô tả chi tiết và bằng chứng hình ảnh/video; quy định cụ thể hồ sơ cần thu thập."
             />
           </Col>
           <Col xs={24} md={12}>
             <FormSelect<CriterionFormValues, number>
               control={control}
               name="baseImpact"
-              label="Mức ảnh hưởng gốc"
+              label="Mức độ ảnh hưởng cơ sở"
               required
               options={IMPACT_OPTIONS}
-              extra="Điểm rủi ro = mức ảnh hưởng × tần suất lỗi"
+              extra="Điểm rủi ro = Mức độ ảnh hưởng × Tần suất vi phạm"
             />
           </Col>
           <Col xs={24} md={12}>
@@ -192,6 +230,7 @@ export function CriterionFormModal({ open, criterion, groups, defaultGroupId, on
           </Col>
         </Row>
       </Form>
+      )}
     </Modal>
   )
 }

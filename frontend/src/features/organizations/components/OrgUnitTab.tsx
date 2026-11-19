@@ -120,28 +120,6 @@ export function OrgUnitTab({ fixedUnitType, createOpen, onCreateClose }: OrgUnit
         activeCount={activeFilterCount}
         activeTags={activeTags}
         onReset={resetFilters}
-        advancedFilters={
-          <>
-            <FilterSelect<number>
-              placeholder="Công ty trực thuộc"
-              width={220}
-              value={filters.companyId}
-              showSearch={{ optionFilterProp: 'label' }}
-              options={(companies.data?.items ?? []).map((c) => ({ value: c.id, label: c.name }))}
-              onChange={(v) => setFilter('companyId', v)}
-            />
-            {!fixedUnitType && (
-              <FilterSelect<OrgUnitType>
-                placeholder="Loại đơn vị"
-                width={160}
-                value={filters.unitType}
-                options={TYPE_OPTIONS}
-                onChange={(v) => setFilter('unitType', v)}
-              />
-            )}
-            <ActiveFilter value={filters.active} onChange={(v) => setFilter('active', v)} width={160} />
-          </>
-        }
       >
         <FilterSelect<number>
           placeholder="Công ty"
@@ -151,6 +129,15 @@ export function OrgUnitTab({ fixedUnitType, createOpen, onCreateClose }: OrgUnit
           options={(companies.data?.items ?? []).map((c) => ({ value: c.id, label: c.name }))}
           onChange={(v) => setFilter('companyId', v)}
         />
+        {!fixedUnitType && (
+          <FilterSelect<OrgUnitType>
+            placeholder="Loại đơn vị"
+            width={150}
+            value={filters.unitType}
+            options={TYPE_OPTIONS}
+            onChange={(v) => setFilter('unitType', v)}
+          />
+        )}
         <ActiveFilter value={filters.active} onChange={(v) => setFilter('active', v)} />
       </AdvancedFilter>
 

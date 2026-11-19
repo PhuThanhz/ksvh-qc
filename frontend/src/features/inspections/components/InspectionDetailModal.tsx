@@ -55,7 +55,9 @@ export function InspectionDetailModal({ open, inspectionId, onClose }: Props) {
         return (
           <div>
             <div style={{ fontWeight: 500 }}>{r.criterionName}</div>
-            <div style={{ fontSize: 12, color: 'var(--app-text-secondary)' }}>{r.criterionCode} · Ảnh hưởng: {r.baseImpact}/5</div>
+            <div style={{ fontSize: 12, color: 'var(--app-text-secondary)', marginTop: 2, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span className="code-tag--blue">{r.criterionCode}</span> · Ảnh hưởng: {r.baseImpact}/5
+            </div>
             {r.comment && <div style={{ fontSize: 13, color: 'var(--app-text-body)', marginTop: 4 }}>Ghi chú: {r.comment}</div>}
             {photos.length > 0 && (
               <Space size={6} wrap style={{ marginTop: 6 }}>
@@ -82,7 +84,7 @@ export function InspectionDetailModal({ open, inspectionId, onClose }: Props) {
           return (
             <Space direction="vertical" size={2}>
               <Tag color="error">Không đạt</Tag>
-              <Tag color="cyan" style={{ fontSize: 11 }}>Lỗi đã bỏ do khiếu nại</Tag>
+              <Tag color="cyan" style={{ fontSize: 11 }}>Điểm không phù hợp được hủy theo kết luận khiếu nại</Tag>
             </Space>
           )
         }
@@ -97,7 +99,7 @@ export function InspectionDetailModal({ open, inspectionId, onClose }: Props) {
       open={open}
       title={
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingRight: 32 }}>
-          <span>Chi tiết phiếu chấm: {ins?.code || ''}</span>
+          <span>Chi tiết biên bản kiểm tra: {ins?.code || ''}</span>
           {ins && (
             <Space size={8}>
               <Button

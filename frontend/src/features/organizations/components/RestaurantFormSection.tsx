@@ -1,15 +1,12 @@
 import { AimOutlined } from '@ant-design/icons'
-import { Button, Col, Divider, Flex, Row } from 'antd'
+import { Button, Col, Divider, Flex, Row, Typography } from 'antd'
 import { useEffect } from 'react'
 import type { Control, UseFormSetValue } from 'react-hook-form'
-import { FormField } from '@/components/data-entry/FormField'
 import { FormNumber } from '@/components/data-entry/FormNumber'
 import { useNotify } from '@/components/feedback/useNotify'
 import type { OrgUnit } from '@/features/organizations/organizations.types'
 import type { OrgUnitFormValues } from '@/features/organizations/schemas/organization.schema'
-import { UserPicker } from '@/features/users'
 import { useGeolocation } from '@/hooks/useGeolocation'
-import { ROLES } from '@/permissions'
 
 export interface RestaurantFormSectionProps {
   control: Control<OrgUnitFormValues>
@@ -17,7 +14,10 @@ export interface RestaurantFormSectionProps {
   unit?: OrgUnit
 }
 
-/** Nhóm trường nhập liệu riêng cho đơn vị Nhà hàng (CHT, OBM, GPS, bán kính – GPS chưa bắt buộc). */
+/**
+ * Nhóm trường nhập liệu riêng cho đơn vị Nhà hàng (GPS, bán kính – GPS chưa bắt buộc).
+ * CHT / OBM không chọn ở đây: gán ở màn Người dùng (chọn nhà hàng phụ trách) hoặc file Excel.
+ */
 export function RestaurantFormSection({ control, setValue, unit }: RestaurantFormSectionProps) {
   const { status, fix, error, locate } = useGeolocation()
   const notify = useNotify()
@@ -38,7 +38,7 @@ export function RestaurantFormSection({ control, setValue, unit }: RestaurantFor
     <>
       <Divider titlePlacement="start">
         <Flex align="center" gap={12}>
-          <span>Thông tin vận hành & GPS</span>
+          <span>Vị trí & GPS</span>
           {setValue && (
             <Button
               size="small"
@@ -52,38 +52,14 @@ export function RestaurantFormSection({ control, setValue, unit }: RestaurantFor
         </Flex>
       </Divider>
       <Row gutter={16}>
-        <Col xs={24} md={12}>
-          <FormField
-            control={control}
-            name="storeManagerUserId"
-            label="Cửa hàng trưởng"
-            render={(field) => (
-              <UserPicker
-                role={ROLES.STORE_MANAGER}
-                value={field.value as number | null}
-                onChange={field.onChange}
-                current={unit?.storeManager}
-                placeholder="Chọn CHT"
-              />
-            )}
-          />
-        </Col>
-        <Col xs={24} md={12}>
-          <FormField
-            control={control}
-            name="obmUserId"
-            label="OBM"
-            render={(field) => (
-              <UserPicker
-                role={ROLES.OBM}
-                value={field.value as number | null}
-                onChange={field.onChange}
-                current={unit?.obm}
-                placeholder="Chọn OBM"
-              />
-            )}
-          />
-        </Col>
+        {unit && (
+          <Col span={24} style={{ marginBottom: 12 }}>
+            <Typography.Text type="secondary">
+              Cửa hàng trưởng: <b>{unit.storeManager?.fullName ?? 'Chưa gán'}</b> · OBM: <b>{unit.obm?.fullName ?? 'Chưa gán'}</b>
+              {' '}(đổi ở màn Người dùng)
+            </Typography.Text>
+          </Col>
+        )}
         <Col xs={24} md={8}>
           <FormNumber control={control} name="latitude" label="Vĩ độ" min={-90} max={90} step={0.000001} precision={6} />
         </Col>

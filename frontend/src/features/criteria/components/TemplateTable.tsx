@@ -5,6 +5,7 @@ import { TableActions } from '@/components/data-display/TableActions'
 import type { Template } from '@/features/criteria/criteria.types'
 import { PERMISSIONS } from '@/permissions'
 import { formatDateTime } from '@/utils/format-date'
+import { actionColumnWidth } from '@/components/data-display/tableActions.utils'
 
 const ACTIVE_META = {
   active: { label: 'Đang dùng', tone: 'success' as const },
@@ -22,7 +23,7 @@ export function TemplateTable({ onView, onEdit, onDelete, ...props }: TemplateTa
     <DataTable<Template>
       {...props}
       rowKey="id"
-      scroll={{ x: 1180 }}
+      scroll={{ x: 1600 }}
       columns={[
         {
           title: '#',
@@ -33,24 +34,28 @@ export function TemplateTable({ onView, onEdit, onDelete, ...props }: TemplateTa
             ((props.params?.page ?? 0) * (props.params?.size ?? 20)) + index + 1,
         },
         {
-          title: 'Mã',
+          title: 'Mã mẫu',
           dataIndex: 'code',
           key: 'code',
           sorter: true,
           width: 130,
-          render: (code: string) => <Typography.Text strong code style={{ whiteSpace: 'nowrap' }}>{code}</Typography.Text>,
+          render: (code: string, t: Template) => (
+            <Tag className="code-tag--blue" onClick={() => onView(t)}>
+              {code}
+            </Tag>
+          ),
         },
         {
-          title: 'Mẫu phiếu',
+          title: 'Tên mẫu phiếu kiểm tra',
           dataIndex: 'name',
           key: 'name',
           sorter: true,
           width: 240,
           render: (name: string, t: Template) => (
             <Flex vertical>
-              <Typography.Link onClick={() => onView(t)} style={{ fontWeight: 500 }}>
+              <span className="cell-title-link" onClick={() => onView(t)}>
                 {name}
-              </Typography.Link>
+              </span>
               {t.description && <Typography.Text type="secondary" ellipsis={{ tooltip: t.description }}>{t.description}</Typography.Text>}
             </Flex>
           ),
@@ -68,29 +73,32 @@ export function TemplateTable({ onView, onEdit, onDelete, ...props }: TemplateTa
             ),
         },
         {
-          title: 'Loại kiểm tra',
+          title: 'Hình thức kiểm tra',
           dataIndex: 'inspectionType',
-          width: 130,
+          width: 150,
           render: (v: string | null) => (v ? <Tag>{v}</Tag> : <Typography.Text type="secondary">—</Typography.Text>),
         },
         {
-          title: 'Số tiêu chí',
+          title: 'Số lượng tiêu chí',
           dataIndex: 'criterionCount',
           align: 'center',
-          width: 120,
+          width: 130,
           render: (cnt: number) => <Tag color={cnt > 0 ? 'cyan' : 'default'} style={{ fontWeight: 500 }}>{cnt} tiêu chí</Tag>,
         },
         {
           title: 'Trạng thái',
           dataIndex: 'active',
-          width: 120,
+          width: 160,
           render: (a: boolean) => <StatusBadge status={a ? 'active' : 'inactive'} meta={ACTIVE_META} />,
         },
         { title: 'Cập nhật', dataIndex: 'updatedAt', width: 160, render: formatDateTime },
         {
           title: 'Thao tác',
           key: 'actions',
-          width: 140,
+          width: actionColumnWidth(3),
+          // Ghim mép phải bằng CSS sticky (.col-actions), không làm đổi bố cục các cột khác.
+      className: 'col-actions',
+          align: 'center' as const,
           render: (_: unknown, t: Template) => (
             <TableActions
               onView={() => onView(t)}

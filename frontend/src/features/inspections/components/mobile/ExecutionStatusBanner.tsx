@@ -46,10 +46,10 @@ export function ExecutionStatusBanner({ isOnline, pendingCount, isSyncing, statu
               color: status === 'CANCELLED' ? 'var(--app-danger)' : 'var(--app-success)',
             }}
           >
-            {status === 'SUBMITTED' && 'Phiếu chấm đã được nộp. Đang xử lý lỗi.'}
-            {status === 'AWAITING_ACK' && 'Phiếu không có lỗi. Chờ CHT xác nhận đã xem.'}
-            {status === 'COMPLETED' && 'Phiếu chấm đã hoàn thành toàn diện.'}
-            {status === 'CANCELLED' && `Phiếu đã bị huỷ${cancelReason ? `: ${cancelReason}` : ''}.`}
+            {status === 'SUBMITTED' && 'Biên bản kiểm tra đã được nộp. Đang xử lý khắc phục vi phạm.'}
+            {status === 'AWAITING_ACK' && 'Biên bản không có vi phạm. Chờ cơ sở xác nhận.'}
+            {status === 'COMPLETED' && 'Biên bản kiểm tra đã hoàn tất toàn diện.'}
+            {status === 'CANCELLED' && `Đợt kiểm tra đã bị huỷ${cancelReason ? `: ${cancelReason}` : ''}.`}
           </div>
         </Card>
       )}

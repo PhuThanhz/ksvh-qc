@@ -9,6 +9,7 @@ import type { PlanAssignmentRequest } from '@/features/inspections/inspection.ty
 import { useOrgUnits } from '@/features/organizations/hooks/useOrganizations'
 import { useUsers } from '@/features/users/hooks/useUsers'
 import { ROLES } from '@/permissions'
+import { ActionButton } from '@/components/data-display/TableActions'
 
 interface Props {
   value?: PlanAssignmentRequest[]
@@ -124,7 +125,7 @@ export function PlanAssignmentEditor({ value = [], onChange, dateRange, disabled
       ),
     },
     {
-      title: 'Mẫu phiếu chấm',
+      title: 'Mẫu phiếu kiểm tra',
       key: 'templateId',
       width: 200,
       render: (_, r, idx) => {
@@ -135,7 +136,7 @@ export function PlanAssignmentEditor({ value = [], onChange, dateRange, disabled
         return (
           <Select
             showSearch
-            placeholder="Chọn mẫu phiếu..."
+            placeholder="Chọn mẫu phiếu kiểm tra..."
             value={r.templateId || undefined}
             onChange={(v) => onUpdateField(idx, 'templateId', v)}
             disabled={disabled}
@@ -168,7 +169,7 @@ export function PlanAssignmentEditor({ value = [], onChange, dateRange, disabled
       align: 'center',
       render: (_, __, idx) =>
         disabled ? null : (
-          <Button type="text" danger icon={<DeleteOutlined />} onClick={() => onRemoveRow(idx)} title="Xoá dòng" />
+          <ActionButton tone="delete" icon={<DeleteOutlined />} tooltip="Xoá dòng" onClick={() => onRemoveRow(idx)} />
         ),
     },
   ]

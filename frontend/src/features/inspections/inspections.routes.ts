@@ -8,7 +8,7 @@ export const inspectionsAdminRoutes: AppRoute[] = [
     path: ROUTES.admin.plans,
     handle: {
       access: PERMISSIONS.PLAN.READ,
-      menu: { label: 'Kế hoạch kiểm tra', icon: 'plans', group: 'operations' },
+      menu: { label: 'Kế hoạch kiểm soát', icon: 'plans', group: 'operations' },
     },
     lazy: () =>
       import('@/features/inspections/pages/admin/PlanListPage').then((m) => ({ Component: m.PlanListPage })),
@@ -17,7 +17,7 @@ export const inspectionsAdminRoutes: AppRoute[] = [
     path: ROUTES.admin.inspections,
     handle: {
       access: { anyOf: [PERMISSIONS.INSPECTION.READ_ALL, PERMISSIONS.INSPECTION.READ_OWN] },
-      menu: { label: 'Phiếu chấm KSVH', icon: 'inspections', group: 'operations' },
+      menu: { label: 'Biên bản kiểm tra KSVH', icon: 'inspections', group: 'operations' },
     },
     lazy: () =>
       import('@/features/inspections/pages/admin/InspectionListPage').then((m) => ({ Component: m.InspectionListPage })),
@@ -26,7 +26,7 @@ export const inspectionsAdminRoutes: AppRoute[] = [
     path: ROUTES.admin.findings,
     handle: {
       access: { anyOf: [PERMISSIONS.FINDING.RESPOND, PERMISSIONS.FINDING.VERIFY, PERMISSIONS.INSPECTION.READ_ALL] },
-      menu: { label: 'Xử lý lỗi & Khắc phục', icon: 'findings', group: 'operations' },
+      menu: { label: 'Khắc phục điểm không phù hợp', icon: 'findings', group: 'operations' },
     },
     lazy: () =>
       import('@/features/inspections/pages/admin/FindingListPage').then((m) => ({ Component: m.FindingListPage })),
@@ -35,7 +35,7 @@ export const inspectionsAdminRoutes: AppRoute[] = [
     path: ROUTES.admin.riskProfiles,
     handle: {
       access: { anyOf: [PERMISSIONS.INSPECTION.READ_ALL, PERMISSIONS.INSPECTION.READ_OWN, PERMISSIONS.REPORT.READ] },
-      menu: { label: 'Hồ sơ rủi ro nhà hàng', icon: 'riskProfiles', group: 'operations' },
+      menu: { label: 'Hồ sơ rủi ro cơ sở', icon: 'riskProfiles', group: 'operations' },
     },
     lazy: () =>
       import('@/features/inspections/pages/admin/RestaurantRiskProfilePage').then((m) => ({

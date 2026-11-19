@@ -8,7 +8,7 @@ export const CHART_COLORS = {
   series: ['#0284c7', '#f97316', '#10b981'] as const,
   ramp: ['#bae6fd', '#7dd3fc', '#38bdf8', '#0284c7', '#0369a1'] as const,
   status: { good: '#16a34a', warning: '#f59e0b', serious: '#ea580c', critical: '#dc2626' },
-  text: '#0f172a',
+  text: '#334155',
   textSecondary: '#475569',
   textMuted: '#94a3b8',
   grid: '#f1f5f9',

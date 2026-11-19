@@ -1,4 +1,3 @@
-import type { CriterionGroup } from '@/features/criteria/criteria.types'
 
 export interface BatchItem {
   key: string
@@ -8,13 +7,6 @@ export interface BatchItem {
   checkMethod: string
 }
 
-export interface BatchCriterionModalProps {
-  open: boolean
-  group?: CriterionGroup
-  groups?: readonly CriterionGroup[]
-  onClose: () => void
-  onSuccess?: () => void
-}
 
 export function getPrefix(groupCode?: string): string {
   if (!groupCode) return 'TC'

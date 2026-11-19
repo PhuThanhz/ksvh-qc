@@ -14,12 +14,14 @@ import { HorizontalBarChart } from '@/features/dashboard/components/HorizontalBa
 import { RestaurantComplianceChart } from '@/features/dashboard/components/RestaurantComplianceChart'
 import { RiskLevelChart } from '@/features/dashboard/components/RiskLevelChart'
 import { TrendChart } from '@/features/dashboard/components/TrendChart'
+import type { DashboardPeriod } from '@/features/dashboard/dashboard.period'
 import { useDashboard } from '@/features/dashboard/hooks/useDashboard'
 
 /** Phần vận hành: chỉ số chính và biểu đồ tương tác chuẩn Slide 1 & quy trình PDF KSVH. */
-export function OperationsSection({ months }: { months: number }) {
+export function OperationsSection({ period }: { period: DashboardPeriod }) {
   const navigate = useNavigate()
-  const dash = useDashboard(months, true)
+  const dash = useDashboard(period, true)
+  const label = period.label
   const levels = useRiskLevels()
   const d = dash.data
   const k = d?.kpis
@@ -36,7 +38,7 @@ export function OperationsSection({ months }: { months: number }) {
             loading={loading}
             value={k?.complianceRate == null ? '—' : `${k.complianceRate.toLocaleString('vi-VN')}`}
             unit={k?.complianceRate == null ? undefined : '%'}
-            footnote="Bình quân toàn hệ thống (Chuẩn ≥85%)"
+            footnote={`Bình quân ${label} (chuẩn ≥85%)`}
             onClick={() => navigate(ROUTES.admin.inspections)}
           />
         </Col>
@@ -48,7 +50,7 @@ export function OperationsSection({ months }: { months: number }) {
             loading={loading}
             value={formatNumber(k?.openFindings ?? 0)}
             unit="lỗi"
-            footnote="Chờ xác nhận, khiếu nại, khắc phục, nghiệm thu"
+            footnote="Hiện tại · chờ xác nhận, khiếu nại, khắc phục, nghiệm thu"
             onClick={() => navigate(`${ROUTES.admin.findings}?status=OPEN`)}
           />
         </Col>
@@ -60,7 +62,7 @@ export function OperationsSection({ months }: { months: number }) {
             loading={loading}
             value={formatNumber(k?.highRiskFindings ?? 0)}
             unit="lỗi"
-            footnote="Mức M3 (7 ngày) & M4 (24 giờ khẩn cấp)"
+            footnote="Hiện tại · mức M3 (7 ngày) & M4 (24 giờ)"
             onClick={() => navigate(`${ROUTES.admin.findings}?status=OPEN`)}
           />
         </Col>
@@ -72,7 +74,7 @@ export function OperationsSection({ months }: { months: number }) {
             loading={loading}
             value={k?.onTimeRate == null ? '—' : `${k.onTimeRate.toLocaleString('vi-VN')}`}
             unit={k?.onTimeRate == null ? undefined : '%'}
-            footnote={`Lỗi đã đóng trong ${months} tháng gần nhất`}
+            footnote={`Lỗi đã đóng trong ${label}`}
             onClick={() => navigate(`${ROUTES.admin.findings}?status=CLOSED`)}
           />
         </Col>
@@ -82,6 +84,7 @@ export function OperationsSection({ months }: { months: number }) {
         <Col xs={24} xl={16}>
           <RestaurantComplianceChart
             data={d?.restaurantCompliance}
+            periodLabel={label}
             loading={loading}
             onSelectRestaurant={(r) => navigate(`${ROUTES.admin.inspections}?restaurantId=${r.id}`)}
           />
@@ -98,7 +101,7 @@ export function OperationsSection({ months }: { months: number }) {
         <Col xs={24} xl={8}>
           <HorizontalBarChart
             title="Nhà hàng rủi ro cao"
-            subtitle="Tổng điểm rủi ro của lỗi đang mở (nhấp để xem lỗi)"
+            subtitle="Hiện tại · tổng điểm rủi ro của lỗi đang mở (nhấp để xem lỗi)"
             valueName="Điểm rủi ro"
             loading={loading}
             emptyText="Không có lỗi nào đang mở"
@@ -117,7 +120,7 @@ export function OperationsSection({ months }: { months: number }) {
         <Col xs={24} lg={12}>
           <HorizontalBarChart
             title="Tiêu chí vi phạm nhiều nhất"
-            subtitle={`Số lỗi trong ${months} tháng (không tính lỗi bị bác)`}
+            subtitle={`Số lỗi trong ${label} (không tính lỗi bị bác)`}
             valueName="Số lỗi"
             loading={loading}
             emptyText="Chưa có lỗi nào trong kỳ"
@@ -127,7 +130,7 @@ export function OperationsSection({ months }: { months: number }) {
         <Col xs={24} lg={12}>
           <HorizontalBarChart
             title="Tình trạng xử lý lỗi"
-            subtitle={`Lỗi phát sinh trong ${months} tháng, theo bước xử lý`}
+            subtitle={`Lỗi phát sinh trong ${label}, theo bước xử lý`}
             valueName="Số lỗi"
             loading={loading}
             emptyText="Chưa có lỗi nào trong kỳ"

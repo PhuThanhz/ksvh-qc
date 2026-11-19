@@ -120,7 +120,6 @@ public class OrganizationExcelService {
 
             Map<String, String> unitFields = Map.ofEntries(Map.entry("companyId", U_COMPANY), Map.entry("unitType", U_TYPE),
                     Map.entry("code", U_CODE), Map.entry("name", U_NAME), Map.entry("address", U_ADDRESS),
-                    Map.entry("storeManagerUserId", U_CHT), Map.entry("obmUserId", U_OBM),
                     Map.entry("latitude", U_LAT), Map.entry("longitude", U_LNG), Map.entry("checkinRadiusM", U_RADIUS));
             session.rows(unitRows, row -> {
                 String code = row.text(U_CODE);
@@ -129,14 +128,15 @@ public class OrganizationExcelService {
                 Long companyId = companyCode == null ? null : companyRepository.findByCodeIgnoreCase(companyCode).map(Company::getId)
                         .orElseThrow(() -> new ExcelCellException(U_COMPANY, "Không tìm thấy công ty có mã \"%s\"".formatted(companyCode)));
                 OrgUnitRequest req = session.validate(new OrgUnitRequest(companyId, row.choice(U_TYPE, TYPES), code,
-                        row.text(U_NAME), row.text(U_ADDRESS), userId(row, U_CHT), userId(row, U_OBM),
+                        row.text(U_NAME), row.text(U_ADDRESS),
                         row.number(U_LAT), row.number(U_LNG), row.integer(U_RADIUS), row.bool(ACTIVE, true)), row, unitFields);
-                if (existing.isPresent()) {
-                    orgUnitService.update(existing.get().getId(), req);
-                    return Outcome.UPDATED;
-                }
-                orgUnitService.create(req);
-                return Outcome.CREATED;
+                Long chtId = userId(row, U_CHT);
+                Long obmId = userId(row, U_OBM);
+                Long unitId = existing.isPresent()
+                        ? orgUnitService.update(existing.get().getId(), req).id()
+                        : orgUnitService.create(req).id();
+                orgUnitService.setAssignees(unitId, chtId, obmId);
+                return existing.isPresent() ? Outcome.UPDATED : Outcome.CREATED;
             });
             return session.finish();
         }

@@ -123,7 +123,7 @@ export function TemplateDetailModal({ open, template, onClose, onEdit }: Templat
   return (
     <DetailModal
       open={open}
-      title={`Chi tiết mẫu phiếu chấm: ${template.code}`}
+      title={`Chi tiết mẫu phiếu kiểm tra: ${template.code}`}
       width={740}
       fields={fields}
       extraFooter={extraFooter}

@@ -50,6 +50,7 @@ export const criteriaApi = {
     api.get<CriterionGroup[]>(PATH.groups, { params: companyId ? { companyId } : undefined }).then(data),
   createGroup: (body: CriterionGroupPayload) => api.post<CriterionGroup>(PATH.groups, body).then(data),
   updateGroup: (id: Id, body: CriterionGroupPayload) => api.put<CriterionGroup>(PATH.group(id), body).then(data),
+  deleteGroup: (id: Id) => api.delete<void>(PATH.group(id)).then(() => undefined),
 
   list: ({ keyword, ...rest }: CriterionListParams) =>
     api.get<PageResponse<Criterion>>(PATH.criteria, { params: { ...rest, keyword: keyword || undefined } }).then(data),
@@ -92,4 +93,11 @@ export const criteriaExcelApi = {
   exportTemplates: () => downloadFile(PATH.templatesExport),
   templatesTemplate: () => downloadFile(PATH.templatesImportTemplate),
   importTemplates: (file: File, commit: boolean) => uploadExcel(PATH.templatesImport, file, commit),
+}
+
+/** Nhập / xuất Excel danh mục phân loại rủi ro. */
+export const riskLevelExcelApi = {
+  exportRiskLevels: () => downloadFile('/api/v1/risk-levels/export', undefined, 'Bang-phan-loai-rui-ro.xlsx'),
+  riskLevelsTemplate: () => downloadFile('/api/v1/risk-levels/import-template', undefined, 'Mau-nhap-phan-loai-rui-ro.xlsx'),
+  importRiskLevels: (file: File, commit: boolean) => uploadExcel('/api/v1/risk-levels/import', file, commit),
 }

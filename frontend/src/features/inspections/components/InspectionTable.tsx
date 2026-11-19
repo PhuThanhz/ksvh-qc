@@ -1,5 +1,5 @@
 import { CloseCircleOutlined } from '@ant-design/icons'
-import { Table, Tag, Tooltip, Typography } from 'antd'
+import { Table, Tag, Tooltip } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { ActionButton, TableActions } from '@/components/data-display/TableActions'
 import { StatusBadge } from '@/components/data-display/StatusBadge'
@@ -9,6 +9,7 @@ import { formatDate } from '@/utils/format-date'
 import { INSPECTION_KIND_LABEL, INSPECTION_MODE_LABEL, type InspectionKind } from '@/features/inspections/inspection.types'
 import { PERMISSIONS, usePermission } from '@/permissions'
 import { formatInspectionDuration, getComplianceGrade } from '@/features/inspections/utils/inspection-metrics'
+import { actionColumnWidth } from '@/components/data-display/tableActions.utils'
 
 interface Props {
   data?: InspectionResponse[]
@@ -43,15 +44,15 @@ export function InspectionTable({
       render: (_, __, i) => currentPage * pageSize + i + 1,
     },
     {
-      title: 'Mã phiếu',
+      title: 'Mã biên bản',
       dataIndex: 'code',
       key: 'code',
-      width: 140,
-      render: (v, r) => (
-        <Tooltip title="Xem chi tiết phiếu chấm">
-          <Typography.Link style={{ fontWeight: 600 }} onClick={() => onView(r)}>
+      width: 150,
+      render: (v: string, r: InspectionResponse) => (
+        <Tooltip title="Nhấp để xem chi tiết biên bản kiểm tra">
+          <Tag className="code-tag--blue" onClick={() => onView(r)}>
             {v}
-          </Typography.Link>
+          </Tag>
         </Tooltip>
       ),
     },
@@ -93,7 +94,7 @@ export function InspectionTable({
       render: (_, r) => (
         <span style={{ fontSize: 13 }}>
           <strong style={{ color: 'var(--app-success)' }}>{r.passedCriteria} Đạt</strong> ·{' '}
-          <strong style={{ color: 'var(--app-danger)' }}>{r.failedCriteria} Lỗi</strong> / {r.totalCriteria} mục
+          <strong style={{ color: 'var(--app-danger)' }}>{r.failedCriteria} Vi phạm</strong> / {r.totalCriteria} mục
         </span>
       ),
     },
@@ -130,7 +131,7 @@ export function InspectionTable({
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
-      width: 130,
+      width: 160,
       render: (st: InspectionStatus) => <StatusBadge status={st} meta={INSPECTION_STATUS_META} />,
     },
     {
@@ -146,20 +147,22 @@ export function InspectionTable({
     {
       title: 'Thao tác',
       key: 'actions',
-      width: 120,
-      align: 'center',
+      width: actionColumnWidth(2),
+      // Ghim mép phải bằng CSS sticky (.col-actions), không làm đổi bố cục các cột khác.
+      className: 'col-actions',
+      align: 'center' as const,
       render: (_, r) => (
         <TableActions
           recordName={r.code}
           onView={() => onView(r)}
-          viewLabel="Xem chi tiết phiếu chấm"
+          viewLabel="Xem chi tiết biên bản kiểm tra"
           extra={
             (r.status === 'ASSIGNED' || r.status === 'IN_PROGRESS') && canCancel ? (
               <ActionButton
                 tone="delete"
                 icon={<CloseCircleOutlined />}
-                tooltip="Huỷ phiếu"
-                ariaLabel={`Huỷ phiếu chấm ${r.code}`}
+                tooltip="Huỷ đợt kiểm tra"
+                ariaLabel={`Huỷ đợt kiểm tra ${r.code}`}
                 onClick={() => onCancel(r)}
               />
             ) : null
@@ -175,7 +178,7 @@ export function InspectionTable({
       dataSource={data}
       rowKey="id"
       loading={loading}
-      scroll={{ x: 1550 }}
+      scroll={{ x: 1820 }}
       onRow={(r) => ({
         onDoubleClick: () => onView(r),
         style: { cursor: 'pointer' },
@@ -188,7 +191,7 @@ export function InspectionTable({
               total: totalItems,
               showSizeChanger: true,
               onChange: (p, s) => onPageChange?.(p, s),
-              showTotal: (total) => `Tổng ${total} phiếu`,
+              showTotal: (total) => `Tổng cộng ${total} biên bản`,
             }
           : false
       }

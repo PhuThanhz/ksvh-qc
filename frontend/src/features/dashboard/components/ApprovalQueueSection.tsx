@@ -1,6 +1,7 @@
 import { ArrowRightOutlined, CalendarOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import { Badge, Button, Card, Col, Empty, Flex, Row, Space, Tag, Typography } from 'antd'
 import { useNavigate } from 'react-router'
+import { RiskLevelTag } from '@/components/data-display/RiskLevelTag'
 import { useApprovalQueue } from '@/features/dashboard/hooks/useDashboard'
 import { PERMISSIONS, usePermission } from '@/permissions'
 import { formatDate } from '@/utils/format-date'
@@ -142,7 +143,7 @@ export function ApprovalQueueSection() {
                   >
                     <div style={{ maxWidth: '75%' }}>
                       <Flex align="center" orientation="horizontal" gap={6}>
-                        <Tag color={f.riskLevelCode === 'M4' ? 'error' : 'warning'}>{f.riskLevelCode}</Tag>
+                        <RiskLevelTag code={f.riskLevelCode} />
                         <Typography.Text strong style={{ fontSize: 13 }}>
                           #{f.id} · {f.restaurantName}
                         </Typography.Text>

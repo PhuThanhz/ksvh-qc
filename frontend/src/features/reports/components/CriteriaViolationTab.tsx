@@ -68,10 +68,11 @@ export function CriteriaViolationTab() {
   const columns: ColumnsType<CriteriaViolationItem> = [
     {
       title: 'Mã tiêu chí',
+      className: 'col-code',
       dataIndex: 'criterionCode',
       key: 'criterionCode',
       width: 120,
-      render: (v) => <b>{v}</b>,
+      render: (v) => <span className="code-tag--blue">{v}</span>,
     },
     {
       title: 'Tên tiêu chí',

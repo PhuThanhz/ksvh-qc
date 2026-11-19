@@ -17,9 +17,10 @@ export interface StatusBadgeProps<S extends string> {
   meta: Record<S, { label: string; tone: BadgeTone }>
 }
 
+/** Nhãn trạng thái: nền rất nhạt, chữ đậm cùng tông, chấm màu phía trước (màu ở .status-tag--*). */
 function BaseStatusBadge<S extends string>({ status, meta }: StatusBadgeProps<S>) {
   const m = meta[status]
-  return <Tag color={COLOR[m.tone]}>{m.label}</Tag>
+  return <Tag className={`status-tag status-tag--${COLOR[m.tone]}`}>{m.label}</Tag>
 }
 
 export const StatusBadge = memo(BaseStatusBadge) as typeof BaseStatusBadge

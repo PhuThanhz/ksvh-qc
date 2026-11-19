@@ -5,4 +5,5 @@ export const organizationKeys = {
   all: ['organizations'] as const,
   companies: (params: CompanyListParams) => [...organizationKeys.all, 'companies', params] as const,
   orgUnits: (params: OrgUnitListParams) => [...organizationKeys.all, 'org-units', params] as const,
+  assignment: (userId: number) => [...organizationKeys.all, 'assignment', userId] as const,
 }

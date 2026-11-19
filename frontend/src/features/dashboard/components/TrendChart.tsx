@@ -4,8 +4,8 @@ import { monthLabel } from '@/features/dashboard/components/chart-utils'
 import type { MonthPoint } from '@/types/api.generated'
 
 const SERIES = [
-  { key: 'inspections', name: 'Phiếu chấm đã gửi', color: CHART_COLORS.series[0] },
-  { key: 'findings', name: 'Lỗi phát sinh', color: CHART_COLORS.series[1] },
+  { key: 'inspections', name: 'Biên bản kiểm tra', color: CHART_COLORS.series[0] },
+  { key: 'findings', name: 'Điểm không phù hợp', color: CHART_COLORS.series[1] },
 ] as const
 
 /** Xu hướng theo tháng: hai đại lượng cùng đơn vị (số lượng) trên một trục. */
@@ -43,13 +43,13 @@ export function TrendChart({ data, loading }: { data?: readonly MonthPoint[]; lo
   return (
     <ChartCard
       title="Xu hướng kiểm tra"
-      subtitle="Số phiếu chấm đã gửi và số lỗi phát sinh theo tháng"
+      subtitle="Số biên bản kiểm tra và số điểm không phù hợp ghi nhận theo tháng"
       loading={loading}
       empty={empty}
-      emptyText="Chưa có phiếu chấm nào trong kỳ"
+      emptyText="Chưa có dữ liệu kiểm tra trong kỳ"
       height={280}
     >
-      <EChart option={option} height={280} ariaLabel="Biểu đồ đường số phiếu chấm và số lỗi theo tháng" />
+      <EChart option={option} height={280} ariaLabel="Biểu đồ đường số biên bản kiểm tra và số điểm không phù hợp theo tháng" />
     </ChartCard>
   )
 }

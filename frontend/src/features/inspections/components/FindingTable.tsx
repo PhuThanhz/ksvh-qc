@@ -1,6 +1,7 @@
 import { Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
+import { RiskLevelTag } from '@/components/data-display/RiskLevelTag'
 import { StatusBadge } from '@/components/data-display/StatusBadge'
 import { FINDING_STATUS_META } from '../constants/status'
 import { FindingActionButtons } from '@/features/inspections/components/FindingActionButtons'
@@ -8,6 +9,7 @@ import type { FindingActionType } from '@/features/inspections/components/Findin
 import type { FindingResponse, FindingStatus } from '@/features/inspections/inspection.types'
 import { formatDate } from '@/utils/format-date'
 import { PERMISSIONS, usePermission } from '@/permissions'
+import { actionColumnWidth } from '@/components/data-display/tableActions.utils'
 
 interface Props {
   data?: FindingResponse[]
@@ -49,13 +51,18 @@ export function FindingTable({
       render: (_, __, i) => currentPage * pageSize + i + 1,
     },
     {
-      title: 'Nhà hàng & Phiếu',
+      title: 'Cơ sở & Biên bản',
       key: 'res',
       width: 200,
       render: (_, r) => (
         <div>
           <div style={{ fontWeight: 600 }}>{r.restaurantName}</div>
-          <div style={{ fontSize: 12, color: 'var(--app-text-secondary)' }}>Phiếu: {r.inspectionCode}</div>
+          <div style={{ fontSize: 12, color: 'var(--app-text-secondary)', marginTop: 3, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span>Biên bản:</span>
+            <Tag className="code-tag--blue" style={{ fontSize: 11.5, padding: '0 6px', lineHeight: '18px' }}>
+              {r.inspectionCode}
+            </Tag>
+          </div>
         </div>
       ),
     },
@@ -71,7 +78,7 @@ export function FindingTable({
             <div style={{ fontSize: 12, color: 'var(--app-text-secondary)', marginTop: 2 }}>Khiếu nại: {r.appealReason}</div>
           )}
           {r.remediationPlan && (
-            <div style={{ fontSize: 12, color: 'var(--app-text-secondary)', marginTop: 2 }}>KH khắc phục: {r.remediationPlan}</div>
+            <div style={{ fontSize: 12, color: 'var(--app-text-secondary)', marginTop: 2 }}>Biện pháp khắc phục: {r.remediationPlan}</div>
           )}
         </div>
       ),
@@ -82,9 +89,7 @@ export function FindingTable({
       width: 150,
       render: (_, r) => (
         <div>
-          <Tag color={r.riskLevelCode === 'M4' ? 'error' : r.riskLevelCode === 'M3' ? 'warning' : 'blue'}>
-            {r.riskLevelCode} - {r.riskLevelName}
-          </Tag>
+          <RiskLevelTag code={r.riskLevelCode} name={r.riskLevelName} showName />
           {r.effectiveImpact != null && r.effectiveImpact > r.baseImpact && (
             <div>
               <Tag color="warning" style={{ margin: '2px 0 0', fontSize: 11 }}>
@@ -124,14 +129,16 @@ export function FindingTable({
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
-      width: 130,
+      width: 160,
       render: (st: FindingStatus) => <StatusBadge status={st} meta={FINDING_STATUS_META} />,
     },
     {
       title: 'Thao tác',
       key: 'actions',
-      width: 175,
-      align: 'center',
+      width: actionColumnWidth(4),
+      // Ghim mép phải bằng CSS sticky (.col-actions), không làm đổi bố cục các cột khác.
+      className: 'col-actions',
+      align: 'center' as const,
       render: (_, r) => (
         <FindingActionButtons
           finding={r}

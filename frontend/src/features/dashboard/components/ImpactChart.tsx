@@ -38,7 +38,7 @@ export function ImpactChart({ criteria, loading }: { criteria?: readonly { baseI
   return (
     <ChartCard
       title="Tiêu chí theo mức ảnh hưởng"
-      subtitle="Mức ảnh hưởng gốc 1 (rất nhẹ) → 5 (rất nghiêm trọng), tiêu chí đang dùng"
+      subtitle="Mức độ ảnh hưởng cơ sở 1 (rất nhẹ) → 5 (nghiêm trọng), các tiêu chí đang áp dụng"
       loading={loading}
       empty={counts.every((c) => c === 0)}
       emptyText="Chưa có tiêu chí đang dùng"

@@ -54,7 +54,7 @@ export function RiskLevelChart({ data, levels, loading }: Props) {
   return (
     <ChartCard
       title="Lỗi đang mở theo mức rủi ro"
-      subtitle="Theo bảng phân loại đang áp dụng"
+      subtitle="Hiện tại · theo bảng phân loại đang áp dụng"
       loading={loading}
       empty={total === 0}
       emptyText="Không có lỗi nào đang mở"

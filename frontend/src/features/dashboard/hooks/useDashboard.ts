@@ -1,12 +1,13 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { dashboardApi } from '@/features/dashboard/api/dashboard.api'
 import { dashboardKeys } from '@/features/dashboard/api/dashboard.keys'
+import type { DashboardPeriod } from '@/features/dashboard/dashboard.period'
 
 /** Số liệu vận hành cho trang Tổng quan; chỉ gọi khi người dùng có quyền xem báo cáo. */
-export function useDashboard(months: number, enabled: boolean) {
+export function useDashboard(period: DashboardPeriod, enabled: boolean) {
   return useQuery({
-    queryKey: dashboardKeys.summary(months),
-    queryFn: () => dashboardApi.summary(months),
+    queryKey: dashboardKeys.summary(period.from, period.to),
+    queryFn: () => dashboardApi.summary(period),
     enabled,
     placeholderData: keepPreviousData,
     staleTime: 60_000,

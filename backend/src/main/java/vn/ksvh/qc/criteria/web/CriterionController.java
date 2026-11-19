@@ -54,6 +54,13 @@ public class CriterionController {
         return service.updateGroup(id, req, CurrentUser.from(jwt).id());
     }
 
+    @DeleteMapping("/criterion-groups/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize(CAN_MANAGE)
+    public void deleteGroup(@PathVariable Long id) {
+        service.deleteGroup(id);
+    }
+
     @GetMapping("/criteria")
     @PreAuthorize(CAN_READ)
     public PageResponse<CriterionResponse> search(

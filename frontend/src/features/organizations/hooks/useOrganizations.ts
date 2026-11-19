@@ -1,12 +1,13 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { STALE_CATALOG_MS } from '@/constants/app.constants'
-import { companiesApi, orgUnitsApi } from '@/features/organizations/api/organizations.api'
+import { companiesApi, orgUnitsApi, restaurantAssignmentsApi } from '@/features/organizations/api/organizations.api'
 import { organizationKeys } from '@/features/organizations/api/organizations.keys'
 import type {
   CompanyListParams,
   CompanyPayload,
   OrgUnitListParams,
   OrgUnitPayload,
+  RestaurantAssignmentPayload,
 } from '@/features/organizations/organizations.types'
 import type { Id } from '@/types/common.types'
 
@@ -59,6 +60,25 @@ export function useDeleteOrgUnit() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (id: Id) => orgUnitsApi.delete(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: organizationKeys.all }),
+  })
+}
+
+/** Nhà hàng người dùng đang phụ trách (CHT / OBM). */
+export function useRestaurantAssignment(userId: Id | undefined, enabled = true) {
+  return useQuery({
+    queryKey: organizationKeys.assignment(Number(userId)),
+    queryFn: () => restaurantAssignmentsApi.get(userId as Id),
+    enabled: enabled && userId !== undefined,
+  })
+}
+
+/** Thay toàn bộ danh sách nhà hàng phụ trách; nhà hàng đổi CHT/OBM nên làm mới cả module. */
+export function useSaveRestaurantAssignment() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ userId, body }: { userId: Id; body: RestaurantAssignmentPayload }) =>
+      restaurantAssignmentsApi.replace(userId, body),
     onSuccess: () => qc.invalidateQueries({ queryKey: organizationKeys.all }),
   })
 }

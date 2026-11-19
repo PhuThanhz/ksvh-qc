@@ -1,8 +1,9 @@
 import { AlertOutlined, BellOutlined, CheckSquareOutlined, UserOutlined } from '@ant-design/icons'
 import { Badge, Drawer } from 'antd'
 import { ActionSheet, TabBar } from 'antd-mobile'
-import { useState } from 'react'
-import { useLocation, useNavigate, useSearchParams } from 'react-router'
+import { useEffect, useState } from 'react'
+import { useLocation, useNavigate, useSearchParams, type RouteObject } from 'react-router'
+import { prefetchRouteChunks } from '@/app/router/prefetch'
 import { AdminLayout } from '@/components/layout/AdminLayout'
 import type { MenuEntry } from '@/components/layout/menu.types'
 import { MobileLayout } from '@/components/layout/MobileLayout'
@@ -15,8 +16,9 @@ import { useConfirm } from '@/hooks/useConfirm'
 import { useNotify } from '@/hooks/useNotify'
 
 /** Ghép layout (không biết gì về phiên) với dữ liệu phiên + đăng xuất. */
-export function AdminShell({ menu }: { menu: readonly MenuEntry[] }) {
+export function AdminShell({ menu, routes }: { menu: readonly MenuEntry[]; routes: readonly RouteObject[] }) {
   const { user } = useSession()
+  useEffect(() => prefetchRouteChunks(routes), [routes])
   const logout = useLogout()
   const confirm = useConfirm()
   const notify = useNotify()

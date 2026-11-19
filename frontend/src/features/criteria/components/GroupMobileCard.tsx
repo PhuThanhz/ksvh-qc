@@ -1,9 +1,9 @@
-import { AppstoreAddOutlined, RightOutlined } from '@ant-design/icons'
-import { Space, Tag, Typography } from 'antd'
-import { ActionButton, TableActions } from '@/components/data-display/TableActions'
+import { RightOutlined } from '@ant-design/icons'
+import { Space, Tag } from 'antd'
+import { TableActions } from '@/components/data-display/TableActions'
 import { StatusBadge } from '@/components/data-display/StatusBadge'
 import type { CriterionGroup } from '@/features/criteria/criteria.types'
-import { PERMISSIONS, ProtectedAction } from '@/permissions'
+import { PERMISSIONS } from '@/permissions'
 
 const ACTIVE_META = {
   active: { label: 'Đang dùng', tone: 'success' as const },
@@ -15,8 +15,8 @@ interface Props {
   index: number
   onEdit: (group: CriterionGroup) => void
   onAddCriterion: (group: CriterionGroup) => void
-  onBatchAddCriteria?: (group: CriterionGroup) => void
   onViewCriteria: (group: CriterionGroup) => void
+  onDelete: (group: CriterionGroup) => void
 }
 
 export function GroupMobileCard({
@@ -24,8 +24,8 @@ export function GroupMobileCard({
   index,
   onEdit,
   onAddCriterion,
-  onBatchAddCriteria,
   onViewCriteria,
+  onDelete,
 }: Props) {
   return (
     <div className="app-mobile-card">
@@ -43,16 +43,16 @@ export function GroupMobileCard({
             <span style={{ fontSize: 12, color: 'var(--app-text-secondary)', fontWeight: 600 }}>
               #{index + 1}
             </span>
-            <Typography.Text code strong style={{ fontSize: 12 }}>
+            <span className="code-tag--blue">
               {g.code}
-            </Typography.Text>
+            </span>
           </Space>
           <div
             onClick={() => onViewCriteria(g)}
             style={{
               fontWeight: 600,
               fontSize: 14,
-              color: 'var(--app-primary)',
+              color: '#0f172a',
               cursor: 'pointer',
               marginTop: 4,
               textDecoration: g.active ? 'none' : 'line-through',
@@ -110,26 +110,16 @@ export function GroupMobileCard({
         <TableActions
           recordName={g.name}
           onView={() => onViewCriteria(g)}
-          viewLabel="Xem chi tiết nhóm"
+          viewLabel="Xem chi tiết nhóm tiêu chí"
           onAdd={() => onAddCriterion(g)}
-          addLabel="Thêm 1 tiêu chí con"
+          addLabel="Thêm tiêu chí vào nhóm"
           addAccess={PERMISSIONS.CRITERIA.MANAGE}
           onEdit={() => onEdit(g)}
-          editLabel="Sửa thông tin nhóm"
+          editLabel="Sửa nhóm tiêu chí"
           editAccess={PERMISSIONS.CRITERIA.MANAGE}
-          extra={
-            onBatchAddCriteria && (
-              <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-                <ActionButton
-                  tone="add"
-                  icon={<AppstoreAddOutlined />}
-                  tooltip="Thêm nhanh nhiều tiêu chí con"
-                  ariaLabel={`Thêm nhanh nhiều tiêu chí vào nhóm ${g.name}`}
-                  onClick={() => onBatchAddCriteria(g)}
-                />
-              </ProtectedAction>
-            )
-          }
+          onDelete={() => onDelete(g)}
+          deleteLabel="Xoá nhóm tiêu chí"
+          deleteAccess={PERMISSIONS.CRITERIA.MANAGE}
         />
       </div>
     </div>

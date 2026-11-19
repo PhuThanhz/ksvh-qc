@@ -117,14 +117,7 @@ public class OrgUnitService {
             if ((req.latitude() == null) != (req.longitude() == null)) {
                 throw new BusinessException(ErrorCode.ORGANIZATION_GPS_REQUIRED, "Nhập đủ cả vĩ độ và kinh độ, hoặc để trống cả hai");
             }
-            if (!Objects.equals(u.getStoreManagerUserId(), req.storeManagerUserId())) {
-                assertAssignee(req.storeManagerUserId(), RoleCodes.STORE_MANAGER, "Cửa hàng trưởng");
-            }
-            if (!Objects.equals(u.getObmUserId(), req.obmUserId())) {
-                assertAssignee(req.obmUserId(), RoleCodes.OBM, "OBM");
-            }
-            u.setStoreManagerUserId(req.storeManagerUserId());
-            u.setObmUserId(req.obmUserId());
+            // CHT / OBM giữ nguyên: chỉ đổi qua setAssignees hoặc RestaurantAssignmentService.
             u.setLatitude(req.latitude());
             u.setLongitude(req.longitude());
             u.setCheckinRadiusM(req.checkinRadiusM());
@@ -136,6 +129,26 @@ public class OrgUnitService {
             u.setLongitude(null);
             u.setCheckinRadiusM(null);
         }
+    }
+
+    /**
+     * Gán CHT / OBM cho một nhà hàng (dùng khi nhập Excel). {@code null} nghĩa là bỏ gán.
+     * Phòng ban không có người phụ trách nên luôn bị bỏ qua.
+     */
+    @Transactional
+    public void setAssignees(Long unitId, Long storeManagerUserId, Long obmUserId) {
+        OrgUnit u = load(unitId);
+        if (u.getUnitType() != OrgUnitType.RESTAURANT) {
+            return;
+        }
+        if (!Objects.equals(u.getStoreManagerUserId(), storeManagerUserId)) {
+            assertAssignee(storeManagerUserId, RoleCodes.STORE_MANAGER, "Cửa hàng trưởng");
+        }
+        if (!Objects.equals(u.getObmUserId(), obmUserId)) {
+            assertAssignee(obmUserId, RoleCodes.OBM, "OBM");
+        }
+        u.setStoreManagerUserId(storeManagerUserId);
+        u.setObmUserId(obmUserId);
     }
 
     /** Người được gán phải tồn tại, đang hoạt động và có đúng vai trò. Cho phép để trống. */

@@ -8,6 +8,7 @@ export interface SearchInputProps {
   defaultValue?: string
   placeholder?: string
   maxWidth?: number | string
+  className?: string
   style?: React.CSSProperties
   /** Gọi sau khi người dùng ngừng gõ SEARCH_DEBOUNCE_MS. */
   onSearch: (keyword: string) => void
@@ -17,7 +18,8 @@ export function SearchInput({
   value: controlledValue,
   defaultValue = '',
   placeholder = 'Tìm kiếm…',
-  maxWidth = 460,
+  maxWidth,
+  className,
   style,
   onSearch,
 }: SearchInputProps) {
@@ -57,7 +59,8 @@ export function SearchInput({
       placeholder={placeholder}
       value={inner}
       onChange={(e) => setInner(e.target.value)}
-      style={{ minWidth: 280, maxWidth, flex: '1 1 360px', ...style }}
+      className={`search-input--transparent ${className ?? ''}`.trim()}
+      style={{ minWidth: 260, maxWidth, flex: '1 1 auto', width: '100%', ...style }}
     />
   )
 }

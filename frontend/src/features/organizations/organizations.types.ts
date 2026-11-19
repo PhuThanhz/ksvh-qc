@@ -8,6 +8,9 @@ export type CompanyPayload = Schemas['CompanyRequest']
 export type UserRef = Schemas['UserRef']
 export type OrgUnitType = Schemas['OrgUnitResponse']['unitType']
 export type OrgUnitPayload = Schemas['OrgUnitRequest']
+export type RestaurantAssignment = Schemas['RestaurantAssignmentResponse']
+export type RestaurantAssignmentPayload = Schemas['RestaurantAssignmentRequest']
+export type AssignedRestaurant = Schemas['AssignedRestaurant']
 
 /** OpenAPI không gắn được null cho trường kiểu tham chiếu: CHT/OBM có thể chưa gán (phòng ban luôn trống). */
 export type OrgUnit = Omit<Schemas['OrgUnitResponse'], 'storeManager' | 'obm'> & {

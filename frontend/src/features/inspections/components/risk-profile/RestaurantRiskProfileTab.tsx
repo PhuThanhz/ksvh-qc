@@ -38,9 +38,9 @@ export function RestaurantRiskProfileTab({ initialRestaurantId }: RestaurantRisk
       <Card size="small">
         <Flex wrap="wrap" gap={12} align="center" justify="space-between">
           <Flex wrap="wrap" gap={10} align="center">
-            <span style={{ fontWeight: 500 }}>Nhà hàng:</span>
+            <span style={{ fontWeight: 500 }}>Cơ sở:</span>
             <Select
-              placeholder="Chọn nhà hàng xem hồ sơ"
+              placeholder="Chọn cơ sở xem hồ sơ rủi ro"
               showSearch
               value={activeRestId}
               onChange={(id) => setRestaurantId(id)}

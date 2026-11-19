@@ -13,13 +13,13 @@ export type FindingActionType =
   | 'VERIFY'
 
 export const FINDING_ACTION_TITLES: Record<FindingActionType, string> = {
-  CONFIRM: 'Xác nhận lỗi vi phạm',
-  APPEAL: 'Gửi khiếu nại lỗi vi phạm',
+  CONFIRM: 'Xác nhận điểm không phù hợp',
+  APPEAL: 'Gửi khiếu nại điểm không phù hợp',
   SUBMIT_REVIEW: 'Thẩm định khiếu nại',
-  CONCLUDE_APPEAL: 'Kết luận họp khiếu nại (Quản lý KSVH)',
-  REMEDIATION_PLAN: 'Lập kế hoạch khắc phục lỗi',
-  SUBMIT_REMEDIATION: 'Báo cáo hoàn thành & Gửi bằng chứng khắc phục',
-  VERIFY: 'Nghiệm thu kết quả khắc phục',
+  CONCLUDE_APPEAL: 'Kết luận khiếu nại (Quản lý KSVH)',
+  REMEDIATION_PLAN: 'Lập biện pháp khắc phục',
+  SUBMIT_REMEDIATION: 'Báo cáo hoàn thành & Gửi minh chứng khắc phục',
+  VERIFY: 'Thẩm tra & Nghiệm thu khắc phục',
 }
 
 export function useFindingActionSubmit(
@@ -47,7 +47,7 @@ export function useFindingActionSubmit(
       const vals = await form.validateFields()
       if (action === 'CONFIRM') {
         await confirm.mutateAsync(finding.id)
-        notify.success('Đã xác nhận lỗi vi phạm')
+        notify.success('Đã xác nhận điểm không phù hợp')
       } else if (action === 'APPEAL') {
         await appeal.mutateAsync({
           id: finding.id,

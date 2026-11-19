@@ -1,7 +1,8 @@
 import { CloseCircleOutlined, DownOutlined, FilterOutlined, ReloadOutlined, UpOutlined } from '@ant-design/icons'
-import { Badge, Button, Card, Flex, Tag, Typography } from 'antd'
+import { Badge, Button, Flex, Tag, Typography } from 'antd'
 import { useState, type ReactNode } from 'react'
 import { SearchInput, type SearchInputProps } from '@/components/data-entry/SearchInput'
+import { usePageActionsSlot } from '@/components/layout/pageActions'
 
 export interface FilterTagItem {
   key: string
@@ -19,8 +20,6 @@ export interface AdvancedFilterProps {
   /** Bộ lọc nâng cao nằm trong panel mở rộng (nếu có) */
   advancedFilters?: ReactNode
 
-  /** Tiêu đề của panel bộ lọc nâng cao (mặc định: 'Bộ lọc nâng cao') */
-  panelTitle?: string
 
   /** Số lượng bộ lọc đang hoạt động */
   activeCount?: number
@@ -42,7 +41,7 @@ export interface AdvancedFilterProps {
 }
 
 /**
- * Component bộ lọc nâng cao dùng chung toàn hệ thống — một khối riêng, đặt phía trên khối bảng (TableCard/DataTable).
+ * Component bộ lọc nâng cao dùng chung toàn hệ thống — nằm trực tiếp trên nền trang (không khung), phía trên khối bảng (TableCard/DataTable).
  * Tích hợp tìm kiếm nhanh, bộ lọc mở rộng (collapsible panel), đếm số lượng bộ lọc (Badge),
  * và danh sách chip tag điều kiện lọc có thể xoá nhanh từng mục.
  */
@@ -50,7 +49,6 @@ export function AdvancedFilter({
   search,
   children,
   advancedFilters,
-  panelTitle = 'Bộ lọc nâng cao',
   activeCount = 0,
   onReset,
   activeTags = [],
@@ -58,70 +56,80 @@ export function AdvancedFilter({
   defaultExpanded = false,
   top,
 }: AdvancedFilterProps) {
-  const [expanded, setExpanded] = useState(defaultExpanded)
+  // Mặc định thu gọn; đang có bộ lọc bật sẵn (vd mở từ link có ?status=) thì mở sẵn để thấy.
+  const [expanded, setExpanded] = useState(defaultExpanded || activeCount > 0)
+  // Nút hành động của trang (Thêm, Excel…) luôn nằm góc phải hàng tìm kiếm.
+  const pageActions = usePageActionsSlot()
   const showReset = Boolean(onReset && activeCount > 0)
-  const hasAdvanced = Boolean(advancedFilters)
+  const hasFilters = Boolean(children || advancedFilters)
 
   return (
-    <div className="glass-panel" style={{ padding: '14px 18px' }}>
+    <div className="advanced-filter">
       <Flex vertical gap={12}>
         {top}
-        {/* Thanh chính */}
-      <Flex justify="space-between" align="center" gap={12} wrap>
-        <Flex align="center" gap={8} wrap style={{ flex: 1, minWidth: 260 }}>
-          {search && <SearchInput {...search} />}
-          {children}
-
-          {hasAdvanced && (
-            <Badge count={activeCount} size="small" offset={[-4, 4]}>
-              <Button
-                icon={<FilterOutlined />}
-                onClick={() => setExpanded((prev) => !prev)}
-                type={expanded ? 'primary' : 'default'}
-              >
-                Bộ lọc {expanded ? <UpOutlined /> : <DownOutlined />}
-              </Button>
-            </Badge>
+        {/* Hàng 1: ô tìm kiếm dài full-width (trái) · nút hành động của trang (phải) */}
+        <Flex align="center" gap={12} wrap style={{ width: '100%' }}>
+          {search ? (
+            <div style={{ flex: 1, minWidth: 260 }}>
+              <SearchInput {...search} maxWidth={search.maxWidth} />
+            </div>
+          ) : (
+            hasFilters && (
+              <Badge count={activeCount} size="small" offset={[-4, 4]}>
+                <Button
+                  icon={<FilterOutlined />}
+                  className={expanded ? 'filter-toggle filter-toggle--open' : 'filter-toggle'}
+                  onClick={() => setExpanded((prev) => !prev)}
+                  aria-expanded={expanded}
+                >
+                  Bộ lọc {expanded ? <UpOutlined /> : <DownOutlined />}
+                </Button>
+              </Badge>
+            )
           )}
-
-          {showReset && (
-            <Button icon={<ReloadOutlined />} onClick={onReset}>
-              Đặt lại ({activeCount})
+          {!search && showReset && (
+            <Button className="filter-reset" icon={<ReloadOutlined />} onClick={onReset}>
+              Đặt lại
             </Button>
+          )}
+          {(extra || pageActions) && (
+            <Flex align="center" gap={8} wrap className="page-actions" style={{ marginInlineStart: 'auto', flexShrink: 0 }}>
+              {extra}
+              {pageActions}
+            </Flex>
           )}
         </Flex>
 
-        {extra && (
+        {/* Hàng 2: Nút [Bộ lọc] + Nút [Đặt lại] khi có ô tìm kiếm */}
+        {search && (hasFilters || showReset) && (
           <Flex align="center" gap={8} wrap>
-            {extra}
+            {hasFilters && (
+              <Badge count={activeCount} size="small" offset={[-4, 4]}>
+                <Button
+                  icon={<FilterOutlined />}
+                  className={expanded ? 'filter-toggle filter-toggle--open' : 'filter-toggle'}
+                  onClick={() => setExpanded((prev) => !prev)}
+                  aria-expanded={expanded}
+                >
+                  Bộ lọc {expanded ? <UpOutlined /> : <DownOutlined />}
+                </Button>
+              </Badge>
+            )}
+            {showReset && (
+              <Button className="filter-reset" icon={<ReloadOutlined />} onClick={onReset}>
+                Đặt lại
+              </Button>
+            )}
           </Flex>
         )}
-      </Flex>
 
-      {/* Panel bộ lọc nâng cao (mở rộng) */}
-      {hasAdvanced && expanded && (
-        <Card
-          size="small"
-          styles={{ body: { padding: '12px 16px', backgroundColor: 'var(--app-surface-muted)', borderRadius: 8 } }}
-        >
-          <Flex vertical gap={12}>
-            <Flex justify="space-between" align="center">
-              <Typography.Text strong style={{ fontSize: 13 }}>
-                <FilterOutlined style={{ marginRight: 6 }} />
-                {panelTitle}
-              </Typography.Text>
-              {showReset && (
-                <Button type="link" size="small" icon={<ReloadOutlined />} onClick={onReset} style={{ padding: 0 }}>
-                  Xoá tất cả bộ lọc
-                </Button>
-              )}
-            </Flex>
-            <Flex align="center" gap={12} wrap>
-              {advancedFilters}
-            </Flex>
+        {/* Hàng 3 (bấm "Bộ lọc" mới hiện): các ô lọc nằm thẳng hàng */}
+        {hasFilters && expanded && (
+          <Flex align="center" gap={8} wrap className="advanced-filter__panel">
+            {children}
+            {advancedFilters}
           </Flex>
-        </Card>
-      )}
+        )}
 
       {/* Danh sách chip/tag các điều kiện đang lọc */}
       {activeTags.length > 0 && (

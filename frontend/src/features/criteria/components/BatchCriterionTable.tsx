@@ -1,13 +1,55 @@
 import { CopyOutlined, DeleteOutlined } from '@ant-design/icons'
 import { Button, Input, Popconfirm, Select, Space, Table, Tooltip } from 'antd'
 import { useMemo } from 'react'
-import { IMPACT_LEVELS } from '@/features/criteria/criteria.types'
 import type { BatchItem } from './batchCriterion.types'
 
-const IMPACT_OPTIONS = IMPACT_LEVELS.map((lvl) => ({
-  value: lvl,
-  label: `Mức ${lvl}`,
-}))
+const IMPACT_OPTIONS = [
+  {
+    value: 1,
+    label: (
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#52c41a' }} />
+        Mức 1
+      </span>
+    ),
+  },
+  {
+    value: 2,
+    label: (
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#1677ff' }} />
+        Mức 2
+      </span>
+    ),
+  },
+  {
+    value: 3,
+    label: (
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#faad14' }} />
+        Mức 3
+      </span>
+    ),
+  },
+  {
+    value: 4,
+    label: (
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#fa541c' }} />
+        Mức 4
+      </span>
+    ),
+  },
+  {
+    value: 5,
+    label: (
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#f5222d' }} />
+        Mức 5
+      </span>
+    ),
+  },
+]
 
 export interface BatchCriterionTableProps {
   items: BatchItem[]
@@ -29,11 +71,21 @@ export function BatchCriterionTable({ items, onUpdateItem, onRemoveItem, onDupli
   return (
     <Table<BatchItem>
       rowKey="key"
-      size="small"
+      size="middle"
       pagination={false}
       dataSource={items}
+      className="batch-criteria-table"
+      bordered
       columns={[
-        { title: '#', key: 'idx', width: 44, align: 'center', render: (_, __, i) => i + 1 },
+        {
+          title: '#',
+          key: 'idx',
+          width: 44,
+          align: 'center',
+          render: (_, __, i) => (
+            <span style={{ color: '#94a3b8', fontSize: 12, fontWeight: 500 }}>{i + 1}</span>
+          ),
+        },
         {
           title: 'Mã tiêu chí (*)',
           key: 'code',
@@ -43,37 +95,42 @@ export function BatchCriterionTable({ items, onUpdateItem, onRemoveItem, onDupli
             return (
               <Tooltip title={isDup ? 'Mã này đang bị trùng lặp trong bảng' : undefined}>
                 <Input
-                  size="small"
                   value={r.code}
                   status={isDup ? 'error' : ''}
-                  placeholder="Mã..."
+                  placeholder="Mã tiêu chí..."
                   onChange={(e) => onUpdateItem(r.key, 'code', e.target.value.toUpperCase())}
-                  style={{ fontFamily: 'monospace', fontWeight: 600 }}
+                  style={{
+                    fontFamily: 'monospace',
+                    fontWeight: 600,
+                    fontSize: 12,
+                    borderRadius: 6,
+                    color: isDup ? '#dc2626' : '#1677ff',
+                    background: '#f8fafc',
+                  }}
                 />
               </Tooltip>
             )
           },
         },
         {
-          title: 'Tên tiêu chí con (*)',
+          title: 'Nội dung tiêu chí kiểm soát (*)',
           key: 'name',
           render: (_, r) => (
             <Input
-              size="small"
               value={r.name}
-              placeholder="VD: Sàn nhà sạch sẽ, không trơn trượt..."
+              placeholder="Nhập nội dung tiêu chí kiểm soát..."
               onChange={(e) => onUpdateItem(r.key, 'name', e.target.value)}
               status={!r.name.trim() && r.code.trim() ? 'warning' : ''}
+              style={{ borderRadius: 6, fontSize: 13 }}
             />
           ),
         },
         {
-          title: 'Mức ảnh hưởng',
+          title: 'Mức độ ảnh hưởng',
           key: 'baseImpact',
-          width: 115,
+          width: 125,
           render: (_, r) => (
             <Select
-              size="small"
               value={r.baseImpact}
               options={IMPACT_OPTIONS}
               onChange={(val) => onUpdateItem(r.key, 'baseImpact', val)}
@@ -82,37 +139,44 @@ export function BatchCriterionTable({ items, onUpdateItem, onRemoveItem, onDupli
           ),
         },
         {
-          title: 'Cách kiểm tra / Ghi chú',
+          title: 'Phương pháp đánh giá / Ghi chú',
           key: 'checkMethod',
           width: 210,
           render: (_, r) => (
             <Input
-              size="small"
               value={r.checkMethod}
-              placeholder="Quan sát / Đo đạc..."
+              placeholder="Phương pháp kiểm tra / ghi chú..."
               onChange={(e) => onUpdateItem(r.key, 'checkMethod', e.target.value)}
+              style={{ borderRadius: 6, fontSize: 13 }}
             />
           ),
         },
         {
           title: '',
           key: 'actions',
-          width: 70,
+          width: 68,
           align: 'center',
           render: (_, r) => (
-            <Space size={2}>
+            <Space size={4}>
               {onDuplicateItem && (
-                <Tooltip title="Nhân bản dòng này">
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={<CopyOutlined />}
-                    onClick={() => onDuplicateItem(r)}
-                  />
-                </Tooltip>
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<CopyOutlined style={{ color: '#64748b' }} />}
+                  title="Nhân bản dòng này"
+                  onClick={() => onDuplicateItem(r)}
+                  style={{ width: 28, height: 28, borderRadius: 6 }}
+                />
               )}
               <Popconfirm title="Xoá dòng này?" onConfirm={() => onRemoveItem(r.key)}>
-                <Button type="text" danger size="small" icon={<DeleteOutlined />} />
+                <Button
+                  type="text"
+                  size="small"
+                  danger
+                  icon={<DeleteOutlined />}
+                  title="Xoá dòng"
+                  style={{ width: 28, height: 28, borderRadius: 6 }}
+                />
               </Popconfirm>
             </Space>
           ),

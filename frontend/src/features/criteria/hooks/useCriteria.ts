@@ -74,3 +74,14 @@ export function useDeleteCriterion() {
     },
   })
 }
+
+export function useDeleteCriterionGroup() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: Id) => criteriaApi.deleteGroup(id),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: criteriaKeys.groups() })
+      void qc.invalidateQueries({ queryKey: criteriaKeys.criteria() })
+    },
+  })
+}

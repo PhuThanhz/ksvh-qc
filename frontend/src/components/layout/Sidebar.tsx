@@ -1,6 +1,6 @@
 import { SettingOutlined } from '@ant-design/icons'
 import { ConfigProvider, Menu, type MenuProps } from 'antd'
-import { useLocation, useNavigate } from 'react-router'
+import { useLocation, useNavigate, useNavigation } from 'react-router'
 import type { MenuEntry } from '@/components/layout/menu.types'
 import { usePermission } from '@/permissions'
 
@@ -41,7 +41,10 @@ const sidebarMenuTheme = {
  */
 export function Sidebar({ menu, onSelect }: SidebarProps) {
   const navigate = useNavigate()
-  const { pathname } = useLocation()
+  const location = useLocation()
+  const navigation = useNavigation()
+  // Đang chuyển trang: tô sáng ngay mục vừa bấm, không đợi trang mới tải xong.
+  const pathname = navigation.location?.pathname ?? location.pathname
   const { allows } = usePermission()
 
   const visible = menu.filter((m) => allows(m.access))

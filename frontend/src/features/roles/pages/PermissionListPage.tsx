@@ -1,17 +1,24 @@
-import { CheckOutlined } from '@ant-design/icons'
-import { Alert, Flex, Table, Tag, Typography, theme } from 'antd'
+import { Alert, Flex, Table, Tag, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { useMemo, useState } from 'react'
 import { TableCard } from '@/components/data-display/TableCard'
 import { AdvancedFilter } from '@/components/data-entry/AdvancedFilter'
 import { ErrorState } from '@/components/feedback/ErrorState'
 import { PageContainer } from '@/components/layout/PageContainer'
+import { PermissionToggleCell } from '@/features/roles/components/PermissionToggleCell'
 import { usePermissionCatalog, useRoles } from '@/features/roles/hooks/useRoles'
+import { lockReason, useTogglePermission } from '@/features/roles/hooks/useTogglePermission'
 import { moduleLabel, type PermissionInfo } from '@/features/roles/roles.types'
+import { PERMISSIONS, usePermission } from '@/permissions'
 
-/** Danh mục permission (định nghĩa trong code) và ma trận permission × vai trò. Chỉ xem. */
+/**
+ * Danh mục permission (định nghĩa trong code) và ma trận permission × vai trò.
+ * Người có quyền role:manage bấm vào ô để cấp / thu quyền của vai trò (không thêm / xoá được mã quyền).
+ */
 export function PermissionListPage() {
-  const { token } = theme.useToken()
+  const { can } = usePermission()
+  const canEdit = can(PERMISSIONS.ROLE.MANAGE)
+  const { toggle, saving } = useTogglePermission()
   const catalog = usePermissionCatalog()
   const roles = useRoles()
   const [keyword, setKeyword] = useState('')
@@ -58,31 +65,49 @@ export function PermissionListPage() {
         ),
       },
       ...(roles.data ?? []).map((r) => ({
-        title: <span title={r.code}>{r.name}</span>,
+        // Tiêu đề được xuống dòng để cột tiêu đề và cột dữ liệu luôn cùng độ rộng (bảng có scroll.y tách header riêng).
+        title: (
+          <span title={r.code} style={{ whiteSpace: 'normal', display: 'block', lineHeight: 1.3 }}>
+            {r.name}
+          </span>
+        ),
         key: r.code,
         align: 'center' as const,
-        width: 124,
-        render: (_: unknown, p: PermissionInfo) =>
-          p.roles.includes(r.code) ? <CheckOutlined style={{ color: token.colorSuccess, fontSize: 16 }} aria-label="Có quyền" /> : null,
+        width: 150,
+        render: (_: unknown, p: PermissionInfo) => (
+          <PermissionToggleCell
+            granted={r.permissions.includes(p.code)}
+            editable={canEdit && !saving}
+            lockReason={canEdit ? lockReason(r, p) : null}
+            onToggle={() => void toggle(r, p)}
+          />
+        ),
       })),
     ],
-    [filteredList, roles.data, token.colorSuccess],
+    [filteredList, roles.data, canEdit, saving, toggle],
   )
 
   const error = (catalog.error && !catalog.data) || (roles.error && !roles.data)
 
   return (
-    <PageContainer title="Quyền (Permission)" subtitle="Danh mục quyền của hệ thống và vai trò nào đang có quyền đó">
+    <PageContainer
+      title="Phân quyền chức năng"
+      subtitle="Danh mục quyền hạn trong hệ thống và ma trận phân quyền theo vai trò"
+    >
       <Flex vertical gap={16}>
         <Alert
           type="info"
           showIcon
-          title="Quyền được định nghĩa trong code (backend kiểm tra bằng @PreAuthorize) nên chỉ xem ở đây. Muốn gán / bỏ quyền cho vai trò, vào trang Vai trò."
+          title={
+            canEdit
+              ? 'Nhấp vào từng ô để thiết lập hoặc thu hồi quyền hạn cho vai trò tương ứng. Danh mục quyền được quản lý tập trung theo mã hệ thống.'
+              : 'Danh mục phân quyền hệ thống ở chế độ chỉ đọc.'
+          }
         />
         <AdvancedFilter
-          search={{ value: keyword, placeholder: 'Tìm theo tên quyền, mã code hoặc nhóm module...', maxWidth: 380, onSearch: setKeyword }}
+          search={{ value: keyword, placeholder: 'Tìm theo tên quyền, mã code hoặc nhóm module...', onSearch: setKeyword }}
           extra={
-            <Typography.Text type="secondary">
+            <Typography.Text className="filter-count">
               Hiển thị <strong>{filteredList.length}</strong> / {catalog.data?.length ?? 0} quyền
             </Typography.Text>
           }
@@ -104,8 +129,8 @@ export function PermissionListPage() {
               dataSource={filteredList}
               columns={columns}
               pagination={false}
-              scroll={{ x: 'max-content' }}
-              sticky={{ offsetHeader: 64 }}
+              // Tiêu đề cố định trong vùng cuộn của bảng (khung TableCard có overflow: hidden nên sticky theo trang không dùng được).
+              scroll={{ x: 'max-content', y: 'calc(100vh - 300px)' }}
             />
           </TableCard>
         )}

@@ -45,7 +45,7 @@ export const router = createBrowserRouter([
       { element: <GuestRoute />, children: authRoutes },
       {
         element: <ProtectedRoute access={AREA_ACCESS.admin} />,
-        children: [{ element: <AdminShell menu={buildMenu(adminRoutes)} />, errorElement: <RouteErrorBoundary />, children: adminRoutes }],
+        children: [{ element: <AdminShell menu={buildMenu(adminRoutes)} routes={adminRoutes} />, errorElement: <RouteErrorBoundary />, children: adminRoutes }],
       },
       {
         element: <ProtectedRoute access={AREA_ACCESS.qc} />,

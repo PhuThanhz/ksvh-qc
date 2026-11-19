@@ -1,6 +1,7 @@
-import { Alert, Empty, Flex, Spin, Table, Tag, Typography } from 'antd'
+import { Alert, Empty, Flex, Spin, Table, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { useEffect, useMemo } from 'react'
+import { RiskLevelTag } from '@/components/data-display/RiskLevelTag'
 import { useVerificationCandidates } from '@/features/inspections/hooks/useVerificationAndSurprise'
 import type { CandidateFindingResponse } from '@/features/inspections/inspection.types'
 import { formatDate } from '@/utils/format-date'
@@ -9,13 +10,6 @@ interface Props {
   restaurantId?: number
   value?: number[]
   onChange: (findingIds: number[]) => void
-}
-
-const RISK_TAG_COLOR: Record<string, string> = {
-  M1: 'green',
-  M2: 'gold',
-  M3: 'orange',
-  M4: 'red',
 }
 
 export function VerificationCandidateSelector({ restaurantId, value = [], onChange }: Props) {
@@ -32,10 +26,11 @@ export function VerificationCandidateSelector({ restaurantId, value = [], onChan
     () => [
       {
         title: 'Mã & Tiêu chí',
+        className: 'col-code',
         key: 'criterion',
         render: (_, r) => (
           <div>
-            <Typography.Text strong>{r.criterionCode}</Typography.Text> - {r.criterionName}
+            <span className="code-tag--blue" style={{ marginRight: 6 }}>{r.criterionCode}</span> {r.criterionName}
             {r.groupName && (
               <div style={{ fontSize: 12, color: 'var(--app-text-secondary)' }}>{r.groupName}</div>
             )}
@@ -47,9 +42,7 @@ export function VerificationCandidateSelector({ restaurantId, value = [], onChan
         dataIndex: 'riskLevelCode',
         key: 'riskLevelCode',
         width: 100,
-        render: (code: string) => (
-          <Tag color={RISK_TAG_COLOR[code] ?? 'default'}>Mức {code}</Tag>
-        ),
+        render: (code: string) => <RiskLevelTag code={code} />,
       },
       {
         title: 'Phương án khắc phục',

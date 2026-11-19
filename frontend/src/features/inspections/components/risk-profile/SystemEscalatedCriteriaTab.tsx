@@ -1,5 +1,5 @@
 import { ArrowRightOutlined, FireOutlined } from '@ant-design/icons'
-import { Button, DatePicker, Flex, Table, Tag, Tooltip, Typography } from 'antd'
+import { DatePicker, Flex, Table, Tag, Tooltip, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import { useState } from 'react'
@@ -7,6 +7,7 @@ import { TableCard } from '@/components/data-display/TableCard'
 import { useEscalatedCriteria } from '@/features/inspections/hooks/useRiskProfile'
 import type { EscalatedCriterionSummary } from '@/features/inspections/risk-profile.types'
 import { formatDate } from '@/utils/format-date'
+import { ActionButton } from '@/components/data-display/TableActions'
 
 export interface SystemEscalatedCriteriaTabProps {
   onSelectRestaurant: (restaurantId: number) => void
@@ -20,7 +21,7 @@ export function SystemEscalatedCriteriaTab({ onSelectRestaurant }: SystemEscalat
 
   const columns: ColumnsType<EscalatedCriterionSummary> = [
     {
-      title: 'Nhà hàng',
+      title: 'Cơ sở vận hành',
       key: 'restaurant',
       width: 200,
       render: (_, r) => (
@@ -31,7 +32,7 @@ export function SystemEscalatedCriteriaTab({ onSelectRestaurant }: SystemEscalat
       ),
     },
     {
-      title: 'Công ty',
+      title: 'Công ty thành viên',
       dataIndex: 'companyName',
       key: 'companyName',
       width: 140,
@@ -42,7 +43,7 @@ export function SystemEscalatedCriteriaTab({ onSelectRestaurant }: SystemEscalat
       key: 'criterion',
       render: (_, r) => (
         <div>
-          <b style={{ color: '#ff4d4f' }}>{r.criterionCode}</b> - {r.criterionName}
+          <span className="code-tag--blue" style={{ marginRight: 6 }}>{r.criterionCode}</span> {r.criterionName}
           <div style={{ fontSize: 12, color: 'var(--app-text-secondary)' }}>Nhóm: {r.groupName || 'Chung'}</div>
         </div>
       ),
@@ -53,7 +54,7 @@ export function SystemEscalatedCriteriaTab({ onSelectRestaurant }: SystemEscalat
       width: 170,
       render: (_, r) => (
         <Flex align="center" gap={6}>
-          <Tag>Gốc: Mức {r.baseImpact}</Tag>
+          <Tag>Cơ sở: Mức {r.baseImpact}</Tag>
           <Tag color="error">▲ Nâng lên: Mức {r.effectiveImpact}</Tag>
         </Flex>
       ),
@@ -80,7 +81,7 @@ export function SystemEscalatedCriteriaTab({ onSelectRestaurant }: SystemEscalat
       width: 170,
       render: (v?: string, r?: EscalatedCriterionSummary) => (
         <Tooltip title={`Đã qua ${r?.cleanMonthsCount ?? 0} tháng sạch liên tục không lỗi`}>
-          <Tag color="warning">Về mức gốc từ {formatDate(v)}</Tag>
+          <Tag color="warning">Hoàn nguyên cơ sở từ {formatDate(v)}</Tag>
         </Tooltip>
       ),
     },
@@ -90,14 +91,7 @@ export function SystemEscalatedCriteriaTab({ onSelectRestaurant }: SystemEscalat
       width: 100,
       align: 'center',
       render: (_, r) => (
-        <Button
-          size="small"
-          type="link"
-          icon={<ArrowRightOutlined />}
-          onClick={() => onSelectRestaurant(r.restaurantId)}
-        >
-          Hồ sơ
-        </Button>
+        <ActionButton tone="view" icon={<ArrowRightOutlined />} tooltip="Xem hồ sơ rủi ro nhà hàng" onClick={() => onSelectRestaurant(r.restaurantId)} />
       ),
     },
   ]

@@ -45,10 +45,11 @@ export function OccurrenceHistoryModal({ open, criterion, onClose }: OccurrenceH
     },
     {
       title: 'Mã lỗi liên quan',
+      className: 'col-code',
       dataIndex: 'findingId',
       key: 'findingId',
       width: 130,
-      render: (id?: number) => (id ? `#${id}` : '—'),
+      render: (id?: number) => (id ? <span className="code-tag--blue">#{id}</span> : '—'),
     },
   ]
 

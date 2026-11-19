@@ -1,11 +1,6 @@
-import {
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-} from '@ant-design/icons'
-import { Button, Flex } from 'antd'
+import { Flex } from 'antd'
 import { useState } from 'react'
-import { useLocation } from 'react-router'
-import type { MenuEntry } from '@/components/layout/menu.types'
+import { SidebarToggleButton } from '@/components/layout/SidebarToggleButton'
 import { NotificationBell } from '@/features/notifications'
 
 const DATE_FORMATTER = new Intl.DateTimeFormat('vi-VN', {
@@ -18,63 +13,16 @@ const DATE_FORMATTER = new Intl.DateTimeFormat('vi-VN', {
 export interface AppHeaderProps {
   collapsed?: boolean
   onToggleSidebar?: () => void
-  menu?: readonly MenuEntry[]
 }
 
-export function AppHeader({ collapsed, onToggleSidebar, menu }: AppHeaderProps) {
-  const { pathname } = useLocation()
+/** Thanh trên cùng: nút thu gọn sidebar (trái), ngày hôm nay và chuông thông báo (phải). Tên trang hiện ở tiêu đề trang. */
+export function AppHeader({ collapsed, onToggleSidebar }: AppHeaderProps) {
   const [todayString] = useState(() => DATE_FORMATTER.format(new Date()))
-
-  const activeEntry = menu
-    ?.filter((m) => pathname === m.path || pathname.startsWith(`${m.path}/`))
-    .sort((a, b) => b.path.length - a.path.length)[0]
 
   return (
     <Flex align="center" justify="space-between" style={{ height: '100%', width: '100%' }}>
-      <Flex align="center" gap={12} style={{ minWidth: 0, overflow: 'hidden' }}>
-        {onToggleSidebar && (
-          <Button
-            type="text"
-            className="glass-pill-btn"
-            icon={
-              collapsed ? (
-                <MenuUnfoldOutlined style={{ color: '#ffffff', fontSize: 16 }} />
-              ) : (
-                <MenuFoldOutlined style={{ color: '#ffffff', fontSize: 16 }} />
-              )
-            }
-            onClick={onToggleSidebar}
-            aria-label={collapsed ? 'Mở thanh điều hướng' : 'Thu gọn thanh điều hướng'}
-            style={{
-              width: 34,
-              height: 34,
-              borderRadius: 8,
-              flexShrink: 0,
-            }}
-          />
-        )}
-
-        {activeEntry && (
-          <Flex align="center" gap={6} style={{ fontSize: 13.5, userSelect: 'none', minWidth: 0, overflow: 'hidden' }}>
-            {activeEntry.group && (
-              <span className="app-header-breadcrumb-group" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                <span style={{ color: 'rgba(255, 255, 255, 0.72)', fontWeight: 500 }}>{activeEntry.group}</span>
-                <span style={{ color: 'rgba(255, 255, 255, 0.45)' }}>/</span>
-              </span>
-            )}
-            <span
-              style={{
-                color: '#ffffff',
-                fontWeight: 600,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              {activeEntry.label}
-            </span>
-          </Flex>
-        )}
+      <Flex align="center">
+        {onToggleSidebar && <SidebarToggleButton collapsed={collapsed} onClick={onToggleSidebar} />}
       </Flex>
 
       <Flex align="center" gap={14}>

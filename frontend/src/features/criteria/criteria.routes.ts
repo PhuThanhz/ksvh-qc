@@ -7,17 +7,17 @@ const READ = PERMISSIONS.CRITERIA.READ
 export const criteriaAdminRoutes: AppRoute[] = [
   {
     path: ROUTES.admin.criteriaGroups,
-    handle: { access: READ, menu: { label: 'Nhóm tiêu chí', icon: 'criteriaGroups', group: 'catalog' } },
+    handle: { access: READ, menu: { label: 'Nhóm tiêu chuẩn', icon: 'criteriaGroups', group: 'catalog' } },
     lazy: () => import('@/features/criteria/pages/CriterionGroupPage').then((m) => ({ Component: m.CriterionGroupPage })),
   },
   {
     path: ROUTES.admin.criteria,
-    handle: { access: READ, menu: { label: 'Tiêu chí', icon: 'criteria', group: 'catalog' } },
+    handle: { access: READ, menu: { label: 'Tiêu chí kiểm soát', icon: 'criteria', group: 'catalog' } },
     lazy: () => import('@/features/criteria/pages/CriteriaPage').then((m) => ({ Component: m.CriteriaPage })),
   },
   {
     path: ROUTES.admin.templates,
-    handle: { access: READ, menu: { label: 'Mẫu phiếu chấm', icon: 'templates', group: 'catalog' } },
+    handle: { access: READ, menu: { label: 'Mẫu phiếu kiểm tra', icon: 'templates', group: 'catalog' } },
     lazy: () => import('@/features/criteria/pages/TemplateListPage').then((m) => ({ Component: m.TemplateListPage })),
   },
   {
@@ -27,7 +27,7 @@ export const criteriaAdminRoutes: AppRoute[] = [
   },
   {
     path: ROUTES.admin.riskRules,
-    handle: { access: READ, menu: { label: 'Tần suất & nâng mức', icon: 'riskRules', group: 'catalog' } },
+    handle: { access: READ, menu: { label: 'Quy tắc tái phạm & Nâng mức', icon: 'riskRules', group: 'catalog' } },
     lazy: () => import('@/features/criteria/pages/RiskRulesPage').then((m) => ({ Component: m.RiskRulesPage })),
   },
 ]

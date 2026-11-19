@@ -46,7 +46,7 @@
   font-weight: 500 !important;
   color: rgba(255, 255, 255, 0.88) !important;
   letter-spacing: -0.01em !important;
-  transition: all 0.15s ease !important;
+  transition: background-color 0.18s ease, color 0.18s ease !important;
   border: none !important;
 }
 
@@ -65,9 +65,8 @@
 
 /* Mục đang chọn: Viên nang phát quang trong mờ */
 .app-shell--themed .app-sidebar .ant-menu-item-selected {
+  /* Không dùng backdrop-filter ở đây: vẽ lại hiệu ứng mờ mỗi lần đổi mục làm giật khi chuyển trang. */
   background: rgba(255, 255, 255, 0.2) !important;
-  backdrop-filter: blur(12px) saturate(160%) !important;
-  -webkit-backdrop-filter: blur(12px) saturate(160%) !important;
   border: 1px solid rgba(255, 255, 255, 0.18) !important;
   color: #ffffff !important;
   font-weight: 600 !important;
@@ -76,49 +75,48 @@
 .app-shell--themed .app-sidebar .ant-menu-item-selected :is(.ant-menu-item-icon, a, .ant-menu-title-content) { color: #ffffff !important; }
 
 /* ---------- 3. Tiêu đề trang & Nút hành động (Page Header & Actions) ---------- */
-.app-shell--themed .page-header h2.ant-typography { color: #ffffff !important; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6) !important; font-weight: 700 !important; }
+.app-shell--themed .page-header h2.ant-typography { color: #ffffff !important; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18) !important; font-weight: 700 !important; }
 .app-shell--themed .page-header :is(.page-subtitle, .page-header__subtitle) {
-  color: #ffffff !important;
+  color: rgba(255, 255, 255, 0.88) !important;
   font-weight: 500 !important;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.75), 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18) !important;
 }
 
 /* Nút phụ góc phải tiêu đề: kính trong suốt phản chiếu hình nền */
-.app-shell--themed .page-header__actions .ant-btn:not(.ant-btn-primary):not(:disabled) {
+.app-shell--themed .page-actions .ant-btn:not(.ant-btn-primary):not(:disabled) {
   border: 1px solid rgba(255, 255, 255, 0.28) !important;
-  background: rgba(255, 255, 255, 0.15) !important;
+  background: rgba(15, 23, 42, 0.2) !important;
   color: #ffffff !important;
   font-weight: 500 !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35) !important;
-  box-shadow: 0 4px 14px -4px rgba(0, 0, 0, 0.3) !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
   backdrop-filter: blur(10px) !important;
   -webkit-backdrop-filter: blur(10px) !important;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
-.app-shell--themed .page-header__actions .ant-btn:not(.ant-btn-primary):not(:disabled) .anticon { color: #ffffff !important; }
-.app-shell--themed .page-header__actions .ant-btn:not(.ant-btn-primary):not(:disabled):hover {
-  background: rgba(255, 255, 255, 0.25) !important;
-  border-color: rgba(255, 255, 255, 0.45) !important;
+.app-shell--themed .page-actions .ant-btn:not(.ant-btn-primary):not(:disabled) .anticon { color: #ffffff !important; }
+.app-shell--themed .page-actions .ant-btn:not(.ant-btn-primary):not(:disabled):hover {
+  background: rgba(15, 23, 42, 0.32) !important;
+  border-color: rgba(255, 255, 255, 0.36) !important;
   color: #ffffff !important;
   transform: translateY(-1px);
 }
 
-/* Nút chính Sapphire Blue Gradient rực rỡ nổi bật */
+/* Nút chính: xanh phẳng một màu, không viền sáng, không đổ bóng chữ */
 .app-shell--themed :is(.ant-btn-primary, .ant-btn-color-primary, .ant-dropdown-button .ant-btn-primary):not(.ant-btn-dangerous):not(:disabled) {
-  border: 1px solid rgba(255, 255, 255, 0.35) !important;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 55%, #1d4ed8 100%) !important;
+  border: 1px solid #2563eb !important;
+  background: #2563eb !important;
   color: #ffffff !important;
   font-weight: 600 !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
-  box-shadow: 0 4px 18px rgba(37, 99, 235, 0.45), 0 1px 3px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.38) !important;
-  transition: all 0.2s ease !important;
+  text-shadow: none !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.18) !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease !important;
 }
 .app-shell--themed :is(.ant-btn-primary, .ant-btn-color-primary, .ant-dropdown-button .ant-btn-primary) .anticon { color: #ffffff !important; }
 .app-shell--themed :is(.ant-btn-primary, .ant-btn-color-primary, .ant-dropdown-button .ant-btn-primary):not(.ant-btn-dangerous):not(:disabled):hover {
-  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 55%, #2563eb 100%) !important;
-  border-color: rgba(255, 255, 255, 0.5) !important;
-  box-shadow: 0 6px 22px rgba(37, 99, 235, 0.6), 0 2px 6px rgba(0, 0, 0, 0.2) !important;
-  transform: translateY(-1px);
+  background: #1d4ed8 !important;
+  border-color: #1d4ed8 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.18) !important;
 }
 
 /* ---------- 4. Khối nội dung nổi (Floating Surfaces) ---------- */
@@ -184,49 +182,145 @@ input::placeholder, textarea::placeholder, .ant-input::placeholder, .ant-picker-
 .ant-tabs-tab:hover { color: #0f172a !important; background: rgba(15, 23, 42, 0.04) !important; }
 .ant-tabs-tab-active,
 .app-shell--themed .ant-tabs-tab-active {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 55%, #1d4ed8 100%) !important;
-  box-shadow: 0 3px 12px rgba(37, 99, 235, 0.35) !important;
+  background: #eff6ff !important;
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.22) !important;
 }
 .ant-tabs-tab-active .ant-tabs-tab-btn,
 .app-shell--themed .ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: #ffffff !important;
+  color: #1d4ed8 !important;
   font-weight: 600 !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+  text-shadow: none !important;
 }
 .ant-tabs-tab-active .anticon,
-.app-shell--themed .ant-tabs-tab-active .anticon { color: #ffffff !important; }
+.app-shell--themed .ant-tabs-tab-active .anticon { color: #2563eb !important; }
 .ant-tabs-ink-bar { display: none !important; }
 
-/* Thanh phân đoạn Segmented: Chống trắng toát, thumb trượt xanh Sapphire nổi bật */
+/* Thanh phân đoạn Segmented: thống nhất với Tabs — rãnh trắng, mục chọn nền xanh nhạt chữ xanh đậm */
 .app-shell--themed .ant-segmented,
 .ant-segmented {
-  background: rgba(15, 23, 42, 0.08) !important;
+  background: #ffffff !important;
   border: 1px solid rgba(15, 23, 42, 0.12) !important;
-  border-radius: 9px !important;
-  padding: 3px !important;
+  border-radius: 12px !important;
+  padding: 4px !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04) !important;
 }
 .app-shell--themed .ant-segmented :is(.ant-segmented-thumb, .ant-segmented-item-selected),
 .ant-segmented :is(.ant-segmented-thumb, .ant-segmented-item-selected) {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 55%, #1d4ed8 100%) !important;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35) !important;
-  border-radius: 7px !important;
-  color: #ffffff !important;
+  background: #eff6ff !important;
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.22) !important;
+  border-radius: 8px !important;
 }
 .app-shell--themed .ant-segmented .ant-segmented-item,
 .ant-segmented .ant-segmented-item {
-  color: #334155 !important;
+  color: #475569 !important;
   font-weight: 500 !important;
-  font-size: 13px !important;
-  border-radius: 7px !important;
-  transition: all 0.2s ease !important;
+  font-size: 13.5px !important;
+  border-radius: 8px !important;
+  transition: color 0.15s ease, background-color 0.15s ease !important;
 }
 .app-shell--themed .ant-segmented .ant-segmented-item:hover:not(.ant-segmented-item-selected) {
   color: #0f172a !important;
-  background: rgba(15, 23, 42, 0.05) !important;
+  background: rgba(15, 23, 42, 0.04) !important;
 }
 .app-shell--themed .ant-segmented .ant-segmented-item-selected :is(.ant-segmented-item-label, .ant-segmented-item-icon),
 .ant-segmented .ant-segmented-item-selected :is(.ant-segmented-item-label, .ant-segmented-item-icon) {
-  color: #ffffff !important;
+  color: #1d4ed8 !important;
   font-weight: 600 !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+  text-shadow: none !important;
 }
+
+
+/* ---------- Thanh tìm kiếm & lọc (AdvancedFilter): kính mờ trong suốt trên nền ảnh, một hàng gọn ---------- */
+.advanced-filter .ant-input-affix-wrapper,
+.advanced-filter .ant-picker,
+.advanced-filter .ant-select .ant-select-selector,
+.advanced-filter .ant-select.ant-select-outlined {
+  min-height: 38px;
+  /* Kính mờ tông tối: đủ đặc để chữ trắng luôn rõ trên mọi ảnh nền (sáng hay tối). */
+  background: rgba(15, 23, 42, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 2px 10px -6px rgba(0, 0, 0, 0.25) !important;
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  transition: background-color 0.15s ease, border-color 0.15s ease !important;
+}
+.advanced-filter :is(.ant-input-affix-wrapper, .ant-picker, .ant-select.ant-select-outlined):hover {
+  background: rgba(15, 23, 42, 0.28) !important;
+  border-color: rgba(255, 255, 255, 0.36) !important;
+}
+.advanced-filter :is(.ant-input-affix-wrapper-focused, .ant-picker-focused, .ant-select-focused),
+.app-shell--themed .advanced-filter :is(.search-input--transparent.ant-input-affix-wrapper-focused, .search-input--transparent.ant-input-affix-wrapper:focus-within) {
+  background: rgba(15, 23, 42, 0.32) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15) !important;
+  outline: none !important;
+}
+.app-shell--themed .advanced-filter .search-input--transparent input.ant-input {
+  color: #ffffff !important;
+}
+.app-shell--themed .advanced-filter .search-input--transparent input.ant-input::placeholder {
+  color: rgba(255, 255, 255, 0.72) !important;
+}
+.app-shell--themed .advanced-filter .search-input--transparent .ant-input-prefix {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+.app-shell--themed .advanced-filter .search-input--transparent .ant-input-clear-icon {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+.advanced-filter .ant-input-affix-wrapper { font-size: 14px; padding-inline: 12px !important; }
+.advanced-filter :is(.ant-input, .ant-picker-input > input, .ant-select-selection-item, .ant-select-selection-search-input) {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+.advanced-filter :is(.ant-input, .ant-picker-input > input)::placeholder { color: rgba(255, 255, 255, 0.7) !important; }
+.advanced-filter :is(.ant-select-selection-placeholder, .ant-select-placeholder) { color: rgba(255, 255, 255, 0.7) !important; }
+.advanced-filter :is(.anticon, .ant-select-arrow, .ant-select-suffix, .ant-picker-suffix, .ant-picker-separator, .ant-input-clear-icon, .ant-select-clear) {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+.advanced-filter .ant-select-clear, .advanced-filter .ant-picker-clear { background: transparent !important; }
+.advanced-filter .ant-btn { height: 38px; border-radius: 10px !important; }
+.advanced-filter :is(.filter-count, .ant-typography-secondary) {
+  color: rgba(255, 255, 255, 0.9) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+.advanced-filter .filter-count strong { color: #ffffff; }
+.advanced-filter :is(.filter-toggle, .filter-reset):not(:disabled) {
+  color: #ffffff !important;
+  background: rgba(15, 23, 42, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  outline: none !important;
+  box-shadow: none !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.advanced-filter :is(.filter-toggle, .filter-reset):not(:disabled):hover {
+  background: rgba(15, 23, 42, 0.35) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  color: #ffffff !important;
+}
+.advanced-filter :is(.filter-toggle, .filter-reset):focus,
+.advanced-filter :is(.filter-toggle, .filter-reset):focus-visible,
+.advanced-filter :is(.filter-toggle, .filter-reset).ant-btn:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+}
+/* Nút "Bộ lọc" khi đang mở: giữ kính mờ cao cấp, chữ trắng, tuyệt đối không bị khối trắng đặc hay viền xanh chói */
+.advanced-filter .filter-toggle.filter-toggle--open:not(:disabled) {
+  background: rgba(255, 255, 255, 0.22) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.55) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  outline: none !important;
+}
+.advanced-filter .filter-toggle.filter-toggle--open:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.28) !important;
+  border-color: rgba(255, 255, 255, 0.65) !important;
+  color: #ffffff !important;
+}
+.advanced-filter .filter-toggle.filter-toggle--open .anticon {
+  color: #ffffff !important;
+}
+.advanced-filter .advanced-filter__panel { animation: page-enter 0.18s cubic-bezier(0.16, 1, 0.3, 1); }

@@ -8,6 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 import vn.ksvh.qc.criteria.domain.*;
 import vn.ksvh.qc.criteria.dto.CriterionGroupRequest;
 import vn.ksvh.qc.criteria.dto.CriterionRequest;
+import vn.ksvh.qc.criteria.dto.RiskLevelItem;
+import vn.ksvh.qc.criteria.dto.RiskLevelVersionRequest;
 import vn.ksvh.qc.criteria.dto.TemplateRequest;
 import vn.ksvh.qc.organization.api.CompanyLookupApi;
 import vn.ksvh.qc.organization.api.CompanyRef;
@@ -15,11 +17,15 @@ import vn.ksvh.qc.shared.error.BusinessException;
 import vn.ksvh.qc.shared.error.ErrorCode;
 import vn.ksvh.qc.shared.excel.*;
 import vn.ksvh.qc.shared.excel.ExcelImporter.Outcome;
+import vn.ksvh.qc.shared.util.BusinessDates;
 
+import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/** Nhập / xuất Excel danh mục 5 (nhóm tiêu chí, tiêu chí) và 6 (mẫu phiếu). */
+/** Nhập / xuất Excel danh mục 5 (nhóm tiêu chí, tiêu chí), 6 (mẫu phiếu) và 7 (phân loại rủi ro). */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -32,15 +38,20 @@ public class CriteriaExcelService {
     static final String T_CODE = "Mã mẫu phiếu", T_NAME = "Tên mẫu phiếu", T_COMPANY = "Mã công ty",
             T_TYPE = "Loại kiểm tra", T_DESC = "Mô tả";
     static final String I_TEMPLATE = "Mã mẫu phiếu", I_CRITERION = "Mã tiêu chí", I_ORDER = "Thứ tự";
+    static final String R_CODE = "Mã mức", R_NAME = "Tên mức", R_MAX = "Điểm trần (<)",
+            R_DAYS = "Hạn khắc phục (ngày)", R_ACTION = "Hành động bắt buộc", R_EFFECTIVE = "Ngày hiệu lực";
     private static final List<String> YES_NO = List.of("Có", "Không");
 
     private final CriterionGroupRepository groupRepository;
     private final CriterionRepository criterionRepository;
     private final InspectionTemplateRepository templateRepository;
+    private final RiskLevelRepository riskLevelRepository;
+    private final RiskConfigService riskConfigService;
     private final CriterionService criterionService;
     private final TemplateService templateService;
     private final CompanyLookupApi companyLookupApi;
     private final ExcelImporter importer;
+    private final Clock clock;
 
     // ---------- Nhóm tiêu chí & tiêu chí ----------
 
@@ -277,5 +288,105 @@ public class CriteriaExcelService {
         }
         return companyLookupApi.findByCode(code).map(CompanyRef::id)
                 .orElseThrow(() -> new ExcelCellException(column, "Không tìm thấy công ty có mã \"%s\"".formatted(code)));
+    }
+
+    // ---------- Phân loại rủi ro (danh mục 7) ----------
+
+    private record RiskLevelRow(String code, String name, BigDecimal maxScore, Integer remediationDays, String action, LocalDate effectiveFrom) {}
+
+    private static ExcelSheet<RiskLevelRow> riskLevelSheet(List<RiskLevelRow> rows) {
+        return ExcelSheet.of("Phân loại rủi ro", "BẢNG PHÂN LOẠI MỨC RỦI RO", rows)
+                .column(R_CODE, 14, RiskLevelRow::code).required().note("Mã mức (VD: M1, M2, M3, M4).")
+                .column(R_NAME, 24, RiskLevelRow::name).required().note("Tên mức rủi ro (VD: Thấp, Trung bình, Cao, Nghiêm trọng).")
+                .column(R_MAX, 18, RiskLevelRow::maxScore).note("Điểm trần (<). Mức cao nhất để trống = không giới hạn trên.")
+                .column(R_DAYS, 22, RiskLevelRow::remediationDays).required().note("Hạn khắc phục tính theo ngày (số nguyên > 0).")
+                .column(R_ACTION, 45, RiskLevelRow::action).wrap().note("Hành động bắt buộc khi xảy ra vi phạm.")
+                .column(R_EFFECTIVE, 18, RiskLevelRow::effectiveFrom).note("Ngày bắt đầu hiệu lực (YYYY-MM-DD). Để trống = hôm nay.");
+    }
+
+    public byte[] exportRiskLevels() {
+        List<RiskLevel> levels = riskLevelRepository.findAllByOrderByEffectiveFromDescMinScoreAsc();
+        List<RiskLevelRow> rows = levels.stream().map(r -> new RiskLevelRow(
+                r.getCode(), r.getName(), r.getMaxScore(), r.getRemediationDays(), r.getAction(), r.getEffectiveFrom()
+        )).toList();
+        return ExcelWriter.export(List.of(riskLevelSheet(rows)));
+    }
+
+    public byte[] riskLevelsTemplate() {
+        LocalDate today = BusinessDates.today(clock);
+        List<RiskLevelRow> sample = List.of(
+                new RiskLevelRow("M1", "Thấp", BigDecimal.valueOf(1.0), 60, "Theo dõi và chuẩn hoá", today),
+                new RiskLevelRow("M2", "Trung bình", BigDecimal.valueOf(6.0), 30, "Khắc phục có kế hoạch", today),
+                new RiskLevelRow("M3", "Cao", BigDecimal.valueOf(12.0), 7, "Khắc phục, phòng ngừa và kiểm tra lại", today),
+                new RiskLevelRow("M4", "Nghiêm trọng", null, 1, "Lập biên bản, báo cáo lãnh đạo", today)
+        );
+        return ExcelWriter.template(List.of(riskLevelSheet(sample)), List.of(
+                "Cấu hình các mức rủi ro M1–M4 theo khoảng điểm liền nhau.",
+                "Điểm bắt đầu tự tính từ 0. Điểm trần của mức trước là điểm sàn của mức kế tiếp.",
+                "Mức rủi ro cao nhất (cuối cùng) để trống ô Điểm trần (<) nghĩa là không giới hạn trên.",
+                "Ngày hiệu lực có thể để trống (mặc định lấy hôm nay) hoặc đặt ngày trong tương lai."
+        ));
+    }
+
+    @Transactional
+    public ImportResult importRiskLevels(MultipartFile file, boolean commit, Long actorId) {
+        try (ExcelImportFile excel = ExcelImportFile.open(file)) {
+            List<ExcelRow> rows = excel.rows(riskLevelSheet(List.of()), false);
+            if (rows.isEmpty()) {
+                throw new BusinessException(ErrorCode.EXCEL_INVALID_FILE,
+                        "File không có dòng dữ liệu nào ở sheet \"Phân loại rủi ro\"");
+            }
+            ExcelImporter.Session session = importer.start(commit);
+
+            // Gom các dòng theo ngày hiệu lực
+            Map<LocalDate, List<ExcelRow>> byDate = new LinkedHashMap<>();
+            LocalDate defaultDate = BusinessDates.today(clock);
+            for (ExcelRow r : rows) {
+                LocalDate d = r.date(R_EFFECTIVE);
+                if (d == null) d = defaultDate;
+                byDate.computeIfAbsent(d, k -> new ArrayList<>()).add(r);
+            }
+
+            for (Map.Entry<LocalDate, List<ExcelRow>> entry : byDate.entrySet()) {
+                LocalDate effDate = entry.getKey();
+                List<ExcelRow> groupRows = entry.getValue();
+                List<RiskLevelItem> items = new ArrayList<>();
+                BigDecimal min = BigDecimal.ZERO;
+
+                for (ExcelRow r : groupRows) {
+                    String code = r.text(R_CODE);
+                    String name = r.text(R_NAME);
+                    BigDecimal max = r.decimal(R_MAX);
+                    Integer days = r.integer(R_DAYS);
+                    String action = r.text(R_ACTION);
+
+                    if (code == null || code.isBlank()) {
+                        throw new ExcelCellException(R_CODE, "Mã mức không được để trống");
+                    }
+                    if (name == null || name.isBlank()) {
+                        throw new ExcelCellException(R_NAME, "Tên mức không được để trống");
+                    }
+                    if (days == null || days <= 0) {
+                        throw new ExcelCellException(R_DAYS, "Hạn khắc phục phải lớn hơn 0");
+                    }
+
+                    items.add(new RiskLevelItem(code, name, min, max, days, action));
+                    if (max != null) {
+                        min = max;
+                    }
+                }
+
+                session.rows(groupRows, row -> {
+                    if (row == groupRows.get(groupRows.size() - 1)) {
+                        if (commit) {
+                            riskConfigService.saveRiskLevelVersion(new RiskLevelVersionRequest(effDate, items), actorId);
+                        }
+                        return Outcome.CREATED;
+                    }
+                    return Outcome.CREATED;
+                });
+            }
+            return session.finish();
+        }
     }
 }

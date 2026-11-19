@@ -10,6 +10,9 @@ export const antdTheme: ThemeConfig = {
     colorSuccess: '#16a34a',
     colorWarning: '#d97706',
     colorError: '#dc2626',
+    colorLink: '#0f172a',
+    colorLinkHover: '#2563eb',
+    colorLinkActive: '#1e40af',
 
     colorPrimaryBg: 'rgba(37, 99, 235, 0.06)',
     colorPrimaryBgHover: 'rgba(37, 99, 235, 0.10)',
@@ -66,11 +69,11 @@ export const antdTheme: ThemeConfig = {
       borderRadius: 8,
     },
     Segmented: {
-      itemSelectedBg: '#2563eb',
-      itemSelectedColor: '#ffffff',
-      itemColor: '#334155',
+      itemSelectedBg: '#eff6ff',
+      itemSelectedColor: '#1d4ed8',
+      itemColor: '#475569',
       itemHoverColor: '#0f172a',
-      trackBg: '#f1f5f9',
+      trackBg: '#ffffff',
     },
     Modal: {
       borderRadiusLG: 24,

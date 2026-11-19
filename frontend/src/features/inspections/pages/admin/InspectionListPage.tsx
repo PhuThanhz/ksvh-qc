@@ -63,15 +63,15 @@ export function InspectionListPage() {
   const onConfirmCancel = async () => {
     if (!cancelDialog.id) return
     if (!cancelDialog.reason.trim()) {
-      notify.error('Vui lòng nhập lý do huỷ phiếu')
+      notify.error('Vui lòng nhập lý do huỷ đợt kiểm tra')
       return
     }
     try {
       await cancel.mutateAsync({ id: cancelDialog.id, body: { reason: cancelDialog.reason.trim() } })
-      notify.success('Đã huỷ phiếu chấm')
+      notify.success('Đã huỷ đợt kiểm tra')
       setCancelDialog({ open: false, reason: '' })
     } catch (err: unknown) {
-      notify.error((err as { message?: string })?.message ?? 'Không thể huỷ phiếu')
+      notify.error((err as { message?: string })?.message ?? 'Không thể huỷ đợt kiểm tra')
     }
   }
 
@@ -79,10 +79,10 @@ export function InspectionListPage() {
     const list = inspections.data?.items ?? []
     if (list.length === 0) return
     exportToCsv(
-      `danh-sach-phieu-cham-${dayjs().format('YYYYMMDD')}`,
+      `danh-sach-bien-ban-kiem-tra-${dayjs().format('YYYYMMDD')}`,
       [
-        { header: 'Mã phiếu', accessor: (i) => i.code },
-        { header: 'Nhà hàng', accessor: (i) => i.restaurantName },
+        { header: 'Mã biên bản', accessor: (i) => i.code },
+        { header: 'Cơ sở', accessor: (i) => i.restaurantName },
         { header: 'Mẫu / Chuyên đề', accessor: (i) => i.templateName ?? (i.topicNames.join(', ') || 'Chuyên đề') },
         { header: 'Loại', accessor: (i) => INSPECTION_KIND_LABEL[i.inspectionType] },
         { header: 'Hình thức', accessor: (i) => INSPECTION_MODE_LABEL[i.inspectionMode] },
@@ -103,8 +103,8 @@ export function InspectionListPage() {
 
   return (
     <PageContainer
-      title="Phiếu chấm kiểm soát"
-      subtitle="Quản lý và theo dõi quá trình thực hiện chấm điểm vận hành tại các nhà hàng"
+      title="Biên bản kiểm tra KSVH"
+      subtitle="Quản lý và giám sát quá trình thực hiện đánh giá kiểm soát vận hành tại các cơ sở"
       extra={
         <Space size={8}>
           <Button icon={<DownloadOutlined />} onClick={onExportInspections} disabled={!inspections.data?.items?.length}>

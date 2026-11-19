@@ -64,4 +64,24 @@ public class CriteriaExcelController {
                                         @AuthenticationPrincipal Jwt jwt) {
         return service.importTemplates(file, commit, CurrentUser.from(jwt).id());
     }
+
+    @GetMapping("/risk-levels/export")
+    @PreAuthorize(CriterionController.CAN_READ)
+    public ResponseEntity<byte[]> exportRiskLevels() {
+        return ExcelResponses.file("Bang-phan-loai-rui-ro", service.exportRiskLevels());
+    }
+
+    @GetMapping("/risk-levels/import-template")
+    @PreAuthorize(CriterionController.CAN_MANAGE)
+    public ResponseEntity<byte[]> riskLevelsTemplate() {
+        return ExcelResponses.file("Mau-nhap-phan-loai-rui-ro", service.riskLevelsTemplate());
+    }
+
+    @PostMapping(value = "/risk-levels/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize(CriterionController.CAN_MANAGE)
+    public ImportResult importRiskLevels(@RequestPart("file") MultipartFile file,
+                                         @RequestParam(defaultValue = "false") boolean commit,
+                                         @AuthenticationPrincipal Jwt jwt) {
+        return service.importRiskLevels(file, commit, CurrentUser.from(jwt).id());
+    }
 }

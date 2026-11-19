@@ -1,8 +1,10 @@
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
-import { Button, Card, Space, Table, Tooltip } from 'antd'
+import { Card, Space, Table } from 'antd'
 import { ConfigStatusTag } from '@/features/criteria/components/ConfigStatusTag'
+import { RiskLevelTag } from '@/components/data-display/RiskLevelTag'
 import type { RiskLevelVersion } from '@/features/criteria/criteria.types'
 import { formatDate, formatDateTime } from '@/utils/format-date'
+import { ActionButton } from '@/components/data-display/TableActions'
 
 interface Props {
   versions: readonly RiskLevelVersion[]
@@ -33,7 +35,13 @@ export function RiskLevelVersionsCard({ versions, loading, selectedDate, editabl
           {
             title: 'Các mức',
             key: 'levels',
-            render: (_, v) => v.levels.map((l) => `${l.code} (${l.remediationDays} ngày)`).join(' · '),
+            render: (_, v) => (
+              <Space size={4} wrap>
+                {v.levels.map((l) => (
+                  <RiskLevelTag key={l.code} code={l.code} />
+                ))}
+              </Space>
+            ),
           },
           {
             title: 'Cập nhật',
@@ -46,14 +54,15 @@ export function RiskLevelVersionsCard({ versions, loading, selectedDate, editabl
             key: 'actions',
             width: 96,
             render: (_, v) => (
-              <Space size={0}>
-                <Tooltip title={v.status === 'SCHEDULED' ? 'Sửa phiên bản' : 'Xem / tạo phiên bản mới từ bản này'}>
-                  <Button type="text" icon={<EditOutlined />} aria-label="Chọn phiên bản" onClick={() => onSelect(v.effectiveFrom)} />
-                </Tooltip>
+              <Space size={6}>
+                <ActionButton
+                  tone="edit"
+                  icon={<EditOutlined />}
+                  tooltip={v.status === 'SCHEDULED' ? 'Sửa phiên bản' : 'Xem / tạo phiên bản mới từ bản này'}
+                  onClick={() => onSelect(v.effectiveFrom)}
+                />
                 {editable && v.status === 'SCHEDULED' && (
-                  <Tooltip title="Xoá phiên bản">
-                    <Button type="text" danger icon={<DeleteOutlined />} aria-label="Xoá phiên bản" onClick={() => onDelete(v)} />
-                  </Tooltip>
+                  <ActionButton tone="delete" icon={<DeleteOutlined />} tooltip="Xoá phiên bản" onClick={() => onDelete(v)} />
                 )}
               </Space>
             ),

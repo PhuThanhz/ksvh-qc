@@ -22,6 +22,7 @@ import {
 import { applyFieldErrors, getErrorMessage } from '@/lib/http'
 import { PERMISSIONS, ProtectedAction } from '@/permissions'
 import { formatDate, formatDateTime } from '@/utils/format-date'
+import { ActionButton } from '@/components/data-display/TableActions'
 
 /** Danh mục 8: kỳ đếm tần suất, theo phiên bản ngày hiệu lực. */
 export function FrequencyCard() {
@@ -63,7 +64,7 @@ export function FrequencyCard() {
 
   return (
     <Card
-      title="Cấu hình tần suất (kỳ đếm lỗi)"
+      title="Chu kỳ theo dõi vi phạm (Tần suất tái diễn)"
       extra={
         <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
           <Button
@@ -81,8 +82,7 @@ export function FrequencyCard() {
     >
       {current && (
         <Typography.Paragraph type="secondary" style={{ marginBottom: 12 }}>
-          Đang áp dụng từ {formatDate(current.effectiveFrom)}: tần suất = số lần "Không đạt" của cùng tiêu chí tại cùng nhà
-          hàng trong {current.periodMonths} tháng dương lịch gần nhất (gồm tháng hiện tại).
+          Đang áp dụng từ {formatDate(current.effectiveFrom)}: Tần suất tái phạm được tính theo tổng số lần đánh giá "Không đạt" đối với cùng một tiêu chí tại cùng một cơ sở trong {current.periodMonths} tháng dương lịch gần nhất (bao gồm tháng hiện tại).
         </Typography.Paragraph>
       )}
       <Table<FrequencyConfig>
@@ -92,7 +92,7 @@ export function FrequencyCard() {
         dataSource={configs.data}
         pagination={false}
         columns={[
-          { title: 'Kỳ đếm', dataIndex: 'periodMonths', render: (m: number) => <strong>{m} tháng</strong> },
+          { title: 'Chu kỳ theo dõi', dataIndex: 'periodMonths', render: (m: number) => <strong>{m} tháng</strong> },
           { title: 'Hiệu lực từ', dataIndex: 'effectiveFrom', render: formatDate },
           { title: 'Trạng thái', dataIndex: 'status', render: (s: ConfigStatus) => <ConfigStatusTag status={s} /> },
           { title: 'Ghi chú', dataIndex: 'note', render: (n: string | null) => n ?? '—' },
@@ -115,7 +115,7 @@ export function FrequencyCard() {
             render: (_: unknown, c: FrequencyConfig) =>
               c.status === 'SCHEDULED' && (
                 <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-                  <Button type="text" danger icon={<DeleteOutlined />} aria-label="Xoá phiên bản" onClick={() => void onDelete(c)} />
+                  <ActionButton tone="delete" icon={<DeleteOutlined />} tooltip="Xoá phiên bản" onClick={() => void onDelete(c)} />
                 </ProtectedAction>
               ),
           },
@@ -123,7 +123,7 @@ export function FrequencyCard() {
       />
       <Modal
         open={open}
-        title="Thêm phiên bản cấu hình tần suất"
+        title="Thiết lập phiên bản chu kỳ theo dõi vi phạm"
         okText="Lưu"
         cancelText="Huỷ"
         centered
@@ -139,7 +139,7 @@ export function FrequencyCard() {
           <FormNumber
             control={control}
             name="periodMonths"
-            label="Kỳ đếm (tháng)"
+            label="Chu kỳ theo dõi (tháng)"
             required
             min={FREQUENCY_PERIOD_MIN}
             max={FREQUENCY_PERIOD_MAX}
@@ -163,7 +163,7 @@ export function FrequencyCard() {
             label="Hiệu lực từ ngày"
             required
             disabledDate={(d) => d.isBefore(dayjs(), 'day')}
-            extra="Không áp dụng ngược quá khứ. Phiên bản cũ giữ nguyên để tính lại đúng lịch sử."
+            extra="Ngày bắt đầu có hiệu lực mới. Dữ liệu trong quá khứ được giữ nguyên để đối soát lịch sử."
           />
           <FormInput control={control} name="note" label="Ghi chú" maxLength={500} />
         </Form>

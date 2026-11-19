@@ -4,6 +4,7 @@ import { StatusBadge, type BadgeTone } from '@/components/data-display/StatusBad
 import { TableActions } from '@/components/data-display/TableActions'
 import type { Employee } from '@/features/employees/employees.types'
 import { PERMISSIONS } from '@/permissions'
+import { actionColumnWidth } from '@/components/data-display/tableActions.utils'
 
 type ActiveKey = 'active' | 'inactive'
 const ACTIVE_META: Record<ActiveKey, { label: string; tone: BadgeTone }> = {
@@ -35,27 +36,28 @@ export function EmployeeTable({ onView, onEdit, onDelete, ...props }: EmployeeTa
             ((props.params?.page ?? 0) * (props.params?.size ?? 20)) + index + 1,
         },
         {
-          title: 'Mã NV',
+          title: 'Mã nhân sự',
+          className: 'col-code',
           dataIndex: 'employeeCode',
           key: 'employeeCode',
           sorter: true,
-          width: 110,
-          render: (c: string) => <span style={{ whiteSpace: 'nowrap', fontWeight: 600 }}>{c}</span>,
+          width: 120,
+          render: (c: string) => <span className="code-tag--blue">{c}</span>,
         },
         {
-          title: 'Họ tên',
+          title: 'Họ và tên',
           dataIndex: 'fullName',
           key: 'fullName',
           sorter: true,
           width: 180,
           render: (name: string, e: Employee) => (
             <Flex vertical>
-              <span>{name}</span>
+              <span className="cell-title-link" onClick={() => onView(e)}>{name}</span>
               {e.jobTitle && <Typography.Text type="secondary">{e.jobTitle}</Typography.Text>}
             </Flex>
           ),
         },
-        { title: 'Nhà hàng / phòng ban', dataIndex: 'orgUnitName', width: 200, render: dash },
+        { title: 'Đơn vị công tác', dataIndex: 'orgUnitName', width: 200, render: dash },
         {
           title: 'Liên hệ',
           key: 'contact',
@@ -68,21 +70,24 @@ export function EmployeeTable({ onView, onEdit, onDelete, ...props }: EmployeeTa
           ),
         },
         {
-          title: 'Tài khoản',
+          title: 'Tài khoản liên kết',
           dataIndex: 'username',
-          width: 130,
+          width: 150,
           render: (u: string | null) => (u ? <Tag>{u}</Tag> : <Typography.Text type="secondary">Chưa có</Typography.Text>),
         },
         {
           title: 'Trạng thái',
           dataIndex: 'active',
-          width: 130,
+          width: 160,
           render: (active: boolean) => <StatusBadge status={active ? 'active' : 'inactive'} meta={ACTIVE_META} />,
         },
         {
           title: 'Thao tác',
           key: 'actions',
-          width: 140,
+          width: actionColumnWidth(3),
+          // Ghim mép phải bằng CSS sticky (.col-actions), không làm đổi bố cục các cột khác.
+      className: 'col-actions',
+          align: 'center' as const,
           render: (_: unknown, e: Employee) => (
             <TableActions
               onView={() => onView(e)}

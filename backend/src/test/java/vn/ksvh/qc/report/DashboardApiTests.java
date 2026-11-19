@@ -66,8 +66,20 @@ class DashboardApiTests extends ApiTestSupport {
     void requiresReportOrInspectionReadAll() throws Exception {
         mvc.perform(get("/api/v1/reports/dashboard").with(as(1L, PermissionCodes.USER_READ)))
                 .andExpect(status().isForbidden());
-        mvc.perform(get("/api/v1/reports/dashboard").param("months", "24").with(as(1L, PermissionCodes.REPORT_READ)))
+        // Kỳ ngược (từ > đến) và kỳ quá dài bị từ chối.
+        mvc.perform(get("/api/v1/reports/dashboard").param("from", "2026-06-01").param("to", "2026-05-01")
+                        .with(as(1L, PermissionCodes.REPORT_READ)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("REPORT_INVALID_PERIOD"));
+        mvc.perform(get("/api/v1/reports/dashboard").param("from", "2020-01-01").param("to", "2026-01-01")
+                        .with(as(1L, PermissionCodes.REPORT_READ)))
                 .andExpect(status().isBadRequest());
+        // Kỳ tự chọn: biểu đồ xu hướng có đúng số tháng trong kỳ (tháng 2 → tháng 4 = 3 điểm).
+        mvc.perform(get("/api/v1/reports/dashboard").param("from", "2026-02-10").param("to", "2026-04-05")
+                        .with(as(1L, PermissionCodes.REPORT_READ)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.trend.length()").value(3))
+                .andExpect(jsonPath("$.trend[0].month").value("2026-02"));
         mvc.perform(get("/api/v1/reports/dashboard").with(as(1L, PermissionCodes.INSPECTION_READ_ALL)))
                 .andExpect(jsonPath("$.kpis").exists());
     }

@@ -33,4 +33,10 @@ public interface OrgUnitRepository extends JpaRepository<OrgUnit, Long>, JpaSpec
 
     @EntityGraph(attributePaths = "company")
     Optional<OrgUnit> findByCodeIgnoreCase(String code);
+
+    /** Nhà hàng mà user đang là Cửa hàng trưởng. */
+    List<OrgUnit> findByStoreManagerUserIdOrderByCodeAsc(Long userId);
+
+    /** Nhà hàng mà user đang là OBM. */
+    List<OrgUnit> findByObmUserIdOrderByCodeAsc(Long userId);
 }

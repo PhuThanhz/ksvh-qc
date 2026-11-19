@@ -5,6 +5,7 @@ import { TableActions } from '@/components/data-display/TableActions'
 import { ImpactTag } from '@/features/criteria/components/ImpactTag'
 import type { Criterion } from '@/features/criteria/criteria.types'
 import { PERMISSIONS } from '@/permissions'
+import { actionColumnWidth } from '@/components/data-display/tableActions.utils'
 
 const ACTIVE_META = {
   active: { label: 'Đang dùng', tone: 'success' as const },
@@ -24,7 +25,7 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
     <DataTable<Criterion>
       {...props}
       rowKey="id"
-      scroll={{ x: 1250 }}
+      scroll={{ x: 1600 }}
       columns={[
         {
           title: '#',
@@ -35,15 +36,16 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
             ((props.params?.page ?? 0) * (props.params?.size ?? 20)) + index + 1,
         },
         {
-          title: 'Mã',
+          title: 'Mã tiêu chí',
+          className: 'col-code',
           dataIndex: 'code',
           key: 'code',
           sorter: true,
           width: 120,
-          render: (code: string) => <span style={{ whiteSpace: 'nowrap', fontWeight: 600 }}>{code}</span>,
+          render: (code: string) => <span className="code-tag--blue">{code}</span>,
         },
         {
-          title: 'Nhóm tiêu chí',
+          title: 'Nhóm tiêu chuẩn',
           dataIndex: 'groupName',
           key: 'groupName',
           sorter: true,
@@ -69,16 +71,16 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
           ),
         },
         {
-          title: 'Tiêu chí',
+          title: 'Nội dung tiêu chí kiểm soát',
           dataIndex: 'name',
           key: 'name',
           sorter: true,
           width: 320,
           render: (name: string, c: Criterion) => (
             <Flex vertical style={{ minWidth: 0 }}>
-              <Typography.Link onClick={() => onView(c)} style={{ fontWeight: 500 }}>
+              <span className="cell-title-link" onClick={() => onView(c)}>
                 {name}
-              </Typography.Link>
+              </span>
               {c.checkMethod && (
                 <Typography.Text type="secondary" ellipsis={{ tooltip: c.checkMethod }}>
                   {c.checkMethod}
@@ -88,7 +90,7 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
           ),
         },
         {
-          title: 'Mẫu phiếu áp dụng',
+          title: 'Mẫu phiếu kiểm tra',
           dataIndex: 'templates',
           key: 'templates',
           width: 170,
@@ -112,17 +114,20 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
             )
           },
         },
-        { title: 'Ảnh hưởng', dataIndex: 'baseImpact', key: 'baseImpact', sorter: true, width: 100, render: (v: number) => <ImpactTag value={v} /> },
+        { title: 'Mức độ ảnh hưởng', dataIndex: 'baseImpact', key: 'baseImpact', sorter: true, width: 140, render: (v: number) => <ImpactTag value={v} /> },
         {
           title: 'Trạng thái',
           dataIndex: 'active',
-          width: 110,
+          width: 160,
           render: (a: boolean) => <StatusBadge status={a ? 'active' : 'inactive'} meta={ACTIVE_META} />,
         },
         {
           title: 'Thao tác',
           key: 'actions',
-          width: 120,
+          width: actionColumnWidth(3),
+          // Ghim mép phải bằng CSS sticky (.col-actions), không làm đổi bố cục các cột khác.
+      className: 'col-actions',
+          align: 'center' as const,
           render: (_: unknown, c: Criterion) => (
             <TableActions
               onView={() => onView(c)}

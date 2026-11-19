@@ -18,6 +18,8 @@ public interface CriterionRepository extends JpaRepository<Criterion, Long>, Jpa
 
     boolean existsByCodeIgnoreCaseAndIdNot(String code, Long id);
 
+    boolean existsByGroupId(Long groupId);
+
     @Override
     @EntityGraph(attributePaths = "group")
     Page<Criterion> findAll(Specification<Criterion> spec, Pageable pageable);

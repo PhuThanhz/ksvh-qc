@@ -11,14 +11,14 @@ export function OrgUnitPage() {
 
   return (
     <PageContainer
-      title="Đơn vị trực thuộc"
-      subtitle="Quản lý toàn bộ danh sách nhà hàng và phòng ban trực thuộc các công ty"
+      title="Đơn vị & Cơ sở vận hành"
+      subtitle="Quản lý toàn bộ danh mục nhà hàng, chi nhánh cơ sở và phòng ban nghiệp vụ trực thuộc"
       extra={
         <Space size={8} wrap>
           <OrganizationExcelActions />
           <ProtectedAction access={PERMISSIONS.ORGANIZATION.MANAGE}>
             <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>
-              Thêm đơn vị
+              Thêm cơ sở / đơn vị
             </Button>
           </ProtectedAction>
         </Space>

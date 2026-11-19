@@ -123,6 +123,29 @@ public class CriterionService {
         return CriterionGroupResponse.from(saved, count, cName);
     }
 
+    @Transactional
+    @CacheEvict(value = CacheConfig.CRITERIA_GROUPS, allEntries = true)
+    public void deleteGroup(Long id) {
+        CriterionGroup g = loadGroup(id);
+        if (criterionRepository.existsByGroupId(id)) {
+            throw new BusinessException(ErrorCode.CRITERIA_IN_USE,
+                    "Nhóm đang chứa tiêu chí con. Vui lòng chuyển hoặc xoá các tiêu chí con trước khi xoá nhóm.");
+        }
+        try {
+            groupRepository.delete(g);
+            groupRepository.flush();
+            if (eventPublisher != null) {
+                eventPublisher.publishEvent(vn.ksvh.qc.shared.audit.AuditLogEvent.of(
+                        null, "CRITERION_GROUP_DELETE", "CRITERION_GROUP", g.getCode(),
+                        "Xoá nhóm tiêu chí " + g.getName() + " (" + g.getCode() + ")"
+                ));
+            }
+        } catch (DataIntegrityViolationException e) {
+            throw new BusinessException(ErrorCode.CRITERIA_IN_USE,
+                    "Nhóm tiêu chí đang được sử dụng trong hệ thống, không thể xoá.");
+        }
+    }
+
     private String resolveCompanyName(Long companyId) {
         if (companyId == null) return null;
         var refs = companyLookupApi.findRefs(List.of(companyId));

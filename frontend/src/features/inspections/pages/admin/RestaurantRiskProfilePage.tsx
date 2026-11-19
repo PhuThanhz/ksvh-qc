@@ -42,8 +42,8 @@ export function RestaurantRiskProfilePage() {
 
   return (
     <PageContainer
-      title="Hồ sơ rủi ro & Hạ mức ảnh hưởng"
-      subtitle="Theo dõi mức độ ảnh hưởng hiệu lực, tần suất vi phạm lũy tiến và thời điểm dự kiến hạ mức cho từng nhà hàng"
+      title="Hồ sơ rủi ro cơ sở"
+      subtitle="Theo dõi diễn biến rủi ro, tần suất vi phạm lũy tiến và chu kỳ hoàn nguyên mức độ ảnh hưởng theo cơ sở"
     >
       <Tabs
         activeKey={activeTab}

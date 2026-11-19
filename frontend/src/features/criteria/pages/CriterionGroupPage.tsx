@@ -35,14 +35,14 @@ export function CriterionGroupPage() {
 
   return (
     <PageContainer
-      title="Nhóm tiêu chí"
-      subtitle="Quản lý các nhóm đánh giá lớn (Vệ sinh, Kho hàng, Quy trình, Chất lượng...) và phân bổ tiêu chí con"
+      title="Nhóm tiêu chuẩn kiểm soát"
+      subtitle="Quản lý các nhóm tiêu chuẩn vận hành lớn (Vệ sinh VSATTP, Cơ sở vật chất, Quy trình phục vụ...) và danh mục tiêu chí"
       extra={
         <Space size={8} wrap>
           <CriteriaExcelActions />
           <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
             <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateGroupOpen(true)}>
-              Thêm nhóm tiêu chí
+              Thêm nhóm tiêu chuẩn
             </Button>
           </ProtectedAction>
         </Space>
