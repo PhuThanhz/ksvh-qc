@@ -18,6 +18,8 @@ export interface GroupTabProps {
   onEditCriterion?: (criterion: Criterion) => void
   createOpen?: boolean
   onCreateClose?: () => void
+  /** Sau khi tạo nhóm mới. */
+  onGroupCreated?: (group: CriterionGroup) => void
 }
 
 export function GroupTab({
@@ -25,6 +27,7 @@ export function GroupTab({
   onEditCriterion,
   createOpen,
   onCreateClose,
+  onGroupCreated,
 }: GroupTabProps) {
   const [selectedCompanyId, setSelectedCompanyId] = useState<number | undefined>(undefined)
   const [keyword, setKeyword] = useState('')
@@ -144,6 +147,7 @@ export function GroupTab({
         group={formModal.group}
         nextOrder={nextOrder}
         onClose={handleCloseForm}
+        onCreated={onGroupCreated}
       />
 
       {/* Modal xem chi tiết nhóm và danh sách tiêu chí nhỏ */}

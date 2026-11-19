@@ -1,183 +1,127 @@
-import { Flex } from 'antd'
-import { useMemo, useState } from 'react'
+import { Button, Flex, Space, Spin, Typography } from 'antd'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNotify } from '@/components/feedback/useNotify'
 import type { CriterionGroup, CriterionPayload } from '@/features/criteria/criteria.types'
 import { useBatchSaveCriteria, useCriteriaList } from '@/features/criteria/hooks/useCriteria'
 import { getErrorMessage } from '@/lib/http'
-import { BatchActionBar } from './BatchActionBar'
-import { BatchCriterionTable } from './BatchCriterionTable'
+import { BatchCriterionList } from './BatchCriterionList'
 import { BatchPasteBox } from './BatchPasteBox'
-import { getPrefix, type BatchItem } from './batchCriterion.types'
+import { BatchToolbar } from './BatchToolbar'
+import { formatCode, getPrefix, newRow, parsePasted, type BatchItem } from './batchCriterion.types'
 
 export interface BatchCriterionContentProps {
   group: CriterionGroup
   onClose: () => void
-  onSuccess?: () => void
 }
 
-export function BatchCriterionContent({ group, onClose, onSuccess }: BatchCriterionContentProps) {
-  const notify = useNotify()
-  const batchSave = useBatchSaveCriteria()
-  const { data: existingData } = useCriteriaList({ groupId: group.id, page: 0, size: 200 })
-
+/** Chờ tải tiêu chí hiện có của nhóm để mã tự sinh nối tiếp, không trùng mã cũ. */
+export function BatchCriterionContent({ group, onClose }: BatchCriterionContentProps) {
+  const existing = useCriteriaList({ groupId: group.id, page: 0, size: 100 })
+  const prefix = getPrefix(group.code)
   const nextSeq = useMemo(() => {
-    const prefix = getPrefix(group.code)
     let max = 0
-    for (const c of existingData?.items ?? []) {
-      const match = c.code.match(new RegExp(`^${prefix}[-_]?(\\d+)$`, 'i'))
-      if (match && match[1]) {
-        const num = Number.parseInt(match[1], 10)
-        if (!Number.isNaN(num) && num > max) max = num
-      }
+    for (const c of existing.data?.items ?? []) {
+      const m = new RegExp(`^${prefix}[-_]?(\\d+)$`, 'i').exec(c.code)
+      if (m?.[1]) max = Math.max(max, Number.parseInt(m[1], 10))
     }
     return max + 1
-  }, [existingData?.items, group.code])
+  }, [existing.data, prefix])
 
-  const [items, setItems] = useState<BatchItem[]>(() => {
-    const prefix = getPrefix(group.code)
-    return [1, 2, 3].map((idx) => ({
-      key: `init-${idx}`,
-      code: `${prefix}-${idx.toString().padStart(2, '0')}`,
-      name: '',
-      baseImpact: 2,
-      checkMethod: '',
-    }))
+  if (existing.isLoading) return <Flex justify="center" style={{ padding: 48 }}><Spin /></Flex>
+  return <BatchEditor group={group} prefix={prefix} nextSeq={nextSeq} onClose={onClose} />
+}
+
+function BatchEditor({ group, prefix, nextSeq, onClose }: BatchCriterionContentProps & { prefix: string; nextSeq: number }) {
+  const notify = useNotify()
+  const batchSave = useBatchSaveCriteria()
+  const [items, setItems] = useState<BatchItem[]>(() => [newRow()])
+  const [pasteOpen, setPasteOpen] = useState(false)
+  const [pasteText, setPasteText] = useState('')
+
+  // Dòng cần đặt con trỏ sau lần render kế tiếp (mở modal → dòng 1; Enter → dòng sau).
+  const pendingFocus = useRef<number | null>(0)
+  useEffect(() => {
+    if (pendingFocus.current === null) return
+    document.querySelector<HTMLTextAreaElement>(`[data-batch-name="${pendingFocus.current}"]`)?.focus()
+    pendingFocus.current = null
   })
 
-  const [pasteText, setPasteText] = useState('')
-  const [showPasteBox, setShowPasteBox] = useState(false)
-
-  const addRows = (count: number) => {
-    const prefix = getPrefix(group.code)
-    const currentCount = items.length
-    const newRows: BatchItem[] = Array.from({ length: count }).map((_, i) => ({
-      key: `row-${Date.now()}-${i}-${Math.random()}`,
-      code: `${prefix}-${(nextSeq + currentCount + i).toString().padStart(2, '0')}`,
-      name: '',
-      baseImpact: 2,
-      checkMethod: '',
-    }))
-    setItems((prev) => [...prev, ...newRows])
+  const update = <K extends keyof BatchItem>(key: string, field: K, value: BatchItem[K]) =>
+    setItems((prev) => prev.map((it) => (it.key === key ? { ...it, [field]: value } : it)))
+  const addRowAndFocus = (index: number) => {
+    pendingFocus.current = index
+    if (index >= items.length) setItems((prev) => [...prev, newRow()])
+    else setItems((prev) => [...prev])
   }
 
-  const handleDuplicate = (item: BatchItem) => {
-    const prefix = getPrefix(group.code)
-    const newRow: BatchItem = {
-      key: `dup-${Date.now()}-${Math.random()}`,
-      code: `${prefix}-${(nextSeq + items.length).toString().padStart(2, '0')}`,
-      name: `${item.name} (sao chép)`,
-      baseImpact: item.baseImpact,
-      checkMethod: item.checkMethod,
-    }
-    setItems((prev) => [...prev, newRow])
-  }
-
-  const handleApplyPaste = () => {
-    const lines = pasteText
-      .split('\n')
-      .map((l) => l.trim())
-      .filter(Boolean)
-    if (lines.length === 0) return
-    const prefix = getPrefix(group.code)
-    const pasted: BatchItem[] = lines.map((line, idx) => ({
-      key: `paste-${Date.now()}-${idx}`,
-      code: `${prefix}-${(nextSeq + idx).toString().padStart(2, '0')}`,
-      name: line.replace(/^[-*•\d.)\s]+/, '').trim(),
-      baseImpact: 2,
-      checkMethod: '',
-    }))
-    setItems(pasted)
-    setShowPasteBox(false)
+  const applyPaste = (mode: 'replace' | 'append') => {
+    const rows = parsePasted(pasteText)
+    setItems((prev) => [...(mode === 'append' ? prev.filter((r) => r.name.trim()) : []), ...rows.map((r) => newRow(r))])
     setPasteText('')
-    notify.success(`Đã nạp ${pasted.length} dòng từ văn bản dán!`)
+    setPasteOpen(false)
+    notify.success(`Đã thêm ${rows.length} tiêu chí vào danh sách`)
   }
 
-  const handleAutoNumber = () => {
-    const prefix = getPrefix(group.code)
-    setItems((prev) =>
-      prev.map((item, idx) => ({
-        ...item,
-        code: `${prefix}-${(nextSeq + idx).toString().padStart(2, '0')}`,
-      })),
-    )
-    notify.success('Đã tự động đánh lại mã tiêu chí!')
-  }
+  const filled = items.filter((r) => r.name.trim())
+  const firstCode = formatCode(prefix, nextSeq)
+  const lastCode = formatCode(prefix, nextSeq + Math.max(filled.length - 1, 0))
 
-  const handleSave = async () => {
-    const validRows = items.filter((r) => r.name.trim() !== '')
-    if (validRows.length === 0) {
-      notify.error('Vui lòng nhập ít nhất một tiêu chí kiểm soát!')
-      return
-    }
-    const codes = new Set<string>()
-    for (const r of validRows) {
-      const c = r.code.trim().toUpperCase()
-      if (!c) {
-        notify.error('Mã tiêu chí không được để trống!')
-        return
-      }
-      if (codes.has(c)) {
-        notify.error(`Mã tiêu chí "${c}" bị trùng lặp!`)
-        return
-      }
-      codes.add(c)
-    }
-
-    const payloads: CriterionPayload[] = validRows.map((r, idx) => ({
+  const save = async () => {
+    // Mã tự sinh nối tiếp mã lớn nhất hiện có của nhóm.
+    const payloads: CriterionPayload[] = filled.map((r, idx) => ({
       groupId: group.id,
-      code: r.code.trim().toUpperCase(),
+      code: formatCode(prefix, nextSeq + idx),
       name: r.name.trim(),
       baseImpact: r.baseImpact,
       checkMethod: r.checkMethod.trim() || undefined,
-      evidenceRequired: undefined,
-      sortOrder: idx + 1,
+      evidenceRequired: r.evidenceRequired.trim() || undefined,
+      sortOrder: nextSeq + idx,
       active: true,
       templateIds: [],
     }))
-
     try {
       await batchSave.mutateAsync(payloads)
-      notify.success(`Đã thêm thành công ${payloads.length} tiêu chí kiểm soát vào nhóm "${group.name}"!`)
+      notify.success(`Đã thêm ${payloads.length} tiêu chí vào nhóm "${group.name}"`)
       onClose()
-      onSuccess?.()
     } catch (err) {
       notify.error(getErrorMessage(err))
     }
   }
 
-  const validCount = items.filter((r) => r.name.trim() !== '').length
-
   return (
-    <Flex vertical gap={12}>
-      {showPasteBox && (
-        <BatchPasteBox
-          pasteText={pasteText}
-          onChangeText={setPasteText}
-          onClose={() => setShowPasteBox(false)}
-          onApply={handleApplyPaste}
+    <>
+      <div className="batch-modal__body">
+        <BatchToolbar
+          count={filled.length}
+          pasteOpen={pasteOpen}
+          onTogglePaste={() => setPasteOpen((v) => !v)}
+          onApplyImpact={(v) => setItems((p) => p.map((x) => ({ ...x, baseImpact: v })))}
+          onClearEmpty={() => setItems((p) => (p.some((x) => x.name.trim()) ? p.filter((x) => x.name.trim()) : [newRow()]))}
         />
-      )}
-      <BatchCriterionTable
-        items={items}
-        onUpdateItem={(key, field, val) =>
-          setItems((prev) => prev.map((it) => (it.key === key ? { ...it, [field]: val } : it)))
-        }
-        onRemoveItem={(key) => setItems((prev) => prev.filter((it) => it.key !== key))}
-        onDuplicateItem={handleDuplicate}
-      />
-      <BatchActionBar
-        showPasteBox={showPasteBox}
-        validCount={validCount}
-        totalCount={items.length}
-        isPending={batchSave.isPending}
-        onAddRows={addRows}
-        onAutoNumber={handleAutoNumber}
-        onClearEmpty={() => setItems((p) => p.filter((x) => x.name.trim() !== ''))}
-        onChangeCommonImpact={(val) => setItems((p) => p.map((x) => ({ ...x, baseImpact: val })))}
-        onTogglePasteBox={() => setShowPasteBox(!showPasteBox)}
-        onClose={onClose}
-        onSave={handleSave}
-      />
-    </Flex>
+        {pasteOpen && <BatchPasteBox pasteText={pasteText} onChangeText={setPasteText} onClose={() => setPasteOpen(false)} onApply={applyPaste} />}
+        <div className="batch-modal__scroll">
+          <BatchCriterionList
+            items={items}
+            onUpdateItem={update}
+            onRemoveItem={(key) => setItems((p) => (p.length > 1 ? p.filter((it) => it.key !== key) : [newRow()]))}
+            onEnterNext={(i) => addRowAndFocus(i + 1)}
+            onAddRow={() => addRowAndFocus(items.length)}
+          />
+        </div>
+      </div>
+      <div className="batch-modal__footer">
+        <Typography.Text type="secondary" style={{ fontSize: 12.5 }}>
+          {filled.length > 0
+            ? `Mã tự sinh: ${firstCode}${filled.length > 1 ? ` → ${lastCode}` : ''}`
+            : 'Mã tiêu chí được tự sinh khi lưu'}
+        </Typography.Text>
+        <Space size={8}>
+          <Button onClick={onClose}>Huỷ</Button>
+          <Button type="primary" loading={batchSave.isPending} disabled={filled.length === 0} onClick={() => void save()}>
+            {filled.length > 1 ? `Thêm ${filled.length} tiêu chí` : 'Thêm tiêu chí'}
+          </Button>
+        </Space>
+      </div>
+    </>
   )
 }

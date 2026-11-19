@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Col, Flex, Form, Modal, Row, Segmented } from 'antd'
-import { useEffect, useState } from 'react'
+import { Col, Flex, Form, Modal, Row } from 'antd'
+import { useEffect } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { FormInput } from '@/components/data-entry/FormInput'
 import { FormNumber } from '@/components/data-entry/FormNumber'
@@ -12,13 +12,8 @@ import { IMPACT_LEVELS, type Criterion, type CriterionGroup } from '@/features/c
 import { useSaveCriterion } from '@/features/criteria/hooks/useCriteria'
 import { criterionSchema, type CriterionFormValues } from '@/features/criteria/schemas/criteria.schema'
 import { applyFieldErrors, getErrorMessage } from '@/lib/http'
-import { CriterionBatchPane } from './CriterionBatchPane'
+import { CriterionBatchModal } from './CriterionBatchModal'
 
-type CreateMode = 'single' | 'batch'
-const MODE_OPTIONS = [
-  { label: 'Thiết lập đơn lẻ', value: 'single' },
-  { label: 'Nhập hàng loạt', value: 'batch' },
-]
 
 const IMPACT_LABELS: Record<number, string> = {
   1: 'Mức 1 – Rất nhẹ', 2: 'Mức 2 – Nhẹ', 3: 'Mức 3 – Trung bình', 4: 'Mức 4 – Nặng (ATTP)', 5: 'Mức 5 – Nghiêm trọng',
@@ -44,14 +39,8 @@ function emptyValues(groupId?: number): CriterionFormValues {
 export function CriterionFormModal({ open, criterion, groups, defaultGroupId, onClose }: CriterionFormModalProps) {
   const notify = useNotify()
   const save = useSaveCriterion()
-  // Khi thêm mới: chọn nhập một tiêu chí (form chi tiết) hoặc nhiều tiêu chí cùng lúc (bảng nhập nhanh).
-  const [mode, setMode] = useState<CreateMode>('single')
-  const [prevOpen, setPrevOpen] = useState(open)
-  if (open !== prevOpen) {
-    setPrevOpen(open)
-    if (open) setMode('single')
-  }
-  const batch = !criterion && mode === 'batch'
+  // Thêm mới luôn dùng bảng nhập (1 hay nhiều tiêu chí đều được); sửa một tiêu chí dùng form chi tiết.
+  const batch = !criterion
   const { control, handleSubmit, reset, setError } = useForm<CriterionFormValues>({
     resolver: zodResolver(criterionSchema),
     defaultValues: emptyValues(defaultGroupId),
@@ -102,6 +91,17 @@ export function CriterionFormModal({ open, criterion, groups, defaultGroupId, on
 
   const groupId = useWatch({ control, name: 'groupId' })
 
+  if (batch) {
+    return (
+      <CriterionBatchModal
+        open={open}
+        groups={groups}
+        defaultGroupId={groupId ?? defaultGroupId}
+        onClose={onClose}
+      />
+    )
+  }
+
   return (
     <Modal
       open={open}
@@ -111,23 +111,11 @@ export function CriterionFormModal({ open, criterion, groups, defaultGroupId, on
             <span style={{ fontSize: 16, fontWeight: 700 }}>Chỉnh sửa tiêu chí kiểm soát</span>
             <span className="code-tag--blue">{criterion.code}</span>
           </Flex>
-        ) : (
-          <Flex align="center" justify="space-between" wrap gap={12} style={{ paddingRight: 32 }}>
-            <span style={{ fontSize: 16, fontWeight: 700 }}>Thêm mới tiêu chí kiểm soát</span>
-            <Segmented
-              size="small"
-              options={MODE_OPTIONS}
-              value={mode}
-              onChange={(v) => setMode(v as CreateMode)}
-              style={{ fontWeight: 500 }}
-            />
-          </Flex>
-        )
+        ) : null
       }
       okText="Lưu"
       cancelText="Huỷ"
-      width={batch ? 1060 : 760}
-      footer={batch ? null : undefined}
+      width={760}
       centered
       styles={{ body: { maxHeight: 'calc(100vh - 160px)', overflowY: 'auto', paddingRight: 4 } }}
       confirmLoading={save.isPending}
@@ -135,9 +123,6 @@ export function CriterionFormModal({ open, criterion, groups, defaultGroupId, on
       onCancel={onClose}
       destroyOnHidden
     >
-      {batch ? (
-        <CriterionBatchPane groups={groups} defaultGroupId={groupId ?? defaultGroupId} onClose={onClose} />
-      ) : (
       <Form layout="vertical" onFinish={() => void onSubmit()}>
         <button type="submit" hidden />
         <Row gutter={16}>
@@ -196,7 +181,6 @@ export function CriterionFormModal({ open, criterion, groups, defaultGroupId, on
           </Col>
         </Row>
       </Form>
-      )}
     </Modal>
   )
 }

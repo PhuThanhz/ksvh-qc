@@ -18,9 +18,11 @@ export interface GroupFormModalProps {
   /** Thứ tự gợi ý khi thêm mới (sau nhóm cuối). */
   nextOrder: number
   onClose: () => void
+  /** Gọi sau khi tạo nhóm mới thành công (vd. mở ngay bảng thêm tiêu chí hàng loạt). */
+  onCreated?: (group: CriterionGroup) => void
 }
 
-export function GroupFormModal({ open, group, nextOrder, onClose }: GroupFormModalProps) {
+export function GroupFormModal({ open, group, nextOrder, onClose, onCreated }: GroupFormModalProps) {
   const notify = useNotify()
   const save = useSaveGroup()
   const companies = useCompanies({ page: 0, size: 100, active: true })
@@ -59,9 +61,10 @@ export function GroupFormModal({ open, group, nextOrder, onClose }: GroupFormMod
     save.mutate(
       { id: group?.id, body: values },
       {
-        onSuccess: () => {
+        onSuccess: (saved) => {
           notify.success(group ? 'Đã cập nhật nhóm' : 'Đã thêm nhóm')
           onClose()
+          if (!group) onCreated?.(saved)
         },
         onError: (err) => {
           if (!applyFieldErrors(err, setError)) notify.error(getErrorMessage(err))
