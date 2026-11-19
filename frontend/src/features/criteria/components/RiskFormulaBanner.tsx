@@ -1,24 +1,87 @@
-import { Card, Typography } from 'antd'
-import { Link } from 'react-router'
+import {
+  CalendarOutlined,
+  CheckCircleOutlined,
+  RiseOutlined,
+  SafetyCertificateOutlined,
+} from '@ant-design/icons'
+import { Col, Row } from 'antd'
+import { useNavigate } from 'react-router'
+import { KpiCard } from '@/components/data-display/KpiCard'
 import { ROUTES } from '@/constants/routes'
+import type { EscalationRule, FrequencyConfig } from '@/features/criteria/criteria.types'
+import { formatDate } from '@/utils/format-date'
 
-/** Giải thích ngắn công thức điểm rủi ro và vai trò của 2 quy tắc trên trang. */
-export function RiskFormulaBanner() {
+export interface RiskFormulaBannerProps {
+  currentFrequency?: FrequencyConfig
+  currentEscalation?: EscalationRule
+  loading?: boolean
+}
+
+/** Bảng chỉ số cấu hình rủi ro đang áp dụng trên toàn hệ thống. */
+export function RiskFormulaBanner({
+  currentFrequency,
+  currentEscalation,
+  loading,
+}: RiskFormulaBannerProps) {
+  const navigate = useNavigate()
+
   return (
-    <Card className="risk-formula" styles={{ body: { padding: '18px 22px' } }}>
-      <div className="risk-formula__eq">
-        <span className="risk-formula__term">Điểm rủi ro</span>
-        <span className="risk-formula__op">=</span>
-        <span className="risk-formula__term risk-formula__term--a">Mức ảnh hưởng</span>
-        <span className="risk-formula__op">×</span>
-        <span className="risk-formula__term risk-formula__term--b">Tần suất</span>
-      </div>
-      <Typography.Paragraph type="secondary" style={{ margin: '10px 0 0' }}>
-        <b>Tần suất</b> = số lần cùng nhà hàng mắc cùng tiêu chí trong <b>kỳ đếm</b> (thẻ 1).{' '}
-        <b>Mức ảnh hưởng</b> lấy từ tiêu chí, được nâng thêm bậc khi tái phạm đủ ngưỡng (thẻ 2).{' '}
-        Điểm sau đó tra ra mức M1–M4 và hạn khắc phục ở trang{' '}
-        <Link to={ROUTES.admin.riskLevels}>Phân loại rủi ro</Link>.
-      </Typography.Paragraph>
-    </Card>
+    <Row gutter={[16, 16]}>
+      <Col xs={24} sm={12} lg={6}>
+        <KpiCard
+          label="Kỳ đếm tần suất hiện hành"
+          value={currentFrequency ? `${currentFrequency.periodMonths}` : '6'}
+          unit="tháng"
+          icon={<CalendarOutlined />}
+          tone="blue"
+          loading={loading}
+          footnote={
+            currentFrequency
+              ? `Đang áp dụng từ ${formatDate(currentFrequency.effectiveFrom)}`
+              : 'Mặc định hệ thống (6 tháng tính lùi)'
+          }
+        />
+      </Col>
+      <Col xs={24} sm={12} lg={6}>
+        <KpiCard
+          label="Ngưỡng nâng mức khi tái phạm"
+          value={
+            currentEscalation
+              ? `Lần ${currentEscalation.thresholdCount} → +${currentEscalation.stepIncrease}`
+              : 'Không nâng'
+          }
+          unit={currentEscalation ? 'bậc' : undefined}
+          icon={<RiseOutlined />}
+          tone={currentEscalation ? 'warning' : 'neutral'}
+          loading={loading}
+          footnote={
+            currentEscalation
+              ? `Trần tối đa: Mức ${currentEscalation.maxImpact} · Từ ${formatDate(currentEscalation.effectiveFrom)}`
+              : 'Giữ nguyên mức ảnh hưởng gốc của tiêu chí'
+          }
+        />
+      </Col>
+      <Col xs={24} sm={12} lg={6}>
+        <KpiCard
+          label="Chu kỳ hoàn nguyên mức gốc"
+          value={currentEscalation ? `${currentEscalation.resetPeriodMonths}` : '—'}
+          unit={currentEscalation ? 'tháng sạch lỗi' : undefined}
+          icon={<CheckCircleOutlined />}
+          tone="good"
+          loading={loading}
+          footnote="Liên tục không vi phạm lại tiêu chí đó"
+        />
+      </Col>
+      <Col xs={24} sm={12} lg={6}>
+        <KpiCard
+          label="Công thức tính điểm rủi ro"
+          value="Mức × Tần suất"
+          icon={<SafetyCertificateOutlined />}
+          tone="neutral"
+          footnote="Tra thang M1–M4 tại Phân loại rủi ro →"
+          onClick={() => navigate(ROUTES.admin.riskLevels)}
+        />
+      </Col>
+    </Row>
   )
 }

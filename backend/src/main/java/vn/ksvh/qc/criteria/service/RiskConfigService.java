@@ -88,7 +88,7 @@ public class RiskConfigService {
      * Các khoảng phải bắt đầu từ 0, liền nhau, không chồng; mức cuối không giới hạn trên.
      */
     @Transactional
-    @CacheEvict(value = CacheConfig.RISK_LEVELS, allEntries = true)
+    @CacheEvict(value = {CacheConfig.RISK_LEVELS, CacheConfig.RISK_CONFIG_AT}, allEntries = true)
     public RiskLevelVersionResponse saveRiskLevelVersion(RiskLevelVersionRequest req, Long actorId) {
         LocalDate date = req.effectiveFrom();
         if (date.isBefore(BusinessDates.today(clock))) {
@@ -131,7 +131,7 @@ public class RiskConfigService {
 
     /** Chỉ xoá được phiên bản chưa đến ngày hiệu lực. */
     @Transactional
-    @CacheEvict(value = CacheConfig.RISK_LEVELS, allEntries = true)
+    @CacheEvict(value = {CacheConfig.RISK_LEVELS, CacheConfig.RISK_CONFIG_AT}, allEntries = true)
     public void deleteRiskLevelVersion(LocalDate effectiveFrom) {
         List<RiskLevel> version = riskLevelRepository.findByEffectiveFromOrderByMinScoreAsc(effectiveFrom);
         if (version.isEmpty()) {
@@ -201,7 +201,7 @@ public class RiskConfigService {
     }
 
     @Transactional
-    @CacheEvict(value = CacheConfig.FREQUENCY_CONFIG, allEntries = true)
+    @CacheEvict(value = {CacheConfig.FREQUENCY_CONFIG, CacheConfig.RISK_CONFIG_AT}, allEntries = true)
     public FrequencyConfigResponse createFrequency(FrequencyConfigRequest req, Long actorId) {
         assertNewEffectiveDate(req.effectiveFrom(), frequencyRepository.existsByEffectiveFrom(req.effectiveFrom()));
         var previous = frequencyRepository.findFirstByEffectiveFromLessThanOrderByEffectiveFromDesc(req.effectiveFrom());
@@ -224,7 +224,7 @@ public class RiskConfigService {
     }
 
     @Transactional
-    @CacheEvict(value = CacheConfig.FREQUENCY_CONFIG, allEntries = true)
+    @CacheEvict(value = {CacheConfig.FREQUENCY_CONFIG, CacheConfig.RISK_CONFIG_AT}, allEntries = true)
     public void deleteFrequency(Long id) {
         FrequencyConfig c = frequencyRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy cấu hình tần suất #" + id));
@@ -234,6 +234,7 @@ public class RiskConfigService {
 
     // ---- Nâng mức ảnh hưởng ----
 
+    @Cacheable(CacheConfig.ESCALATION_RULES)
     public List<EscalationRuleResponse> escalationRules() {
         List<EscalationRule> all = escalationRepository.findAllByOrderByEffectiveFromDesc();
         Map<Long, UserSummary> creators = users.findSummaries(all.stream().map(EscalationRule::getCreatedBy).toList());
@@ -247,6 +248,7 @@ public class RiskConfigService {
     }
 
     @Transactional
+    @CacheEvict(value = {CacheConfig.ESCALATION_RULES, CacheConfig.RISK_CONFIG_AT}, allEntries = true)
     public EscalationRuleResponse createEscalation(EscalationRuleRequest req, Long actorId) {
         assertNewEffectiveDate(req.effectiveFrom(), escalationRepository.existsByEffectiveFrom(req.effectiveFrom()));
         var previous = escalationRepository.findFirstByEffectiveFromLessThanOrderByEffectiveFromDesc(req.effectiveFrom());
@@ -276,6 +278,7 @@ public class RiskConfigService {
     }
 
     @Transactional
+    @CacheEvict(value = {CacheConfig.ESCALATION_RULES, CacheConfig.RISK_CONFIG_AT}, allEntries = true)
     public void deleteEscalation(Long id) {
         EscalationRule r = escalationRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy quy tắc nâng mức #" + id));

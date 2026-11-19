@@ -105,6 +105,7 @@ export function RemediationStatusTab() {
         <ReportFilterBar filter={filter} onChange={setFilter} />
         <ProtectedAction access={{ anyOf: [PERMISSIONS.REPORT.EXPORT, PERMISSIONS.REPORT.READ] }}>
           <Button
+            className="btn-tint-excel"
             icon={<FileExcelOutlined />}
             loading={exporting}
             onClick={handleExport}
@@ -158,8 +159,8 @@ export function RemediationStatusTab() {
       </Row>
 
       <TableCard>
-        <Flex justify="space-between" align="center" style={{ margin: '8px 0 12px' }}>
-          <Typography.Title level={5} style={{ margin: 0 }}>
+        <Flex justify="space-between" align="center" style={{ borderBottom: '1px solid #eef2f6' }}>
+          <Typography.Title level={5} style={{ margin: 0, fontSize: 15 }}>
             Tình trạng & Tiến độ khắc phục vi phạm theo nhà hàng
           </Typography.Title>
         </Flex>

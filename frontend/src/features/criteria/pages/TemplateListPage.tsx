@@ -1,5 +1,4 @@
-import { PlusOutlined } from '@ant-design/icons'
-import { Button, Flex, Select, Space } from 'antd'
+import { Button, Flex, Select } from 'antd'
 import { useCallback, useMemo, useState } from 'react'
 import { AdvancedFilter, type FilterTagItem } from '@/components/data-entry/AdvancedFilter'
 import { ActiveFilter } from '@/components/data-entry/ActiveFilter'
@@ -83,15 +82,13 @@ export function TemplateListPage() {
     <PageContainer
       title="Mẫu phiếu kiểm tra"
       subtitle="Bộ tiêu chí đánh giá áp dụng theo từng hình thức kiểm soát và mô hình vận hành"
+      headerExtra={<TemplateExcelActions />}
       extra={
-        <Space size={8}>
-          <TemplateExcelActions />
-          <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => setModal({ open: true })}>
-              Tạo mẫu phiếu kiểm tra
-            </Button>
-          </ProtectedAction>
-        </Space>
+        <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
+          <Button type="primary" onClick={() => setModal({ open: true })}>
+            Tạo mẫu phiếu kiểm tra
+          </Button>
+        </ProtectedAction>
       }
     >
       <Flex vertical gap={16}>

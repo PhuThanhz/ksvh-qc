@@ -42,75 +42,83 @@ export function ReportFilterBar({
     onChange({})
   }
 
+  const hasActiveFilters = Boolean(
+    filter.from || filter.to || filter.companyId || filter.restaurantId || filter.inspectorId || filter.groupId,
+  )
+
   return (
-    <Flex wrap="wrap" gap={10} align="center">
-      <DatePicker.RangePicker
-        value={dateValue}
-        placeholder={['Từ ngày', 'Đến ngày']}
-        format="DD/MM/YYYY"
-        onChange={(dates) => {
-          onChange({
-            ...filter,
-            from: dates?.[0] ? dates[0].format('YYYY-MM-DD') : undefined,
-            to: dates?.[1] ? dates[1].format('YYYY-MM-DD') : undefined,
-          })
-        }}
-        style={{ width: 240 }}
-      />
+    <div className="advanced-filter">
+      <Flex wrap="wrap" gap={8} align="center">
+        <DatePicker.RangePicker
+          value={dateValue}
+          placeholder={['Từ ngày', 'Đến ngày']}
+          format="DD/MM/YYYY"
+          onChange={(dates) => {
+            onChange({
+              ...filter,
+              from: dates?.[0] ? dates[0].format('YYYY-MM-DD') : undefined,
+              to: dates?.[1] ? dates[1].format('YYYY-MM-DD') : undefined,
+            })
+          }}
+          style={{ width: 240 }}
+        />
 
-      <Select
-        placeholder="Công ty"
-        allowClear
-        showSearch
-        value={filter.companyId}
-        onChange={(companyId) => onChange({ ...filter, companyId, restaurantId: undefined, groupId: undefined })}
-        style={{ width: 170 }}
-        filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
-        options={companies.data?.items.map((c) => ({ value: c.id, label: c.name }))}
-      />
-
-      {showRestaurant && (
         <Select
-          placeholder="Nhà hàng"
+          placeholder="Công ty"
           allowClear
           showSearch
-          value={filter.restaurantId}
-          onChange={(restaurantId) => onChange({ ...filter, restaurantId })}
-          style={{ width: 190 }}
+          value={filter.companyId}
+          onChange={(companyId) => onChange({ ...filter, companyId, restaurantId: undefined, groupId: undefined })}
+          style={{ width: 170 }}
           filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
-          options={restaurants.data?.items.map((r) => ({ value: r.id, label: `${r.code} - ${r.name}` }))}
+          options={companies.data?.items.map((c) => ({ value: c.id, label: c.name }))}
         />
-      )}
 
-      {showInspector && (
-        <Select
-          placeholder="Chuyên viên KSVH"
-          allowClear
-          showSearch
-          value={filter.inspectorId}
-          onChange={(inspectorId) => onChange({ ...filter, inspectorId })}
-          style={{ width: 180 }}
-          filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
-          options={inspectors.data?.items.map((u) => ({ value: u.id, label: u.fullName || u.username }))}
-        />
-      )}
+        {showRestaurant && (
+          <Select
+            placeholder="Nhà hàng"
+            allowClear
+            showSearch
+            value={filter.restaurantId}
+            onChange={(restaurantId) => onChange({ ...filter, restaurantId })}
+            style={{ width: 190 }}
+            filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
+            options={restaurants.data?.items.map((r) => ({ value: r.id, label: `${r.code} - ${r.name}` }))}
+          />
+        )}
 
-      {showGroup && (
-        <Select
-          placeholder="Nhóm tiêu chí"
-          allowClear
-          showSearch
-          value={filter.groupId}
-          onChange={(groupId) => onChange({ ...filter, groupId })}
-          style={{ width: 180 }}
-          filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
-          options={groups.data?.map((g) => ({ value: g.id, label: g.name }))}
-        />
-      )}
+        {showInspector && (
+          <Select
+            placeholder="Chuyên viên KSVH"
+            allowClear
+            showSearch
+            value={filter.inspectorId}
+            onChange={(inspectorId) => onChange({ ...filter, inspectorId })}
+            style={{ width: 180 }}
+            filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
+            options={inspectors.data?.items.map((u) => ({ value: u.id, label: u.fullName || u.username }))}
+          />
+        )}
 
-      <Button icon={<ReloadOutlined />} onClick={handleReset}>
-        Đặt lại
-      </Button>
-    </Flex>
+        {showGroup && (
+          <Select
+            placeholder="Nhóm tiêu chí"
+            allowClear
+            showSearch
+            value={filter.groupId}
+            onChange={(groupId) => onChange({ ...filter, groupId })}
+            style={{ width: 180 }}
+            filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
+            options={groups.data?.map((g) => ({ value: g.id, label: g.name }))}
+          />
+        )}
+
+        {hasActiveFilters && (
+          <Button className="filter-reset" icon={<ReloadOutlined />} onClick={handleReset}>
+            Đặt lại
+          </Button>
+        )}
+      </Flex>
+    </div>
   )
 }

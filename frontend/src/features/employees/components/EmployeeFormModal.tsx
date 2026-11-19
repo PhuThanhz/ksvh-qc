@@ -1,17 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Col, Form, Modal, Row } from 'antd'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { FormField } from '@/components/data-entry/FormField'
 import { FormInput } from '@/components/data-entry/FormInput'
 import { FormSwitch } from '@/components/data-entry/FormSwitch'
 import { useNotify } from '@/components/feedback/useNotify'
 import type { Employee, EmployeePayload } from '@/features/employees/employees.types'
-import { useSaveEmployee } from '@/features/employees/hooks/useEmployees'
+import { useEmployees, useSaveEmployee } from '@/features/employees/hooks/useEmployees'
 import { employeeSchema, type EmployeeFormValues } from '@/features/employees/schemas/employee.schema'
 import { OrgUnitPicker } from '@/features/organizations'
 import { UserPicker } from '@/features/users'
 import { applyFieldErrors, getErrorMessage } from '@/lib/http'
+import { nextSequentialCode } from '@/utils/auto-code'
 
 const EMPTY: EmployeeFormValues = {
   employeeCode: '',
@@ -59,14 +60,20 @@ export interface EmployeeFormModalProps {
 export function EmployeeFormModal({ open, employee, onClose }: EmployeeFormModalProps) {
   const notify = useNotify()
   const save = useSaveEmployee()
+  const allEmployees = useEmployees({ page: 0, size: 100 })
   const { control, handleSubmit, reset, setError } = useForm<EmployeeFormValues>({
     resolver: zodResolver(employeeSchema),
     defaultValues: EMPTY,
   })
 
+  const autoCode = useMemo(() => {
+    const existingCodes = (allEmployees.data?.items ?? []).map((e) => e.employeeCode)
+    return nextSequentialCode('NV', existingCodes, 3, '-')
+  }, [allEmployees.data])
+
   useEffect(() => {
-    if (open) reset(employee ? toFormValues(employee) : EMPTY)
-  }, [open, employee, reset])
+    if (open) reset(employee ? toFormValues(employee) : { ...EMPTY, employeeCode: autoCode })
+  }, [open, employee, autoCode, reset])
 
   const onSubmit = handleSubmit((values) =>
     save.mutate(
@@ -108,10 +115,10 @@ export function EmployeeFormModal({ open, employee, onClose }: EmployeeFormModal
         <button type="submit" hidden />
         <Row gutter={16}>
           <Col xs={24} md={8}>
-            <FormInput control={control} name="employeeCode" label="Mã nhân viên" required maxLength={30} placeholder="VD: NV0123" />
+            <FormInput control={control} name="employeeCode" label="Mã nhân viên (Tự sinh)" required maxLength={30} placeholder="Tự động sinh" />
           </Col>
           <Col xs={24} md={16}>
-            <FormInput control={control} name="fullName" label="Họ tên" required maxLength={150} placeholder="VD: Trần Thị Mai" />
+            <FormInput control={control} name="fullName" label="Họ tên" required autoFocus={!employee} maxLength={150} placeholder="VD: Trần Thị Mai" />
           </Col>
           <Col xs={24} md={12}>
             <FormInput control={control} name="jobTitle" label="Chức danh" maxLength={150} placeholder="VD: Bếp trưởng, Quản lý sảnh..." />

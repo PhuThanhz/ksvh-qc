@@ -1,5 +1,4 @@
-import { PlusOutlined } from '@ant-design/icons'
-import { Button, Flex, Space } from 'antd'
+import { Button, Flex } from 'antd'
 import { useCallback, useMemo, useState } from 'react'
 import { AdvancedFilter, type FilterTagItem } from '@/components/data-entry/AdvancedFilter'
 import { ActiveFilter } from '@/components/data-entry/ActiveFilter'
@@ -77,15 +76,13 @@ export function EmployeeListPage() {
     <PageContainer
       title="Hồ sơ nhân sự"
       subtitle="Quản lý danh sách nhân sự, chức danh chuyên môn, đơn vị công tác và liên kết tài khoản hệ thống"
+      headerExtra={<EmployeeExcelActions />}
       extra={
-        <Space size={8}>
-          <EmployeeExcelActions />
-          <ProtectedAction access={PERMISSIONS.EMPLOYEE.MANAGE}>
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => setEditing({ open: true })}>
-              Thêm nhân viên
-            </Button>
-          </ProtectedAction>
-        </Space>
+        <ProtectedAction access={PERMISSIONS.EMPLOYEE.MANAGE}>
+          <Button type="primary" onClick={() => setEditing({ open: true })}>
+            Thêm nhân viên
+          </Button>
+        </ProtectedAction>
       }
     >
       <Flex vertical gap={16}>

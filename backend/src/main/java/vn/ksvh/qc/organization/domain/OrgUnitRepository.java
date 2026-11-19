@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +27,9 @@ public interface OrgUnitRepository extends JpaRepository<OrgUnit, Long>, JpaSpec
 
     @EntityGraph(attributePaths = "company")
     Optional<OrgUnit> findWithCompanyById(Long id);
+
+    @EntityGraph(attributePaths = "company")
+    List<OrgUnit> findWithCompanyByIdIn(Collection<Long> ids);
 
     /** Id các nhà hàng mà user là Cửa hàng trưởng hoặc OBM. */
     @Query("select u.id from OrgUnit u where u.storeManagerUserId = :userId or u.obmUserId = :userId")

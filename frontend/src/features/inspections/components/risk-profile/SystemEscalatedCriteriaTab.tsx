@@ -98,28 +98,29 @@ export function SystemEscalatedCriteriaTab({ onSelectRestaurant }: SystemEscalat
 
   return (
     <Flex vertical gap={16}>
-      <Flex justify="space-between" align="center" wrap="wrap" gap={12}>
-        <Flex align="center" gap={10}>
-          <span style={{ fontWeight: 500 }}>Tính đến ngày:</span>
+      <div className="advanced-filter">
+        <Flex justify="space-between" align="center" wrap="wrap" gap={12}>
           <DatePicker
             value={asOfDate ? dayjs(asOfDate) : null}
-            placeholder="Hôm nay"
+            placeholder="Tính đến hôm nay"
             format="DD/MM/YYYY"
             onChange={(d) => setAsOfDate(d ? d.format('YYYY-MM-DD') : undefined)}
-            style={{ width: 140 }}
+            style={{ width: 170 }}
           />
-        </Flex>
 
-        <span style={{ fontSize: 13, color: 'var(--app-text-secondary)' }}>
-          <FireOutlined style={{ color: '#ff4d4f', marginRight: 6 }} />
-          Toàn hệ thống có <b>{items.length}</b> tiêu chí đang bị nâng mức do tái phạm
-        </span>
-      </Flex>
+          <span className="app-stat-chip">
+            <FireOutlined style={{ color: '#ff4d4f', marginRight: 6 }} />
+            Toàn hệ thống có <strong>{items.length}</strong> tiêu chí đang bị nâng mức do tái phạm
+          </span>
+        </Flex>
+      </div>
 
       <TableCard>
-        <Typography.Title level={5} style={{ margin: '8px 0 12px' }}>
-          Danh sách các điểm nóng tiêu chí đang bị nâng mức rủi ro
-        </Typography.Title>
+        <Flex justify="space-between" align="center" style={{ borderBottom: '1px solid #eef2f6' }}>
+          <Typography.Title level={5} style={{ margin: 0, fontSize: 15 }}>
+            Danh sách các điểm nóng tiêu chí đang bị nâng mức rủi ro
+          </Typography.Title>
+        </Flex>
         <Table
           rowKey={(r) => `${r.restaurantId}-${r.criterionId}`}
           dataSource={items}

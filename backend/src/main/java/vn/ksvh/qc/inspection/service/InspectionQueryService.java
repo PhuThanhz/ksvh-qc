@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 public class InspectionQueryService {
 
     private final InspectionRepository inspectionRepository;
+    private final InspectionItemRepository inspectionItemRepository;
     private final FindingRepository findingRepository;
     private final CriteriaLookupApi criteriaLookupApi;
     private final OrgUnitLookupApi orgUnitLookupApi;
@@ -78,6 +79,7 @@ public class InspectionQueryService {
 
         Map<Long, Integer> riskScoreMap = new HashMap<>();
         Map<Long, String> maxRiskMap = new HashMap<>();
+        Map<Long, int[]> itemSummaryMap = new HashMap<>();
         if (!inspectionIds.isEmpty()) {
             for (Object[] row : findingRepository.findRiskSummariesByInspectionIds(inspectionIds)) {
                 Long insId = ((Number) row[0]).longValue();
@@ -85,6 +87,17 @@ public class InspectionQueryService {
                 String maxCode = (String) row[2];
                 riskScoreMap.put(insId, sumScore);
                 maxRiskMap.put(insId, maxCode);
+            }
+            for (Object[] row : inspectionItemRepository.summarizeByInspectionIds(inspectionIds)) {
+                Long insId = ((Number) row[0]).longValue();
+                itemSummaryMap.put(insId, new int[]{
+                        row[1] != null ? ((Number) row[1]).intValue() : 0,
+                        row[2] != null ? ((Number) row[2]).intValue() : 0,
+                        row[3] != null ? ((Number) row[3]).intValue() : 0,
+                        row[4] != null ? ((Number) row[4]).intValue() : 0,
+                        row[5] != null ? ((Number) row[5]).intValue() : 0,
+                        row[6] != null ? ((Number) row[6]).intValue() : 0
+                });
             }
         }
 
@@ -99,7 +112,9 @@ public class InspectionQueryService {
                     .filter(Objects::nonNull)
                     .map(CriterionGroupRef::name)
                     .toList();
-            return InspectionResponse.from(i, rName, tName, insName, totalRisk, maxRisk, tNames, false);
+            int[] s = itemSummaryMap.getOrDefault(i.getId(), new int[6]);
+            return InspectionResponse.fromSummary(i, rName, tName, insName, totalRisk, maxRisk, tNames,
+                    s[0], s[1], s[2], s[3], s[4], s[5]);
         });
     }
 
@@ -110,6 +125,7 @@ public class InspectionQueryService {
         );
         var restaurantIds = list.stream().map(Inspection::getRestaurantId).distinct().toList();
         var templateIds = list.stream().map(Inspection::getTemplateId).distinct().toList();
+        var inspectionIds = list.stream().map(Inspection::getId).toList();
         var allTopicGroupIds = list.stream()
                 .flatMap(ins -> ins.getTopicGroupIds().stream())
                 .distinct()
@@ -121,6 +137,21 @@ public class InspectionQueryService {
         Map<Long, CriterionGroupRef> topicGroups = criteriaLookupApi.findGroups(allTopicGroupIds);
         String insName = inspectors.containsKey(inspectorId) ? inspectors.get(inspectorId).fullName() : null;
 
+        Map<Long, int[]> itemSummaryMap = new HashMap<>();
+        if (!inspectionIds.isEmpty()) {
+            for (Object[] row : inspectionItemRepository.summarizeByInspectionIds(inspectionIds)) {
+                Long insId = ((Number) row[0]).longValue();
+                itemSummaryMap.put(insId, new int[]{
+                        row[1] != null ? ((Number) row[1]).intValue() : 0,
+                        row[2] != null ? ((Number) row[2]).intValue() : 0,
+                        row[3] != null ? ((Number) row[3]).intValue() : 0,
+                        row[4] != null ? ((Number) row[4]).intValue() : 0,
+                        row[5] != null ? ((Number) row[5]).intValue() : 0,
+                        row[6] != null ? ((Number) row[6]).intValue() : 0
+                });
+            }
+        }
+
         return list.stream().map(i -> {
             String rName = restaurants.containsKey(i.getRestaurantId()) ? restaurants.get(i.getRestaurantId()).name() : null;
             String tName = i.getTemplateId() != null && templates.containsKey(i.getTemplateId()) ? templates.get(i.getTemplateId()).name() : null;
@@ -129,7 +160,9 @@ public class InspectionQueryService {
                     .filter(Objects::nonNull)
                     .map(CriterionGroupRef::name)
                     .toList();
-            return InspectionResponse.from(i, rName, tName, insName, 0, null, tNames, false);
+            int[] s = itemSummaryMap.getOrDefault(i.getId(), new int[6]);
+            return InspectionResponse.fromSummary(i, rName, tName, insName, 0, null, tNames,
+                    s[0], s[1], s[2], s[3], s[4], s[5]);
         }).toList();
     }
 
@@ -201,5 +234,9 @@ public class InspectionQueryService {
     public Inspection load(Long id) {
         return inspectionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy phiếu chấm #" + id));
+    }
+
+    public Map<Long, UserSummary> lookupInspectors(Collection<Long> ids) {
+        return userAccountApi.findSummaries(ids);
     }
 }

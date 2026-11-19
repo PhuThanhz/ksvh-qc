@@ -1,4 +1,4 @@
-import { DownloadOutlined, PlusOutlined, ThunderboltOutlined } from '@ant-design/icons'
+import { DownloadOutlined, ThunderboltOutlined } from '@ant-design/icons'
 import { Badge, Button, Flex, Space } from 'antd'
 import dayjs from 'dayjs'
 import { useCallback, useMemo, useState } from 'react'
@@ -107,9 +107,9 @@ export function InspectionListPage() {
     <PageContainer
       title="Biên bản kiểm tra KSVH"
       subtitle="Quản lý và giám sát quá trình thực hiện đánh giá kiểm soát vận hành tại các cơ sở"
-      extra={
+      headerExtra={
         <Space size={8}>
-          <Button icon={<DownloadOutlined />} onClick={onExportInspections} disabled={!inspections.data?.items?.length}>
+          <Button className="btn-tint-excel" icon={<DownloadOutlined />} onClick={onExportInspections} disabled={!inspections.data?.items?.length}>
             Xuất CSV
           </Button>
           <ProtectedAction access={canCreateRule}>
@@ -119,19 +119,20 @@ export function InspectionListPage() {
               </Badge>
             </Button>
           </ProtectedAction>
-          <ProtectedAction access={canCreateRule}>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => {
-                setPrefilledCreate(undefined)
-                setCreateModal(true)
-              }}
-            >
-              Tạo đợt kiểm tra
-            </Button>
-          </ProtectedAction>
         </Space>
+      }
+      extra={
+        <ProtectedAction access={canCreateRule}>
+          <Button
+            type="primary"
+            onClick={() => {
+              setPrefilledCreate(undefined)
+              setCreateModal(true)
+            }}
+          >
+            Tạo đợt kiểm tra
+          </Button>
+        </ProtectedAction>
       }
     >
       <Flex vertical gap={16}>

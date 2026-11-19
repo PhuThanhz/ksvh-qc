@@ -93,6 +93,7 @@ export function MonthlySummaryTab() {
         <ReportFilterBar filter={filter} onChange={setFilter} />
         <ProtectedAction access={{ anyOf: [PERMISSIONS.REPORT.EXPORT, PERMISSIONS.REPORT.READ] }}>
           <Button
+            className="btn-tint-excel"
             icon={<FileExcelOutlined />}
             loading={exporting}
             onClick={handleExport}
@@ -152,9 +153,11 @@ export function MonthlySummaryTab() {
       )}
 
       <TableCard>
-        <Typography.Title level={5} style={{ margin: '8px 0 12px' }}>
-          Bảng chi tiết tổng hợp theo tháng
-        </Typography.Title>
+        <Flex justify="space-between" align="center" style={{ borderBottom: '1px solid #eef2f6' }}>
+          <Typography.Title level={5} style={{ margin: 0, fontSize: 15 }}>
+            Bảng chi tiết tổng hợp theo tháng
+          </Typography.Title>
+        </Flex>
         <Table
           rowKey="month"
           dataSource={items}

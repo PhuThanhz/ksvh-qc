@@ -1,5 +1,4 @@
-import { PlusOutlined } from '@ant-design/icons'
-import { Button, Space } from 'antd'
+import { Button } from 'antd'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { PageContainer } from '@/components/layout/PageContainer'
@@ -41,15 +40,13 @@ export function CriterionGroupPage() {
     <PageContainer
       title="Nhóm tiêu chí kiểm soát"
       subtitle="Quản lý các nhóm tiêu chí vận hành (Vệ sinh VSATTP, Cơ sở vật chất, Quy trình phục vụ...) và danh mục tiêu chí"
+      headerExtra={<CriteriaExcelActions />}
       extra={
-        <Space size={8} wrap>
-          <CriteriaExcelActions />
-          <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateGroupOpen(true)}>
-              Thêm nhóm tiêu chí
-            </Button>
-          </ProtectedAction>
-        </Space>
+        <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
+          <Button type="primary" onClick={() => setCreateGroupOpen(true)}>
+            Thêm nhóm tiêu chí
+          </Button>
+        </ProtectedAction>
       }
     >
       <GroupTab

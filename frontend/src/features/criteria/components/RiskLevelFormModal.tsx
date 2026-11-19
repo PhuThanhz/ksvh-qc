@@ -24,7 +24,9 @@ export function RiskLevelFormModal({
       open={open}
       title={
         <span style={{ fontSize: 16, fontWeight: 700 }}>
-          {effectiveFrom ? `Sửa bảng phân loại (Hiệu lực từ ${formatDate(effectiveFrom)})` : 'Tạo bảng phân loại rủi ro mới'}
+          {effectiveFrom
+            ? `Chỉnh sửa thang phân loại (Hiệu lực từ ${formatDate(effectiveFrom)})`
+            : 'Cập nhật thang phân loại rủi ro'}
         </span>
       }
       width={1060}

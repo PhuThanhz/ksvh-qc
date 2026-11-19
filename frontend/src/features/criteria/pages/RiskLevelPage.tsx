@@ -1,5 +1,4 @@
-import { PlusOutlined } from '@ant-design/icons'
-import { Button, Space } from 'antd'
+import { Button } from 'antd'
 import { useState } from 'react'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { RiskLevelExcelActions } from '@/features/criteria/components/RiskLevelExcelActions'
@@ -15,20 +14,14 @@ export function RiskLevelPage() {
   return (
     <PageContainer
       title="Phân loại rủi ro"
-      subtitle="Cấu hình thang mức rủi ro (M1–M4), khoảng điểm vi phạm và thời hạn khắc phục bắt buộc"
+      subtitle="Cấu hình thang mức rủi ro (M1–M4), khoảng điểm vi phạm và thời hạn khắc phục bắt buộc trên toàn hệ thống"
+      headerExtra={<RiskLevelExcelActions />}
       extra={
-        <Space size={8} wrap>
-          <RiskLevelExcelActions />
-          {canManage && (
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => setCreateOpen(true)}
-            >
-              Thêm bảng phân loại mới
-            </Button>
-          )}
-        </Space>
+        canManage && (
+          <Button type="primary" onClick={() => setCreateOpen(true)}>
+            Cập nhật thang phân loại
+          </Button>
+        )
       }
     >
       <RiskLevelSection

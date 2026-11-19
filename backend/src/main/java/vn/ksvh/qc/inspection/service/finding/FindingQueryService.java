@@ -133,6 +133,23 @@ public class FindingQueryService {
                 RoleCodes.OBM
         );
         List<UserSummary> candidates = userAccountApi.findActiveUsersByRoleIn(targetRoles);
+        Set<Long> obmUserIds = candidates.stream()
+                .filter(u -> u.hasRole(RoleCodes.OBM)
+                        && !u.hasRole(RoleCodes.KSVH_LEAD)
+                        && !u.hasRole(RoleCodes.KSVH_MANAGER)
+                        && !u.hasRole(RoleCodes.KSVH_INSPECTOR))
+                .map(UserSummary::id)
+                .collect(Collectors.toSet());
+        Set<Long> obmIdsForRestaurant = new HashSet<>();
+        if (!obmUserIds.isEmpty()) {
+            OrgUnitRef rest = orgUnitLookupApi.findRefs(List.of(f.getRestaurantId())).get(f.getRestaurantId());
+            if (rest != null && rest.obmUserId() != null) {
+                obmIdsForRestaurant.add(rest.obmUserId());
+            }
+            if (rest != null && rest.storeManagerUserId() != null) {
+                obmIdsForRestaurant.add(rest.storeManagerUserId());
+            }
+        }
 
         return candidates.stream()
                 .filter(u -> !Objects.equals(u.id(), excludedInspectorId))
@@ -144,7 +161,7 @@ public class FindingQueryService {
                         return true;
                     }
                     if (u.hasRole(RoleCodes.OBM)) {
-                        return orgUnitLookupApi.findRestaurantIdsManagedBy(u.id()).contains(f.getRestaurantId());
+                        return obmIdsForRestaurant.contains(u.id());
                     }
                     return false;
                 })

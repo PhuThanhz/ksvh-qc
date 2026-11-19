@@ -1,5 +1,4 @@
-import { PlusOutlined } from '@ant-design/icons'
-import { Button, Space } from 'antd'
+import { Button } from 'antd'
 import { useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { PageContainer } from '@/components/layout/PageContainer'
@@ -27,20 +26,17 @@ export function CriteriaPage() {
     <PageContainer
       title="Tiêu chí kiểm soát"
       subtitle="Danh mục tiêu chí kiểm soát chi tiết, phương pháp đánh giá, mức độ ảnh hưởng cơ sở và mẫu phiếu kiểm tra áp dụng"
+      headerExtra={<CriteriaExcelActions />}
       extra={
-        <Space size={8} wrap>
-          <CriteriaExcelActions />
-          <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-            {/* Một nút duy nhất: trong modal chọn thêm một tiêu chí hoặc nhiều tiêu chí cùng lúc. */}
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => setCriterionModal({ open: true, defaultGroupId: initialGroupId })}
-            >
-              Thêm tiêu chí
-            </Button>
-          </ProtectedAction>
-        </Space>
+        <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
+          {/* Một nút duy nhất: trong modal chọn thêm một tiêu chí hoặc nhiều tiêu chí cùng lúc. */}
+          <Button
+            type="primary"
+            onClick={() => setCriterionModal({ open: true, defaultGroupId: initialGroupId })}
+          >
+            Thêm tiêu chí
+          </Button>
+        </ProtectedAction>
       }
     >
       <CriterionTab

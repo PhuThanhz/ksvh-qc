@@ -161,5 +161,10 @@
   }
 }
 
-/* Nút chính đậm hơn nút phụ một bậc (màu, bo góc, chiều cao lấy từ theme antd) */
+/* Nút chính trên hàng tìm kiếm cao 40px, bo góc 10px đồng bộ với ô tìm kiếm */
 .ant-btn-primary { font-weight: 600; }
+.advanced-filter .page-actions .ant-btn-primary {
+  min-height: 40px !important;
+  border-radius: 10px !important;
+  padding-inline: 18px !important;
+}

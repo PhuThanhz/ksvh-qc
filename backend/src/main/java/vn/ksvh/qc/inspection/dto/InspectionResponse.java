@@ -129,4 +129,48 @@ public record InspectionResponse(
                 items
         );
     }
+
+    /** Tạo response cho danh sách từ số liệu đã tổng hợp sẵn bằng SQL (không kích hoạt lazy load i.getItems()). */
+    public static InspectionResponse fromSummary(Inspection i, String restaurantName, String templateName, String inspectorName,
+                                                 int totalRiskScore, String maxRiskLevel, List<String> topicNames,
+                                                 int totalCriteria, int passedCriteria, int failedCriteria, int naCriteria,
+                                                 int passWeight, int failWeight) {
+        BigDecimal compliance = passWeight + failWeight == 0 ? null
+                : BigDecimal.valueOf(passWeight * 100.0 / (passWeight + failWeight)).setScale(2, RoundingMode.HALF_UP);
+        return new InspectionResponse(
+                i.getId(),
+                i.getCode(),
+                i.getPlanId(),
+                i.getRestaurantId(),
+                restaurantName,
+                i.getTemplateId(),
+                templateName,
+                i.getInspectorId(),
+                inspectorName,
+                i.getInspectionType(),
+                i.getInspectionMode(),
+                i.getLocationStatus(),
+                topicNames,
+                i.getStatus(),
+                i.getCancelReason(),
+                i.getCheckinLat(),
+                i.getCheckinLng(),
+                i.getCheckinDistanceM(),
+                i.getCheckinAt(),
+                i.getSubmittedAt(),
+                i.getCompletedAt(),
+                i.getAcknowledgedAt(),
+                totalCriteria,
+                passedCriteria,
+                failedCriteria,
+                naCriteria,
+                compliance,
+                compliance,
+                totalRiskScore,
+                maxRiskLevel,
+                i.getNotes(),
+                i.getCreatedAt(),
+                List.of()
+        );
+    }
 }

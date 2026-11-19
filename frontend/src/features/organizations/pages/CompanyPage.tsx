@@ -1,4 +1,3 @@
-import { PlusOutlined } from '@ant-design/icons'
 import { Button } from 'antd'
 import { useState } from 'react'
 import { PageContainer } from '@/components/layout/PageContainer'
@@ -15,7 +14,7 @@ export function CompanyPage() {
       subtitle="Danh mục các công ty pháp nhân và thương hiệu trực thuộc hệ thống"
       extra={
         <ProtectedAction access={PERMISSIONS.ORGANIZATION.MANAGE}>
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>
+          <Button type="primary" onClick={() => setCreateOpen(true)}>
             Thêm công ty
           </Button>
         </ProtectedAction>

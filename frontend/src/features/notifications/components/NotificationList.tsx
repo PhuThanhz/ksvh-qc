@@ -95,7 +95,7 @@ export function NotificationList({ onItemClick }: NotificationListProps) {
           ))
         )}
       </div>
-      <NotificationPreferenceModal open={prefOpen} onClose={() => setPrefOpen(false)} />
+      {prefOpen && <NotificationPreferenceModal open={prefOpen} onClose={() => setPrefOpen(false)} />}
     </div>
   )
 }

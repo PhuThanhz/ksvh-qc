@@ -1,6 +1,8 @@
 package vn.ksvh.qc.criteria.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -8,6 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import vn.ksvh.qc.shared.config.CacheConfig;
 import vn.ksvh.qc.criteria.domain.Criterion;
 import vn.ksvh.qc.criteria.domain.CriterionRepository;
 import vn.ksvh.qc.criteria.domain.InspectionTemplate;
@@ -65,10 +68,18 @@ public class TemplateService {
         var page = templateRepository.findAll(spec, safe);
         var companyIds = page.getContent().stream().map(InspectionTemplate::getCompanyId).filter(Objects::nonNull).toList();
         var companyRefs = companyLookupApi.findRefs(companyIds);
+        var templateIds = page.getContent().stream().map(InspectionTemplate::getId).toList();
+        Map<Long, Integer> itemCounts = templateIds.isEmpty() ? Map.of() :
+                templateRepository.countItemsByTemplateIds(templateIds).stream()
+                        .collect(Collectors.toMap(
+                                row -> ((Number) row[0]).longValue(),
+                                row -> ((Number) row[1]).intValue()
+                        ));
         return PageResponse.of(page, t -> {
             String cName = t.getCompanyId() != null && companyRefs.containsKey(t.getCompanyId())
                     ? companyRefs.get(t.getCompanyId()).name() : null;
-            return TemplateResponse.from(t, List.of(), cName);
+            int count = itemCounts.getOrDefault(t.getId(), 0);
+            return TemplateResponse.from(t, List.of(), cName, count);
         });
     }
 
@@ -77,6 +88,7 @@ public class TemplateService {
     }
 
     /** Mọi mẫu phiếu, sắp theo mã. Dùng cho ô chọn mẫu ở form tiêu chí. */
+    @Cacheable(CacheConfig.TEMPLATE_OPTIONS)
     public List<TemplateOption> options() {
         return templateRepository.findAll(Sort.by("code")).stream().map(TemplateOption::from).toList();
     }
@@ -86,6 +98,7 @@ public class TemplateService {
     }
 
     @Transactional
+    @CacheEvict(value = CacheConfig.TEMPLATE_OPTIONS, allEntries = true)
     public TemplateResponse create(TemplateRequest req, Long actorId) {
         String code = req.code().trim();
         if (templateRepository.existsByCodeIgnoreCase(code)) {
@@ -97,6 +110,7 @@ public class TemplateService {
     }
 
     @Transactional
+    @CacheEvict(value = CacheConfig.TEMPLATE_OPTIONS, allEntries = true)
     public TemplateResponse update(Long id, TemplateRequest req, Long actorId) {
         InspectionTemplate t = load(id);
         String code = req.code().trim();
@@ -108,6 +122,7 @@ public class TemplateService {
     }
 
     @Transactional
+    @CacheEvict(value = CacheConfig.TEMPLATE_OPTIONS, allEntries = true)
     public void delete(Long id) {
         InspectionTemplate t = load(id);
         try {

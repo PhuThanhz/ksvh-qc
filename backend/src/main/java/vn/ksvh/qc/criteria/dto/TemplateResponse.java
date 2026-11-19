@@ -20,6 +20,10 @@ public record TemplateResponse(
         List<CriterionResponse> criteria) {
 
     public static TemplateResponse from(InspectionTemplate t, List<CriterionResponse> criteria, String companyName) {
+        return from(t, criteria, companyName, t.getItems().size());
+    }
+
+    public static TemplateResponse from(InspectionTemplate t, List<CriterionResponse> criteria, String companyName, int criterionCount) {
         return new TemplateResponse(
                 t.getId(),
                 t.getCode(),
@@ -29,7 +33,7 @@ public record TemplateResponse(
                 t.getCompanyId(),
                 companyName,
                 t.isActive(),
-                t.getItems().size(),
+                criterionCount,
                 t.getUpdatedAt(),
                 criteria);
     }

@@ -18,7 +18,11 @@ import vn.ksvh.qc.shared.error.ErrorCode;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,8 +51,17 @@ public class InspectionVerificationService {
         Instant now = clock.instant();
         int failedCount = 0;
 
+        List<Long> findingIds = inspection.getItems().stream()
+                .map(InspectionItem::getFindingId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+        Map<Long, Finding> findingMap = findingIds.isEmpty() ? Map.of()
+                : findingRepository.findAllById(findingIds).stream()
+                .collect(Collectors.toMap(Finding::getId, Function.identity()));
+
         for (InspectionItem item : inspection.getItems()) {
-            InspectionSubmitItemRequest sub = submitByItem.get(item.getId());
+            InspectionSubmitItemRequest sub = item.getId() != null ? submitByItem.get(item.getId()) : null;
             if (sub == null) {
                 sub = submitByCriterion.get(item.getCriterionId());
             }
@@ -73,7 +86,7 @@ public class InspectionVerificationService {
             }
 
             if (item.getFindingId() != null) {
-                Finding f = findingRepository.findById(item.getFindingId()).orElse(null);
+                Finding f = findingMap.get(item.getFindingId());
                 if (f != null) {
                     findingService.verifyInternal(f, passed, item.getComment(), user.id(), user.username());
                 }

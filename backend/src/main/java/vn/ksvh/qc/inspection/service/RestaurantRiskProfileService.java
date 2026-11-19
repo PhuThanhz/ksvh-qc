@@ -145,7 +145,10 @@ public class RestaurantRiskProfileService {
             return List.of();
         }
 
-        List<FindingOccurrence> allOccurrences = occurrenceRepository.findAll();
+        List<FindingOccurrence> allOccurrences = occurrenceRepository.findAllForMultiViolationPairs();
+        if (allOccurrences.isEmpty()) {
+            return List.of();
+        }
         Map<Long, Map<Long, List<FindingOccurrence>>> byRestAndCrit = allOccurrences.stream()
                 .collect(Collectors.groupingBy(FindingOccurrence::getRestaurantId,
                         Collectors.groupingBy(FindingOccurrence::getCriterionId)));

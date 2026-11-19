@@ -8,7 +8,7 @@ import { FormSwitch } from '@/components/data-entry/FormSwitch'
 import { useNotify } from '@/components/feedback/useNotify'
 import { DEFAULT_CHECKIN_RADIUS_M } from '@/constants/app.constants'
 import { RestaurantFormSection } from '@/features/organizations/components/RestaurantFormSection'
-import { useCompanies, useSaveOrgUnit } from '@/features/organizations/hooks/useOrganizations'
+import { useCompanies, useOrgUnits, useSaveOrgUnit } from '@/features/organizations/hooks/useOrganizations'
 import {
   ORG_UNIT_TYPE_LABEL,
   type OrgUnit,
@@ -17,6 +17,7 @@ import {
 } from '@/features/organizations/organizations.types'
 import { orgUnitSchema, type OrgUnitFormValues } from '@/features/organizations/schemas/organization.schema'
 import { applyFieldErrors, getErrorMessage } from '@/lib/http'
+import { nextSequentialCode, uniqueAcronymCode } from '@/utils/auto-code'
 
 const COMPANY_OPTIONS_SIZE = 100
 const TYPE_OPTIONS = (Object.keys(ORG_UNIT_TYPE_LABEL) as OrgUnitType[]).map((t) => ({
@@ -76,18 +77,35 @@ export function OrgUnitFormModal({ open, unit, fixedUnitType, onClose }: OrgUnit
   const notify = useNotify()
   const save = useSaveOrgUnit()
   const companies = useCompanies({ page: 0, size: COMPANY_OPTIONS_SIZE, active: true })
-  const { control, handleSubmit, reset, setError, setValue } = useForm<OrgUnitFormValues>({
+  const allUnits = useOrgUnits({ page: 0, size: 200 })
+  const { control, handleSubmit, reset, setError, setValue, formState } = useForm<OrgUnitFormValues>({
     resolver: zodResolver(orgUnitSchema),
     defaultValues: EMPTY,
   })
   const unitType = useWatch({ control, name: 'unitType' })
   const isRestaurant = (fixedUnitType ?? unitType) === 'RESTAURANT'
+  const prefix = isRestaurant ? 'NH' : 'PB'
+
+  const existingCodes = useMemo(() => (allUnits.data?.items ?? []).map((u) => u.code), [allUnits.data])
+  const defaultCode = useMemo(() => nextSequentialCode(prefix, existingCodes, 2, '-'), [prefix, existingCodes])
 
   useEffect(() => {
     if (open) {
-      reset(unit ? toFormValues(unit) : { ...EMPTY, unitType: fixedUnitType ?? 'RESTAURANT' })
+      reset(
+        unit
+          ? toFormValues(unit)
+          : { ...EMPTY, unitType: fixedUnitType ?? 'RESTAURANT', code: defaultCode },
+      )
     }
-  }, [open, unit, fixedUnitType, reset])
+  }, [open, unit, fixedUnitType, defaultCode, reset])
+
+  const watchedName = useWatch({ control, name: 'name' })
+  useEffect(() => {
+    if (!open || unit || formState.dirtyFields.code) return
+    const trimmed = (watchedName ?? '').trim()
+    const generated = trimmed ? uniqueAcronymCode(trimmed, existingCodes, prefix, prefix) : defaultCode
+    setValue('code', generated, { shouldValidate: false })
+  }, [open, unit, watchedName, existingCodes, prefix, defaultCode, formState.dirtyFields.code, setValue])
 
   // Công ty đã ngưng hoạt động không nằm trong danh sách chọn nhưng vẫn phải hiện tên khi sửa đơn vị cũ.
   const companyOptions = useMemo(() => {
@@ -160,10 +178,10 @@ export function OrgUnitFormModal({ open, unit, fixedUnitType, onClose }: OrgUnit
             <FormInput
               control={control}
               name="code"
-              label={isRestaurant ? 'Mã nhà hàng' : 'Mã phòng ban'}
+              label={isRestaurant ? 'Mã nhà hàng (Tự sinh)' : 'Mã phòng ban (Tự sinh)'}
               required
               maxLength={30}
-              placeholder={isRestaurant ? 'VD: NH-Q1-01' : 'VD: PB-QC'}
+              placeholder="Tự động sinh"
             />
           </Col>
           <Col xs={24} md={fixedUnitType ? 24 : 16}>
@@ -172,6 +190,7 @@ export function OrgUnitFormModal({ open, unit, fixedUnitType, onClose }: OrgUnit
               name="name"
               label={isRestaurant ? 'Tên nhà hàng' : 'Tên phòng ban'}
               required
+              autoFocus={!unit}
               maxLength={200}
               placeholder={isRestaurant ? 'VD: Nhà hàng Chi nhánh Quận 1' : 'VD: Phòng KSVH'}
             />

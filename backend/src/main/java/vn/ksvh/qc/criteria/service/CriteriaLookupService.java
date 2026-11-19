@@ -8,12 +8,14 @@ import vn.ksvh.qc.criteria.domain.FrequencyConfigRepository;
 import vn.ksvh.qc.criteria.api.RiskConfigRef;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.ksvh.qc.criteria.api.CriteriaLookupApi;
 import vn.ksvh.qc.criteria.api.CriterionRef;
 import vn.ksvh.qc.criteria.api.RiskLevelRef;
 import vn.ksvh.qc.criteria.api.TemplateRef;
+import vn.ksvh.qc.shared.config.CacheConfig;
 import vn.ksvh.qc.shared.util.BusinessDates;
 import vn.ksvh.qc.criteria.domain.Criterion;
 import vn.ksvh.qc.criteria.domain.CriterionRepository;
@@ -122,6 +124,7 @@ class CriteriaLookupService implements CriteriaLookupApi {
 
     /** Chưa khai báo kỳ đếm → mặc định 6 tháng (giá trị ví dụ trong tài liệu nghiệp vụ). */
     @Override
+    @Cacheable(value = CacheConfig.RISK_CONFIG_AT, key = "#date")
     public RiskConfigRef riskConfigAt(LocalDate date) {
         int period = frequencyRepository.findFirstByEffectiveFromLessThanEqualOrderByEffectiveFromDesc(date)
                 .map(f -> (int) f.getPeriodMonths()).orElse(6);

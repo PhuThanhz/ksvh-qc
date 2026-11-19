@@ -64,19 +64,13 @@ export function TemplateTable({ onView, onEdit, onDelete, ...props }: TemplateTa
           title: 'Công ty áp dụng',
           dataIndex: 'companyName',
           key: 'companyName',
-          width: 170,
+          width: 190,
           render: (companyName: string | null | undefined) =>
             companyName ? (
               <Tag>{companyName}</Tag>
             ) : (
               <Tag color="default">Dùng chung toàn hệ thống</Tag>
             ),
-        },
-        {
-          title: 'Hình thức kiểm tra',
-          dataIndex: 'inspectionType',
-          width: 150,
-          render: (v: string | null) => (v ? <Tag>{v}</Tag> : <Typography.Text type="secondary">—</Typography.Text>),
         },
         {
           title: 'Số lượng tiêu chí',

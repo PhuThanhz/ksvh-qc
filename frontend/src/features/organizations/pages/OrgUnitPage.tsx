@@ -1,5 +1,5 @@
-import { ApartmentOutlined, PlusOutlined, ShopOutlined } from '@ant-design/icons'
-import { Button, Space } from 'antd'
+import { ApartmentOutlined, ShopOutlined } from '@ant-design/icons'
+import { Button } from 'antd'
 import { useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { PageContainer } from '@/components/layout/PageContainer'
@@ -30,15 +30,13 @@ export function OrgUnitPage() {
     <PageContainer
       title="Đơn vị & Cơ sở vận hành"
       subtitle="Nhà hàng (được kiểm tra) và phòng ban nghiệp vụ trực thuộc các công ty"
+      headerExtra={<OrganizationExcelActions />}
       extra={
-        <Space size={8} wrap>
-          <OrganizationExcelActions />
-          <ProtectedAction access={PERMISSIONS.ORGANIZATION.MANAGE}>
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>
-              {active.addLabel}
-            </Button>
-          </ProtectedAction>
-        </Space>
+        <ProtectedAction access={PERMISSIONS.ORGANIZATION.MANAGE}>
+          <Button type="primary" onClick={() => setCreateOpen(true)}>
+            {active.addLabel}
+          </Button>
+        </ProtectedAction>
       }
     >
       <OrgUnitTab

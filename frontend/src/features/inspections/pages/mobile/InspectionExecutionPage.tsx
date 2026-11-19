@@ -1,5 +1,5 @@
 import { Card, Dialog, NavBar, ProgressBar, Segmented, Space, Toast } from 'antd-mobile'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { useGeolocation } from '@/hooks/useGeolocation'
 import { useInspection, useInspectionItems, useInspectionMutations } from '@/features/inspections/hooks/useInspectionData'
@@ -111,6 +111,12 @@ export function InspectionExecutionPage() {
 
   const [filterMode, setFilterMode] = useState<'all' | 'unrated' | 'fail'>('all')
 
+  const indexById = useMemo(() => {
+    const map = new Map<number, number>()
+    ;(items ?? []).forEach((it, idx) => map.set(it.id, idx + 1))
+    return map
+  }, [items])
+
   if (isLoading || !ins) return <div style={{ padding: 24, textAlign: 'center' }}>Đang tải thông tin biên bản kiểm tra...</div>
 
   const totalCriteria = items?.length ?? 0
@@ -210,7 +216,7 @@ export function InspectionExecutionPage() {
             )}
 
             {displayedItems.map((it) => {
-              const originalIndex = (items ?? []).findIndex((orig) => orig.id === it.id) + 1
+              const originalIndex = indexById.get(it.id) ?? 1
               return (
                 <InspectionCriterionCard
                   key={it.id}
@@ -220,6 +226,9 @@ export function InspectionExecutionPage() {
                   onSetResult={(res: ItemResult) => setCriterionResult(it.criterionId, res)}
                   onSetComment={(comment: string) => setCriterionComment(it.criterionId, comment)}
                   onSetEvidence={(urls: string) => setCriterionEvidence(it.criterionId, urls)}
+                  onSetCriterionResult={setCriterionResult}
+                  onSetCriterionComment={setCriterionComment}
+                  onSetCriterionEvidence={setCriterionEvidence}
                   inspectionId={insId}
                   inspectorName={ins.inspectorName}
                   restaurantName={ins.restaurantName}

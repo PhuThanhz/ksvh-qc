@@ -75,7 +75,7 @@ public class CriterionService {
     }
 
     @Transactional
-    @CacheEvict(value = CacheConfig.CRITERIA_GROUPS, allEntries = true)
+    @CacheEvict(value = {CacheConfig.CRITERIA_GROUPS, CacheConfig.ACTIVE_CRITERIA_OPTIONS}, allEntries = true)
     public CriterionGroupResponse createGroup(CriterionGroupRequest req, Long actorId) {
         String code = req.code().trim();
         if (groupRepository.existsByCodeIgnoreCase(code)) {
@@ -95,7 +95,7 @@ public class CriterionService {
     }
 
     @Transactional
-    @CacheEvict(value = CacheConfig.CRITERIA_GROUPS, allEntries = true)
+    @CacheEvict(value = {CacheConfig.CRITERIA_GROUPS, CacheConfig.ACTIVE_CRITERIA_OPTIONS}, allEntries = true)
     public CriterionGroupResponse updateGroup(Long id, CriterionGroupRequest req, Long actorId) {
         CriterionGroup g = loadGroup(id);
         String code = req.code().trim();
@@ -124,7 +124,7 @@ public class CriterionService {
     }
 
     @Transactional
-    @CacheEvict(value = CacheConfig.CRITERIA_GROUPS, allEntries = true)
+    @CacheEvict(value = {CacheConfig.CRITERIA_GROUPS, CacheConfig.ACTIVE_CRITERIA_OPTIONS}, allEntries = true)
     public void deleteGroup(Long id) {
         CriterionGroup g = loadGroup(id);
         if (criterionRepository.existsByGroupId(id)) {
@@ -221,6 +221,7 @@ public class CriterionService {
     }
 
     /** Toàn bộ tiêu chí đang hoạt động (nhóm cũng đang hoạt động), đã sắp xếp. Dùng chọn vào mẫu phiếu. */
+    @Cacheable(CacheConfig.ACTIVE_CRITERIA_OPTIONS)
     public List<CriterionResponse> activeOptions() {
         return criterionRepository.findActiveOrdered().stream().map(CriterionResponse::from).toList();
     }
@@ -234,7 +235,7 @@ public class CriterionService {
     }
 
     @Transactional
-    @CacheEvict(value = CacheConfig.CRITERIA_GROUPS, allEntries = true)
+    @CacheEvict(value = {CacheConfig.CRITERIA_GROUPS, CacheConfig.ACTIVE_CRITERIA_OPTIONS}, allEntries = true)
     public CriterionResponse create(CriterionRequest req, Long actorId) {
         String code = req.code().trim();
         if (criterionRepository.existsByCodeIgnoreCase(code)) {
@@ -256,6 +257,7 @@ public class CriterionService {
     }
 
     @Transactional
+    @CacheEvict(value = {CacheConfig.CRITERIA_GROUPS, CacheConfig.ACTIVE_CRITERIA_OPTIONS}, allEntries = true)
     public List<CriterionResponse> createBatch(List<CriterionRequest> requests, Long actorId) {
         if (requests == null || requests.isEmpty()) {
             return List.of();
@@ -268,7 +270,7 @@ public class CriterionService {
     }
 
     @Transactional
-    @CacheEvict(value = CacheConfig.CRITERIA_GROUPS, allEntries = true)
+    @CacheEvict(value = {CacheConfig.CRITERIA_GROUPS, CacheConfig.ACTIVE_CRITERIA_OPTIONS}, allEntries = true)
     public CriterionResponse update(Long id, CriterionRequest req, Long actorId) {
         Criterion c = loadCriterion(id);
         String code = req.code().trim();
@@ -304,7 +306,7 @@ public class CriterionService {
      * → chuyển sang "ngưng hoạt động" để giữ lịch sử.
      */
     @Transactional
-    @CacheEvict(value = CacheConfig.CRITERIA_GROUPS, allEntries = true)
+    @CacheEvict(value = {CacheConfig.CRITERIA_GROUPS, CacheConfig.ACTIVE_CRITERIA_OPTIONS}, allEntries = true)
     public void deleteCriterion(Long id) {
         Criterion c = loadCriterion(id);
         List<String> templates = templateRepository.findTemplateRefsByCriterionId(id).stream()

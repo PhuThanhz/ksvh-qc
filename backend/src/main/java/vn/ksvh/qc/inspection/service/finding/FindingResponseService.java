@@ -63,16 +63,21 @@ public class FindingResponseService {
         if (ids == null || ids.isEmpty()) {
             return 0;
         }
+        List<Finding> findings = lifecycle.loadAll(ids);
+        Set<Long> checkedRestaurants = new HashSet<>();
         int count = 0;
-        for (Long id : ids) {
-            Finding f = lifecycle.load(id);
-            access.requireStoreManager(f.getRestaurantId(), user);
+        for (Finding f : findings) {
+            if (checkedRestaurants.add(f.getRestaurantId())) {
+                access.requireStoreManager(f.getRestaurantId(), user);
+            }
             if (f.getStatus() == FindingStatus.OPEN) {
                 lifecycle.transition(f, FindingStatus.CONFIRMED, FindingEventAction.CONFIRMED, user, note);
                 lifecycle.addOccurrence(f, OccurrenceSource.CONFIRMED);
-                lifecycle.save(f);
                 count++;
             }
+        }
+        if (count > 0) {
+            lifecycle.flushAll();
         }
         return count;
     }

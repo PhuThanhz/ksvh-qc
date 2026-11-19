@@ -153,7 +153,21 @@ public class InspectionBatchCreationService {
             throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Lỗi trùng lặp mã phiếu hoặc dữ liệu không hợp lệ trong đợt tạo hàng loạt");
         }
 
-        List<InspectionResponse> responses = createdList.stream().map(queryService::toResponse).toList();
+        var inspectorMap = queryService.lookupInspectors(List.of(req.inspectorId()));
+        String insName = inspectorMap.containsKey(req.inspectorId()) ? inspectorMap.get(req.inspectorId()).fullName() : null;
+        var tplMap = templateId != null ? criteriaLookupApi.findTemplates(List.of(templateId)) : Map.<Long, TemplateRef>of();
+        String tplName = templateId != null && tplMap.containsKey(templateId) ? tplMap.get(templateId).name() : null;
+        var topicGroupMap = topics.isEmpty() ? Map.<Long, vn.ksvh.qc.criteria.api.CriterionGroupRef>of() : criteriaLookupApi.findGroups(topics);
+        List<String> topicNames = topics.stream()
+                .map(topicGroupMap::get)
+                .filter(Objects::nonNull)
+                .map(vn.ksvh.qc.criteria.api.CriterionGroupRef::name)
+                .toList();
+
+        List<InspectionResponse> responses = createdList.stream().map(ins -> {
+            OrgUnitRef r = restaurants.get(ins.getRestaurantId());
+            return InspectionResponse.from(ins, r != null ? r.name() : null, tplName, insName, 0, null, topicNames, true);
+        }).toList();
         for (InspectionResponse res : responses) {
             eventPublisher.publishEvent(new InspectionAssignedEvent(
                     res.id(), res.code(), res.restaurantId(), res.restaurantName(), res.inspectorId(), res.inspectionType().name()

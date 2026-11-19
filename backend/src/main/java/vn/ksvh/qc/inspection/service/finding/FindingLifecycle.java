@@ -43,6 +43,14 @@ public class FindingLifecycle {
         return findingRepository.findById(id).orElseThrow(() -> new NotFoundException("Không tìm thấy lỗi vi phạm #" + id));
     }
 
+    public List<Finding> loadAll(java.util.Collection<Long> ids) {
+        return findingRepository.findAllById(ids);
+    }
+
+    public void flushAll() {
+        findingRepository.flush();
+    }
+
     public Inspection inspectionOf(Finding f) {
         return inspectionRepository.findById(f.getInspectionId())
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy phiếu chấm #" + f.getInspectionId()));

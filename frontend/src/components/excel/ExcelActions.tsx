@@ -37,7 +37,7 @@ export function ExcelActions(props: ExcelActionsProps) {
     onImported,
     canImport,
     errorMessage,
-    mode = 'dropdown',
+    mode = 'buttons',
   } = props
 
   const isMobile = useIsMobile()
@@ -115,20 +115,6 @@ export function ExcelActions(props: ExcelActionsProps) {
         </Dropdown>
       ) : (
         <Space size={8} wrap>
-          {canImport && (
-            <Tooltip title="Thêm / cập nhật hàng loạt từ file Excel">
-              <Button className="btn-tint-excel" icon={<CloudUploadOutlined />} onClick={() => setImportOpen(true)}>
-                Nhập Excel
-              </Button>
-            </Tooltip>
-          )}
-          {canImport && (
-            <Tooltip title="Tải file Excel mẫu đúng cột để điền rồi nhập">
-              <Button icon={<DownloadOutlined />} loading={downloadingTemplate} onClick={() => void downloadTemplate()}>
-                File mẫu
-              </Button>
-            </Tooltip>
-          )}
           <Tooltip title="Tải toàn bộ dữ liệu ra file Excel (.xlsx)">
             <Button
               className="btn-tint-excel"
@@ -136,9 +122,28 @@ export function ExcelActions(props: ExcelActionsProps) {
               loading={exporting}
               onClick={() => void exportFile()}
             >
-              Xuất Excel
+              Xuất file Excel
             </Button>
           </Tooltip>
+          {canImport && (
+            <Tooltip title="Thêm / cập nhật hàng loạt từ file Excel">
+              <Button className="btn-tint-import" icon={<CloudUploadOutlined />} onClick={() => setImportOpen(true)}>
+                Nhập từ Excel
+              </Button>
+            </Tooltip>
+          )}
+          {canImport && (
+            <Tooltip title="Tải file Excel mẫu đúng cột để điền rồi nhập">
+              <Button
+                className="btn-tint-template"
+                icon={<DownloadOutlined />}
+                loading={downloadingTemplate}
+                onClick={() => void downloadTemplate()}
+              >
+                Tải file mẫu
+              </Button>
+            </Tooltip>
+          )}
         </Space>
       )}
 

@@ -32,7 +32,7 @@ public class InspectorProductivityReportService {
 
         List<Object> params = new ArrayList<>();
         params.add(Date.valueOf(from));
-        params.add(Date.valueOf(to));
+        params.add(Date.valueOf(to.plusDays(1)));
 
         StringBuilder extraWhere = new StringBuilder();
         if (filter.inspectorId() != null) {
@@ -53,7 +53,7 @@ public class InspectorProductivityReportService {
                 FROM users u
                 JOIN user_roles ur ON ur.user_id = u.id
                 JOIN roles ro ON ur.role_id = ro.id
-                LEFT JOIN inspections i ON i.inspector_id = u.id AND i.created_at::date BETWEEN ? AND ?
+                LEFT JOIN inspections i ON i.inspector_id = u.id AND i.created_at >= ?::timestamp AND i.created_at < ?::timestamp
                 LEFT JOIN findings f ON f.inspection_id = i.id
                 WHERE ro.code = 'KSVH_INSPECTOR' AND u.active = true
                 """ + extraWhere + """

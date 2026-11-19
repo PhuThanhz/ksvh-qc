@@ -1,4 +1,3 @@
-import { PlusOutlined } from '@ant-design/icons'
 import { Button, Flex, Input, Modal, Select } from 'antd'
 import { useCallback, useState } from 'react'
 import { AdvancedFilter } from '@/components/data-entry/AdvancedFilter'
@@ -110,7 +109,7 @@ export function PlanListPage() {
       subtitle="Lập kế hoạch, phân bổ lịch trình và phê duyệt đợt kiểm soát vận hành định kỳ và đột xuất"
       extra={
         <ProtectedAction access={PERMISSIONS.PLAN.CREATE}>
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => setModal({ open: true })}>
+          <Button type="primary" onClick={() => setModal({ open: true })}>
             Thêm kế hoạch
           </Button>
         </ProtectedAction>

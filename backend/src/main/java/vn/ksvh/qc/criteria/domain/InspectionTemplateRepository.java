@@ -43,5 +43,8 @@ public interface InspectionTemplateRepository
     @Query("SELECT DISTINCT item.criterionId FROM InspectionTemplate it JOIN it.items item")
     List<Long> findAllAssignedCriterionIds();
 
+    @Query("SELECT it.id, SIZE(it.items) FROM InspectionTemplate it WHERE it.id IN :templateIds")
+    List<Object[]> countItemsByTemplateIds(@Param("templateIds") Collection<Long> templateIds);
+
     Optional<InspectionTemplate> findByCodeIgnoreCase(String code);
 }

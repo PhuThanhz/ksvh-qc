@@ -4,6 +4,7 @@ import { severityColor } from '@/components/charts'
 import type { Control } from 'react-hook-form'
 import { FormInput } from '@/components/data-entry/FormInput'
 import { FormNumber } from '@/components/data-entry/FormNumber'
+import { FormTextarea } from '@/components/data-entry/FormTextarea'
 import type { RiskLevel } from '@/features/criteria/criteria.types'
 import type { RiskLevelsFormValues } from '@/features/criteria/schemas/criteria.schema'
 import { ActionButton } from '@/components/data-display/TableActions'
@@ -30,12 +31,12 @@ export function RiskLevelTable({
         className="compact-table-form"
         dataSource={fields}
         pagination={false}
-        scroll={{ x: 'max-content' }}
+        scroll={{ x: 960 }}
         columns={[
           {
             title: 'Mã mức',
             className: 'col-code',
-            width: 120,
+            width: 110,
             render: (_, __, i) => (
               <Flex align="center" gap={8}>
                 <span style={{ width: 8, height: 8, borderRadius: 999, background: severityColor(i, fields.length), flexShrink: 0 }} />
@@ -45,7 +46,7 @@ export function RiskLevelTable({
           },
           {
             title: 'Tên mức',
-            width: 170,
+            width: 155,
             render: (_, __, i) => (
               <FormInput
                 control={control}
@@ -53,24 +54,25 @@ export function RiskLevelTable({
                 disabled={!editable}
                 maxLength={100}
                 placeholder="VD: Thấp"
+                style={{ width: '100%' }}
               />
             ),
           },
           {
             title: 'Điểm từ (≥)',
-            width: 110,
+            width: 100,
             render: (_, __, i) => (
-              <div style={{ lineHeight: '32px' }}>
+              <div style={{ lineHeight: '36px' }}>
                 <Typography.Text strong>{preview[i]?.minScore ?? 0}</Typography.Text>
               </div>
             ),
           },
           {
             title: 'Đến (<)',
-            width: 140,
+            width: 125,
             render: (_, __, i) =>
               i === fields.length - 1 ? (
-                <div style={{ lineHeight: '32px' }}>
+                <div style={{ lineHeight: '36px' }}>
                   <Typography.Text type="secondary">Không giới hạn</Typography.Text>
                 </div>
               ) : (
@@ -81,12 +83,13 @@ export function RiskLevelTable({
                   min={0}
                   step={1}
                   placeholder="Điểm trần"
+                  style={{ width: '100%' }}
                 />
               ),
           },
           {
             title: 'Hạn khắc phục (ngày)',
-            width: 160,
+            width: 150,
             render: (_, __, i) => (
               <FormNumber
                 control={control}
@@ -95,18 +98,21 @@ export function RiskLevelTable({
                 min={1}
                 max={365}
                 precision={0}
+                style={{ width: '100%' }}
               />
             ),
           },
           {
             title: 'Hành động bắt buộc',
             render: (_, __, i) => (
-              <FormInput
+              <FormTextarea
                 control={control}
                 name={`levels.${i}.action`}
                 disabled={!editable}
                 maxLength={500}
+                autoSize={{ minRows: 1, maxRows: 4 }}
                 placeholder="Hành động khi vi phạm (VD: Lập biên bản, báo cáo lãnh đạo...)"
+                style={{ width: '100%' }}
               />
             ),
           },

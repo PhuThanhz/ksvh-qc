@@ -34,7 +34,7 @@ public class RemediationStatusReportService {
         params.add(Date.valueOf(today));
         params.add(Date.valueOf(today));
         params.add(Date.valueOf(from));
-        params.add(Date.valueOf(to));
+        params.add(Date.valueOf(to.plusDays(1)));
 
         StringBuilder extraWhere = new StringBuilder();
         if (filter.companyId() != null) {
@@ -62,7 +62,7 @@ public class RemediationStatusReportService {
                 JOIN companies c ON r.company_id = c.id
                 LEFT JOIN users m ON r.store_manager_user_id = m.id
                 JOIN findings f ON f.restaurant_id = r.id
-                WHERE f.created_at::date BETWEEN ? AND ?
+                WHERE f.created_at >= ?::timestamp AND f.created_at < ?::timestamp
                 """ + extraWhere + """
                 GROUP BY r.id, r.code, r.name, c.name, m.full_name
                 ORDER BY overdue_open DESC, total_findings DESC

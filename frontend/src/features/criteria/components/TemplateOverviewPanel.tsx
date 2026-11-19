@@ -20,8 +20,8 @@ export function TemplateOverviewPanel({ template }: { template: Template }) {
         <DetailItem icon={<BankOutlined />} label="Công ty áp dụng" value={template.companyName ?? 'Dùng chung mọi công ty'} />
         <DetailItem
           icon={<TagOutlined />}
-          label="Loại kiểm tra"
-          value={template.inspectionType ? (INSPECTION_TYPE_LABEL[template.inspectionType] ?? template.inspectionType) : null}
+          label="Phạm vi áp dụng"
+          value={template.inspectionType ? (INSPECTION_TYPE_LABEL[template.inspectionType] ?? template.inspectionType) : 'Kiểm tra định kỳ tháng'}
         />
         <DetailItem icon={<ProfileOutlined />} label="Mô tả" value={template.description} />
       </DetailSection>

@@ -17,6 +17,9 @@ public interface PlanAssignmentRepository extends JpaRepository<PlanAssignment, 
 
     List<PlanAssignment> findByPlanIdIn(Collection<Long> planIds);
 
+    @Query("select a.planId, count(a) from PlanAssignment a where a.planId in :planIds group by a.planId")
+    List<Object[]> countByPlanIdIn(Collection<Long> planIds);
+
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("delete from PlanAssignment a where a.planId = :planId")
     void deleteByPlanId(Long planId);

@@ -104,14 +104,50 @@
 .action-btn-neutral:hover:not(:disabled) { color: #0f172a !important; background: #f1f5f9 !important; border-color: #e2e8f0 !important; }
 .action-btn:disabled { opacity: 0.35; }
 
-.btn-tint-excel {
-  color: #107c41 !important;
-  background: #ecfdf5 !important;
-  border: 1px solid rgba(16, 124, 65, 0.22) !important;
+/* 3 nút Excel góc trên: Viền trắng rõ nét (line trắng), ruột kính trong có màu nhẹ, chữ & icon đậm sắc nét */
+.btn-tint-excel,
+.btn-tint-import,
+.btn-tint-template {
+  border: 1.5px solid rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(14px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(150%) !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08) !important;
+  text-shadow: none !important;
+  transition: all 0.15s ease !important;
 }
+
+.btn-tint-excel {
+  color: #065f46 !important;
+  background: rgba(236, 253, 245, 0.72) !important;
+}
+.btn-tint-excel .anticon { color: #059669 !important; }
 .btn-tint-excel:hover:not(:disabled) {
-  background: rgba(16, 124, 65, 0.16) !important;
-  border-color: rgba(16, 124, 65, 0.4) !important;
+  background: rgba(220, 252, 231, 0.88) !important;
+  border-color: #ffffff !important;
+  color: #064e3b !important;
+}
+
+.btn-tint-import {
+  color: #1e40af !important;
+  background: rgba(239, 246, 255, 0.72) !important;
+}
+.btn-tint-import .anticon { color: #2563eb !important; }
+.btn-tint-import:hover:not(:disabled) {
+  background: rgba(219, 234, 254, 0.88) !important;
+  border-color: #ffffff !important;
+  color: #1e3a8a !important;
+}
+
+.btn-tint-template {
+  color: #92400e !important;
+  background: rgba(255, 251, 235, 0.72) !important;
+}
+.btn-tint-template .anticon { color: #d97706 !important; }
+.btn-tint-template:hover:not(:disabled) {
+  background: rgba(254, 243, 199, 0.88) !important;
+  border-color: #ffffff !important;
+  color: #78350f !important;
 }
 
 /* Khung TableCard */
@@ -197,21 +233,3 @@
 .ant-table-wrapper a:not(.ant-btn):not(.cell-force-color):hover,
 .ant-table-wrapper .ant-typography a:hover,
 .ant-table-wrapper a.ant-typography:hover { color: #2563eb !important; }
-
-/* Trang Quy tắc tái phạm: công thức + thẻ quy tắc */
-.risk-formula__eq { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: 18px; font-weight: 600; color: #0f172a; }
-.risk-formula__term { padding: 4px 12px; border-radius: 8px; background: #f1f5f9; }
-.risk-formula__term--a { background: #fff7ed; color: #c2410c; }
-.risk-formula__term--b { background: #eff6ff; color: #1d4ed8; }
-.risk-formula__op { color: #94a3b8; font-weight: 500; }
-.rule-card { height: 100%; }
-.rule-card__step {
-  width: 26px; height: 26px; border-radius: 50%; flex: none;
-  display: inline-flex; align-items: center; justify-content: center;
-  background: #eff6ff; color: #1d4ed8; font-weight: 700; font-size: 13px;
-}
-.rule-card__current { padding: 14px 16px; border-radius: 12px; background: #f8fafc; border: 1px solid rgba(15, 23, 42, 0.06); }
-.rule-card__label { display: block; font-size: 12px; font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; color: #64748b; margin-bottom: 4px; }
-.rule-card__value { font-size: 24px; font-weight: 700; color: #0f172a; line-height: 1.3; }
-.rule-card__details { margin-top: 4px; color: #334155; }
-.rule-card__since { display: block; margin-top: 6px; font-size: 12.5px; color: #64748b; }

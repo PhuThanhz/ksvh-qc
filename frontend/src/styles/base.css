@@ -81,8 +81,9 @@ code, kbd, samp, pre, .font-code {
   font-family: var(--font-family-code) !important;
 }
 
-.compact-table-form .ant-form-item { margin-bottom: 0; }
+.compact-table-form .ant-form-item { margin-bottom: 0; width: 100%; }
 .compact-table-form .ant-table-cell { vertical-align: top; }
+.compact-table-form .ant-table table { width: 100% !important; }
 
 /* Thin Smooth Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }

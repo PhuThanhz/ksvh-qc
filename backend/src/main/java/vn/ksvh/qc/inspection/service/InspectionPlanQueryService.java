@@ -69,9 +69,11 @@ public class InspectionPlanQueryService {
         Map<Long, UserSummary> users = userAccountApi.findSummaries(userIds);
 
         var planIds = page.getContent().stream().map(InspectionPlan::getId).toList();
-        List<PlanAssignment> allAssignments = planAssignmentRepository.findByPlanIdIn(planIds);
-        Map<Long, Long> counts = allAssignments.stream()
-                .collect(Collectors.groupingBy(PlanAssignment::getPlanId, Collectors.counting()));
+        Map<Long, Long> counts = planIds.isEmpty() ? Map.of() : planAssignmentRepository.countByPlanIdIn(planIds).stream()
+                .collect(Collectors.toMap(
+                        row -> ((Number) row[0]).longValue(),
+                        row -> ((Number) row[1]).longValue()
+                ));
 
         return PageResponse.of(page, p -> {
             String createdByName = p.getCreatedBy() != null && users.containsKey(p.getCreatedBy())

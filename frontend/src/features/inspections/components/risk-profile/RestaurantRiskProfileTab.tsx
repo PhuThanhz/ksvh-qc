@@ -4,7 +4,7 @@ import {
   CheckCircleOutlined,
   FireOutlined,
 } from '@ant-design/icons'
-import { Card, Col, DatePicker, Flex, Row, Select, Typography } from 'antd'
+import { Col, DatePicker, Flex, Row, Select, Typography } from 'antd'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { KpiCard } from '@/components/data-display/KpiCard'
@@ -35,37 +35,40 @@ export function RestaurantRiskProfileTab({ initialRestaurantId }: RestaurantRisk
 
   return (
     <Flex vertical gap={16}>
-      <Card size="small">
-        <Flex wrap="wrap" gap={12} align="center" justify="space-between">
-          <Flex wrap="wrap" gap={10} align="center">
-            <span style={{ fontWeight: 500 }}>Cơ sở:</span>
+      <div className="advanced-filter">
+        <Flex wrap="wrap" gap={10} align="center" justify="space-between">
+          <Flex wrap="wrap" gap={8} align="center">
             <Select
               placeholder="Chọn cơ sở xem hồ sơ rủi ro"
               showSearch
               value={activeRestId}
               onChange={(id) => setRestaurantId(id)}
-              style={{ width: 280 }}
+              style={{ width: 290 }}
               filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
               options={restList.map((r) => ({ value: r.id, label: `${r.code} - ${r.name}` }))}
             />
 
-            <span style={{ fontWeight: 500, marginLeft: 8 }}>Tính đến ngày:</span>
             <DatePicker
               value={asOfDate ? dayjs(asOfDate) : null}
-              placeholder="Hôm nay"
+              placeholder="Tính đến hôm nay"
               format="DD/MM/YYYY"
               onChange={(d) => setAsOfDate(d ? d.format('YYYY-MM-DD') : undefined)}
-              style={{ width: 140 }}
+              style={{ width: 165 }}
             />
           </Flex>
 
           {data && (
-            <div className="app-secondary-text">
-              Công ty: <b>{data.companyName || '—'}</b> · CHT: <b>{data.storeManagerName || '—'}</b>
-            </div>
+            <Flex wrap gap={8} align="center">
+              <span className="app-stat-chip">
+                Công ty: <strong>{data.companyName || '—'}</strong>
+              </span>
+              <span className="app-stat-chip">
+                Cửa hàng trưởng: <strong>{data.storeManagerName || '—'}</strong>
+              </span>
+            </Flex>
           )}
         </Flex>
-      </Card>
+      </div>
 
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} lg={6}>
@@ -117,8 +120,8 @@ export function RestaurantRiskProfileTab({ initialRestaurantId }: RestaurantRisk
       </Row>
 
       <TableCard>
-        <Flex justify="space-between" align="center" style={{ margin: '8px 0 12px' }}>
-          <Typography.Title level={5} style={{ margin: 0 }}>
+        <Flex justify="space-between" align="center" style={{ borderBottom: '1px solid #eef2f6' }}>
+          <Typography.Title level={5} style={{ margin: 0, fontSize: 15 }}>
             Hồ sơ rủi ro chi tiết theo từng tiêu chí tại {data?.restaurantName || 'nhà hàng'}
           </Typography.Title>
           <span className="app-secondary-text">

@@ -32,7 +32,7 @@ public class MonthlySummaryReportService {
 
         List<Object> params = new ArrayList<>();
         params.add(Date.valueOf(from));
-        params.add(Date.valueOf(to));
+        params.add(Date.valueOf(to.plusDays(1)));
 
         StringBuilder extraWhere = new StringBuilder();
         if (filter.companyId() != null) {
@@ -66,7 +66,7 @@ public class MonthlySummaryReportService {
                 JOIN org_units r ON i.restaurant_id = r.id
                 LEFT JOIN inspection_items it ON it.inspection_id = i.id
                 LEFT JOIN findings f ON f.inspection_id = i.id
-                WHERE i.created_at::date BETWEEN ? AND ?
+                WHERE i.created_at >= ?::timestamp AND i.created_at < ?::timestamp
                 """ + extraWhere + """
                 GROUP BY to_char(coalesce(i.completed_at, i.submitted_at, i.created_at), 'YYYY-MM')
                 ORDER BY month_str ASC

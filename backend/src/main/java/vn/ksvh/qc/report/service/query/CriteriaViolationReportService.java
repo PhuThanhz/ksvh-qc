@@ -32,7 +32,7 @@ public class CriteriaViolationReportService {
 
         List<Object> params = new ArrayList<>();
         params.add(Date.valueOf(from));
-        params.add(Date.valueOf(to));
+        params.add(Date.valueOf(to.plusDays(1)));
 
         StringBuilder extraWhere = new StringBuilder();
         if (filter.groupId() != null) {
@@ -60,7 +60,7 @@ public class CriteriaViolationReportService {
                 JOIN criterion_groups cg ON c.group_id = cg.id
                 JOIN findings f ON f.criterion_id = c.id
                 JOIN org_units r ON f.restaurant_id = r.id
-                WHERE f.created_at::date BETWEEN ? AND ?
+                WHERE f.created_at >= ?::timestamp AND f.created_at < ?::timestamp
                 """ + extraWhere + """
                 GROUP BY c.id, c.code, c.name, cg.name, c.base_impact
                 ORDER BY violation_count DESC, repeat_count DESC

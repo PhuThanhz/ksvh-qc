@@ -39,6 +39,9 @@ public abstract class ApiTestSupport {
     @Autowired
     protected JsonMapper jsonMapper;
 
+    @Autowired(required = false)
+    protected org.springframework.cache.CacheManager cacheManager;
+
     protected MockMvc mvc;
 
     /** Kho ảnh giả: test không cần MinIO. Mặc định mọi object "tồn tại"; test có thể đổi để thử ảnh không tồn tại. */
@@ -50,6 +53,14 @@ public abstract class ApiTestSupport {
 
     @BeforeEach
     void setUpMvc() {
+        if (cacheManager != null) {
+            cacheManager.getCacheNames().forEach(name -> {
+                var cache = cacheManager.getCache(name);
+                if (cache != null) {
+                    cache.clear();
+                }
+            });
+        }
         mvc = MockMvcBuilders.webAppContextSetup(context)
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();

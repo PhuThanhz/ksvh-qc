@@ -12,6 +12,7 @@ export function useNotifications(page = 0, size = 20) {
   return useQuery({
     queryKey: NOTIFICATION_KEYS.list(page, size),
     queryFn: () => notificationsApi.list({ page, size }),
+    staleTime: 30_000,
   })
 }
 
@@ -19,6 +20,7 @@ export function useNotificationPreferences() {
   return useQuery({
     queryKey: NOTIFICATION_KEYS.preferences(),
     queryFn: () => notificationsApi.getPreferences(),
+    staleTime: 300_000,
   })
 }
 
@@ -36,6 +38,7 @@ export function useUnreadCount() {
   return useQuery({
     queryKey: NOTIFICATION_KEYS.unreadCount(),
     queryFn: () => notificationsApi.unreadCount(),
+    staleTime: 30_000,
     refetchInterval: 60_000,
     refetchIntervalInBackground: false,
   })

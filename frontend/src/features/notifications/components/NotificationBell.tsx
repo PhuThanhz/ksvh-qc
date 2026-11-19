@@ -50,9 +50,10 @@ export function NotificationBell({ isMobile }: NotificationBellProps) {
           placement="bottom"
           open={open}
           onClose={() => setOpen(false)}
+          destroyOnHidden
           styles={{ wrapper: { height: '75vh' }, body: { padding: 0 } }}
         >
-          <NotificationList onItemClick={() => setOpen(false)} />
+          {open ? <NotificationList onItemClick={() => setOpen(false)} /> : null}
         </Drawer>
       </>
     )
@@ -60,7 +61,7 @@ export function NotificationBell({ isMobile }: NotificationBellProps) {
 
   return (
     <Popover
-      content={<NotificationList onItemClick={() => setOpen(false)} />}
+      content={open ? <NotificationList onItemClick={() => setOpen(false)} /> : null}
       trigger="click"
       open={open}
       onOpenChange={setOpen}

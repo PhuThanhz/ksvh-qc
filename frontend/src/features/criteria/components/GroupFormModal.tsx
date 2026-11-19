@@ -1,16 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Form, Modal } from 'antd'
 import { useEffect, useMemo } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { FormInput } from '@/components/data-entry/FormInput'
 import { FormSelect } from '@/components/data-entry/FormSelect'
 import { FormSwitch } from '@/components/data-entry/FormSwitch'
 import { useNotify } from '@/components/feedback/useNotify'
 import type { CriterionGroup } from '@/features/criteria/criteria.types'
-import { useSaveGroup } from '@/features/criteria/hooks/useCriteria'
+import { useCriterionGroups, useSaveGroup } from '@/features/criteria/hooks/useCriteria'
 import { groupSchema, type GroupFormValues } from '@/features/criteria/schemas/criteria.schema'
 import { useCompanies } from '@/features/organizations/hooks/useOrganizations'
 import { applyFieldErrors, getErrorMessage } from '@/lib/http'
+import { nextSequentialCode, uniqueAcronymCode } from '@/utils/auto-code'
 
 export interface GroupFormModalProps {
   open: boolean
@@ -25,11 +26,15 @@ export interface GroupFormModalProps {
 export function GroupFormModal({ open, group, nextOrder, onClose, onCreated }: GroupFormModalProps) {
   const notify = useNotify()
   const save = useSaveGroup()
+  const allGroups = useCriterionGroups()
   const companies = useCompanies({ page: 0, size: 100, active: true })
-  const { control, handleSubmit, reset, setError } = useForm<GroupFormValues>({
+  const { control, handleSubmit, reset, setError, setValue, formState } = useForm<GroupFormValues>({
     resolver: zodResolver(groupSchema),
     defaultValues: { code: '', name: '', companyId: null, sortOrder: nextOrder, active: true },
   })
+
+  const existingCodes = useMemo(() => (allGroups.data ?? []).map((g) => g.code), [allGroups.data])
+  const defaultCode = useMemo(() => nextSequentialCode('NTC', existingCodes, 2, '-'), [existingCodes])
 
   useEffect(() => {
     if (!open) return
@@ -42,9 +47,17 @@ export function GroupFormModal({ open, group, nextOrder, onClose, onCreated }: G
             sortOrder: group.sortOrder,
             active: group.active,
           }
-        : { code: '', name: '', companyId: null, sortOrder: nextOrder, active: true },
+        : { code: defaultCode, name: '', companyId: null, sortOrder: nextOrder, active: true },
     )
-  }, [open, group, nextOrder, reset])
+  }, [open, group, nextOrder, defaultCode, reset])
+
+  const watchedName = useWatch({ control, name: 'name' })
+  useEffect(() => {
+    if (!open || group || formState.dirtyFields.code) return
+    const trimmed = (watchedName ?? '').trim()
+    const generated = trimmed ? uniqueAcronymCode(trimmed, existingCodes, '', 'NTC') : defaultCode
+    setValue('code', generated, { shouldValidate: false })
+  }, [open, group, watchedName, existingCodes, defaultCode, formState.dirtyFields.code, setValue])
 
   const companyOptions = useMemo(() => {
     const list = (companies.data?.items ?? []).map((c) => ({
@@ -88,8 +101,8 @@ export function GroupFormModal({ open, group, nextOrder, onClose, onCreated }: G
       <Form layout="vertical" onFinish={() => void onSubmit()}>
         {/* Nút submit ẩn: nhấn Enter trong ô nhập sẽ lưu (nút Lưu nằm ở footer, ngoài form). */}
         <button type="submit" hidden />
-        <FormInput control={control} name="code" label="Mã nhóm" required maxLength={30} placeholder="VD: VSB" />
-        <FormInput control={control} name="name" label="Tên nhóm" required maxLength={200} placeholder="VD: Vệ sinh khu bếp" />
+        <FormInput control={control} name="name" label="Tên nhóm" required autoFocus={!group} maxLength={200} placeholder="VD: Vệ sinh khu bếp" />
+        <FormInput control={control} name="code" label="Mã nhóm (Tự sinh theo tên)" required maxLength={30} placeholder="Tự động sinh" />
         <FormSelect
           control={control}
           name="companyId"

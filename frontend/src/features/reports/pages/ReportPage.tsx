@@ -5,9 +5,10 @@ import {
   TeamOutlined,
   TrophyOutlined,
 } from '@ant-design/icons'
-import { Tabs, Tooltip } from 'antd'
+import { Flex } from 'antd'
 import { useState } from 'react'
 import { PageContainer } from '@/components/layout/PageContainer'
+import { ViewTabs } from '@/components/layout/ViewTabs'
 import { CriteriaViolationTab } from '@/features/reports/components/CriteriaViolationTab'
 import { InspectorProductivityTab } from '@/features/reports/components/InspectorProductivityTab'
 import { MonthlySummaryTab } from '@/features/reports/components/MonthlySummaryTab'
@@ -20,50 +21,28 @@ export function ReportPage() {
   const tabItems = [
     {
       key: 'monthly',
-      label: (
-        <span>
-          <CalendarOutlined /> Tổng hợp tháng
-        </span>
-      ),
-      children: <MonthlySummaryTab />,
+      label: 'Tổng hợp tháng',
+      icon: <CalendarOutlined />,
     },
     {
       key: 'ranking',
-      label: (
-        <span>
-          <TrophyOutlined /> Xếp hạng nhà hàng
-        </span>
-      ),
-      children: <RestaurantRankingTab />,
+      label: 'Xếp hạng nhà hàng',
+      icon: <TrophyOutlined />,
     },
     {
       key: 'pareto',
-      label: (
-        <Tooltip title="Lỗi theo tiêu chí (Phân tích Pareto 80/20)">
-          <span>
-            <BarChartOutlined /> Tiêu chí (Pareto)
-          </span>
-        </Tooltip>
-      ),
-      children: <CriteriaViolationTab />,
+      label: 'Tiêu chí (Pareto 80/20)',
+      icon: <BarChartOutlined />,
     },
     {
       key: 'remediation',
-      label: (
-        <span>
-          <CheckCircleOutlined /> Tiến độ khắc phục
-        </span>
-      ),
-      children: <RemediationStatusTab />,
+      label: 'Tiến độ khắc phục',
+      icon: <CheckCircleOutlined />,
     },
     {
       key: 'productivity',
-      label: (
-        <span>
-          <TeamOutlined /> Năng suất chuyên viên
-        </span>
-      ),
-      children: <InspectorProductivityTab />,
+      label: 'Năng suất chuyên viên',
+      icon: <TeamOutlined />,
     },
   ]
 
@@ -72,13 +51,15 @@ export function ReportPage() {
       title="Báo cáo & Phân tích kiểm soát"
       subtitle="Tổng hợp dữ liệu điều hành, đánh giá mức độ tuân thủ và phân tích chất lượng vận hành toàn hệ thống"
     >
-      <Tabs
-        activeKey={activeTab}
-        onChange={setActiveTab}
-        items={tabItems}
-        size="large"
-        tabBarStyle={{ marginBottom: 20 }}
-      />
+      <Flex vertical gap={16}>
+        <ViewTabs activeKey={activeTab} onChange={setActiveTab} items={tabItems} />
+
+        {activeTab === 'monthly' && <MonthlySummaryTab />}
+        {activeTab === 'ranking' && <RestaurantRankingTab />}
+        {activeTab === 'pareto' && <CriteriaViolationTab />}
+        {activeTab === 'remediation' && <RemediationStatusTab />}
+        {activeTab === 'productivity' && <InspectorProductivityTab />}
+      </Flex>
     </PageContainer>
   )
 }

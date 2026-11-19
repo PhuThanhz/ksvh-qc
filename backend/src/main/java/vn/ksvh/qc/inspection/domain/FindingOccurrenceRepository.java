@@ -19,4 +19,16 @@ public interface FindingOccurrenceRepository extends JpaRepository<FindingOccurr
 
     /** Lấy toàn bộ lịch sử phát sinh tần suất lỗi của một nhà hàng, sắp xếp mới nhất trước. */
     List<FindingOccurrence> findByRestaurantIdOrderByOccurredAtDesc(Long restaurantId);
+
+    /** Chỉ lấy các cặp (restaurantId, criterionId) có từ 2 lần lỗi trở lên để kiểm tra nâng mức ảnh hưởng, tránh quét toàn bộ lịch sử 1 lần lỗi. */
+    @Query("""
+            select o from FindingOccurrence o
+            where (o.restaurantId, o.criterionId) in (
+                select o2.restaurantId, o2.criterionId
+                from FindingOccurrence o2
+                group by o2.restaurantId, o2.criterionId
+                having count(o2) >= 2
+            )
+            """)
+    List<FindingOccurrence> findAllForMultiViolationPairs();
 }

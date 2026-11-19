@@ -105,8 +105,8 @@ export function AuditLogPage() {
     <PageContainer
       title="Nhật ký hệ thống"
       subtitle="Theo dõi lịch sử thay đổi cấu hình, phân quyền, huỷ phiếu và các thao tác quản trị"
-      extra={
-        <Button icon={<DownloadOutlined />} onClick={onExportCsv} disabled={!auditLogs.data?.content?.length}>
+      headerExtra={
+        <Button className="btn-tint-excel" icon={<DownloadOutlined />} onClick={onExportCsv} disabled={!auditLogs.data?.content?.length}>
           Xuất CSV
         </Button>
       }

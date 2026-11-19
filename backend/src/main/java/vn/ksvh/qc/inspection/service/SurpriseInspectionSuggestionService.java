@@ -10,6 +10,8 @@ import vn.ksvh.qc.inspection.domain.Finding;
 import vn.ksvh.qc.inspection.domain.FindingRepository;
 import vn.ksvh.qc.inspection.domain.FindingStatus;
 import vn.ksvh.qc.inspection.dto.SurpriseInspectionSuggestion;
+import vn.ksvh.qc.organization.api.CompanyLookupApi;
+import vn.ksvh.qc.organization.api.CompanyRef;
 import vn.ksvh.qc.organization.api.OrgUnitLookupApi;
 import vn.ksvh.qc.organization.api.OrgUnitRef;
 import vn.ksvh.qc.security.CurrentUser;
@@ -24,6 +26,7 @@ public class SurpriseInspectionSuggestionService {
 
     private final FindingRepository findingRepository;
     private final OrgUnitLookupApi orgUnitLookupApi;
+    private final CompanyLookupApi companyLookupApi;
     private final CriteriaLookupApi criteriaLookupApi;
 
     private static final Set<FindingStatus> ACTIVE_FINDING_STATUSES = EnumSet.of(
@@ -46,6 +49,12 @@ public class SurpriseInspectionSuggestionService {
 
         Set<Long> restIds = byRestaurant.keySet();
         Map<Long, OrgUnitRef> restMap = orgUnitLookupApi.findRefs(restIds);
+
+        Set<Long> companyIds = restMap.values().stream()
+                .map(OrgUnitRef::companyId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        Map<Long, CompanyRef> companyMap = companyLookupApi.findRefs(companyIds);
 
         Set<Long> critIds = activeFindings.stream().map(Finding::getCriterionId).collect(Collectors.toSet());
         Map<Long, CriterionRef> critMap = criteriaLookupApi.findCriteria(critIds);
@@ -126,7 +135,7 @@ public class SurpriseInspectionSuggestionService {
                     .map(CriterionGroupRef::name)
                     .toList();
 
-            OrgUnitRef parentCompany = rest.companyId() != null ? orgUnitLookupApi.findRefs(List.of(rest.companyId())).get(rest.companyId()) : null;
+            CompanyRef parentCompany = rest.companyId() != null ? companyMap.get(rest.companyId()) : null;
 
             results.add(new SurpriseInspectionSuggestion(
                     rId,

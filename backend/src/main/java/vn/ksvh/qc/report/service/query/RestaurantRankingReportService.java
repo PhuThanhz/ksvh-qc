@@ -32,7 +32,7 @@ public class RestaurantRankingReportService {
 
         List<Object> params = new ArrayList<>();
         params.add(Date.valueOf(from));
-        params.add(Date.valueOf(to));
+        params.add(Date.valueOf(to.plusDays(1)));
 
         StringBuilder extraWhere = new StringBuilder();
         if (filter.companyId() != null) {
@@ -63,9 +63,9 @@ public class RestaurantRankingReportService {
                 FROM org_units r
                 JOIN companies c ON r.company_id = c.id
                 LEFT JOIN users m ON r.store_manager_user_id = m.id
-                LEFT JOIN inspections i ON i.restaurant_id = r.id AND i.created_at::date BETWEEN ? AND ?
+                LEFT JOIN inspections i ON i.restaurant_id = r.id AND i.created_at >= ?::timestamp AND i.created_at < ?::timestamp
                 LEFT JOIN inspection_items it ON it.inspection_id = i.id
-                LEFT JOIN findings f ON f.restaurant_id = r.id AND f.created_at::date BETWEEN ? AND ?
+                LEFT JOIN findings f ON f.restaurant_id = r.id AND f.created_at >= ?::timestamp AND f.created_at < ?::timestamp
                 WHERE r.unit_type = 'RESTAURANT' AND r.active = true
                 """ + extraWhere + """
                 GROUP BY r.id, r.code, r.name, c.name, m.full_name
@@ -74,7 +74,7 @@ public class RestaurantRankingReportService {
 
         // Insert duplicate params for findings sub-clause
         params.add(2, Date.valueOf(from));
-        params.add(3, Date.valueOf(to));
+        params.add(3, Date.valueOf(to.plusDays(1)));
 
         List<RestaurantRankingItem> items = jdbc.query(sql, (rs, rowNum) -> {
             long pass = rs.getLong("pass_items");

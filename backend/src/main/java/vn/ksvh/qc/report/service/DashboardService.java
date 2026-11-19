@@ -83,13 +83,14 @@ public class DashboardService {
     private Kpis kpis(LocalDate today, LocalDate monthStart, Period period, List<RestaurantCompliance> restComp) {
         Map<String, Object> inspKpis = jdbc.queryForMap("""
                 SELECT
-                    SUM(CASE WHEN DATE(submitted_at) >= ? THEN 1 ELSE 0 END) AS this_month,
-                    SUM(CASE WHEN DATE(submitted_at) >= ? AND DATE(submitted_at) < ? THEN 1 ELSE 0 END) AS last_month,
-                    COUNT(DISTINCT CASE WHEN DATE(submitted_at) >= ? THEN restaurant_id END) AS restaurants
+                    SUM(CASE WHEN submitted_at >= ?::timestamp THEN 1 ELSE 0 END) AS this_month,
+                    SUM(CASE WHEN submitted_at >= ?::timestamp AND submitted_at < ?::timestamp THEN 1 ELSE 0 END) AS last_month,
+                    COUNT(DISTINCT CASE WHEN submitted_at >= ?::timestamp THEN restaurant_id END) AS restaurants
                 FROM inspections
+                WHERE submitted_at >= ?::timestamp
                 """,
                 Date.valueOf(monthStart), Date.valueOf(monthStart.minusMonths(1)),
-                Date.valueOf(monthStart), Date.valueOf(monthStart));
+                Date.valueOf(monthStart), Date.valueOf(monthStart), Date.valueOf(monthStart.minusMonths(1)));
         long thisMonth = inspKpis.get("this_month") != null ? ((Number) inspKpis.get("this_month")).longValue() : 0L;
         long lastMonth = inspKpis.get("last_month") != null ? ((Number) inspKpis.get("last_month")).longValue() : 0L;
         long restaurants = inspKpis.get("restaurants") != null ? ((Number) inspKpis.get("restaurants")).longValue() : 0L;
@@ -108,7 +109,7 @@ public class DashboardService {
                 SELECT
                     COUNT(*) AS total,
                     SUM(CASE WHEN DATE(verified_at) <= deadline_date THEN 1 ELSE 0 END) AS on_time
-                FROM findings WHERE status = 'CLOSED' AND DATE(verified_at) >= ? AND DATE(verified_at) < ?
+                FROM findings WHERE status = 'CLOSED' AND verified_at >= ?::timestamp AND verified_at < ?::timestamp
                 """, period.startSql(), period.endSql());
         long total = closed.get("total") != null ? ((Number) closed.get("total")).longValue() : 0L;
         long onTime = closed.get("on_time") != null ? ((Number) closed.get("on_time")).longValue() : 0L;
@@ -130,7 +131,7 @@ public class DashboardService {
         jdbc.query("""
                 SELECT to_char(submitted_at, 'YYYY-MM') AS ym, COUNT(*) AS cnt
                 FROM inspections
-                WHERE DATE(submitted_at) >= ? AND DATE(submitted_at) < ?
+                WHERE submitted_at >= ?::timestamp AND submitted_at < ?::timestamp
                 GROUP BY to_char(submitted_at, 'YYYY-MM')
                 """, rs -> {
             inspMap.put(rs.getString("ym"), rs.getLong("cnt"));
@@ -140,7 +141,7 @@ public class DashboardService {
         jdbc.query("""
                 SELECT to_char(created_at, 'YYYY-MM') AS ym, COUNT(*) AS cnt
                 FROM findings
-                WHERE DATE(created_at) >= ? AND DATE(created_at) < ?
+                WHERE created_at >= ?::timestamp AND created_at < ?::timestamp
                 GROUP BY to_char(created_at, 'YYYY-MM')
                 """, rs -> {
             findMap.put(rs.getString("ym"), rs.getLong("cnt"));
@@ -170,7 +171,7 @@ public class DashboardService {
         Map<String, Long> counts = new HashMap<>();
         jdbc.query("""
                 SELECT status, COUNT(*) AS cnt FROM findings
-                WHERE DATE(created_at) >= ? AND DATE(created_at) < ? GROUP BY status
+                WHERE created_at >= ?::timestamp AND created_at < ?::timestamp GROUP BY status
                 """, rs -> {
             counts.put(rs.getString("status"), rs.getLong("cnt"));
         }, period.startSql(), period.endSql());
@@ -193,7 +194,7 @@ public class DashboardService {
         return jdbc.query("""
                 SELECT c.code AS code_key, c.name AS label, COUNT(*) AS cnt
                 FROM findings f JOIN criteria c ON c.id = f.criterion_id
-                WHERE f.status <> 'DISMISSED' AND DATE(f.created_at) >= ? AND DATE(f.created_at) < ?
+                WHERE f.status <> 'DISMISSED' AND f.created_at >= ?::timestamp AND f.created_at < ?::timestamp
                 GROUP BY c.code, c.name ORDER BY cnt DESC, c.code LIMIT 5
                 """,
                 (rs, i) -> new CountItem(rs.getString("code_key"), rs.getString("label"), rs.getLong("cnt")),
@@ -207,7 +208,7 @@ public class DashboardService {
                     COALESCE(SUM(CASE WHEN ii.result = 'PASS' THEN ii.base_impact ELSE 0 END), 0) AS pass_weight,
                     COALESCE(SUM(CASE WHEN ii.result = 'FAIL' THEN ii.base_impact ELSE 0 END), 0) AS fail_weight
                 FROM org_units u
-                LEFT JOIN inspections i ON i.restaurant_id = u.id AND i.status IN ('COMPLETED', 'AWAITING_ACK') AND DATE(i.submitted_at) >= ? AND DATE(i.submitted_at) < ?
+                LEFT JOIN inspections i ON i.restaurant_id = u.id AND i.status IN ('COMPLETED', 'AWAITING_ACK') AND i.submitted_at >= ?::timestamp AND i.submitted_at < ?::timestamp
                 LEFT JOIN inspection_items ii ON ii.inspection_id = i.id
                 WHERE u.unit_type = 'RESTAURANT' AND u.active = true
                 GROUP BY u.id, u.code, u.name

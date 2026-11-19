@@ -27,7 +27,7 @@ class OrgUnitLookupService implements OrgUnitLookupApi {
         if (distinct.isEmpty()) {
             return Map.of();
         }
-        return orgUnitRepository.findAllById(distinct).stream()
+        return orgUnitRepository.findWithCompanyByIdIn(distinct).stream()
                 .collect(Collectors.toUnmodifiableMap(u -> u.getId(),
                         this::toRef));
     }

@@ -44,6 +44,7 @@ export function AmbientCanvas() {
         overflow: 'hidden',
         background: activeTheme.isImage ? '#0f172a' : activeTheme.gradient,
         transform: 'translateZ(0)',
+        contain: 'strict',
       }}
     >
       {activeTheme.isImage && (
@@ -57,13 +58,13 @@ export function AmbientCanvas() {
               backgroundPosition: 'center',
             }}
           />
-          {/* Lớp phủ gradient nhẹ trên đỉnh giúp chữ header & page title luôn tương phản cực cao như Shopee Hub */}
+          {/* Lớp phủ gradient nhẹ nhàng để ảnh nền sáng và trong trẻo hơn */}
           <div
             style={{
               position: 'absolute',
               inset: 0,
               background:
-                'linear-gradient(to bottom, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.22) 35%, rgba(0, 0, 0, 0.12) 100%)',
+                'linear-gradient(to bottom, rgba(15, 23, 42, 0.26) 0%, rgba(15, 23, 42, 0.12) 40%, rgba(15, 23, 42, 0.05) 100%)',
             }}
           />
         </>

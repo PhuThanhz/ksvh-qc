@@ -15,12 +15,10 @@
   box-shadow: none !important;
 }
 .ant-tabs-tab:not(.ant-tabs-tab-active) {
-  background: rgba(255, 255, 255, 0.72) !important;
-  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.78) !important;
 }
 :is(.ant-card, .ant-modal, .ant-drawer) .ant-tabs-tab:not(.ant-tabs-tab-active) {
   background: #f1f5f9 !important;
-  backdrop-filter: none;
 }
 .ant-tabs-nav::before { display: none !important; }
 .ant-tabs-tab {
@@ -84,96 +82,104 @@
   text-shadow: none !important;
 }
 
-/* ---------- Thanh tìm kiếm & lọc (AdvancedFilter): kính mờ trong suốt trên nền ảnh, một hàng gọn ---------- */
+/* ---------- Thanh tìm kiếm & lọc (AdvancedFilter): Nền trắng sáng sạch sẽ (Crisp White), chữ đậm rõ ---------- */
 .advanced-filter .ant-input-affix-wrapper,
 .advanced-filter .ant-picker,
 .advanced-filter .ant-select .ant-select-selector,
 .advanced-filter .ant-select.ant-select-outlined {
-  min-height: 36px;
-  background: rgba(15, 23, 42, 0.2) !important;
-  border: 1px solid rgba(255, 255, 255, 0.28) !important;
-  border-radius: 8px !important;
-  box-shadow: 0 2px 10px -6px rgba(0, 0, 0, 0.25) !important;
-  backdrop-filter: blur(16px) saturate(150%);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
-  transition: background-color 0.15s ease, border-color 0.15s ease !important;
+  min-height: 40px;
+  background: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.14) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.07) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
 }
 .advanced-filter :is(.ant-input-affix-wrapper, .ant-picker, .ant-select.ant-select-outlined):hover {
-  background: rgba(15, 23, 42, 0.28) !important;
-  border-color: rgba(255, 255, 255, 0.36) !important;
+  background: #ffffff !important;
+  border-color: #93c5fd !important;
 }
 .advanced-filter :is(.ant-input-affix-wrapper-focused, .ant-picker-focused, .ant-select-focused),
 .app-shell--themed .advanced-filter :is(.search-input--transparent.ant-input-affix-wrapper-focused, .search-input--transparent.ant-input-affix-wrapper:focus-within) {
-  background: rgba(15, 23, 42, 0.32) !important;
-  border-color: rgba(255, 255, 255, 0.5) !important;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15) !important;
+  background: #ffffff !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.16) !important;
   outline: none !important;
 }
 .app-shell--themed .advanced-filter .search-input--transparent input.ant-input {
-  color: #ffffff !important;
+  color: #0f172a !important;
 }
 .app-shell--themed .advanced-filter .search-input--transparent input.ant-input::placeholder {
-  color: rgba(255, 255, 255, 0.88) !important;
+  color: #64748b !important;
   font-weight: 500 !important;
 }
 .app-shell--themed .advanced-filter .search-input--transparent .ant-input-prefix {
-  color: rgba(255, 255, 255, 0.92) !important;
+  color: #64748b !important;
 }
 .app-shell--themed .advanced-filter .search-input--transparent .ant-input-clear-icon {
-  color: rgba(255, 255, 255, 0.7) !important;
+  color: #94a3b8 !important;
 }
 .advanced-filter .ant-input-affix-wrapper { font-size: 14px; padding-inline: 12px !important; }
 .advanced-filter :is(.ant-input, .ant-picker-input > input, .ant-select-selection-item, .ant-select-selection-search-input) {
   background: transparent !important;
-  color: #ffffff !important;
+  color: #0f172a !important;
 }
-.advanced-filter :is(.ant-input, .ant-picker-input > input)::placeholder { color: rgba(255, 255, 255, 0.88) !important; font-weight: 500 !important; }
-.advanced-filter :is(.ant-select-selection-placeholder, .ant-select-placeholder) { color: rgba(255, 255, 255, 0.88) !important; font-weight: 500 !important; }
+.advanced-filter :is(.ant-input, .ant-picker-input > input)::placeholder { color: #64748b !important; font-weight: 500 !important; }
+.advanced-filter :is(.ant-select-selection-placeholder, .ant-select-placeholder) { color: #64748b !important; font-weight: 500 !important; }
 .advanced-filter :is(.anticon, .ant-select-arrow, .ant-select-suffix, .ant-picker-suffix, .ant-picker-separator, .ant-input-clear-icon, .ant-select-clear) {
-  color: rgba(255, 255, 255, 0.85) !important;
+  color: #64748b !important;
 }
-.advanced-filter .ant-select-clear, .advanced-filter .ant-picker-clear { background: transparent !important; }
+.advanced-filter .ant-select-clear, .advanced-filter .ant-picker-clear { background: #ffffff !important; }
 .advanced-filter :is(.filter-count, .ant-typography-secondary) {
-  color: rgba(255, 255, 255, 0.9) !important;
+  color: rgba(255, 255, 255, 0.92) !important;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
 }
 .advanced-filter .filter-count strong { color: #ffffff; }
 .advanced-filter :is(.filter-toggle, .filter-reset):not(:disabled) {
-  color: #ffffff !important;
-  background: rgba(15, 23, 42, 0.22) !important;
-  border: 1px solid rgba(255, 255, 255, 0.28) !important;
-  backdrop-filter: blur(16px) saturate(150%);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  min-height: 36px;
+  border-radius: 10px !important;
+  padding-inline: 14px !important;
+  color: #334155 !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.14) !important;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05) !important;
+  font-weight: 500 !important;
   outline: none !important;
-  box-shadow: none !important;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: all 0.15s ease !important;
+}
+.advanced-filter :is(.filter-toggle, .filter-reset):not(:disabled) .anticon {
+  color: #64748b !important;
 }
 .advanced-filter :is(.filter-toggle, .filter-reset):not(:disabled):hover {
-  background: rgba(15, 23, 42, 0.35) !important;
-  border-color: rgba(255, 255, 255, 0.45) !important;
-  color: #ffffff !important;
+  background: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.28) !important;
+  color: #0f172a !important;
+}
+.advanced-filter :is(.filter-toggle, .filter-reset):not(:disabled):hover .anticon {
+  color: #0f172a !important;
 }
 .advanced-filter :is(.filter-toggle, .filter-reset):focus,
 .advanced-filter :is(.filter-toggle, .filter-reset):focus-visible,
 .advanced-filter :is(.filter-toggle, .filter-reset).ant-btn:focus-visible {
   outline: none !important;
-  box-shadow: none !important;
-  border-color: rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08) !important;
+  border-color: rgba(15, 23, 42, 0.28) !important;
 }
 .advanced-filter .filter-toggle.filter-toggle--open:not(:disabled) {
-  background: rgba(255, 255, 255, 0.22) !important;
-  color: #ffffff !important;
-  border-color: rgba(255, 255, 255, 0.55) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: rgba(15, 23, 42, 0.24) !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08) !important;
   outline: none !important;
 }
 .advanced-filter .filter-toggle.filter-toggle--open:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.28) !important;
-  border-color: rgba(255, 255, 255, 0.65) !important;
-  color: #ffffff !important;
+  background: #f8fafc !important;
+  border-color: rgba(15, 23, 42, 0.32) !important;
+  color: #0f172a !important;
 }
 .advanced-filter .filter-toggle.filter-toggle--open .anticon {
-  color: #ffffff !important;
+  color: #334155 !important;
 }
 .advanced-filter .advanced-filter__panel { animation: page-enter 0.18s cubic-bezier(0.16, 1, 0.3, 1); }
 

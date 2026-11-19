@@ -1,5 +1,5 @@
 import { Button, Card, Tag, TextArea, Toast } from 'antd-mobile'
-import type { ChangeEvent } from 'react'
+import { memo, type ChangeEvent } from 'react'
 import { CriterionEvidenceSection } from '@/features/inspections/components/CriterionEvidenceSection'
 import { FindingRemediationInfo } from '@/features/inspections/components/FindingRemediationInfo'
 import { usePhotoCapture } from '@/features/media'
@@ -18,6 +18,9 @@ interface Props {
   onSetResult: (res: ItemResult) => void
   onSetComment: (comment: string) => void
   onSetEvidence: (evidenceUrls: string) => void
+  onSetCriterionResult?: (criterionId: number, res: ItemResult) => void
+  onSetCriterionComment?: (criterionId: number, comment: string) => void
+  onSetCriterionEvidence?: (criterionId: number, evidenceUrls: string) => void
   inspectionId?: number
   inspectorName?: string
   restaurantName?: string
@@ -25,13 +28,16 @@ interface Props {
   readOnly?: boolean
 }
 
-export function InspectionCriterionCard({
+export const InspectionCriterionCard = memo(function InspectionCriterionCard({
   index,
   item,
   rating,
   onSetResult,
   onSetComment,
   onSetEvidence,
+  onSetCriterionResult,
+  onSetCriterionComment,
+  onSetCriterionEvidence,
   inspectionId,
   inspectorName,
   restaurantName,
@@ -40,6 +46,21 @@ export function InspectionCriterionCard({
 }: Props) {
   const photo = usePhotoCapture()
   const isBusy = photo.step === 'processing' || photo.step === 'uploading'
+
+  const handleSetResult = (res: ItemResult) => {
+    if (onSetCriterionResult) onSetCriterionResult(item.criterionId, res)
+    else onSetResult(res)
+  }
+
+  const handleSetComment = (comment: string) => {
+    if (onSetCriterionComment) onSetCriterionComment(item.criterionId, comment)
+    else onSetComment(comment)
+  }
+
+  const handleSetEvidence = (evidenceUrls: string) => {
+    if (onSetCriterionEvidence) onSetCriterionEvidence(item.criterionId, evidenceUrls)
+    else onSetEvidence(evidenceUrls)
+  }
 
   const onCapturePhoto = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -58,7 +79,7 @@ export function InspectionCriterionCard({
     if (captured) {
       const currentUrls = rating.evidenceUrls ? rating.evidenceUrls.split(',').map((u) => u.trim()).filter(Boolean) : []
       currentUrls.push(captured.objectKey)
-      onSetEvidence(currentUrls.join(', '))
+      handleSetEvidence(currentUrls.join(', '))
       Toast.show({
         icon: captured.isOffline ? 'warning' : 'success',
         content: captured.isOffline ? 'Đã lưu ngoại tuyến (tự đồng bộ khi có mạng)' : 'Đã tải bằng chứng lên',
@@ -69,7 +90,7 @@ export function InspectionCriterionCard({
   const onRemovePhoto = (urlToRemove: string) => {
     const urls = rating.evidenceUrls ? rating.evidenceUrls.split(',').map((u) => u.trim()).filter(Boolean) : []
     const updated = urls.filter((u) => u !== urlToRemove)
-    onSetEvidence(updated.join(', '))
+    handleSetEvidence(updated.join(', '))
   }
 
   const evidenceList = rating.evidenceUrls
@@ -102,7 +123,7 @@ export function InspectionCriterionCard({
           color={rating.result === 'PASS' ? 'success' : 'default'}
           fill={rating.result === 'PASS' ? 'solid' : 'outline'}
           style={{ height: 44, fontSize: 14, fontWeight: 600, borderRadius: 8 }}
-          onClick={() => onSetResult('PASS')}
+          onClick={() => handleSetResult('PASS')}
         >
           Đạt
         </Button>
@@ -111,7 +132,7 @@ export function InspectionCriterionCard({
           color={rating.result === 'FAIL' ? 'danger' : 'default'}
           fill={rating.result === 'FAIL' ? 'solid' : 'outline'}
           style={{ height: 44, fontSize: 14, fontWeight: 600, borderRadius: 8 }}
-          onClick={() => onSetResult('FAIL')}
+          onClick={() => handleSetResult('FAIL')}
         >
           Không đạt
         </Button>
@@ -120,7 +141,7 @@ export function InspectionCriterionCard({
           color={rating.result === 'NA' ? 'primary' : 'default'}
           fill={rating.result === 'NA' ? 'solid' : 'outline'}
           style={{ height: 44, fontSize: 14, fontWeight: 600, borderRadius: 8 }}
-          onClick={() => onSetResult('NA')}
+          onClick={() => handleSetResult('NA')}
         >
           N/A
         </Button>
@@ -139,7 +160,7 @@ export function InspectionCriterionCard({
             rows={2}
             readOnly={readOnly}
             value={rating.comment ?? ''}
-            onChange={onSetComment}
+            onChange={handleSetComment}
             style={{ background: 'var(--app-surface)', padding: 6, borderRadius: 4 }}
           />
 
@@ -163,11 +184,22 @@ export function InspectionCriterionCard({
             rows={2}
             readOnly={readOnly}
             value={rating.comment ?? ''}
-            onChange={onSetComment}
+            onChange={handleSetComment}
             style={{ background: 'var(--app-surface)', padding: 6, borderRadius: 4 }}
           />
         </div>
       )}
     </Card>
   )
-}
+}, (prev, next) =>
+  prev.index === next.index &&
+  prev.item === next.item &&
+  prev.readOnly === next.readOnly &&
+  prev.inspectionId === next.inspectionId &&
+  prev.inspectorName === next.inspectorName &&
+  prev.restaurantName === next.restaurantName &&
+  prev.gpsCoords === next.gpsCoords &&
+  prev.rating.result === next.rating.result &&
+  prev.rating.comment === next.rating.comment &&
+  prev.rating.evidenceUrls === next.rating.evidenceUrls
+)

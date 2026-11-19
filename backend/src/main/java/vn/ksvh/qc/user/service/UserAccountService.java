@@ -39,7 +39,7 @@ class UserAccountService implements UserAccountApi {
         if (distinct.isEmpty()) {
             return Map.of();
         }
-        return userRepository.findAllById(distinct).stream()
+        return userRepository.findWithRolesByIdIn(distinct).stream()
                 .collect(Collectors.toUnmodifiableMap(User::getId,
                         u -> new UserSummary(u.getId(), u.getUsername(), u.getFullName(), u.isActive(), u.roleCodes())));
     }

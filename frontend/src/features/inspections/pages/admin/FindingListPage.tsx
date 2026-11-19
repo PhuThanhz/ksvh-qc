@@ -92,8 +92,9 @@ export function FindingListPage() {
     <PageContainer
       title="Khắc phục điểm không phù hợp"
       subtitle="Theo dõi toàn diện chu trình xử lý điểm không phù hợp: phản hồi, biện pháp khắc phục, thẩm tra và đóng hồ sơ"
-      extra={
+      headerExtra={
         <Button
+          className="btn-tint-excel"
           icon={<DownloadOutlined />}
           onClick={() => exportFindingsToCsv(findings.data?.items ?? [])}
           disabled={!findings.data?.items?.length}
