@@ -1,0 +1,245 @@
+/* ==========================================================================
+   LAYOUT STYLES: Sidebar, Header, Frosted Glass, Shell, Navigation
+   ========================================================================== */
+
+/* Sidebar kính mờ Apple */
+.apple-frosted-sidebar {
+  background: rgba(255, 255, 255, 0.52) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  border-inline-end: 1px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.04) !important;
+}
+
+.apple-frosted-header {
+  background: rgba(255, 255, 255, 0.52) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.03) !important;
+}
+
+.apple-frosted-sidebar .ant-menu {
+  border-inline-end: none !important;
+  padding-inline: 4px !important;
+  background: transparent !important;
+}
+
+.apple-frosted-sidebar .ant-menu-item,
+.apple-frosted-sidebar .ant-menu-submenu-title {
+  border-radius: 8px !important;
+  margin-inline: 6px !important;
+  margin-block: 3px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  color: #334155 !important;
+  letter-spacing: -0.01em !important;
+  transition: all 0.15s ease !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.apple-frosted-sidebar :is(.ant-menu-title-content, .ant-menu-item a, .ant-menu-item .ant-menu-item-icon, .ant-menu-submenu-title .ant-menu-item-icon, .ant-menu-submenu-arrow) {
+  color: inherit !important;
+  transition: color 0.15s ease !important;
+}
+
+.apple-frosted-sidebar :is(.ant-menu-item, .ant-menu-submenu-title) .ant-menu-item-icon {
+  font-size: 16px !important;
+  margin-right: 9px !important;
+  color: #64748b !important;
+}
+
+.apple-frosted-sidebar .ant-menu-submenu-arrow {
+  color: #94a3b8 !important;
+  font-size: 11px !important;
+}
+
+.apple-frosted-sidebar :is(.ant-menu-item, .ant-menu-submenu-title):hover {
+  background: rgba(255, 255, 255, 0.45) !important;
+  border: none !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03) !important;
+  color: #0f172a !important;
+}
+.apple-frosted-sidebar :is(.ant-menu-item, .ant-menu-submenu-title):hover .ant-menu-item-icon {
+  color: #0f172a !important;
+}
+
+.apple-frosted-sidebar .ant-menu-item-selected {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  font-weight: 600 !important;
+  border: 1px solid var(--app-border) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+}
+.apple-frosted-sidebar .ant-menu-item-selected :is(.ant-menu-item-icon, a, .ant-menu-title-content) {
+  color: #0f172a !important;
+}
+.apple-frosted-sidebar .ant-menu-sub { background: transparent !important; }
+
+/* Bitrix Pre-blurred Glass Sidebar & Header */
+:is(.bitrix-frosted-sidebar, .glass-chrome-sidebar) {
+  background: rgba(15, 23, 42, 0.55) !important;
+  border-inline-end: 1px solid rgba(255, 255, 255, 0.18) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+:is(.bitrix-frosted-sidebar, .glass-chrome-sidebar)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: var(--ambient-bg-blur, var(--ambient-bg-image));
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+}
+
+:is(.bitrix-frosted-sidebar, .glass-chrome-sidebar)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.18));
+  pointer-events: none;
+}
+
+:is(.bitrix-frosted-sidebar, .glass-chrome-sidebar) > * {
+  position: relative;
+  z-index: 1;
+}
+
+.bitrix-frosted-sidebar .ant-menu {
+  background: transparent !important;
+  border-inline-end: none !important;
+  position: relative;
+  z-index: 1;
+}
+
+.bitrix-frosted-sidebar :is(.ant-menu-item, .ant-menu-submenu-title) {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  border-radius: 10px !important;
+  margin-inline: 10px !important;
+  margin-block: 3px !important;
+  border: 1px solid transparent !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
+  transition: all 0.18s ease !important;
+}
+
+.bitrix-frosted-sidebar :is(.ant-menu-item, .ant-menu-submenu-title) .ant-menu-item-icon {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-size: 16px !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
+}
+
+.bitrix-frosted-sidebar :is(.ant-menu-item, .ant-menu-submenu-title):hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+.bitrix-frosted-sidebar :is(.ant-menu-item, .ant-menu-submenu-title):hover .ant-menu-item-icon {
+  color: #ffffff !important;
+}
+
+.bitrix-frosted-sidebar .ant-menu-item-selected {
+  background: rgba(255, 255, 255, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  border-radius: 12px !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+.bitrix-frosted-sidebar .ant-menu-item-selected :is(.ant-menu-item-icon, a, .ant-menu-title-content) {
+  color: #ffffff !important;
+}
+
+:is(.bitrix-frosted-header, .glass-chrome-header) {
+  background: rgba(15, 23, 42, 0.55) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+:is(.bitrix-frosted-header, .glass-chrome-header)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: var(--ambient-bg-blur, var(--ambient-bg-image));
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+}
+
+:is(.bitrix-frosted-header, .glass-chrome-header)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: rgba(0, 0, 0, 0.22);
+  pointer-events: none;
+}
+
+:is(.bitrix-frosted-header, .glass-chrome-header) > * {
+  position: relative;
+  z-index: 1;
+}
+
+.glass-pill-btn,
+.bitrix-frosted-header .ant-btn:not(.ant-btn-link) {
+  background: rgba(255, 255, 255, 0.14) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
+  transition: all 0.18s ease !important;
+}
+.glass-pill-btn:hover,
+.bitrix-frosted-header .ant-btn:not(.ant-btn-link):hover {
+  background: rgba(255, 255, 255, 0.22) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  color: #ffffff !important;
+}
+
+.glass-profile-card {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border-radius: 14px !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
+}
+
+.sidebar-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; padding: 0; cursor: pointer;
+  color: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+.sidebar-toggle:hover { color: #ffffff; background: rgba(255, 255, 255, 0.16); border-color: rgba(255, 255, 255, 0.26); }
+.sidebar-toggle:active { background: rgba(255, 255, 255, 0.22); }
+.sidebar-toggle:focus-visible { outline: 2px solid rgba(147, 197, 253, 0.9); outline-offset: 2px; }
+
+/* Ô ma trận quyền × vai trò */
+.perm-cell {
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+  width: 36px; height: 30px; border-radius: 8px; border: 1px solid transparent; background: transparent;
+}
+.perm-cell__check { color: #16a34a; font-size: 16px; }
+.perm-cell__lock { color: #94a3b8; font-size: 11px; }
+.perm-cell__plus { color: #94a3b8; font-size: 13px; opacity: 0; transition: opacity 0.15s ease; }
+.perm-cell--editable { cursor: pointer; transition: background-color 0.15s ease, border-color 0.15s ease; }
+.perm-cell--editable:hover { background: #eff6ff; border-color: rgba(37, 99, 235, 0.25); }
+.perm-cell--editable:hover .perm-cell__plus { opacity: 1; color: #2563eb; }
+.perm-cell--granted:hover { background: #fef2f2; border-color: rgba(220, 38, 38, 0.25); }
+.perm-cell--granted:hover .perm-cell__check { color: #dc2626; }
+.perm-cell--editable:focus-visible { outline: 2px solid #2563eb; outline-offset: 1px; }
+tr:hover .perm-cell__plus { opacity: 0.6; }

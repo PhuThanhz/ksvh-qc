@@ -31,4 +31,8 @@ export const organizationsAdminRoutes: AppRoute[] = [
     path: ROUTES.admin.departments,
     element: createElement(Navigate, { to: ROUTES.admin.organizations, replace: true }),
   },
+  {
+    path: ROUTES.admin.orgUnits,
+    element: createElement(Navigate, { to: ROUTES.admin.organizations, replace: true }),
+  },
 ]

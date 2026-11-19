@@ -1,0 +1,161 @@
+@import './tokens.css';
+
+/* ==========================================================================
+   BIẾN MÀU DÙNG CHUNG — KSVH QC
+   ========================================================================== */
+:root {
+  /* Chữ trên nền sáng */
+  --app-text: #0f172a;
+  --app-text-body: #475569;
+  --app-text-secondary: #64748b;
+  --app-text-muted: #94a3b8;
+
+  /* Nền & viền trên vùng sáng */
+  --app-surface: #ffffff;
+  --app-surface-muted: #f8fafc;
+  --app-surface-sunken: #f1f5f9;
+  --app-border: #e2e8f0;
+  --app-border-strong: #cbd5e1;
+  --app-focus-border: #94a3b8;
+  --app-focus-ring: rgba(100, 116, 139, 0.15);
+
+  /* Chữ & viền trên khung tối (sidebar, header, logo) */
+  --app-chrome-solid: #0f172a;
+  --app-chrome-solid-light: #1e293b;
+  --app-chrome-solid-mid: #334155;
+
+  --app-on-dark: #ffffff;
+  --app-on-dark-secondary: rgba(255, 255, 255, 0.75);
+  --app-on-dark-muted: rgba(255, 255, 255, 0.55);
+  --app-on-dark-faint: rgba(255, 255, 255, 0.40);
+  --app-on-dark-border: rgba(255, 255, 255, 0.18);
+  --app-on-dark-glass: rgba(255, 255, 255, 0.14);
+  --app-on-dark-glass-border: rgba(255, 255, 255, 0.28);
+
+  /* Màu trạng thái (chữ / nền nhạt / viền) */
+  --app-success: #16a34a;
+  --app-success-bg: #f0fdf4;
+  --app-success-border: #bbf7d0;
+  --app-warning: #d97706;
+  --app-warning-bg: #fffbeb;
+  --app-warning-border: #fde68a;
+  --app-danger: #dc2626;
+  --app-danger-bg: #fef2f2;
+  --app-danger-border: #fecaca;
+  --app-info: #2563eb;
+  --app-info-bg: #eff6ff;
+  --app-info-border: #bfdbfe;
+  --app-excel: #1d6f42;
+
+  /* Kính */
+  --app-glass-bg: rgba(255, 255, 255, 0.90);
+  --app-glass-border: rgba(255, 255, 255, 0.70);
+  --app-chrome-bg: rgba(12, 12, 14, 0.55);
+
+  /* antd-mobile đồng bộ ngôn ngữ thương hiệu KSVH QC */
+  --adm-color-primary: #1677ff;
+  --adm-border-radius: 12px;
+  --adm-font-size-main: 14px;
+
+  /* Màu nhấn theo ý nghĩa */
+  --tint-neutral: 15, 23, 42;
+  --tint-view: 37, 99, 235;
+  --tint-add: 22, 163, 74;
+  --tint-edit: 217, 119, 6;
+  --tint-delete: 220, 38, 38;
+  --tint-excel: 16, 124, 65;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { margin: 0; min-height: 100%; }
+
+body {
+  font-family: var(--font-family-apple);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: transparent;
+  color: var(--apple-text-primary);
+}
+
+code, kbd, samp, pre, .font-code {
+  font-family: var(--font-family-code) !important;
+}
+
+.compact-table-form .ant-form-item { margin-bottom: 0; }
+.compact-table-form .ant-table-cell { vertical-align: top; }
+
+/* Thin Smooth Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.6); }
+
+/* Tiện ích typography & chip */
+.app-subtext,
+.app-caption {
+  font-size: 12px !important;
+  color: var(--app-text-secondary) !important;
+  line-height: 1.4 !important;
+}
+
+.app-secondary-text {
+  font-size: 13px !important;
+  color: var(--app-text-secondary) !important;
+}
+
+.app-danger-text { color: var(--app-danger) !important; }
+.app-warning-text { color: var(--app-warning) !important; }
+.app-success-text { color: var(--app-success) !important; }
+
+.app-mobile-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: all 0.15s ease;
+}
+
+.app-stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: var(--app-surface-muted);
+  border: 1px solid var(--app-border);
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
+.code-badge {
+  font-family: var(--font-family-code) !important;
+  background: rgba(15, 23, 42, 0.05);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 12.5px;
+  letter-spacing: -0.01em;
+}
+
+/* Chuyển trang mượt */
+.nav-progress {
+  position: absolute; left: 0; bottom: 0; height: 2px; width: 0; opacity: 0; pointer-events: none;
+  background: linear-gradient(90deg, #60a5fa, #2563eb);
+  box-shadow: 0 0 8px rgba(96, 165, 250, 0.7);
+  transition: width 0.25s ease, opacity 0.3s ease 0.15s;
+}
+.nav-progress--active { width: 85%; opacity: 1; transition: width 2.5s cubic-bezier(0.1, 0.6, 0.2, 1), opacity 0.1s ease; }
+
+.page-enter { animation: page-enter 0.22s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-enter { animation: none; }
+  .nav-progress { transition: none; }
+}
+
+@media (max-width: 900px) { .auth-hero-pane { display: none !important; } }

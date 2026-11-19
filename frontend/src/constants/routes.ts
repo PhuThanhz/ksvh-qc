@@ -5,6 +5,7 @@ export const ROUTES = {
     root: '/admin',
     users: '/admin/users',
     organizations: '/admin/organizations',
+    orgUnits: '/admin/org-units',
     restaurants: '/admin/restaurants',
     departments: '/admin/departments',
     companies: '/admin/companies',
