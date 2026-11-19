@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Col, Flex, Form, Modal, Row, Segmented } from 'antd'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { FormInput } from '@/components/data-entry/FormInput'
 import { FormNumber } from '@/components/data-entry/FormNumber'
@@ -10,7 +10,6 @@ import { FormTextarea } from '@/components/data-entry/FormTextarea'
 import { useNotify } from '@/components/feedback/useNotify'
 import { IMPACT_LEVELS, type Criterion, type CriterionGroup } from '@/features/criteria/criteria.types'
 import { useSaveCriterion } from '@/features/criteria/hooks/useCriteria'
-import { useTemplateOptions } from '@/features/criteria/hooks/useTemplates'
 import { criterionSchema, type CriterionFormValues } from '@/features/criteria/schemas/criteria.schema'
 import { applyFieldErrors, getErrorMessage } from '@/lib/http'
 import { CriterionBatchPane } from './CriterionBatchPane'
@@ -38,17 +37,15 @@ export interface CriterionFormModalProps {
 function emptyValues(groupId?: number): CriterionFormValues {
   return {
     groupId: groupId ?? null, code: '', name: '', checkMethod: '',
-    evidenceRequired: '', baseImpact: 1, sortOrder: 0, active: true, templateIds: [],
+    evidenceRequired: '', baseImpact: 1, sortOrder: 0, active: true,
   }
 }
 
 export function CriterionFormModal({ open, criterion, groups, defaultGroupId, onClose }: CriterionFormModalProps) {
   const notify = useNotify()
   const save = useSaveCriterion()
-  const templates = useTemplateOptions(open)
   // Khi thêm mới: chọn nhập một tiêu chí (form chi tiết) hoặc nhiều tiêu chí cùng lúc (bảng nhập nhanh).
   const [mode, setMode] = useState<CreateMode>('single')
-  // Mỗi lần mở modal: quay về chế độ "Một tiêu chí" (điều chỉnh state theo props ngay khi render).
   const [prevOpen, setPrevOpen] = useState(open)
   if (open !== prevOpen) {
     setPrevOpen(open)
@@ -68,7 +65,6 @@ export function CriterionFormModal({ open, criterion, groups, defaultGroupId, on
             groupId: criterion.groupId, code: criterion.code, name: criterion.name,
             checkMethod: criterion.checkMethod ?? '', evidenceRequired: criterion.evidenceRequired ?? '',
             baseImpact: criterion.baseImpact, sortOrder: criterion.sortOrder, active: criterion.active,
-            templateIds: criterion.templates?.map((t) => t.id) ?? [],
           }
         : emptyValues(defaultGroupId),
     )
@@ -83,7 +79,6 @@ export function CriterionFormModal({ open, criterion, groups, defaultGroupId, on
           groupId: v.groupId ?? 0,
           checkMethod: v.checkMethod || undefined,
           evidenceRequired: v.evidenceRequired || undefined,
-          templateIds: v.templateIds ?? [],
         },
       },
       {
@@ -105,23 +100,7 @@ export function CriterionFormModal({ open, criterion, groups, defaultGroupId, on
       label: `${g.code} – ${g.name}${g.companyName ? ` (${g.companyName})` : ''}`,
     }))
 
-  // Nhóm riêng của một công ty → chỉ chọn được mẫu của đúng công ty đó (server cũng kiểm tra).
-  // Mẫu đã ngưng / khác công ty vẫn hiện nếu tiêu chí đang nằm trong mẫu, để bỏ chọn được.
   const groupId = useWatch({ control, name: 'groupId' })
-  const selectedTemplateIds = useWatch({ control, name: 'templateIds' })
-  const groupCompanyId = groups.find((g) => g.id === groupId)?.companyId ?? null
-  const templateOptions = useMemo(() => {
-    const selected = new Set(selectedTemplateIds ?? [])
-    return (templates.data ?? [])
-      .filter((t) => {
-        const fits = t.active && (groupCompanyId === null || t.companyId === groupCompanyId)
-        return fits || selected.has(t.id)
-      })
-      .map((t) => {
-        const note = !t.active ? ' (đã ngưng)' : groupCompanyId !== null && t.companyId !== groupCompanyId ? ' (khác công ty)' : ''
-        return { value: t.id, label: `${t.code} – ${t.name}${note}` }
-      })
-  }, [templates.data, groupCompanyId, selectedTemplateIds])
 
   return (
     <Modal
@@ -188,19 +167,6 @@ export function CriterionFormModal({ open, criterion, groups, defaultGroupId, on
           </Col>
           <Col span={24}>
             <FormInput control={control} name="name" label="Nội dung tiêu chí kiểm soát" required maxLength={300} placeholder="Nhập nội dung tiêu chí kiểm soát chi tiết..." />
-          </Col>
-          <Col span={24}>
-            <FormSelect<CriterionFormValues, number[]>
-              control={control}
-              name="templateIds"
-              label="Mẫu phiếu kiểm tra áp dụng"
-              mode="multiple"
-              showSearch={{ optionFilterProp: 'label' }}
-              placeholder="Chọn các mẫu phiếu kiểm tra áp dụng tiêu chí này (tuỳ chọn)"
-              options={templateOptions}
-              allowClear
-              extra="Tiêu chí kiểm soát sẽ tự động được bổ sung vào danh mục đánh giá của các mẫu phiếu đã chọn."
-            />
           </Col>
           <Col span={24}>
             <FormTextarea control={control} name="checkMethod" label="Phương pháp đánh giá" autoSize={{ minRows: 2, maxRows: 6 }} maxLength={4000} />
