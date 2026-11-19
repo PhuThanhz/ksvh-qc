@@ -1,7 +1,5 @@
 package vn.ksvh.qc.organization.domain;
 
-import vn.ksvh.qc.organization.api.RiskPolicy;
-
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -54,9 +52,13 @@ public class OrgUnit extends BaseEntity {
     @Column(name = "checkin_radius_m")
     private Integer checkinRadiusM;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "risk_policy", nullable = false, length = 20)
-    private RiskPolicy riskPolicy = RiskPolicy.STANDARD;
+    /** Ngưỡng nâng mức riêng (số lần lỗi trong kỳ đếm); null = theo quy tắc nâng mức chung. */
+    @Column(name = "escalation_threshold")
+    private Short escalationThreshold;
+
+    /** Số tháng liên tục không lỗi để hạ về mức gốc, riêng của nhà hàng; null = theo quy tắc chung. */
+    @Column(name = "escalation_reset_months")
+    private Short escalationResetMonths;
 
     @Column(nullable = false)
     private boolean active = true;

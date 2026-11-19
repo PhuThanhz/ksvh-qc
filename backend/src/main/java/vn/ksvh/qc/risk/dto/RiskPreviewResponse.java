@@ -2,15 +2,11 @@ package vn.ksvh.qc.risk.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import vn.ksvh.qc.organization.api.RiskPolicy;
-
 import java.time.LocalDate;
 
 /** Kết quả mô phỏng một lần lỗi theo cấu hình hiệu lực tại {@code date}. */
 public record RiskPreviewResponse(
         LocalDate date,
-        /** Chính sách mà quy tắc nâng mức được lấy ra (Khắt khe chưa khai báo thì về Tiêu chuẩn). */
-        RiskPolicy policy,
         int periodMonths,
         LocalDate periodStart,
         @Schema(nullable = true) Integer thresholdCount,

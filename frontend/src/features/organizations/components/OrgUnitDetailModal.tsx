@@ -4,7 +4,7 @@ import { DetailModal, type DetailField } from '@/components/feedback/DetailModal
 import { ActiveBadge } from '@/features/organizations/components/ActiveBadge'
 import { OrgUnitTypeTag } from '@/features/organizations/components/OrgUnitTypeTag'
 import {
-  RISK_POLICY_LABEL,
+  escalationOverrideText,
   type OrgUnit,
   type OrgUnitType,
   type UserRef,
@@ -62,8 +62,12 @@ export function OrgUnitDetailModal({ open, unit, fixedUnitType, onClose, onEdit 
         value: unit.checkinRadiusM ? `${unit.checkinRadiusM} mét` : '—',
       },
       {
-        label: 'Chính sách rủi ro',
-        value: <Tag color={unit.riskPolicy === 'STRICT' ? 'error' : 'default'}>{RISK_POLICY_LABEL[unit.riskPolicy]}</Tag>,
+        label: 'Ngưỡng nâng mức',
+        value: escalationOverrideText(unit) ? (
+          <Tag color="warning">Riêng: {escalationOverrideText(unit)}</Tag>
+        ) : (
+          'Theo quy tắc chung'
+        ),
       },
     )
   }

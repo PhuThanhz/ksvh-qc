@@ -5,7 +5,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import vn.ksvh.qc.organization.api.RiskPolicy;
 import vn.ksvh.qc.organization.domain.*;
 import vn.ksvh.qc.organization.dto.CompanyRequest;
 import vn.ksvh.qc.organization.dto.OrgUnitRequest;
@@ -29,17 +28,12 @@ public class OrganizationExcelService {
     static final String CO_CODE = "Mã công ty", CO_NAME = "Tên công ty", ACTIVE = "Hoạt động";
     static final String U_CODE = "Mã đơn vị", U_NAME = "Tên đơn vị", U_COMPANY = "Mã công ty", U_TYPE = "Loại đơn vị",
             U_ADDRESS = "Địa chỉ", U_CHT = "Tài khoản CHT", U_OBM = "Tài khoản OBM",
-            U_LAT = "Vĩ độ", U_LNG = "Kinh độ", U_RADIUS = "Bán kính GPS (m)", U_POLICY = "Chính sách rủi ro";
+            U_LAT = "Vĩ độ", U_LNG = "Kinh độ", U_RADIUS = "Bán kính GPS (m)",
+            U_THRESHOLD = "Ngưỡng nâng mức riêng", U_RESET = "Hạ mức sau (tháng) riêng";
     private static final Map<String, OrgUnitType> TYPES = new LinkedHashMap<>();
     static {
         TYPES.put("Nhà hàng", OrgUnitType.RESTAURANT);
         TYPES.put("Phòng ban", OrgUnitType.DEPARTMENT);
-    }
-    private static final Map<String, RiskPolicy> POLICIES = new LinkedHashMap<>();
-    static {
-        for (RiskPolicy p : RiskPolicy.values()) {
-            POLICIES.put(p.label(), p);
-        }
     }
     private static final List<String> YES_NO = List.of("Có", "Không");
 
@@ -53,7 +47,7 @@ public class OrganizationExcelService {
     private record CompanyRow(String code, String name, Boolean active) {}
 
     private record UnitRow(String code, String name, String companyCode, String type, String address,
-                           String cht, String obm, Double lat, Double lng, Integer radius, String policy, Boolean active) {}
+                           String cht, String obm, Double lat, Double lng, Integer radius, Integer threshold, Integer reset, Boolean active) {}
 
     private static ExcelSheet<CompanyRow> companySheet(List<CompanyRow> rows) {
         return ExcelSheet.of("Công ty", "DANH MỤC CÔNG TY", rows)
@@ -74,8 +68,10 @@ public class OrganizationExcelService {
                 .column(U_LAT, 13, UnitRow::lat).note("Không bắt buộc. Số thập phân, vd 10.762622. Nhập thì phải có cả kinh độ.")
                 .column(U_LNG, 13, UnitRow::lng).note("Không bắt buộc. Số thập phân, vd 106.660172")
                 .column(U_RADIUS, 14, UnitRow::radius).note("Không bắt buộc. Từ 10 đến 5000 mét.")
-                .column(U_POLICY, 16, UnitRow::policy).options(List.copyOf(POLICIES.keySet()))
-                .note("Chỉ cho nhà hàng. Bỏ trống: nhà hàng mới = Tiêu chuẩn, nhà hàng đã có = giữ nguyên.")
+                .column(U_THRESHOLD, 16, UnitRow::threshold)
+                .note("Chỉ cho nhà hàng cần khác quy tắc chung (vd fine dining). Từ 2 đến 50 lần. Bỏ trống = theo quy tắc chung.")
+                .column(U_RESET, 16, UnitRow::reset)
+                .note("Số tháng liên tục không lỗi để hạ về mức gốc, 1–24. Bỏ trống = theo quy tắc chung.")
                 .column(ACTIVE, 12, UnitRow::active).options(YES_NO);
     }
 
@@ -92,7 +88,8 @@ public class OrganizationExcelService {
                 u.getUnitType() == OrgUnitType.RESTAURANT ? "Nhà hàng" : "Phòng ban",
                 u.getAddress(), username(users, u.getStoreManagerUserId()), username(users, u.getObmUserId()),
                 u.getLatitude(), u.getLongitude(), u.getCheckinRadiusM(),
-                u.getUnitType() == OrgUnitType.RESTAURANT ? u.getRiskPolicy().label() : null, u.isActive())).toList();
+                u.getEscalationThreshold() == null ? null : u.getEscalationThreshold().intValue(),
+                u.getEscalationResetMonths() == null ? null : u.getEscalationResetMonths().intValue(), u.isActive())).toList();
         return ExcelWriter.export(List.of(
                 companySheet(companies.stream().map(c -> new CompanyRow(c.getCode(), c.getName(), c.isActive())).toList()),
                 unitSheet(unitRows)));
@@ -130,7 +127,8 @@ public class OrganizationExcelService {
 
             Map<String, String> unitFields = Map.ofEntries(Map.entry("companyId", U_COMPANY), Map.entry("unitType", U_TYPE),
                     Map.entry("code", U_CODE), Map.entry("name", U_NAME), Map.entry("address", U_ADDRESS),
-                    Map.entry("latitude", U_LAT), Map.entry("longitude", U_LNG), Map.entry("checkinRadiusM", U_RADIUS));
+                    Map.entry("latitude", U_LAT), Map.entry("longitude", U_LNG), Map.entry("checkinRadiusM", U_RADIUS),
+                    Map.entry("escalationThreshold", U_THRESHOLD), Map.entry("escalationResetMonths", U_RESET));
             session.rows(unitRows, row -> {
                 String code = row.text(U_CODE);
                 Optional<OrgUnit> existing = code == null ? Optional.empty() : orgUnitRepository.findByCodeIgnoreCase(code);
@@ -140,7 +138,7 @@ public class OrganizationExcelService {
                 OrgUnitRequest req = session.validate(new OrgUnitRequest(companyId, row.choice(U_TYPE, TYPES), code,
                         row.text(U_NAME), row.text(U_ADDRESS),
                         row.number(U_LAT), row.number(U_LNG), row.integer(U_RADIUS), row.bool(ACTIVE, true),
-                        row.choice(U_POLICY, POLICIES)), row, unitFields);
+                        row.integer(U_THRESHOLD), row.integer(U_RESET)), row, unitFields);
                 Long chtId = userId(row, U_CHT);
                 Long obmId = userId(row, U_OBM);
                 Long unitId = existing.isPresent()

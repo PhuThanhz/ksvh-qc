@@ -107,7 +107,7 @@ export function RestaurantRiskProfileTab({ initialRestaurantId }: RestaurantRisk
             loading={isLoading}
             footnote={
               data
-                ? `Chính sách ${data.riskPolicy === 'STRICT' ? 'Khắt khe' : 'Tiêu chuẩn'}${
+                ? `${data.customEscalation ? 'Ngưỡng riêng' : 'Quy tắc chung'}${
                     data.escalationThreshold != null ? ` · nâng mức từ ${data.escalationThreshold} lần` : ''
                   }`
                 : 'Liên tục không phát sinh lỗi'

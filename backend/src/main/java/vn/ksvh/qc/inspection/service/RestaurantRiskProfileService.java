@@ -12,7 +12,6 @@ import vn.ksvh.qc.organization.api.CompanyLookupApi;
 import vn.ksvh.qc.organization.api.CompanyRef;
 import vn.ksvh.qc.organization.api.OrgUnitLookupApi;
 import vn.ksvh.qc.organization.api.OrgUnitRef;
-import vn.ksvh.qc.organization.api.RiskPolicy;
 import vn.ksvh.qc.risk.CurrentCriterionRisk;
 import vn.ksvh.qc.risk.RiskRules;
 import vn.ksvh.qc.shared.error.BusinessException;
@@ -37,7 +36,6 @@ public class RestaurantRiskProfileService {
     private final OrgUnitLookupApi orgUnitLookupApi;
     private final CompanyLookupApi companyLookupApi;
     private final UserAccountApi userAccountApi;
-    private final RiskAssessor riskAssessor;
     private final Clock clock;
 
     public RestaurantRiskProfileResponse getRestaurantRiskProfile(Long restaurantId, LocalDate asOfDate) {
@@ -47,8 +45,8 @@ public class RestaurantRiskProfileService {
         }
 
         LocalDate asOf = asOfDate != null ? asOfDate : BusinessDates.today(clock);
-        RiskConfigRef config = riskAssessor.configFor(restaurantId, asOf);
-        RiskRules rules = RiskRules.from(config);
+        RiskConfigRef config = criteriaLookupApi.riskConfigAt(asOf);
+        RiskRules rules = RiskAssessor.rulesFor(rest, config);
 
         String companyName = null;
         if (rest.companyId() != null) {
@@ -120,7 +118,7 @@ public class RestaurantRiskProfileService {
                 .thenComparing(CriterionRiskProfileItem::lastViolationDate, Comparator.nullsLast(Comparator.reverseOrder())));
 
         int totalEscalated = (int) items.stream().filter(CriterionRiskProfileItem::isEscalated).count();
-        Integer resetPeriod = config.escalation() != null ? config.escalation().resetPeriodMonths() : null;
+        Integer resetPeriod = rules.escalation() != null ? rules.escalation().resetPeriodMonths() : null;
 
         return new RestaurantRiskProfileResponse(
                 rest.id(),
@@ -131,8 +129,8 @@ public class RestaurantRiskProfileService {
                 asOf,
                 config.periodMonths(),
                 asOf.withDayOfMonth(1).minusMonths(config.periodMonths() - 1L),
-                rest.riskPolicy() != null ? rest.riskPolicy() : RiskPolicy.STANDARD,
-                config.escalation() != null ? config.escalation().thresholdCount() : null,
+                rest.escalationThreshold() != null || rest.escalationResetMonths() != null,
+                rules.escalation() != null ? rules.escalation().thresholdCount() : null,
                 resetPeriod,
                 totalEscalated,
                 activeFindings.size(),
@@ -142,14 +140,8 @@ public class RestaurantRiskProfileService {
 
     public List<EscalatedCriterionSummary> getEscalatedCriteria(LocalDate asOfDate) {
         LocalDate asOf = asOfDate != null ? asOfDate : BusinessDates.today(clock);
-        Map<RiskPolicy, RiskRules> rulesByPolicy = new EnumMap<>(RiskPolicy.class);
-        for (RiskPolicy policy : RiskPolicy.values()) {
-            RiskConfigRef config = criteriaLookupApi.riskConfigAt(asOf, policy);
-            if (config.escalation() != null) {
-                rulesByPolicy.put(policy, RiskRules.from(config));
-            }
-        }
-        if (rulesByPolicy.isEmpty()) {
+        RiskConfigRef config = criteriaLookupApi.riskConfigAt(asOf);
+        if (config.escalation() == null) {
             return List.of();
         }
 
@@ -176,8 +168,7 @@ public class RestaurantRiskProfileService {
             Long restId = restEntry.getKey();
             OrgUnitRef rest = restMap.get(restId);
             if (rest == null) continue;
-            RiskRules rules = rulesByPolicy.get(rest.riskPolicy() != null ? rest.riskPolicy() : RiskPolicy.STANDARD);
-            if (rules == null) continue;
+            RiskRules rules = RiskAssessor.rulesFor(rest, config);
             String companyName = rest.companyId() != null && companyMap.containsKey(rest.companyId())
                     ? companyMap.get(rest.companyId()).name() : null;
 

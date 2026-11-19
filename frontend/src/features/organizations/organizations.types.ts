@@ -11,18 +11,14 @@ export type RestaurantAssignment = Schemas['RestaurantAssignmentResponse']
 export type RestaurantAssignmentPayload = Schemas['RestaurantAssignmentRequest']
 export type AssignedRestaurant = Schemas['AssignedRestaurant']
 
-export type RiskPolicy = Schemas['OrgUnitResponse']['riskPolicy']
-
-/** Ngưỡng nâng / hạ mức của từng chính sách khai báo ở trang Quy tắc tái phạm & nâng mức (theo ngày hiệu lực). */
-export const RISK_POLICY_LABEL: Record<RiskPolicy, string> = {
-  STANDARD: 'Tiêu chuẩn',
-  STRICT: 'Khắt khe (Fine dining)',
+/** Ngưỡng nâng / hạ mức riêng của nhà hàng; trống = theo quy tắc chung (trang Quy tắc tái phạm & nâng mức). */
+export function escalationOverrideText(u: Pick<OrgUnit, 'escalationThreshold' | 'escalationResetMonths'>): string | null {
+  const parts = [
+    u.escalationThreshold != null ? `nâng mức từ ${u.escalationThreshold} lần` : null,
+    u.escalationResetMonths != null ? `hạ mức sau ${u.escalationResetMonths} tháng` : null,
+  ].filter(Boolean)
+  return parts.length ? parts.join(' · ') : null
 }
-
-export const RISK_POLICY_OPTIONS = (Object.keys(RISK_POLICY_LABEL) as RiskPolicy[]).map((value) => ({
-  value,
-  label: RISK_POLICY_LABEL[value],
-}))
 
 /** OpenAPI không gắn được null cho trường kiểu tham chiếu: CHT/OBM có thể chưa gán (phòng ban luôn trống). */
 export type OrgUnit = Omit<Schemas['OrgUnitResponse'], 'storeManager' | 'obm'> & {

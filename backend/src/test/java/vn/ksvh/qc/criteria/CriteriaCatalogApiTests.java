@@ -258,7 +258,7 @@ class CriteriaCatalogApiTests extends ApiTestSupport {
 
     @Test
     void escalationRuleListMarksCurrentVersion() throws Exception {
-        mvc.perform(withJson(post("/api/v1/escalation-rules"), Map.of("riskPolicy", "STANDARD", "thresholdCount", 4, "stepIncrease", 1,
+        mvc.perform(withJson(post("/api/v1/escalation-rules"), Map.of("thresholdCount", 4, "stepIncrease", 1,
                         "maxImpact", 5, "resetPeriodMonths", 6, "effectiveFrom", TODAY.plusDays(10).toString()))
                         .with(as(1L, MANAGE)))
                 .andExpect(status().isCreated());
@@ -269,7 +269,7 @@ class CriteriaCatalogApiTests extends ApiTestSupport {
                 .andExpect(jsonPath("$[1].status").value("CURRENT"))
                 .andExpect(jsonPath("$[1].thresholdCount").value(3));
 
-        mvc.perform(withJson(post("/api/v1/escalation-rules"), Map.of("riskPolicy", "STANDARD", "thresholdCount", 3, "stepIncrease", 1,
+        mvc.perform(withJson(post("/api/v1/escalation-rules"), Map.of("thresholdCount", 3, "stepIncrease", 1,
                         "maxImpact", 6, "resetPeriodMonths", 6, "effectiveFrom", TODAY.plusDays(20).toString()))
                         .with(as(1L, MANAGE)))
                 .andExpect(status().isBadRequest())
@@ -289,7 +289,7 @@ class CriteriaCatalogApiTests extends ApiTestSupport {
         mvc.perform(delete("/api/v1/frequency-configs/" + freq).with(as(1L, MANAGE))).andExpect(status().isNoContent());
 
         // Nâng mức: giống cả 4 thông số → chặn; khác 1 thông số → cho phép
-        Map<String, Object> rule = Map.of("riskPolicy", "STANDARD", "thresholdCount", 7, "stepIncrease", 2, "maxImpact", 4,
+        Map<String, Object> rule = Map.of("thresholdCount", 7, "stepIncrease", 2, "maxImpact", 4,
                 "resetPeriodMonths", 9, "effectiveFrom", TODAY.plusDays(50).toString());
         long esc = read(mvc.perform(withJson(post("/api/v1/escalation-rules"), rule).with(as(1L, MANAGE)))
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString()).get("id").asLong();

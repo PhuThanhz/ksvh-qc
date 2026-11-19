@@ -6,8 +6,7 @@ import { ActiveBadge } from '@/features/organizations/components/ActiveBadge'
 import { OrgUnitTypeTag } from '@/features/organizations/components/OrgUnitTypeTag'
 import {
   ORG_UNIT_TYPE_LABEL,
-  RISK_POLICY_LABEL,
-  type RiskPolicy,
+  escalationOverrideText,
   type OrgUnit,
   type OrgUnitType,
 } from '@/features/organizations/organizations.types'
@@ -80,7 +79,7 @@ export function OrgUnitTable({ onView, onEdit, onDelete, onFilterType, fixedUnit
     // Tên công ty dài: xuống tối đa 2 dòng theo từ (không bẻ từng chữ), rê chuột xem đủ.
     // Không dùng `ellipsis` của antd (nó chuyển cả bảng sang table-layout: fixed, bóp cột không khai báo độ rộng).
     {
-      title: 'Công ty thành viên',
+      title: 'Công ty',
       dataIndex: 'companyName',
       width: 240,
       render: (v: string) => (
@@ -115,13 +114,13 @@ export function OrgUnitTable({ onView, onEdit, onDelete, onFilterType, fixedUnit
               ),
           },
           {
-            title: 'Chính sách rủi ro',
-            dataIndex: 'riskPolicy',
-            key: 'riskPolicy',
-            width: 170,
-            render: (policy: RiskPolicy) => (
-              <Tag color={policy === 'STRICT' ? 'error' : 'default'}>{RISK_POLICY_LABEL[policy]}</Tag>
-            ),
+            title: 'Ngưỡng nâng mức',
+            key: 'escalation',
+            width: 190,
+            render: (_: unknown, u: OrgUnit) => {
+              const text = escalationOverrideText(u)
+              return text ? <Tag color="warning">Riêng: {text}</Tag> : <span className="cell-sub">Theo quy tắc chung</span>
+            },
           },
         ]
       : []),

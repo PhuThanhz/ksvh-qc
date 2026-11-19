@@ -1868,8 +1868,10 @@ export interface components {
             /** Format: int32 */
             checkinRadiusM?: number;
             active?: boolean;
-            /** @enum {string|null} */
-            riskPolicy?: "STANDARD" | "STRICT" | null;
+            /** Format: int32 */
+            escalationThreshold?: number | null;
+            /** Format: int32 */
+            escalationResetMonths?: number | null;
         };
         OrgUnitResponse: {
             /** Format: int64 */
@@ -1892,8 +1894,10 @@ export interface components {
             /** Format: int32 */
             checkinRadiusM: number | null;
             active: boolean;
-            /** @enum {string} */
-            riskPolicy: "STANDARD" | "STRICT";
+            /** Format: int32 */
+            escalationThreshold: number | null;
+            /** Format: int32 */
+            escalationResetMonths: number | null;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -2529,8 +2533,6 @@ export interface components {
             note?: string | null;
         };
         EscalationRuleRequest: {
-            /** @enum {string} */
-            riskPolicy: "STANDARD" | "STRICT";
             /** Format: int32 */
             thresholdCount: number;
             /** Format: int32 */
@@ -2546,8 +2548,6 @@ export interface components {
         EscalationRuleResponse: {
             /** Format: int64 */
             id: number;
-            /** @enum {string} */
-            riskPolicy: "STANDARD" | "STRICT";
             /** Format: int32 */
             thresholdCount: number;
             /** Format: int32 */
@@ -2599,8 +2599,6 @@ export interface components {
         RiskPreviewResponse: {
             /** Format: date */
             date: string;
-            /** @enum {string} */
-            policy: "STANDARD" | "STRICT";
             /** Format: int32 */
             periodMonths: number;
             /** Format: date */
@@ -2696,8 +2694,7 @@ export interface components {
             periodMonths: number;
             /** Format: date */
             periodStart: string;
-            /** @enum {string} */
-            riskPolicy: "STANDARD" | "STRICT";
+            customEscalation: boolean;
             /** Format: int32 */
             escalationThreshold: number | null;
             /** Format: int32 */
@@ -5484,7 +5481,6 @@ export interface operations {
                 baseImpact: number;
                 violations: number;
                 date?: string;
-                policy?: "STANDARD" | "STRICT";
             };
             header?: never;
             path?: never;

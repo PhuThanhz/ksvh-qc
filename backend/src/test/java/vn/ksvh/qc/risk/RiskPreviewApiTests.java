@@ -44,26 +44,4 @@ class RiskPreviewApiTests extends ApiTestSupport {
                         .with(as(1L, PermissionCodes.CRITERIA_READ)))
                 .andExpect(status().isBadRequest());
     }
-
-    @Test
-    void strictPolicyUsesItsOwnEscalationRule() throws Exception {
-        jdbc.update("""
-                INSERT INTO impact_escalation_rules(risk_policy, threshold_count, step_increase, max_impact, reset_period_months, effective_from)
-                VALUES ('STRICT', 2, 1, 5, 12, ?)""", java.sql.Date.valueOf(TODAY));
-
-        // Khắt khe: lần thứ 2 đã nâng mức, kỳ hạ mức riêng 12 tháng
-        mvc.perform(get("/api/v1/risk/preview").param("baseImpact", "2").param("violations", "2")
-                        .param("policy", "STRICT").with(as(1L, PermissionCodes.CRITERIA_READ)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.policy").value("STRICT"))
-                .andExpect(jsonPath("$.thresholdCount").value(2))
-                .andExpect(jsonPath("$.resetPeriodMonths").value(12))
-                .andExpect(jsonPath("$.escalated").value(true));
-
-        // Không truyền chính sách → Tiêu chuẩn
-        mvc.perform(get("/api/v1/risk/preview").param("baseImpact", "2").param("violations", "1")
-                        .with(as(1L, PermissionCodes.CRITERIA_READ)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.policy").value("STANDARD"));
-    }
 }

@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import vn.ksvh.qc.shared.config.CacheConfig;
-import vn.ksvh.qc.organization.api.RiskPolicy;
 import vn.ksvh.qc.criteria.domain.EscalationRule;
 import vn.ksvh.qc.criteria.domain.EscalationRuleRepository;
 import vn.ksvh.qc.criteria.domain.FrequencyConfig;
@@ -235,39 +234,30 @@ public class RiskConfigService {
 
     // ---- Nâng mức ảnh hưởng ----
 
-    /** Mọi phiên bản của mọi chính sách (Tiêu chuẩn trước), trong mỗi chính sách mới nhất trước. */
     public List<EscalationRuleResponse> escalationRules() {
-        List<EscalationRule> all = escalationRepository.findAllByOrderByRiskPolicyAscEffectiveFromDesc();
-        Map<Long, UserSummary> creators = users.findSummaries(all.stream().map(EscalationRule::getCreatedBy)
-                .filter(Objects::nonNull).distinct().toList());
+        List<EscalationRule> all = escalationRepository.findAllByOrderByEffectiveFromDesc();
+        Map<Long, UserSummary> creators = users.findSummaries(all.stream().map(EscalationRule::getCreatedBy).toList());
+        List<ConfigStatus> statuses = statuses(all.stream().map(EscalationRule::getEffectiveFrom).toList());
         List<EscalationRuleResponse> result = new ArrayList<>();
-        for (RiskPolicy policy : RiskPolicy.values()) {
-            List<EscalationRule> versions = all.stream().filter(r -> r.getRiskPolicy() == policy).toList();
-            List<ConfigStatus> statuses = statuses(versions.stream().map(EscalationRule::getEffectiveFrom).toList());
-            for (int i = 0; i < versions.size(); i++) {
-                EscalationRule r = versions.get(i);
-                result.add(EscalationRuleResponse.from(r, statuses.get(i), name(creators, r.getCreatedBy())));
-            }
+        for (int i = 0; i < all.size(); i++) {
+            EscalationRule r = all.get(i);
+            result.add(EscalationRuleResponse.from(r, statuses.get(i), name(creators, r.getCreatedBy())));
         }
         return result;
     }
 
     @Transactional
     public EscalationRuleResponse createEscalation(EscalationRuleRequest req, Long actorId) {
-        RiskPolicy policy = req.riskPolicy();
-        assertNewEffectiveDate(req.effectiveFrom(),
-                escalationRepository.existsByRiskPolicyAndEffectiveFrom(policy, req.effectiveFrom()));
-        var previous = escalationRepository.findFirstByRiskPolicyAndEffectiveFromLessThanOrderByEffectiveFromDesc(
-                policy, req.effectiveFrom());
+        assertNewEffectiveDate(req.effectiveFrom(), escalationRepository.existsByEffectiveFrom(req.effectiveFrom()));
+        var previous = escalationRepository.findFirstByEffectiveFromLessThanOrderByEffectiveFromDesc(req.effectiveFrom());
         if (previous.isPresent()
                 && previous.get().getThresholdCount() == req.thresholdCount()
                 && previous.get().getStepIncrease() == req.stepIncrease()
                 && previous.get().getMaxImpact() == req.maxImpact()
                 && previous.get().getResetPeriodMonths() == req.resetPeriodMonths()) {
-            throw unchanged("quy tắc nâng mức " + policy.label(), previous.get().getEffectiveFrom());
+            throw unchanged("quy tắc nâng mức", previous.get().getEffectiveFrom());
         }
         EscalationRule r = new EscalationRule();
-        r.setRiskPolicy(policy);
         r.setThresholdCount(req.thresholdCount().shortValue());
         r.setStepIncrease(req.stepIncrease().shortValue());
         r.setMaxImpact(req.maxImpact().shortValue());
@@ -279,7 +269,7 @@ public class RiskConfigService {
         if (eventPublisher != null) {
             eventPublisher.publishEvent(vn.ksvh.qc.shared.audit.AuditLogEvent.of(
                     actorId, "RISK_CONFIG_UPDATE", "ESCALATION_RULE", req.effectiveFrom().toString(),
-                    "Tạo phiên bản quy tắc nâng mức ảnh hưởng – chính sách " + policy.label() + " (ngưỡng " + req.thresholdCount() + " lần, tăng +" + req.stepIncrease() + ") hiệu lực từ ngày " + req.effectiveFrom()
+                    "Tạo phiên bản quy tắc nâng mức ảnh hưởng (ngưỡng " + req.thresholdCount() + " lần, tăng +" + req.stepIncrease() + ") hiệu lực từ ngày " + req.effectiveFrom()
             ));
         }
         return escalationRules().stream().filter(x -> x.id().equals(r.getId())).findFirst().orElseThrow();

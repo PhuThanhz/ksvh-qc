@@ -3,9 +3,8 @@ import { Button, Col, Divider, Flex, Row, Typography } from 'antd'
 import { useEffect } from 'react'
 import type { Control, UseFormSetValue } from 'react-hook-form'
 import { FormNumber } from '@/components/data-entry/FormNumber'
-import { FormSelect } from '@/components/data-entry/FormSelect'
 import { useNotify } from '@/components/feedback/useNotify'
-import { RISK_POLICY_OPTIONS, type OrgUnit } from '@/features/organizations/organizations.types'
+import type { OrgUnit } from '@/features/organizations/organizations.types'
 import type { OrgUnitFormValues } from '@/features/organizations/schemas/organization.schema'
 import { useGeolocation } from '@/hooks/useGeolocation'
 
@@ -79,13 +78,34 @@ export function RestaurantFormSection({ control, setValue, unit }: RestaurantFor
             extra="Không bắt buộc. Hệ thống chỉ ghi nhận vị trí khi bắt đầu kiểm tra, không chặn"
           />
         </Col>
-        <Col span={24}>
-          <FormSelect
+      </Row>
+      <Divider titlePlacement="start" plain style={{ margin: '4px 0 12px' }}>
+        Ngưỡng nâng mức riêng
+      </Divider>
+      <Typography.Paragraph type="secondary" style={{ fontSize: 12.5, marginTop: -4 }}>
+        Chỉ nhập khi nhà hàng cần khắt khe hơn quy tắc chung (vd fine dining). Để trống = theo quy tắc chung.
+      </Typography.Paragraph>
+      <Row gutter={16}>
+        <Col xs={24} md={12}>
+          <FormNumber
             control={control}
-            name="riskPolicy"
-            label="Chính sách rủi ro"
-            options={RISK_POLICY_OPTIONS}
-            extra="Quyết định ngưỡng nâng mức và thời gian hạ mức khi tái phạm. Thông số từng chính sách khai báo ở Quy tắc tái phạm & nâng mức."
+            name="escalationThreshold"
+            label="Nâng mức từ lần thứ"
+            min={2}
+            max={50}
+            precision={0}
+            placeholder="Theo quy tắc chung"
+          />
+        </Col>
+        <Col xs={24} md={12}>
+          <FormNumber
+            control={control}
+            name="escalationResetMonths"
+            label="Hạ mức sau (tháng không lỗi)"
+            min={1}
+            max={24}
+            precision={0}
+            placeholder="Theo quy tắc chung"
           />
         </Col>
       </Row>

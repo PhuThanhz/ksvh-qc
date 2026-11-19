@@ -7,21 +7,20 @@ import { FormDatePicker } from '@/components/data-entry/FormDatePicker'
 import { FormInput } from '@/components/data-entry/FormInput'
 import { FormNumber } from '@/components/data-entry/FormNumber'
 import { useNotify } from '@/components/feedback/useNotify'
-import { RISK_POLICIES, type EscalationRule, type RiskPolicy } from '@/features/criteria/criteria.types'
+import type { EscalationRule } from '@/features/criteria/criteria.types'
 import { useCreateEscalation } from '@/features/criteria/hooks/useRiskConfig'
 import { escalationSchema, type EscalationFormValues } from '@/features/criteria/schemas/criteria.schema'
 import { applyFieldErrors, getErrorMessage } from '@/lib/http'
 
 export interface EscalationFormModalProps {
   open: boolean
-  policy: RiskPolicy
   /** Phiên bản đang áp dụng để điền sẵn. */
   current?: EscalationRule
   onClose: () => void
 }
 
-/** Thêm phiên bản quy tắc nâng mức cho một chính sách rủi ro. */
-export function EscalationFormModal({ open, policy, current, onClose }: EscalationFormModalProps) {
+/** Thêm phiên bản quy tắc nâng mức chung. */
+export function EscalationFormModal({ open, current, onClose }: EscalationFormModalProps) {
   const notify = useNotify()
   const create = useCreateEscalation()
   const { control, handleSubmit, reset, setError } = useForm<EscalationFormValues>({
@@ -31,18 +30,18 @@ export function EscalationFormModal({ open, policy, current, onClose }: Escalati
   useEffect(() => {
     if (!open) return
     reset({
-      thresholdCount: current?.thresholdCount ?? (policy === 'STRICT' ? 2 : 3),
+      thresholdCount: current?.thresholdCount ?? 3,
       stepIncrease: current?.stepIncrease ?? 1,
       maxImpact: current?.maxImpact ?? 5,
       resetPeriodMonths: current?.resetPeriodMonths ?? 6,
       effectiveFrom: dayjs().format('YYYY-MM-DD'),
       note: '',
     })
-  }, [open, policy, current, reset])
+  }, [open, current, reset])
 
   const onSubmit = handleSubmit((v) =>
     create.mutate(
-      { ...v, riskPolicy: policy, note: v.note || undefined },
+      { ...v, note: v.note || undefined },
       {
         onSuccess: () => {
           notify.success('Đã thêm phiên bản quy tắc nâng mức')
@@ -55,11 +54,10 @@ export function EscalationFormModal({ open, policy, current, onClose }: Escalati
     ),
   )
 
-  const label = RISK_POLICIES.find((p) => p.value === policy)?.label ?? policy
   return (
     <Modal
       open={open}
-      title={`Phiên bản mới – chính sách ${label}`}
+      title="Thêm phiên bản quy tắc nâng mức"
       okText="Lưu"
       cancelText="Huỷ"
       centered

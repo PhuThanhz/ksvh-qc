@@ -6,7 +6,6 @@ import vn.ksvh.qc.criteria.api.CriteriaLookupApi;
 import vn.ksvh.qc.criteria.api.RiskConfigRef;
 import vn.ksvh.qc.organization.api.OrgUnitLookupApi;
 import vn.ksvh.qc.organization.api.OrgUnitRef;
-import vn.ksvh.qc.organization.api.RiskPolicy;
 import vn.ksvh.qc.inspection.domain.FindingOccurrenceRepository;
 import vn.ksvh.qc.risk.RiskAssessment;
 import vn.ksvh.qc.risk.RiskRules;
@@ -20,7 +19,7 @@ import java.util.List;
 /**
  * Tính rủi ro cho một lần lỗi mới của (nhà hàng, tiêu chí): lịch sử lấy từ bảng finding_occurrences,
  * cấu hình (kỳ đếm, nâng mức, bảng mức) lấy bản đang hiệu lực tại ngày tính.
- * Đây là nơi DUY NHẤT chọn bộ quy tắc theo chính sách rủi ro của nhà hàng – mọi chỗ tính rủi ro đều đi qua đây.
+ * Đây là nơi DUY NHẤT áp ngưỡng nâng / hạ mức riêng của nhà hàng – mọi chỗ tính rủi ro đều đi qua đây.
  */
 @Component
 @RequiredArgsConstructor
@@ -30,20 +29,17 @@ public class RiskAssessor {
     private final CriteriaLookupApi criteria;
     private final OrgUnitLookupApi orgUnits;
 
-    /** Cấu hình rủi ro áp dụng cho nhà hàng tại ngày {@code at} (theo chính sách rủi ro của nhà hàng). */
-    public RiskConfigRef configFor(Long restaurantId, LocalDate at) {
-        return criteria.riskConfigAt(at, policyOf(restaurantId));
-    }
-
-    /** Bộ quy tắc rủi ro áp dụng cho nhà hàng tại ngày {@code at}. */
+    /** Bộ quy tắc rủi ro áp dụng cho nhà hàng tại ngày {@code at} (quy tắc chung + ngưỡng riêng nếu có). */
     public RiskRules rulesFor(Long restaurantId, LocalDate at) {
-        return RiskRules.from(configFor(restaurantId, at));
+        OrgUnitRef rest = orgUnits.findRefs(List.of(restaurantId)).get(restaurantId);
+        return rulesFor(rest, criteria.riskConfigAt(at));
     }
 
-    /** Chính sách rủi ro của nhà hàng; không tìm thấy thì coi là Tiêu chuẩn. */
-    public RiskPolicy policyOf(Long restaurantId) {
-        OrgUnitRef rest = orgUnits.findRefs(List.of(restaurantId)).get(restaurantId);
-        return rest != null && rest.riskPolicy() != null ? rest.riskPolicy() : RiskPolicy.STANDARD;
+    /** Như trên khi đã có sẵn nhà hàng và cấu hình chung (tránh tra lại khi duyệt nhiều nhà hàng). */
+    public static RiskRules rulesFor(OrgUnitRef restaurant, RiskConfigRef config) {
+        RiskRules rules = RiskRules.from(config);
+        return restaurant == null ? rules
+                : rules.withEscalationOverride(restaurant.escalationThreshold(), restaurant.escalationResetMonths());
     }
 
     /** Lần lỗi đang tính chưa có trong bảng occurrence (gọi trước khi ghi lần +1). */

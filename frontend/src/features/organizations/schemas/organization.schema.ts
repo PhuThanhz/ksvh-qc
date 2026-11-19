@@ -22,7 +22,8 @@ export const orgUnitSchema = z
     longitude: z.number().min(-180, 'Kinh độ phải từ -180 đến 180').max(180, 'Kinh độ phải từ -180 đến 180').nullable(),
     checkinRadiusM: z.number().int('Bán kính là số nguyên').min(10, 'Bán kính tối thiểu 10 m').max(5000, 'Bán kính tối đa 5000 m').nullable(),
     active: z.boolean(),
-    riskPolicy: z.enum(['STANDARD', 'STRICT']),
+    escalationThreshold: z.number().int('Ngưỡng là số nguyên').min(2, 'Ngưỡng từ 2 đến 50 lần').max(50, 'Ngưỡng từ 2 đến 50 lần').nullable(),
+    escalationResetMonths: z.number().int('Số tháng là số nguyên').min(1, 'Hạ mức sau 1 đến 24 tháng').max(24, 'Hạ mức sau 1 đến 24 tháng').nullable(),
   })
   .superRefine((v, ctx) => {
     if (v.companyId === null) ctx.addIssue({ code: 'custom', path: ['companyId'], message: 'Vui lòng chọn công ty' })

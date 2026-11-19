@@ -9,7 +9,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import io.swagger.v3.oas.annotations.media.Schema;
-import vn.ksvh.qc.organization.api.RiskPolicy;
 import vn.ksvh.qc.organization.domain.OrgUnitType;
 
 /**
@@ -49,12 +48,20 @@ public record OrgUnitRequest(
 
         boolean active,
 
-        /** Chỉ dùng cho nhà hàng; bỏ trống khi sửa = giữ nguyên, khi tạo = Tiêu chuẩn. */
+        /** Ngưỡng nâng mức riêng của nhà hàng; bỏ trống = theo quy tắc chung. */
         @Schema(nullable = true)
-        RiskPolicy riskPolicy) {
+        @Min(value = 2, message = "Ngưỡng nâng mức riêng từ 2 đến 50 lần")
+        @Max(value = 50, message = "Ngưỡng nâng mức riêng từ 2 đến 50 lần")
+        Integer escalationThreshold,
+
+        /** Số tháng không lỗi để hạ mức, riêng của nhà hàng; bỏ trống = theo quy tắc chung. */
+        @Schema(nullable = true)
+        @Min(value = 1, message = "Hạ mức sau 1 đến 24 tháng")
+        @Max(value = 24, message = "Hạ mức sau 1 đến 24 tháng")
+        Integer escalationResetMonths) {
 
     public OrgUnitRequest(Long companyId, OrgUnitType unitType, String code, String name, String address,
                           Double latitude, Double longitude, Integer checkinRadiusM, boolean active) {
-        this(companyId, unitType, code, name, address, latitude, longitude, checkinRadiusM, active, null);
+        this(companyId, unitType, code, name, address, latitude, longitude, checkinRadiusM, active, null, null);
     }
 }

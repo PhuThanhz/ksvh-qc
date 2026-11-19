@@ -1,7 +1,5 @@
 package vn.ksvh.qc.organization.dto;
 
-import vn.ksvh.qc.organization.api.RiskPolicy;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import vn.ksvh.qc.organization.domain.OrgUnit;
 import vn.ksvh.qc.organization.domain.OrgUnitType;
@@ -26,7 +24,8 @@ public record OrgUnitResponse(
         @Schema(nullable = true) Double longitude,
         @Schema(nullable = true) Integer checkinRadiusM,
         boolean active,
-        RiskPolicy riskPolicy,
+        @Schema(nullable = true) Integer escalationThreshold,
+        @Schema(nullable = true) Integer escalationResetMonths,
         Instant createdAt,
         Instant updatedAt) {
 
@@ -35,7 +34,9 @@ public record OrgUnitResponse(
         return new OrgUnitResponse(u.getId(), u.getCompany().getId(), u.getCompany().getCode(), u.getCompany().getName(),
                 u.getUnitType(), u.getCode(), u.getName(), u.getAddress(),
                 UserRef.from(lookup(users, u.getStoreManagerUserId())), UserRef.from(lookup(users, u.getObmUserId())),
-                u.getLatitude(), u.getLongitude(), u.getCheckinRadiusM(), u.isActive(), u.getRiskPolicy(), u.getCreatedAt(), u.getUpdatedAt());
+                u.getLatitude(), u.getLongitude(), u.getCheckinRadiusM(), u.isActive(),
+                u.getEscalationThreshold() == null ? null : u.getEscalationThreshold().intValue(),
+                u.getEscalationResetMonths() == null ? null : u.getEscalationResetMonths().intValue(), u.getCreatedAt(), u.getUpdatedAt());
     }
 
     private static UserSummary lookup(Map<Long, UserSummary> users, Long id) {

@@ -1,7 +1,5 @@
 package vn.ksvh.qc.organization.service;
 
-import vn.ksvh.qc.organization.api.RiskPolicy;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -115,9 +113,8 @@ public class OrgUnitService {
         u.setActive(req.active());
 
         if (req.unitType() == OrgUnitType.RESTAURANT) {
-            if (req.riskPolicy() != null) {
-                u.setRiskPolicy(req.riskPolicy());
-            }
+            u.setEscalationThreshold(req.escalationThreshold() == null ? null : req.escalationThreshold().shortValue());
+            u.setEscalationResetMonths(req.escalationResetMonths() == null ? null : req.escalationResetMonths().shortValue());
             // Toạ độ chưa bắt buộc; nếu nhập thì phải đủ cả vĩ độ và kinh độ.
             if ((req.latitude() == null) != (req.longitude() == null)) {
                 throw new BusinessException(ErrorCode.ORGANIZATION_GPS_REQUIRED, "Nhập đủ cả vĩ độ và kinh độ, hoặc để trống cả hai");
@@ -127,7 +124,8 @@ public class OrgUnitService {
             u.setLongitude(req.longitude());
             u.setCheckinRadiusM(req.checkinRadiusM());
         } else {
-            u.setRiskPolicy(RiskPolicy.STANDARD);
+            u.setEscalationThreshold(null);
+            u.setEscalationResetMonths(null);
             // Phòng ban không được kiểm tra: không có CHT, OBM, toạ độ.
             u.setStoreManagerUserId(null);
             u.setObmUserId(null);

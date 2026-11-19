@@ -12,7 +12,7 @@ export interface EscalationVersionTableProps {
   onDelete: (rule: EscalationRule) => void
 }
 
-/** Các phiên bản quy tắc nâng mức của một chính sách, mới nhất trước. */
+/** Các phiên bản quy tắc nâng mức chung, mới nhất trước. */
 export function EscalationVersionTable({ rules, loading, onDelete }: EscalationVersionTableProps) {
   return (
     <Table<EscalationRule>
@@ -22,7 +22,7 @@ export function EscalationVersionTable({ rules, loading, onDelete }: EscalationV
       dataSource={rules}
       pagination={false}
       scroll={{ x: 'max-content' }}
-      locale={{ emptyText: 'Chưa có phiên bản nào – đang dùng quy tắc của chính sách Tiêu chuẩn' }}
+      locale={{ emptyText: 'Chưa có phiên bản nào – chưa áp dụng nâng mức' }}
       columns={[
         { title: 'Ngưỡng tái phạm', dataIndex: 'thresholdCount', render: (n: number) => `${n} lần` },
         { title: 'Mức nâng', dataIndex: 'stepIncrease', render: (n: number) => `+${n} bậc` },

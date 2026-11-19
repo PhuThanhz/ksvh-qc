@@ -13,15 +13,18 @@ public record OrgUnitRef(
         Long storeManagerUserId,
         Long obmUserId,
         Long companyId,
-        RiskPolicy riskPolicy
+        /** Ngưỡng nâng mức riêng; null = theo quy tắc chung. */
+        Integer escalationThreshold,
+        /** Số tháng hạ mức riêng; null = theo quy tắc chung. */
+        Integer escalationResetMonths
 ) {
     public OrgUnitRef(Long id, String code, String name, String unitType, boolean active) {
-        this(id, code, name, unitType, active, null, null, null, null, null, null, RiskPolicy.STANDARD);
+        this(id, code, name, unitType, active, null, null, null, null, null, null, null, null);
     }
 
     public OrgUnitRef(Long id, String code, String name, String unitType, boolean active,
                       Double latitude, Double longitude, Integer checkinRadiusM,
                       Long storeManagerUserId, Long obmUserId, Long companyId) {
-        this(id, code, name, unitType, active, latitude, longitude, checkinRadiusM, storeManagerUserId, obmUserId, companyId, RiskPolicy.STANDARD);
+        this(id, code, name, unitType, active, latitude, longitude, checkinRadiusM, storeManagerUserId, obmUserId, companyId, null, null);
     }
 }
