@@ -1,4 +1,4 @@
-import { EditOutlined, KeyOutlined } from '@ant-design/icons'
+import { EditOutlined, IdcardOutlined, KeyOutlined, SafetyOutlined, UserOutlined } from '@ant-design/icons'
 import { Button, Space, Tag } from 'antd'
 import { StatusBadge, type BadgeTone } from '@/components/data-display/StatusBadge'
 import { DetailModal, type DetailField } from '@/components/feedback/DetailModal'
@@ -40,7 +40,6 @@ export function UserDetailModal({ open, user, roleName, onClose, onEdit, onReset
       label: 'Trạng thái',
       value: <StatusBadge status={user.active ? 'active' : 'inactive'} meta={ACTIVE_META} />,
     },
-    { label: 'Ngày tạo', value: formatDateTime(user.createdAt) },
   ]
 
   const extraFooter = (
@@ -73,7 +72,20 @@ export function UserDetailModal({ open, user, roleName, onClose, onEdit, onReset
   return (
     <DetailModal
       open={open}
-      title={`Chi tiết người dùng: ${user.fullName}`}
+      title="Chi tiết người dùng"
+      subtitle="Tài khoản đăng nhập & vai trò trong hệ thống"
+      icon={<UserOutlined />}
+      hero={{
+        avatar: user.fullName.trim().split(/\s+/).at(-1)?.charAt(0).toUpperCase() ?? <UserOutlined />,
+        eyebrow: 'Hồ sơ người dùng',
+        title: user.fullName,
+        status: <StatusBadge status={user.active ? 'active' : 'inactive'} meta={ACTIVE_META} />,
+        chips: [
+          { icon: <IdcardOutlined />, label: user.username },
+          ...user.roles.map((r) => ({ icon: <SafetyOutlined />, label: roleName(r) })),
+        ],
+      }}
+      audit={{ createdAt: formatDateTime(user.createdAt) }}
       width={600}
       fields={fields}
       extraFooter={extraFooter}

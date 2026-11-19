@@ -71,7 +71,7 @@ export function AdvancedFilter({
         <Flex align="center" gap={12} wrap style={{ width: '100%' }}>
           {search ? (
             <div style={{ flex: 1, minWidth: 260 }}>
-              <SearchInput {...search} maxWidth={search.maxWidth} />
+              <SearchInput {...search} maxWidth="none" />
             </div>
           ) : (
             hasFilters && (

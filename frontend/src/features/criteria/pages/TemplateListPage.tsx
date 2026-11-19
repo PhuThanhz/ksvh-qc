@@ -99,7 +99,6 @@ export function TemplateListPage() {
           search={{
             value: filters.keyword ?? '',
             placeholder: 'Tìm theo mã, tên, loại nhà hàng, kiểm tra...',
-            maxWidth: 480,
             onSearch,
           }}
           activeCount={activeFilterCount}

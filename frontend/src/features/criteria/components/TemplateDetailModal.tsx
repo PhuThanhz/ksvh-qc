@@ -1,10 +1,10 @@
-import { EditOutlined, SearchOutlined } from '@ant-design/icons'
-import { Badge, Button, Flex, Input, List, Spin, Tag, Typography } from 'antd'
-import { useMemo, useState } from 'react'
+import { AppstoreOutlined, BankOutlined, BarcodeOutlined, EditOutlined, FileDoneOutlined, FileTextOutlined, OrderedListOutlined } from '@ant-design/icons'
+import { Button } from 'antd'
 import { StatusBadge } from '@/components/data-display/StatusBadge'
-import { DetailModal, type DetailField } from '@/components/feedback/DetailModal'
-import { ImpactTag } from '@/features/criteria/components/ImpactTag'
-import type { Criterion, Template } from '@/features/criteria/criteria.types'
+import { DetailDrawer } from '@/components/feedback/detail'
+import { TemplateCriteriaPanel } from '@/features/criteria/components/TemplateCriteriaPanel'
+import { TemplateOverviewPanel } from '@/features/criteria/components/TemplateOverviewPanel'
+import { INSPECTION_TYPE_LABEL, type Template } from '@/features/criteria/criteria.types'
 import { useTemplate } from '@/features/criteria/hooks/useTemplates'
 import { formatDateTime } from '@/utils/format-date'
 
@@ -20,117 +20,59 @@ export interface TemplateDetailModalProps {
   onEdit?: (template: Template) => void
 }
 
+/** Chi tiết mẫu phiếu: hero + tab Tổng quan / Danh sách tiêu chí. */
 export function TemplateDetailModal({ open, template, onClose, onEdit }: TemplateDetailModalProps) {
-  const [filterText, setFilterText] = useState('')
   const detail = useTemplate(open && template?.id ? template.id : undefined)
-  const fullTemplate = detail.data ?? template
-
-  const criteriaList = useMemo<Criterion[]>(() => {
-    const list = fullTemplate?.criteria ?? []
-    if (!filterText.trim()) return list
-    const q = filterText.trim().toLowerCase()
-    return list.filter(
-      (c) =>
-        c.code.toLowerCase().includes(q) ||
-        c.name.toLowerCase().includes(q) ||
-        (c.groupName && c.groupName.toLowerCase().includes(q)),
-    )
-  }, [fullTemplate?.criteria, filterText])
-
   if (!template) return null
-
-  const fields: DetailField[] = [
-    { label: 'Mã mẫu phiếu', value: fullTemplate?.code ?? template.code },
-    { label: 'Tên mẫu phiếu', value: fullTemplate?.name ?? template.name },
-    {
-      label: 'Công ty áp dụng',
-      value: fullTemplate?.companyName ?? 'Dùng chung toàn hệ thống (mọi công ty)',
-    },
-    { label: 'Loại kiểm tra', value: fullTemplate?.inspectionType ?? '—' },
-    { label: 'Mô tả', span: 2, value: fullTemplate?.description || '—' },
-    {
-      label: 'Trạng thái',
-      value: <StatusBadge status={fullTemplate?.active ?? template.active ? 'active' : 'inactive'} meta={ACTIVE_META} />,
-    },
-    { label: 'Cập nhật lần cuối', value: formatDateTime(fullTemplate?.updatedAt ?? template.updatedAt) },
-    {
-      label: (
-        <Flex vertical gap={4}>
-          <span>Danh sách tiêu chí ({fullTemplate?.criterionCount ?? fullTemplate?.criteria?.length ?? 0})</span>
-          {fullTemplate?.criteria && fullTemplate.criteria.length > 5 && (
-            <Input
-              size="small"
-              prefix={<SearchOutlined style={{ color: 'var(--app-text-secondary)' }} />}
-              placeholder="Tìm nhanh tiêu chí..."
-              value={filterText}
-              onChange={(e) => setFilterText(e.target.value)}
-              allowClear
-              style={{ maxWidth: 200, fontWeight: 'normal' }}
-            />
-          )}
-        </Flex>
-      ),
-      span: 2,
-      value: detail.isLoading ? (
-        <div style={{ textAlign: 'center', padding: 24 }}>
-          <Spin tip="Đang tải danh sách tiêu chí..." />
-        </div>
-      ) : criteriaList.length > 0 ? (
-        <List
-          size="small"
-          bordered
-          style={{ maxHeight: 280, overflowY: 'auto' }}
-          dataSource={criteriaList}
-          renderItem={(c, index) => (
-            <List.Item
-              extra={<ImpactTag value={c.baseImpact} />}
-              style={{ padding: '6px 12px' }}
-            >
-              <List.Item.Meta
-                title={
-                  <Flex align="center" gap={8} wrap="wrap">
-                    <Badge count={index + 1} style={{ backgroundColor: 'var(--app-text-secondary)' }} />
-                    <Typography.Text strong code>[{c.code}]</Typography.Text>
-                    <span>{c.name}</span>
-                    {c.groupName && <Tag style={{ fontSize: 11 }}>{c.groupName}</Tag>}
-                  </Flex>
-                }
-              />
-            </List.Item>
-          )}
-        />
-      ) : (
-        <Typography.Text type="secondary">
-          {fullTemplate?.criteria?.length ? 'Không tìm thấy tiêu chí phù hợp' : 'Chưa có tiêu chí nào trong mẫu phiếu này'}
-        </Typography.Text>
-      ),
-    },
-  ]
-
-  const extraFooter = onEdit ? (
-    <Button
-      key="edit"
-      icon={<EditOutlined />}
-      onClick={() => {
-        onClose()
-        onEdit(fullTemplate ?? template)
-      }}
-    >
-      Chỉnh sửa
-    </Button>
-  ) : undefined
+  const t = detail.data ?? template
+  const criteria = t.criteria ?? []
+  const groupCount = new Set(criteria.map((c) => c.groupId)).size
+  const count = t.criterionCount ?? criteria.length
 
   return (
-    <DetailModal
+    <DetailDrawer
       open={open}
-      title={`Chi tiết mẫu phiếu kiểm tra: ${template.code}`}
-      width={740}
-      fields={fields}
-      extraFooter={extraFooter}
-      onClose={() => {
-        setFilterText('')
-        onClose()
+      onClose={onClose}
+      icon={<FileTextOutlined />}
+      title="Chi tiết mẫu phiếu"
+      subtitle="Bộ tiêu chí Chuyên viên dùng khi kiểm tra định kỳ"
+      hero={{
+        avatar: <FileDoneOutlined />,
+        eyebrow: 'Mẫu phiếu kiểm tra',
+        title: t.name,
+        status: <StatusBadge status={t.active ? 'active' : 'inactive'} meta={ACTIVE_META} />,
+        chips: [
+          { icon: <BarcodeOutlined />, label: t.code },
+          { icon: <BankOutlined />, label: t.companyName ?? 'Dùng chung mọi công ty' },
+          ...(t.inspectionType
+            ? [{ icon: <AppstoreOutlined />, label: INSPECTION_TYPE_LABEL[t.inspectionType] ?? t.inspectionType }]
+            : []),
+          { icon: <OrderedListOutlined />, label: `${count} tiêu chí · ${groupCount} nhóm` },
+        ],
       }}
+      tabs={[
+        { key: 'overview', label: 'Tổng quan', children: <TemplateOverviewPanel template={t} /> },
+        {
+          key: 'criteria',
+          label: `Danh sách tiêu chí (${count})`,
+          children: <TemplateCriteriaPanel criteria={criteria} loading={detail.isLoading} />,
+        },
+      ]}
+      audit={{ updatedAt: formatDateTime(t.updatedAt) }}
+      actions={
+        onEdit && (
+          <Button
+            type="primary"
+            icon={<EditOutlined />}
+            onClick={() => {
+              onClose()
+              onEdit(t)
+            }}
+          >
+            Chỉnh sửa
+          </Button>
+        )
+      }
     />
   )
 }

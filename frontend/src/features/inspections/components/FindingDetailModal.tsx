@@ -1,15 +1,25 @@
-import { FilePdfOutlined } from '@ant-design/icons'
-import { Button, Card, Descriptions, Empty, Flex, Image, Modal, Space, Spin, Tag, Typography } from 'antd'
+import {
+  AlertOutlined,
+  BarcodeOutlined,
+  CalendarOutlined,
+  FilePdfOutlined,
+  FileProtectOutlined,
+  RiseOutlined,
+  ShopOutlined,
+  SyncOutlined,
+  WarningOutlined,
+} from '@ant-design/icons'
+import { Button, Empty, Skeleton, Tag } from 'antd'
+import dayjs from 'dayjs'
 import { useState } from 'react'
-import { RiskLevelTag } from '@/components/data-display/RiskLevelTag'
-import { FindingAppealReviewsCard } from '@/features/inspections/components/FindingAppealReviewsCard'
+import { DetailDrawer, DetailSection, type DetailStat, type DetailTab } from '@/components/feedback/detail'
+import { FindingAppealPanel, FindingRemediationPanel, FindingSitePanel } from '@/features/inspections/components/FindingDetailPanels'
 import { FindingTimeline } from '@/features/inspections/components/FindingTimeline'
-import { FINDING_STATUS_TAG } from '@/features/inspections/finding.types'
+import { FINDING_STATUS_TAG, type FindingResponse } from '@/features/inspections/finding.types'
 import { useFinding } from '@/features/inspections/hooks/useInspectionData'
 import { reportApi } from '@/features/reports/api/report.api'
 import { useNotify } from '@/hooks/useNotify'
-import { formatDate } from '@/utils/format-date'
-import { isVideoUrl, parseMediaUrls, toMediaUrl } from '@/utils/media-url'
+import { formatDate, formatDateTime } from '@/utils/format-date'
 
 interface Props {
   open: boolean
@@ -17,45 +27,63 @@ interface Props {
   onClose: () => void
 }
 
-function EvidenceGallery({ urls, title }: { urls?: string | null; title: string }) {
-  const list = parseMediaUrls(urls)
-  if (list.length === 0) return null
+const DONE = new Set(['CLOSED', 'DISMISSED'])
 
-  return (
-    <div style={{ marginTop: 8 }}>
-      <Typography.Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
-        {title} ({list.length} tệp):
-      </Typography.Text>
-      <Space size={8} wrap>
-        {list.map((u, idx) => {
-          const mediaUrl = toMediaUrl(u)
-          if (isVideoUrl(u)) {
-            return (
-              <video
-                key={idx}
-                src={mediaUrl}
-                controls
-                style={{ width: 140, height: 80, borderRadius: 4, objectFit: 'cover', border: '1px solid var(--app-border)' }}
-              />
-            )
-          }
-          return (
-            <Image
-              key={idx}
-              src={mediaUrl}
-              alt={`${title} #${idx + 1}`}
-              loading="lazy"
-              width={72}
-              height={72}
-              style={{ objectFit: 'cover', borderRadius: 4, border: '1px solid var(--app-border)' }}
-            />
-          )
-        })}
-      </Space>
-    </div>
-  )
+function findingStats(f: FindingResponse): DetailStat[] {
+  const escalated = f.effectiveImpact != null && f.effectiveImpact > f.baseImpact
+  const overdue = !DONE.has(f.status) && f.deadlineDate && dayjs(f.deadlineDate).isBefore(dayjs(), 'day')
+  const high = f.riskLevelCode === 'M3' || f.riskLevelCode === 'M4'
+  return [
+    {
+      icon: <AlertOutlined />,
+      label: 'Mức rủi ro',
+      value: f.riskLevelCode,
+      hint: `${f.riskLevelName} · ${f.calculatedScore} điểm`,
+      tone: high ? 'danger' : 'warning',
+    },
+    {
+      icon: <RiseOutlined />,
+      label: 'Mức ảnh hưởng',
+      value: escalated ? `${f.baseImpact} → ${f.effectiveImpact}` : `Mức ${f.baseImpact}`,
+      hint: escalated ? 'Đã nâng mức do tái phạm' : 'Theo mức gốc của tiêu chí',
+      tone: escalated ? 'warning' : 'default',
+    },
+    {
+      icon: <SyncOutlined />,
+      label: 'Tần suất',
+      value: `${f.violationCount} lần`,
+      hint: 'Trong kỳ đếm, tính cả lần này',
+      tone: f.violationCount > 1 ? 'warning' : 'default',
+    },
+    {
+      icon: <CalendarOutlined />,
+      label: 'Hạn khắc phục',
+      value: f.deadlineDate ? formatDate(f.deadlineDate) : '—',
+      hint: overdue ? 'Đã quá hạn' : `${f.remediationDays} ngày theo mức ${f.riskLevelCode}`,
+      tone: overdue ? 'danger' : 'info',
+    },
+  ]
 }
 
+function findingTabs(f: FindingResponse): DetailTab[] {
+  const tabs: DetailTab[] = [{ key: 'site', label: 'Hiện trường', children: <FindingSitePanel finding={f} /> }]
+  if (f.appealReason || f.appealEvidenceUrls) tabs.push({ key: 'appeal', label: 'Khiếu nại', children: <FindingAppealPanel finding={f} /> })
+  if (f.remediationPlan || f.remediationEvidenceUrls || f.verifiedByName) {
+    tabs.push({ key: 'remediation', label: 'Khắc phục', children: <FindingRemediationPanel finding={f} /> })
+  }
+  tabs.push({
+    key: 'history',
+    label: `Lịch sử xử lý (${f.history?.length ?? 0})`,
+    children: (
+      <DetailSection title="Nhật ký chu trình">
+        <FindingTimeline history={f.history} />
+      </DetailSection>
+    ),
+  })
+  return tabs
+}
+
+/** Chi tiết điểm không phù hợp: hero + chỉ số rủi ro + tab Hiện trường / Khiếu nại / Khắc phục / Lịch sử. */
 export function FindingDetailModal({ open, findingId, onClose }: Props) {
   const { data: finding, isLoading } = useFinding(findingId)
   const [downloadingPdf, setDownloadingPdf] = useState(false)
@@ -74,123 +102,40 @@ export function FindingDetailModal({ open, findingId, onClose }: Props) {
     }
   }
 
+  const status = finding && FINDING_STATUS_TAG[finding.status]
   return (
-    <Modal
+    <DetailDrawer
       open={open}
-      title={
-        <Flex justify="space-between" align="center" style={{ paddingRight: 32 }}>
-          <Space>
-            <span>Chi tiết điểm không phù hợp #{finding?.id}</span>
-            {finding?.status && (
-              <Tag color={FINDING_STATUS_TAG[finding.status]?.color}>
-                {FINDING_STATUS_TAG[finding.status]?.label}
-              </Tag>
-            )}
-          </Space>
-          {finding?.riskLevelCode === 'M4' && (
-            <Button
-              danger
-              size="small"
-              icon={<FilePdfOutlined />}
-              loading={downloadingPdf}
-              onClick={handleExportM4Pdf}
-            >
-              Biên bản M4 (PDF)
-            </Button>
-          )}
-        </Flex>
+      onClose={onClose}
+      icon={<WarningOutlined />}
+      title="Chi tiết điểm không phù hợp"
+      subtitle={finding && `#${finding.id} · biên bản ${finding.inspectionCode}`}
+      hero={
+        finding && {
+          avatar: <span className="detail-hero__avatar--text">{finding.riskLevelCode}</span>,
+          eyebrow: 'Điểm không phù hợp',
+          title: finding.criterionName,
+          status: status && <Tag color={status.color} style={{ margin: 0 }}>{status.label}</Tag>,
+          chips: [
+            { icon: <ShopOutlined />, label: finding.restaurantName },
+            { icon: <BarcodeOutlined />, label: finding.criterionCode },
+            { icon: <FileProtectOutlined />, label: `Biên bản ${finding.inspectionCode}` },
+          ],
+        }
       }
-      onCancel={onClose}
-      footer={null}
-      width={760}
-      destroyOnHidden
+      stats={finding ? findingStats(finding) : undefined}
+      tabs={finding ? findingTabs(finding) : undefined}
+      audit={finding && { createdAt: formatDateTime(finding.createdAt) }}
+      actions={
+        finding?.riskLevelCode === 'M4' && (
+          <Button danger icon={<FilePdfOutlined />} loading={downloadingPdf} onClick={handleExportM4Pdf}>
+            Biên bản M4 (PDF)
+          </Button>
+        )
+      }
     >
-      {isLoading ? (
-        <Flex justify="center" align="center" style={{ minHeight: 200 }}>
-          <Spin />
-        </Flex>
-      ) : finding ? (
-        <Flex vertical gap={16} style={{ marginTop: 16 }}>
-          <Descriptions size="small" bordered column={2}>
-            <Descriptions.Item label="Nhà hàng">{finding.restaurantName}</Descriptions.Item>
-            <Descriptions.Item label="Mã phiếu kiểm tra"><span className="code-tag--blue">{finding.inspectionCode}</span></Descriptions.Item>
-            <Descriptions.Item label="Tiêu chí" span={2}>
-              <div>
-                <b>{finding.criterionName}</b>
-                <span className="code-tag--blue" style={{ marginLeft: 8 }}>{finding.criterionCode}</span>
-              </div>
-            </Descriptions.Item>
-            <Descriptions.Item label="Mức độ ảnh hưởng">
-              Mức {finding.baseImpact}/5
-              {finding.effectiveImpact != null && finding.effectiveImpact > finding.baseImpact && (
-                <Tag color="warning" style={{ marginLeft: 6 }}>
-                  ▲ Nâng lên mức {finding.effectiveImpact}
-                </Tag>
-              )}
-            </Descriptions.Item>
-            <Descriptions.Item label="Tần suất vi phạm">
-              Lặp lại <b>{finding.violationCount} lần</b>
-            </Descriptions.Item>
-            <Descriptions.Item label="Mức rủi ro">
-              <RiskLevelTag code={finding.riskLevelCode} name={finding.riskLevelName} showName /> ({finding.calculatedScore} điểm)
-            </Descriptions.Item>
-            <Descriptions.Item label="Hạn khắc phục">
-              {formatDate(finding.deadlineDate)} ({finding.remediationDays} ngày)
-            </Descriptions.Item>
-            {finding.verifiedByName && (
-              <Descriptions.Item label="Chuyên viên nghiệm thu">{finding.verifiedByName}</Descriptions.Item>
-            )}
-            {finding.appealConcludedByName && (
-              <Descriptions.Item label="Thẩm định khiếu nại">{finding.appealConcludedByName}</Descriptions.Item>
-            )}
-          </Descriptions>
-
-          <Card size="small" title="Mô tả lỗi vi phạm hiện trường">
-            <Typography.Paragraph style={{ margin: 0 }}>
-              {finding.description || '—'}
-            </Typography.Paragraph>
-            <EvidenceGallery urls={finding.evidenceUrls} title="Ảnh bằng chứng hiện trường" />
-          </Card>
-
-          {(finding.appealReason || finding.appealEvidenceUrls) && (
-            <Card size="small" title="Thông tin khiếu nại từ nhà hàng">
-              <Descriptions size="small" column={1}>
-                <Descriptions.Item label="Lý do khiếu nại">{finding.appealReason}</Descriptions.Item>
-                {finding.appealConclusion && (
-                  <Descriptions.Item label="Kết luận khiếu nại">
-                    <Tag color={finding.appealConclusion === 'UPHELD' ? 'volcano' : 'green'}>
-                      {finding.appealConclusion === 'UPHELD' ? 'Bác khiếu nại (Giữ nguyên lỗi)' : 'Chấp thuận khiếu nại (Huỷ lỗi)'}
-                    </Tag>
-                  </Descriptions.Item>
-                )}
-              </Descriptions>
-              <EvidenceGallery urls={finding.appealEvidenceUrls} title="Ảnh/Video bằng chứng khiếu nại" />
-            </Card>
-          )}
-
-          <FindingAppealReviewsCard finding={finding} />
-
-          {(finding.remediationPlan || finding.remediationEvidenceUrls) && (
-            <Card size="small" title="Kế hoạch & Bằng chứng khắc phục">
-              <Descriptions size="small" column={2}>
-                <Descriptions.Item label="Kế hoạch khắc phục" span={2}>{finding.remediationPlan}</Descriptions.Item>
-                <Descriptions.Item label="Hẹn hoàn thành">{formatDate(finding.remediationTargetDate)}</Descriptions.Item>
-                <Descriptions.Item label="Thời điểm nộp BC">{formatDate(finding.remediationSubmittedAt)}</Descriptions.Item>
-                {finding.verificationComment && (
-                  <Descriptions.Item label="Nhận xét nghiệm thu" span={2}>{finding.verificationComment}</Descriptions.Item>
-                )}
-              </Descriptions>
-              <EvidenceGallery urls={finding.remediationEvidenceUrls} title="Ảnh/Video bằng chứng sau khắc phục" />
-            </Card>
-          )}
-
-          <Card size="small" title="Lịch sử xử lý & Nhật ký chu trình">
-            <FindingTimeline history={finding.history} />
-          </Card>
-        </Flex>
-      ) : (
-        <Empty description="Không tìm thấy thông tin lỗi" />
-      )}
-    </Modal>
+      {isLoading && <Skeleton active paragraph={{ rows: 8 }} />}
+      {!isLoading && !finding && <Empty description="Không tìm thấy thông tin lỗi" />}
+    </DetailDrawer>
   )
 }

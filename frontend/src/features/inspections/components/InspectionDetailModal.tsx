@@ -1,16 +1,28 @@
+import {
+  AlertOutlined,
+  AppstoreOutlined,
+  CalendarOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  FilePdfOutlined,
+  FileProtectOutlined,
+  PrinterOutlined,
+  SafetyCertificateOutlined,
+  UserOutlined,
+} from '@ant-design/icons'
+import { Button, Skeleton, Space, Tag } from 'antd'
 import { lazy, Suspense, useState } from 'react'
-import { Button, Card, Descriptions, Image, Modal, Space, Table, Tag } from 'antd'
-import { FilePdfOutlined, PrinterOutlined } from '@ant-design/icons'
-import type { ColumnsType } from 'antd/es/table'
-import type { InspectionItemResponse, ItemResult } from '@/features/inspections/inspection.types'
+import { StatusBadge } from '@/components/data-display/StatusBadge'
+import { DetailDrawer, type DetailStat } from '@/components/feedback/detail'
+import { InspectionCriteriaResults } from '@/features/inspections/components/InspectionCriteriaResults'
+import { InspectionOverviewPanel } from '@/features/inspections/components/InspectionOverviewPanel'
+import { INSPECTION_STATUS_META } from '@/features/inspections/constants/status'
 import { useInspection } from '@/features/inspections/hooks/useInspectionData'
+import { INSPECTION_KIND_LABEL, INSPECTION_MODE_LABEL, type InspectionResponse } from '@/features/inspections/inspection.types'
+import { formatInspectionDuration, getComplianceGrade } from '@/features/inspections/utils/inspection-metrics'
 import { reportApi } from '@/features/reports/api/report.api'
 import { useNotify } from '@/hooks/useNotify'
-import { formatDate } from '@/utils/format-date'
-import { INSPECTION_KIND_LABEL, INSPECTION_MODE_LABEL, LOCATION_STATUS_META } from '@/features/inspections/inspection.types'
-import { ITEM_RESULT_META } from '@/features/inspections/constants/status'
-import { isVideoUrl, parseMediaUrls, toMediaUrl } from '@/utils/media-url'
-import { formatInspectionDuration, getComplianceGrade } from '@/features/inspections/utils/inspection-metrics'
+import { formatDate, formatDateTime } from '@/utils/format-date'
 
 const InspectionPrintModal = lazy(() =>
   import('./InspectionPrintModal').then((m) => ({ default: m.InspectionPrintModal })),
@@ -22,6 +34,42 @@ interface Props {
   onClose: () => void
 }
 
+function inspectionStats(ins: InspectionResponse): DetailStat[] {
+  const grade = getComplianceGrade(ins.complianceScore, ins.maxRiskLevel)
+  const score = ins.adjustedComplianceScore ?? ins.complianceScore
+  return [
+    {
+      icon: <SafetyCertificateOutlined />,
+      label: 'Điểm tuân thủ',
+      value: score == null ? '—' : `${score.toLocaleString('vi-VN')}%`,
+      hint: <Tag color={grade.color} style={{ margin: 0 }}>{grade.label}</Tag>,
+      tone: score == null ? 'default' : grade.color === 'error' ? 'danger' : grade.color === 'success' ? 'good' : 'warning',
+    },
+    {
+      icon: <CheckCircleOutlined />,
+      label: 'Kết quả chấm',
+      value: `${ins.passedCriteria}/${ins.totalCriteria} đạt`,
+      hint: `${ins.failedCriteria} không đạt · ${ins.naCriteria} không áp dụng`,
+      tone: ins.failedCriteria > 0 ? 'warning' : 'good',
+    },
+    {
+      icon: <AlertOutlined />,
+      label: 'Điểm rủi ro',
+      value: `${ins.totalRiskScore} điểm`,
+      hint: ins.maxRiskLevel ? `Mức cao nhất: ${ins.maxRiskLevel}` : 'Không có vi phạm',
+      tone: ins.maxRiskLevel === 'M4' || ins.maxRiskLevel === 'M3' ? 'danger' : ins.maxRiskLevel ? 'warning' : 'good',
+    },
+    {
+      icon: <ClockCircleOutlined />,
+      label: 'Thời lượng',
+      value: ins.checkinAt ? formatInspectionDuration(ins.checkinAt, ins.submittedAt) : '—',
+      hint: ins.submittedAt ? `Nộp ${formatDateTime(ins.submittedAt)}` : 'Chưa nộp',
+      tone: 'info',
+    },
+  ]
+}
+
+/** Chi tiết biên bản kiểm tra: hero + chỉ số + tab Tổng quan / Tiêu chí đánh giá. */
 export function InspectionDetailModal({ open, inspectionId, onClose }: Props) {
   const { data: ins, isLoading } = useInspection(inspectionId)
   const [printOpen, setPrintOpen] = useState(false)
@@ -41,154 +89,58 @@ export function InspectionDetailModal({ open, inspectionId, onClose }: Props) {
     }
   }
 
-  const grade = getComplianceGrade(ins?.complianceScore, ins?.maxRiskLevel)
-  const duration = formatInspectionDuration(ins?.checkinAt, ins?.submittedAt)
-
-  const columns: ColumnsType<InspectionItemResponse> = [
-    { title: '#', key: 'idx', width: 50, render: (_, __, i) => i + 1 },
-    { title: 'Nhóm', dataIndex: 'groupName', key: 'groupName', width: 140 },
-    {
-      title: 'Tiêu chí',
-      key: 'criterion',
-      render: (_, r) => {
-        const photos = parseMediaUrls(r.evidenceUrls)
-        return (
-          <div>
-            <div style={{ fontWeight: 500 }}>{r.criterionName}</div>
-            <div style={{ fontSize: 12, color: 'var(--app-text-secondary)', marginTop: 2, display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span className="code-tag--blue">{r.criterionCode}</span> · Ảnh hưởng: {r.baseImpact}/5
-            </div>
-            {r.comment && <div style={{ fontSize: 13, color: 'var(--app-text-body)', marginTop: 4 }}>Ghi chú: {r.comment}</div>}
-            {photos.length > 0 && (
-              <Space size={6} wrap style={{ marginTop: 6 }}>
-                {photos.map((url, i) =>
-                  isVideoUrl(url) ? (
-                    <video key={i} src={toMediaUrl(url)} controls style={{ width: 90, height: 48, objectFit: 'cover', borderRadius: 4, border: '1px solid var(--app-border)' }} />
-                  ) : (
-                    <Image key={i} src={toMediaUrl(url)} alt={`Bằng chứng #${i + 1}`} loading="lazy" width={48} height={48} style={{ objectFit: 'cover', borderRadius: 4, border: '1px solid var(--app-border)' }} />
-                  )
-                )}
-              </Space>
-            )}
-          </div>
-        )
-      },
-    },
-    {
-      title: 'Kết quả',
-      dataIndex: 'result',
-      key: 'result',
-      width: 140,
-      render: (res: ItemResult, record: InspectionItemResponse) => {
-        if (record.findingStatus === 'DISMISSED' || (record.result === 'FAIL' && record.findingStatus === 'DISMISSED')) {
-          return (
-            <Space direction="vertical" size={2}>
-              <Tag color="error">Không đạt</Tag>
-              <Tag color="cyan" style={{ fontSize: 11 }}>Điểm không phù hợp được hủy theo kết luận khiếu nại</Tag>
-            </Space>
-          )
-        }
-        const meta = ITEM_RESULT_META[res]
-        return <Tag color={meta?.color}>{meta?.label}</Tag>
-      },
-    },
-  ]
-
   return (
-    <Modal
+    <DetailDrawer
       open={open}
-      title={
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingRight: 32 }}>
-          <span>Chi tiết biên bản kiểm tra: {ins?.code || ''}</span>
-          {ins && (
-            <Space size={8}>
-              <Button
-                size="small"
-                icon={<FilePdfOutlined />}
-                loading={downloadingPdf}
-                onClick={handleExportPdf}
-              >
-                Tải PDF
-              </Button>
-              <Button
-                type="primary"
-                size="small"
-                icon={<PrinterOutlined />}
-                onClick={() => setPrintOpen(true)}
-              >
-                In biên bản QC
-              </Button>
-            </Space>
-          )}
-        </div>
+      onClose={onClose}
+      icon={<FileProtectOutlined />}
+      title="Chi tiết biên bản kiểm tra"
+      subtitle={ins?.code}
+      hero={
+        ins && {
+          avatar: <FileProtectOutlined />,
+          eyebrow: `Biên bản ${ins.code}`,
+          title: ins.restaurantName,
+          status: <StatusBadge status={ins.status} meta={INSPECTION_STATUS_META} />,
+          description: ins.templateName || ins.topicNames.join(', '),
+          chips: [
+            { icon: <AppstoreOutlined />, label: `${INSPECTION_KIND_LABEL[ins.inspectionType]} · ${INSPECTION_MODE_LABEL[ins.inspectionMode]}` },
+            { icon: <UserOutlined />, label: ins.inspectorName },
+            ...(ins.checkinAt ? [{ icon: <CalendarOutlined />, label: formatDate(ins.checkinAt) }] : []),
+          ],
+        }
       }
-      onCancel={onClose}
-      footer={null}
-      width={820}
+      stats={ins ? inspectionStats(ins) : undefined}
+      tabs={
+        ins && [
+          { key: 'overview', label: 'Tổng quan', children: <InspectionOverviewPanel ins={ins} /> },
+          {
+            key: 'items',
+            label: `Tiêu chí đánh giá (${ins.items?.length ?? 0})`,
+            children: <InspectionCriteriaResults items={ins.items ?? []} loading={isLoading} />,
+          },
+        ]
+      }
+      audit={ins && { createdAt: formatDateTime(ins.createdAt), updatedAt: ins.completedAt && formatDateTime(ins.completedAt) }}
+      actions={
+        ins && (
+          <Space size={8}>
+            <Button icon={<FilePdfOutlined />} loading={downloadingPdf} onClick={handleExportPdf}>
+              Tải PDF
+            </Button>
+            <Button type="primary" icon={<PrinterOutlined />} onClick={() => setPrintOpen(true)}>
+              In biên bản QC
+            </Button>
+          </Space>
+        )
+      }
     >
-      {ins && (
-        <div style={{ marginTop: 16 }}>
-          <Descriptions size="small" bordered column={2}>
-            <Descriptions.Item label="Nhà hàng">{ins.restaurantName}</Descriptions.Item>
-            <Descriptions.Item label="Loại kiểm tra">
-              {INSPECTION_KIND_LABEL[ins.inspectionType]} · {INSPECTION_MODE_LABEL[ins.inspectionMode]}
-            </Descriptions.Item>
-            <Descriptions.Item label={ins.templateName ? 'Mẫu phiếu' : 'Chuyên đề'}>
-              {ins.templateName ?? (ins.topicNames.join(', ') || '—')}
-            </Descriptions.Item>
-            <Descriptions.Item label="Chuyên viên KSVH">{ins.inspectorName}</Descriptions.Item>
-            <Descriptions.Item label="Bắt đầu lúc">{formatDate(ins.checkinAt)}</Descriptions.Item>
-            <Descriptions.Item label="Vị trí khi bắt đầu">
-              {ins.locationStatus ? <Tag color={LOCATION_STATUS_META[ins.locationStatus].color}>{LOCATION_STATUS_META[ins.locationStatus].label}</Tag> : '—'}
-            </Descriptions.Item>
-            <Descriptions.Item label="Điểm tuân thủ">
-              {ins.complianceScore == null ? (
-                '—'
-              ) : (
-                <Space wrap>
-                  <b>{ins.complianceScore.toLocaleString('vi-VN')}%</b>
-                  {ins.adjustedComplianceScore != null && ins.adjustedComplianceScore !== ins.complianceScore && (
-                    <Tag color="cyan">Sau khiếu nại: {ins.adjustedComplianceScore.toLocaleString('vi-VN')}%</Tag>
-                  )}
-                  <Tag color={grade.color}>{grade.label}</Tag>
-                </Space>
-              )}
-            </Descriptions.Item>
-            <Descriptions.Item label="Thời lượng kiểm tra">
-              <b>{duration}</b> {ins.submittedAt && `(Nộp: ${formatDate(ins.submittedAt)})`}
-            </Descriptions.Item>
-            <Descriptions.Item label="Khoảng cách GPS">{ins.checkinDistanceM ? `${Math.round(ins.checkinDistanceM)} mét` : '—'}</Descriptions.Item>
-            <Descriptions.Item label="Tổng điểm rủi ro">
-              <b>{ins.totalRiskScore} điểm</b> ({ins.maxRiskLevel || 'Không vi phạm'})
-            </Descriptions.Item>
-            <Descriptions.Item label="Kết quả chung">
-              {ins.passedCriteria} Đạt · {ins.failedCriteria} Không đạt · {ins.naCriteria} K/A
-            </Descriptions.Item>
-            {ins.notes && <Descriptions.Item label="Ghi chú" span={2}>{ins.notes}</Descriptions.Item>}
-          </Descriptions>
-
-          <Card title="Danh sách tiêu chí đánh giá" size="small" style={{ marginTop: 16 }}>
-            <Table
-              columns={columns}
-              dataSource={ins.items}
-              rowKey="id"
-              loading={isLoading}
-              pagination={false}
-              size="small"
-            />
-          </Card>
-
-          {printOpen && (
-            <Suspense fallback={null}>
-              <InspectionPrintModal
-                open={printOpen}
-                inspection={ins}
-                onClose={() => setPrintOpen(false)}
-              />
-            </Suspense>
-          )}
-        </div>
+      <Skeleton active loading={isLoading} paragraph={{ rows: 8 }} />
+      {ins && printOpen && (
+        <Suspense fallback={null}>
+          <InspectionPrintModal open={printOpen} inspection={ins} onClose={() => setPrintOpen(false)} />
+        </Suspense>
       )}
-    </Modal>
+    </DetailDrawer>
   )
 }

@@ -1,4 +1,6 @@
-import { Descriptions, Modal, Spin, Typography } from 'antd'
+import { HistoryOutlined } from '@ant-design/icons'
+import { Descriptions, Spin, Typography } from 'antd'
+import { DetailDrawer } from '@/components/feedback/detail'
 import { AuditActionTag } from '@/features/audit/components/AuditActionTag'
 import { useAuditLog } from '@/features/audit/hooks/useAuditLogs'
 import { TARGET_LABELS } from '@/features/audit/audit.types'
@@ -23,13 +25,11 @@ export function AuditLogDetailModal({ logId, open, onClose }: Props) {
   }
 
   return (
-    <Modal
+    <DetailDrawer
       open={open}
+      onClose={onClose}
+      icon={<HistoryOutlined />}
       title="Chi tiết nhật ký hệ thống"
-      onCancel={onClose}
-      footer={null}
-      width={720}
-      destroyOnHidden
     >
       <Spin spinning={isLoading}>
         {log && (
@@ -80,6 +80,6 @@ export function AuditLogDetailModal({ logId, open, onClose }: Props) {
           </Descriptions>
         )}
       </Spin>
-    </Modal>
+    </DetailDrawer>
   )
 }

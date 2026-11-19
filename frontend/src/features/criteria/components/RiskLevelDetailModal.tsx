@@ -1,4 +1,6 @@
-import { Button, Descriptions, Modal, Space } from 'antd'
+import { SafetyCertificateOutlined } from '@ant-design/icons'
+import { Button, Descriptions, Space } from 'antd'
+import { DetailDrawer } from '@/components/feedback/detail'
 import { ConfigStatusTag } from '@/features/criteria/components/ConfigStatusTag'
 import { RiskLevelView } from '@/features/criteria/components/RiskLevelView'
 import type { RiskLevelVersion } from '@/features/criteria/criteria.types'
@@ -23,23 +25,20 @@ export function RiskLevelDetailModal({
   if (!version) return null
 
   return (
-    <Modal
+    <DetailDrawer
       open={open}
+      onClose={onClose}
+      icon={<SafetyCertificateOutlined />}
       title={
         <Space size={8}>
-          <span style={{ fontSize: 16, fontWeight: 700 }}>Chi tiết bảng phân loại rủi ro</span>
+          <span>Chi tiết bảng phân loại rủi ro</span>
           <ConfigStatusTag status={version.status} />
         </Space>
       }
-      width={1060}
-      onCancel={onClose}
-      footer={[
-        <Button key="close" onClick={onClose}>
-          Đóng
-        </Button>,
-        editable && onEdit && (
+      actions={
+        editable &&
+        onEdit && (
           <Button
-            key="edit"
             type="primary"
             onClick={() => {
               onClose()
@@ -48,9 +47,8 @@ export function RiskLevelDetailModal({
           >
             {version.status === 'SCHEDULED' ? 'Sửa phiên bản này' : 'Tạo phiên bản mới từ bản này'}
           </Button>
-        ),
-      ]}
-      destroyOnHidden
+        )
+      }
     >
       <Descriptions bordered size="small" column={{ xs: 1, sm: 3 }} style={{ margin: '16px 0 20px' }}>
         <Descriptions.Item label="Ngày bắt đầu hiệu lực">
@@ -70,7 +68,7 @@ export function RiskLevelDetailModal({
         </div>
         <RiskLevelView levels={version.levels} />
       </div>
-    </Modal>
+    </DetailDrawer>
   )
 }
 

@@ -62,3 +62,6 @@ export const CONFIG_STATUS_META: Record<ConfigStatus, { label: string; tone: 'su
   SCHEDULED: { label: 'Sắp áp dụng', tone: 'processing' },
   PAST: { label: 'Đã thay thế', tone: 'default' },
 }
+
+/** Nhãn loại kiểm tra lưu trên mẫu phiếu (giá trị cũ có thể là chữ tự do). */
+export const INSPECTION_TYPE_LABEL: Record<string, string> = { PERIODIC: 'Định kỳ', SURPRISE: 'Đột xuất' }

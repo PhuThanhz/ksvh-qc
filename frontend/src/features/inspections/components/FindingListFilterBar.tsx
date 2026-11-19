@@ -41,7 +41,6 @@ export function FindingListFilterBar({
     <AdvancedFilter
       search={{
         placeholder: 'Tìm kiếm mô tả vi phạm, khiếu nại, biện pháp khắc phục...',
-        maxWidth: 460,
         value: keyword,
         onSearch,
       }}

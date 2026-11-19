@@ -1,4 +1,6 @@
-import { Descriptions, Flex, Modal, Spin, Table, Tag, Typography } from 'antd'
+import { CalendarOutlined } from '@ant-design/icons'
+import { Descriptions, Flex, Spin, Table, Tag, Typography } from 'antd'
+import { DetailDrawer } from '@/components/feedback/detail'
 import type { ColumnsType } from 'antd/es/table'
 import { StatusBadge } from '@/components/data-display/StatusBadge'
 import { INSPECTION_STATUS_META, PLAN_STATUS_META } from '../constants/status'
@@ -82,13 +84,11 @@ export function PlanDetailModal({ planId, open, onClose }: Props) {
   ]
 
   return (
-    <Modal
+    <DetailDrawer
       open={open}
+      onClose={onClose}
+      icon={<CalendarOutlined />}
       title={`Chi tiết kế hoạch: ${plan?.planCode ?? ''}`}
-      onCancel={onClose}
-      footer={null}
-      width={860}
-      destroyOnHidden
     >
       <Spin spinning={planQuery.isLoading}>
         {plan && (
@@ -139,6 +139,6 @@ export function PlanDetailModal({ planId, open, onClose }: Props) {
           </Flex>
         )}
       </Spin>
-    </Modal>
+    </DetailDrawer>
   )
 }

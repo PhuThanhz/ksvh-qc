@@ -1,4 +1,4 @@
-import { EditOutlined, EnvironmentOutlined } from '@ant-design/icons'
+import { AlertOutlined, ApartmentOutlined, BankOutlined, BarcodeOutlined, EditOutlined, EnvironmentOutlined, ShopOutlined, UserOutlined } from '@ant-design/icons'
 import { Button, Space, Tag, Typography } from 'antd'
 import { DetailModal, type DetailField } from '@/components/feedback/DetailModal'
 import { ActiveBadge } from '@/features/organizations/components/ActiveBadge'
@@ -72,11 +72,6 @@ export function OrgUnitDetailModal({ open, unit, fixedUnitType, onClose, onEdit 
     )
   }
 
-  fields.push(
-    { label: 'Ngày tạo', value: formatDateTime(unit.createdAt) },
-    { label: 'Cập nhật lần cuối', value: formatDateTime(unit.updatedAt) },
-  )
-
   const extraFooter = onEdit ? (
     <Button
       key="edit"
@@ -94,6 +89,22 @@ export function OrgUnitDetailModal({ open, unit, fixedUnitType, onClose, onEdit 
     <DetailModal
       open={open}
       title={title}
+      icon={isDepartment ? <ApartmentOutlined /> : <ShopOutlined />}
+      subtitle={isDepartment ? 'Phòng ban nghiệp vụ' : 'Cơ sở được kiểm tra'}
+      hero={{
+        avatar: isDepartment ? <ApartmentOutlined /> : <ShopOutlined />,
+        eyebrow: isDepartment ? 'Phòng ban' : 'Nhà hàng',
+        title: unit.name,
+        status: <ActiveBadge active={unit.active} />,
+        description: unit.address,
+        chips: [
+          { icon: <BarcodeOutlined />, label: unit.code },
+          { icon: <BankOutlined />, label: unit.companyName },
+          ...(!isDepartment && unit.storeManager ? [{ icon: <UserOutlined />, label: `CHT: ${unit.storeManager.fullName}` }] : []),
+          ...(!isDepartment && escalationOverrideText(unit) ? [{ icon: <AlertOutlined />, label: `Ngưỡng riêng: ${escalationOverrideText(unit)}` }] : []),
+        ],
+      }}
+      audit={{ createdAt: formatDateTime(unit.createdAt), updatedAt: formatDateTime(unit.updatedAt) }}
       width={720}
       fields={fields}
       extraFooter={extraFooter}

@@ -1,5 +1,6 @@
-import { Button, Descriptions, Modal, type DescriptionsProps } from 'antd'
+import type { DescriptionsProps } from 'antd'
 import type { ReactNode } from 'react'
+import { DetailDrawer, DetailItem, DetailSection, type DetailAudit, type DetailHeroProps } from '@/components/feedback/detail'
 
 export interface DetailField {
   label: ReactNode
@@ -13,54 +14,43 @@ export interface DetailModalProps {
   fields?: DetailField[]
   children?: ReactNode
   onClose: () => void
+  /** @deprecated Drawer chi tiết dùng chung một độ rộng; giữ để không vỡ chỗ gọi cũ. */
   width?: number
   column?: DescriptionsProps['column']
   extraFooter?: ReactNode
+  icon?: ReactNode
+  subtitle?: ReactNode
+  hero?: DetailHeroProps
+  audit?: DetailAudit
 }
 
 /**
- * Modal xem chi tiết chuẩn hoá dùng chung cho mọi module (User, Employee, OrgUnit, Criteria, v.v.).
- * Tự động render lưới nhãn - giá trị bằng Descriptions và nút Đóng chuẩn.
+ * Xem chi tiết dạng đơn giản (danh sách nhãn – giá trị) cho mọi module.
+ * Hiển thị bằng DetailDrawer chung; trang cần hero / tab / icon thì dùng thẳng DetailDrawer.
  */
-export function DetailModal({
-  open,
-  title,
-  fields,
-  children,
-  onClose,
-  width = 680,
-  column = { xs: 1, sm: 2 },
-  extraFooter,
-}: DetailModalProps) {
+export function DetailModal(props: DetailModalProps) {
+  const { open, title, fields, children, onClose, column, extraFooter, icon, subtitle, hero, audit } = props
+  const oneColumn = column === 1
   return (
-    <Modal
+    <DetailDrawer
       open={open}
       title={title}
-      width={width}
-      centered
-      styles={{ body: { maxHeight: 'calc(100vh - 180px)', overflowY: 'auto', paddingRight: 4 } }}
-      onCancel={onClose}
-      destroyOnHidden
-      footer={[
-        extraFooter,
-        <Button key="close" type="primary" onClick={onClose}>
-          Đóng
-        </Button>,
-      ]}
+      onClose={onClose}
+      actions={extraFooter}
+      fit
+      icon={icon}
+      subtitle={subtitle}
+      hero={hero}
+      audit={audit}
     >
-      <div style={{ marginTop: 16 }}>
-        {fields && fields.length > 0 && (
-          <Descriptions bordered column={column} size="middle">
-            {fields.map((f, i) => (
-              <Descriptions.Item key={i} label={f.label} span={f.span}>
-                {f.value ?? '—'}
-              </Descriptions.Item>
-            ))}
-          </Descriptions>
-        )}
-        {children}
-      </div>
-    </Modal>
+      {fields && fields.length > 0 && (
+        <DetailSection title="Thông tin chung" columns={oneColumn ? 1 : 2}>
+          {fields.map((f, i) => (
+            <DetailItem key={i} label={f.label} value={f.value} wide={f.span === 2} />
+          ))}
+        </DetailSection>
+      )}
+      {children}
+    </DetailDrawer>
   )
 }
-

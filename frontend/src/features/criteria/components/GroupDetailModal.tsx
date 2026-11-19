@@ -1,5 +1,6 @@
-import { ArrowRightOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
-import { Badge, Button, Descriptions, Empty, Flex, Input, Modal, Space, Table, Tag, Typography } from 'antd'
+import { AppstoreOutlined, ArrowRightOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
+import { Badge, Button, Descriptions, Empty, Flex, Input, Space, Table, Tag, Typography } from 'antd'
+import { DetailDrawer } from '@/components/feedback/detail'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { StatusBadge } from '@/components/data-display/StatusBadge'
@@ -61,45 +62,37 @@ export function GroupDetailModal({
   const totalCount = criteriaData?.items.length ?? group.criterionCount ?? 0
 
   return (
-    <Modal
+    <DetailDrawer
       open={open}
+      onClose={onClose}
+      icon={<AppstoreOutlined />}
       title={
         <Flex align="center" gap={10} wrap="wrap">
-          <Typography.Title level={5} style={{ margin: 0 }}>
-            Chi tiết nhóm tiêu chí: {group.name}
-          </Typography.Title>
+          <span>Chi tiết nhóm tiêu chí: {group.name}</span>
           <Tag style={{ fontFamily: 'monospace', fontWeight: 600 }}>{group.code}</Tag>
           <StatusBadge status={group.active ? 'active' : 'inactive'} meta={ACTIVE_META} />
         </Flex>
       }
-      width={900}
-      centered
-      styles={{ body: { maxHeight: 'calc(100vh - 160px)', overflowY: 'auto' } }}
-      onCancel={onClose}
-      destroyOnHidden
-      footer={
-        <Flex justify="space-between" align="center" wrap="wrap" gap={8}>
+      actions={
+        <Space wrap>
           <Button icon={<ArrowRightOutlined />} onClick={() => { onClose(); navigate(`${ROUTES.admin.criteria}?groupId=${group.id}`) }}>
             Xem toàn bộ danh sách tiêu chí
           </Button>
-          <Space>
-            {onAddCriterion && (
-              <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-                <Button icon={<PlusOutlined />} onClick={() => { onClose(); onAddCriterion(group) }}>
-                  Thêm tiêu chí
-                </Button>
-              </ProtectedAction>
-            )}
-            {onEditGroup && (
-              <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-                <Button type="primary" icon={<EditOutlined />} onClick={() => { onClose(); onEditGroup(group) }}>
-                  Chỉnh sửa nhóm
-                </Button>
-              </ProtectedAction>
-            )}
-            <Button onClick={onClose}>Đóng</Button>
-          </Space>
-        </Flex>
+          {onAddCriterion && (
+            <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
+              <Button icon={<PlusOutlined />} onClick={() => { onClose(); onAddCriterion(group) }}>
+                Thêm tiêu chí
+              </Button>
+            </ProtectedAction>
+          )}
+          {onEditGroup && (
+            <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
+              <Button type="primary" icon={<EditOutlined />} onClick={() => { onClose(); onEditGroup(group) }}>
+                Chỉnh sửa nhóm
+              </Button>
+            </ProtectedAction>
+          )}
+        </Space>
       }
     >
       <div style={{ marginTop: 12 }}>
@@ -172,6 +165,6 @@ export function GroupDetailModal({
           ]}
         />
       </div>
-    </Modal>
+    </DetailDrawer>
   )
 }

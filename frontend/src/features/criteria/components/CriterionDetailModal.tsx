@@ -1,4 +1,6 @@
-import { Button, Descriptions, Modal, Space, type DescriptionsProps } from 'antd'
+import { FileSearchOutlined } from '@ant-design/icons'
+import { Button, Descriptions, Space, type DescriptionsProps } from 'antd'
+import { DetailDrawer } from '@/components/feedback/detail'
 import { StatusBadge } from '@/components/data-display/StatusBadge'
 import { ImpactTag } from '@/features/criteria/components/ImpactTag'
 import type { Criterion } from '@/features/criteria/criteria.types'
@@ -48,29 +50,25 @@ export function CriterionDetailModal({ open, criterion, onClose, onEdit }: Crite
   ]
 
   return (
-    <Modal
+    <DetailDrawer
       open={open ?? Boolean(criterion)}
-      title={`Chi tiết tiêu chí kiểm soát: ${criterion.code}`}
-      width={760}
-      centered
-      onCancel={onClose}
-      footer={
-        <Space>
-          <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-            <Button
-              type="primary"
-              onClick={() => {
-                onClose()
-                onEdit(criterion)
-              }}
-            >
-              Chỉnh sửa
-            </Button>
-          </ProtectedAction>
-          <Button onClick={onClose}>Đóng</Button>
-        </Space>
+      onClose={onClose}
+      icon={<FileSearchOutlined />}
+      title={`Chi tiết tiêu chí: ${criterion.code}`}
+      subtitle={criterion.groupName}
+      actions={
+        <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
+          <Button
+            type="primary"
+            onClick={() => {
+              onClose()
+              onEdit(criterion)
+            }}
+          >
+            Chỉnh sửa
+          </Button>
+        </ProtectedAction>
       }
-      destroyOnHidden
     >
       <Descriptions
         bordered
@@ -79,6 +77,6 @@ export function CriterionDetailModal({ open, criterion, onClose, onEdit }: Crite
         items={items}
         style={{ marginTop: 12 }}
       />
-    </Modal>
+    </DetailDrawer>
   )
 }

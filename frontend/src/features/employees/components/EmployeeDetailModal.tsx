@@ -1,4 +1,4 @@
-import { EditOutlined } from '@ant-design/icons'
+import { EditOutlined, IdcardOutlined, ShopOutlined, SolutionOutlined } from '@ant-design/icons'
 import { Button, Tag } from 'antd'
 import { StatusBadge, type BadgeTone } from '@/components/data-display/StatusBadge'
 import { DetailModal, type DetailField } from '@/components/feedback/DetailModal'
@@ -35,7 +35,6 @@ export function EmployeeDetailModal({ open, employee, onClose, onEdit }: Employe
       label: 'Trạng thái',
       value: <StatusBadge status={employee.active ? 'active' : 'inactive'} meta={ACTIVE_META} />,
     },
-    { label: 'Ngày tạo', value: formatDateTime(employee.createdAt) },
   ]
 
   const extraFooter = onEdit ? (
@@ -54,8 +53,20 @@ export function EmployeeDetailModal({ open, employee, onClose, onEdit }: Employe
   return (
     <DetailModal
       open={open}
-      title={`Chi tiết nhân viên: ${employee.fullName}`}
-      width={640}
+      title="Chi tiết nhân viên"
+      icon={<IdcardOutlined />}
+      hero={{
+        avatar: employee.fullName.trim().split(/\s+/).at(-1)?.charAt(0).toUpperCase(),
+        eyebrow: 'Hồ sơ nhân viên',
+        title: employee.fullName,
+        status: <StatusBadge status={employee.active ? 'active' : 'inactive'} meta={ACTIVE_META} />,
+        chips: [
+          { icon: <IdcardOutlined />, label: employee.employeeCode },
+          ...(employee.jobTitle ? [{ icon: <SolutionOutlined />, label: employee.jobTitle }] : []),
+          ...(employee.orgUnitName ? [{ icon: <ShopOutlined />, label: employee.orgUnitName }] : []),
+        ],
+      }}
+      audit={{ createdAt: formatDateTime(employee.createdAt) }}
       fields={fields}
       extraFooter={extraFooter}
       onClose={onClose}

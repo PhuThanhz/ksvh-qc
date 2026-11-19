@@ -1,3 +1,4 @@
+import { BarcodeOutlined, KeyOutlined, SafetyOutlined, TeamOutlined } from '@ant-design/icons'
 import { Space, Tag } from 'antd'
 import { DetailModal, type DetailField } from '@/components/feedback/DetailModal'
 import type { Role } from '@/features/roles/roles.types'
@@ -36,15 +37,26 @@ export function RoleDetailModal({ open, role, onClose }: RoleDetailModalProps) {
         </div>
       ),
     },
-    { label: 'Cập nhật lần cuối', value: formatDateTime(role.updatedAt) },
-    { label: 'Người cập nhật', value: role.updatedByName || '—' },
   ]
 
   return (
     <DetailModal
       open={open}
-      title={`Chi tiết vai trò: ${role.name}`}
-      width={640}
+      title="Chi tiết vai trò"
+      icon={<SafetyOutlined />}
+      hero={{
+        avatar: <SafetyOutlined />,
+        eyebrow: 'Vai trò',
+        title: role.name,
+        status: role.systemRole ? <Tag style={{ margin: 0 }}>Vai trò gốc</Tag> : undefined,
+        description: role.description,
+        chips: [
+          { icon: <BarcodeOutlined />, label: role.code },
+          { icon: <TeamOutlined />, label: `${role.userCount} người dùng` },
+          { icon: <KeyOutlined />, label: `${role.permissions?.length ?? 0} quyền` },
+        ],
+      }}
+      audit={{ updatedBy: role.updatedByName, updatedAt: formatDateTime(role.updatedAt) }}
       fields={fields}
       onClose={onClose}
     />
