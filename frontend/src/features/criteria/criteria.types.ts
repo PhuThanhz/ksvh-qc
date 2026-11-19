@@ -25,9 +25,15 @@ export type CriterionPayload = Omit<Schemas['CriterionRequest'], 'templateIds'> 
 export type Template = Schemas['TemplateResponse'] & {
   companyId?: number | null
   companyName?: string | null
+  frequencyPeriodMonths?: number | null
+  escalationThresholdCount?: number | null
+  resetPeriodMonths?: number | null
 }
 export type TemplatePayload = Omit<Schemas['TemplateRequest'], 'companyId'> & {
   companyId?: number | null
+  frequencyPeriodMonths?: number | null
+  escalationThresholdCount?: number | null
+  resetPeriodMonths?: number | null
 }
 export type TemplateOption = Schemas['TemplateOption']
 export type RiskLevel = Schemas['RiskLevelItem']

@@ -1,5 +1,5 @@
 import { EditOutlined, EnvironmentOutlined } from '@ant-design/icons'
-import { Button, Space, Typography } from 'antd'
+import { Button, Space, Tag, Typography } from 'antd'
 import { DetailModal, type DetailField } from '@/components/feedback/DetailModal'
 import { ActiveBadge } from '@/features/organizations/components/ActiveBadge'
 import { OrgUnitTypeTag } from '@/features/organizations/components/OrgUnitTypeTag'
@@ -59,6 +59,14 @@ export function OrgUnitDetailModal({ open, unit, fixedUnitType, onClose, onEdit 
       {
         label: 'Bán kính check-in',
         value: unit.checkinRadiusM ? `${unit.checkinRadiusM} mét` : '—',
+      },
+      {
+        label: 'Chính sách rủi ro',
+        value: unit.riskPolicy === 'STRICT' ? (
+          <Tag color="error">Khắt khe - Fine Dining (Ngưỡng 2 lần)</Tag>
+        ) : (
+          <Tag color="blue">Tiêu chuẩn (Ngưỡng 3 lần)</Tag>
+        ),
       },
     )
   }

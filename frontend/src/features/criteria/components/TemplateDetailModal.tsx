@@ -1,5 +1,5 @@
 import { EditOutlined, SearchOutlined } from '@ant-design/icons'
-import { Badge, Button, Flex, Input, List, Spin, Tag, Typography } from 'antd'
+import { Badge, Button, Flex, Input, List, Space, Spin, Tag, Typography } from 'antd'
 import { useMemo, useState } from 'react'
 import { StatusBadge } from '@/components/data-display/StatusBadge'
 import { DetailModal, type DetailField } from '@/components/feedback/DetailModal'
@@ -53,6 +53,17 @@ export function TemplateDetailModal({ open, template, onClose, onEdit }: Templat
       value: <StatusBadge status={fullTemplate?.active ?? template.active ? 'active' : 'inactive'} meta={ACTIVE_META} />,
     },
     { label: 'Cập nhật lần cuối', value: formatDateTime(fullTemplate?.updatedAt ?? template.updatedAt) },
+    {
+      label: 'Quy tắc rủi ro mẫu',
+      span: 2,
+      value: (
+        <Space size={16} wrap>
+          <span>Kỳ đếm cuốn: <b>{fullTemplate?.frequencyPeriodMonths ?? 6} tháng</b></span>
+          <span>Ngưỡng nâng mức: <b>≥ {fullTemplate?.escalationThresholdCount ?? 3} lần</b></span>
+          <span>Kỳ hạ mức: <b>{fullTemplate?.resetPeriodMonths ?? 6} tháng sạch</b></span>
+        </Space>
+      ),
+    },
     {
       label: (
         <Flex vertical gap={4}>

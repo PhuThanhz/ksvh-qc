@@ -26,7 +26,11 @@ public class RiskAssessor {
 
     /** Lần lỗi đang tính chưa có trong bảng occurrence (gọi trước khi ghi lần +1). */
     public RiskAssessment assessNew(Long restaurantId, Long criterionId, int baseImpact, LocalDate at) {
-        RiskRules rules = RiskRules.from(criteria.riskConfigAt(at));
+        return assessNew(restaurantId, criterionId, baseImpact, at, RiskRules.from(criteria.riskConfigAt(at)));
+    }
+
+    /** Lần lỗi đang tính chưa có trong bảng occurrence, áp dụng bộ quy tắc rủi ro tuỳ biến theo mẫu/nhà hàng. */
+    public RiskAssessment assessNew(Long restaurantId, Long criterionId, int baseImpact, LocalDate at, RiskRules rules) {
         List<LocalDate> previous = occurrences.findOccurredAt(restaurantId, criterionId).stream()
                 .map(i -> i.atZone(BusinessDates.ZONE).toLocalDate())
                 .toList();

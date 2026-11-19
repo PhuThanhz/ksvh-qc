@@ -45,5 +45,13 @@ public record OrgUnitRequest(
         @Max(value = 5000, message = "Bán kính tối đa 5000 m")
         Integer checkinRadiusM,
 
-        boolean active) {
+        boolean active,
+
+        @Size(max = 20, message = "Chính sách rủi ro tối đa 20 ký tự")
+        String riskPolicy) {
+
+    public OrgUnitRequest(Long companyId, OrgUnitType unitType, String code, String name, String address,
+                          Double latitude, Double longitude, Integer checkinRadiusM, boolean active) {
+        this(companyId, unitType, code, name, address, latitude, longitude, checkinRadiusM, active, "STANDARD");
+    }
 }

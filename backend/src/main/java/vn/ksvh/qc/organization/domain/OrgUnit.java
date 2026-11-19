@@ -52,6 +52,9 @@ public class OrgUnit extends BaseEntity {
     @Column(name = "checkin_radius_m")
     private Integer checkinRadiusM;
 
+    @Column(name = "risk_policy", nullable = false, length = 20)
+    private String riskPolicy = "STANDARD";
+
     @Column(nullable = false)
     private boolean active = true;
 

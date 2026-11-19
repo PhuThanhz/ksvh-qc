@@ -22,6 +22,7 @@ export const orgUnitSchema = z
     longitude: z.number().min(-180, 'Kinh độ phải từ -180 đến 180').max(180, 'Kinh độ phải từ -180 đến 180').nullable(),
     checkinRadiusM: z.number().int('Bán kính là số nguyên').min(10, 'Bán kính tối thiểu 10 m').max(5000, 'Bán kính tối đa 5000 m').nullable(),
     active: z.boolean(),
+    riskPolicy: z.enum(['STANDARD', 'STRICT']),
   })
   .superRefine((v, ctx) => {
     if (v.companyId === null) ctx.addIssue({ code: 'custom', path: ['companyId'], message: 'Vui lòng chọn công ty' })

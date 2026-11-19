@@ -17,6 +17,9 @@ public record TemplateResponse(
         boolean active,
         int criterionCount,
         Instant updatedAt,
+        @Schema(nullable = true) Integer frequencyPeriodMonths,
+        @Schema(nullable = true) Integer escalationThresholdCount,
+        @Schema(nullable = true) Integer resetPeriodMonths,
         List<CriterionResponse> criteria) {
 
     public static TemplateResponse from(InspectionTemplate t, List<CriterionResponse> criteria, String companyName) {
@@ -31,6 +34,9 @@ public record TemplateResponse(
                 t.isActive(),
                 t.getItems().size(),
                 t.getUpdatedAt(),
+                t.getFrequencyPeriodMonths(),
+                t.getEscalationThresholdCount(),
+                t.getResetPeriodMonths(),
                 criteria);
     }
 }

@@ -46,7 +46,7 @@ public class RestaurantRiskProfileService {
 
         LocalDate asOf = asOfDate != null ? asOfDate : BusinessDates.today(clock);
         RiskConfigRef config = criteriaLookupApi.riskConfigAt(asOf);
-        RiskRules rules = RiskRules.from(config);
+        RiskRules rules = RiskRules.forContext(config, rest.riskPolicy());
 
         String companyName = null;
         if (rest.companyId() != null) {

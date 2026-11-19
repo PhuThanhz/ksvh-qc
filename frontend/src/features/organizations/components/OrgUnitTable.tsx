@@ -1,5 +1,5 @@
 import { EnvironmentOutlined } from '@ant-design/icons'
-import { Flex, Space, Tooltip, Typography } from 'antd'
+import { Flex, Space, Tag, Tooltip, Typography } from 'antd'
 import { DataTable, type DataTableProps } from '@/components/data-display/DataTable'
 import { TableActions } from '@/components/data-display/TableActions'
 import { ActiveBadge } from '@/features/organizations/components/ActiveBadge'
@@ -110,6 +110,18 @@ export function OrgUnitTable({ onView, onEdit, onDelete, onFilterType, fixedUnit
                 </Flex>
               ) : (
                 <span className="cell-sub">Chưa có toạ độ</span>
+              ),
+          },
+          {
+            title: 'Chính sách rủi ro',
+            dataIndex: 'riskPolicy',
+            key: 'riskPolicy',
+            width: 170,
+            render: (policy?: string) =>
+              policy === 'STRICT' ? (
+                <Tag color="error" style={{ fontSize: 11 }}>Khắt khe (Fine Dining)</Tag>
+              ) : (
+                <Tag color="default" style={{ fontSize: 11 }}>Tiêu chuẩn</Tag>
               ),
           },
         ]

@@ -4,6 +4,7 @@ import { useEffect, useMemo } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { FormField } from '@/components/data-entry/FormField'
 import { FormInput } from '@/components/data-entry/FormInput'
+import { FormNumber } from '@/components/data-entry/FormNumber'
 import { FormSelect } from '@/components/data-entry/FormSelect'
 import { FormSwitch } from '@/components/data-entry/FormSwitch'
 import { useNotify } from '@/components/feedback/useNotify'
@@ -17,6 +18,7 @@ import { applyFieldErrors, getErrorMessage } from '@/lib/http'
 
 const EMPTY: TemplateFormValues = {
   code: '', name: '', companyId: null, inspectionType: '', description: '', criterionIds: [], active: true,
+  frequencyPeriodMonths: 6, escalationThresholdCount: 3, resetPeriodMonths: 6,
 }
 
 export interface TemplateFormModalProps {
@@ -45,6 +47,9 @@ export function TemplateFormModal({ open, templateId, onClose }: TemplateFormMod
       code: t.code, name: t.name, companyId: t.companyId ?? null,
       inspectionType: t.inspectionType ?? '', description: t.description ?? '',
       criterionIds: t.criteria.map((c) => c.id), active: t.active,
+      frequencyPeriodMonths: t.frequencyPeriodMonths ?? 6,
+      escalationThresholdCount: t.escalationThresholdCount ?? 3,
+      resetPeriodMonths: t.resetPeriodMonths ?? 6,
     } : EMPTY)
   }, [open, editing, detail.data, reset])
 
@@ -102,6 +107,9 @@ export function TemplateFormModal({ open, templateId, onClose }: TemplateFormMod
           ...v, companyId: v.companyId ?? undefined, criterionIds: ordered,
           inspectionType: v.inspectionType || undefined,
           description: v.description || undefined,
+          frequencyPeriodMonths: v.frequencyPeriodMonths ?? 6,
+          escalationThresholdCount: v.escalationThresholdCount ?? 3,
+          resetPeriodMonths: v.resetPeriodMonths ?? 6,
         },
       },
       {
@@ -155,6 +163,45 @@ export function TemplateFormModal({ open, templateId, onClose }: TemplateFormMod
             <Col xs={24} md={6}><FormInput control={control} name="inspectionType" label="Loại kiểm tra" maxLength={100} placeholder="VD: Định kỳ, Đột xuất" /></Col>
             <Col xs={24} md={18}><FormInput control={control} name="description" label="Mô tả" maxLength={500} /></Col>
             <Col xs={24} md={6}><FormSwitch control={control} name="active" label="Đang dùng" /></Col>
+            <Col xs={24} md={8}>
+              <FormNumber
+                control={control}
+                name="frequencyPeriodMonths"
+                label="Kỳ đếm tần suất lỗi (tháng)"
+                min={1}
+                max={24}
+                step={1}
+                precision={0}
+                placeholder="6"
+                extra="Kỳ đếm cuốn tính số lần lỗi (mặc định 6 tháng)"
+              />
+            </Col>
+            <Col xs={24} md={8}>
+              <FormNumber
+                control={control}
+                name="escalationThresholdCount"
+                label="Ngưỡng nâng mức rủi ro (lần)"
+                min={1}
+                max={10}
+                step={1}
+                precision={0}
+                placeholder="3"
+                extra="Số lần vi phạm trong kỳ để nâng mức rủi ro (mặc định 3)"
+              />
+            </Col>
+            <Col xs={24} md={8}>
+              <FormNumber
+                control={control}
+                name="resetPeriodMonths"
+                label="Kỳ hạ lại mức gốc (tháng)"
+                min={1}
+                max={24}
+                step={1}
+                precision={0}
+                placeholder="6"
+                extra="Số tháng liên tục sạch lỗi để hạ về ban đầu (mặc định 6)"
+              />
+            </Col>
             <Col span={24}>
               <FormField
                 control={control}

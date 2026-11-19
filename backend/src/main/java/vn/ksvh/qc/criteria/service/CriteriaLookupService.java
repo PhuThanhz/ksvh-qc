@@ -68,7 +68,8 @@ class CriteriaLookupService implements CriteriaLookupApi {
                 .collect(Collectors.toUnmodifiableMap(
                         InspectionTemplate::getId,
                         t -> new TemplateRef(t.getId(), t.getCode(), t.getName(), t.isActive(),
-                                t.getCompanyId(), List.of())
+                                t.getCompanyId(), t.getFrequencyPeriodMonths(), t.getEscalationThresholdCount(),
+                                t.getResetPeriodMonths(), List.of())
                 ));
     }
 
@@ -89,7 +90,8 @@ class CriteriaLookupService implements CriteriaLookupApi {
                     .map(this::toCriterionRef)
                     .toList();
             return new TemplateRef(t.getId(), t.getCode(), t.getName(), t.isActive(),
-                    t.getCompanyId(), items);
+                    t.getCompanyId(), t.getFrequencyPeriodMonths(), t.getEscalationThresholdCount(),
+                    t.getResetPeriodMonths(), items);
         });
     }
 

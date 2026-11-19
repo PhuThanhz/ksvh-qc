@@ -3,8 +3,9 @@ import { Button, Col, Divider, Flex, Row, Typography } from 'antd'
 import { useEffect } from 'react'
 import type { Control, UseFormSetValue } from 'react-hook-form'
 import { FormNumber } from '@/components/data-entry/FormNumber'
+import { FormSelect } from '@/components/data-entry/FormSelect'
 import { useNotify } from '@/components/feedback/useNotify'
-import type { OrgUnit } from '@/features/organizations/organizations.types'
+import { RISK_POLICY_OPTIONS, type OrgUnit } from '@/features/organizations/organizations.types'
 import type { OrgUnitFormValues } from '@/features/organizations/schemas/organization.schema'
 import { useGeolocation } from '@/hooks/useGeolocation'
 
@@ -76,6 +77,15 @@ export function RestaurantFormSection({ control, setValue, unit }: RestaurantFor
             step={10}
             precision={0}
             extra="Không bắt buộc. Hệ thống chỉ ghi nhận vị trí khi bắt đầu kiểm tra, không chặn"
+          />
+        </Col>
+        <Col span={24}>
+          <FormSelect
+            control={control}
+            name="riskPolicy"
+            label="Chính sách kiểm soát rủi ro"
+            options={RISK_POLICY_OPTIONS}
+            extra="Áp dụng ngưỡng vi phạm khắt khe hơn (2 lần) đối với các chuỗi Fine Dining như Tenku, Ussina"
           />
         </Col>
       </Row>
