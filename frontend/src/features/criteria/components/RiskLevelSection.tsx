@@ -1,5 +1,5 @@
 import { Badge, Flex, Select, Space, Table } from 'antd'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { AdvancedFilter } from '@/components/data-entry/AdvancedFilter'
 import { TableCard } from '@/components/data-display/TableCard'
 import { TableActions } from '@/components/data-display/TableActions'
@@ -22,6 +22,8 @@ export interface RiskLevelSectionProps {
   onCreateClose?: () => void
 }
 
+const EMPTY_LIST: readonly RiskLevelVersion[] = []
+
 /** Danh mục phân loại mức rủi ro M1–M4 dạng bảng quản lý chuẩn: xem chi tiết, sửa, xoá, tạo phiên bản mới. */
 export function RiskLevelSection({ createOpen, onCreateClose }: RiskLevelSectionProps) {
   const notify = useNotify()
@@ -40,34 +42,32 @@ export function RiskLevelSection({ createOpen, onCreateClose }: RiskLevelSection
     effectiveFrom?: string
   }>({ open: false, source: [] })
 
-  const currentVersion = (versions.data ?? []).find((v) => v.status === 'CURRENT') ?? versions.data?.[0]
+  const list = versions.data ?? EMPTY_LIST
+  const currentVersion = list.find((v) => v.status === 'CURRENT') ?? list[0]
 
-  // Kích hoạt khi bấm nút "+ Tạo bảng phân loại mới" từ thanh tiêu đề
-  useEffect(() => {
-    if (createOpen && currentVersion) {
-      setFormModal({
-        open: true,
-        source: currentVersion.levels,
-        effectiveFrom: undefined,
-      })
-      onCreateClose?.()
-    }
-  }, [createOpen, currentVersion, onCreateClose])
+  const activeForm = formModal.open
+    ? formModal
+    : createOpen
+      ? { open: true, source: currentVersion?.levels ?? [], effectiveFrom: undefined }
+      : { open: false, source: [], effectiveFrom: undefined }
+
+  const handleCloseForm = () => {
+    setFormModal({ open: false, source: [] })
+    onCreateClose?.()
+  }
 
   const handleEdit = (v: RiskLevelVersion) => {
-    if (v.status === 'SCHEDULED') {
-      // Bản sắp áp dụng: sửa trực tiếp
-      setFormModal({ open: true, source: v.levels, effectiveFrom: v.effectiveFrom })
-    } else {
-      // Bản đang áp dụng hoặc lịch sử: tạo phiên bản mới kế thừa các mức của bản này
-      setFormModal({ open: true, source: v.levels, effectiveFrom: undefined })
-    }
+    setFormModal({
+      open: true,
+      source: v.levels,
+      effectiveFrom: v.status === 'SCHEDULED' ? v.effectiveFrom : undefined,
+    })
   }
 
   const handleDelete = async (v: RiskLevelVersion) => {
     if (v.status !== 'SCHEDULED') {
       notify.warning(
-        'Chỉ có thể xoá các bảng phân loại ở trạng thái "Sắp áp dụng". Bảng đang áp dụng không thể xoá để đảm bảo tính toàn vẹn dữ liệu kiểm tra.',
+        'Chỉ có thể xoá các bảng phân loại ở trạng thái "Sắp áp dụng". Bảng đang áp dụng không thể xoá để đảm bảo tính toàn vẹn dữ liệu.',
       )
       return
     }
@@ -85,19 +85,13 @@ export function RiskLevelSection({ createOpen, onCreateClose }: RiskLevelSection
     })
   }
 
-  if (versions.error && !versions.data) {
-    return <ErrorState onRetry={() => void versions.refetch()} />
-  }
-
-  const list = versions.data ?? []
-
   const filteredList = useMemo(() => {
     let res = list
     if (statusFilter && statusFilter !== 'ALL') {
       res = res.filter((v) => v.status === statusFilter)
     }
-    if (keyword.trim()) {
-      const q = keyword.trim().toLowerCase()
+    const q = keyword.trim().toLowerCase()
+    if (q) {
       res = res.filter(
         (v) =>
           formatDate(v.effectiveFrom).toLowerCase().includes(q) ||
@@ -119,6 +113,10 @@ export function RiskLevelSection({ createOpen, onCreateClose }: RiskLevelSection
     const scheduled = list.filter((v) => v.status === 'SCHEDULED').length
     return { total, current, scheduled }
   }, [list])
+
+  if (versions.error && !versions.data) {
+    return <ErrorState onRetry={() => void versions.refetch()} />
+  }
 
   const activeFiltersCount = (statusFilter !== 'ALL' ? 1 : 0) + (keyword.trim() ? 1 : 0)
 
@@ -241,7 +239,6 @@ export function RiskLevelSection({ createOpen, onCreateClose }: RiskLevelSection
         />
       </TableCard>
 
-      {/* Modal xem chi tiết bảng phân loại M1–M4 */}
       <RiskLevelDetailModal
         open={Boolean(detailModal)}
         version={detailModal}
@@ -250,13 +247,13 @@ export function RiskLevelSection({ createOpen, onCreateClose }: RiskLevelSection
         onEdit={(v) => handleEdit(v)}
       />
 
-      {/* Modal soạn thảo / Tạo phiên bản mới */}
       <RiskLevelFormModal
-        open={formModal.open}
-        source={formModal.source}
-        effectiveFrom={formModal.effectiveFrom}
-        onClose={() => setFormModal({ open: false, source: [] })}
+        open={activeForm.open}
+        source={activeForm.source}
+        effectiveFrom={activeForm.effectiveFrom}
+        onClose={handleCloseForm}
         onSaved={() => {
+          handleCloseForm()
           void versions.refetch()
         }}
       />

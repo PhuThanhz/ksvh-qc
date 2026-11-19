@@ -8,7 +8,7 @@ export interface RiskLevelTagProps {
   style?: React.CSSProperties
 }
 
-export function getRiskLevelClass(code?: string | number | null): string {
+function getRiskLevelClass(code?: string | number | null): string {
   if (code == null) return 'risk-tag--default'
   const str = String(code).trim().toUpperCase()
   if (str === 'M1' || str === '1') return 'risk-tag--m1'
