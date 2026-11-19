@@ -1,18 +1,17 @@
-import { PlusOutlined } from '@ant-design/icons'
-import { Button, Card, Typography } from 'antd'
 import { useState } from 'react'
 import { useConfirm } from '@/components/feedback/useConfirm'
 import { useNotify } from '@/components/feedback/useNotify'
 import { EscalationFormModal } from '@/features/criteria/components/EscalationFormModal'
 import { EscalationVersionTable } from '@/features/criteria/components/EscalationVersionTable'
+import { RuleHistoryModal } from '@/features/criteria/components/RuleHistoryModal'
+import { RuleSummaryCard } from '@/features/criteria/components/RuleSummaryCard'
 import type { EscalationRule } from '@/features/criteria/criteria.types'
 import { useDeleteEscalation, useEscalationRules } from '@/features/criteria/hooks/useRiskConfig'
 import { getErrorMessage } from '@/lib/http'
-import { PERMISSIONS, ProtectedAction } from '@/permissions'
 import { formatDate } from '@/utils/format-date'
 
 /**
- * Danh mục 9: quy tắc nâng / hạ mức chung cho cả chuỗi, phiên bản theo ngày hiệu lực.
+ * Danh mục 9: quy tắc nâng / hạ mức chung cho cả chuỗi, phiên bản theo ngày áp dụng.
  * Nhà hàng cần khác (vd fine dining) khai báo ngưỡng riêng ở Danh mục cơ sở.
  */
 export function EscalationCard() {
@@ -20,11 +19,14 @@ export function EscalationCard() {
   const confirm = useConfirm()
   const rules = useEscalationRules()
   const remove = useDeleteEscalation()
-  const [open, setOpen] = useState(false)
-  const current = rules.data?.find((r) => r.status === 'CURRENT')
+  const [formOpen, setFormOpen] = useState(false)
+  const [historyOpen, setHistoryOpen] = useState(false)
+  const list = rules.data ?? []
+  const current = list.find((r) => r.status === 'CURRENT')
+  const scheduled = list.filter((r) => r.status === 'SCHEDULED').at(-1)
 
   const onDelete = async (r: EscalationRule) => {
-    if (!(await confirm({ title: `Xoá phiên bản hiệu lực từ ${formatDate(r.effectiveFrom)}?`, okText: 'Xoá', danger: true }))) return
+    if (!(await confirm({ title: `Xoá phiên bản áp dụng từ ${formatDate(r.effectiveFrom)}?`, okText: 'Xoá', danger: true }))) return
     remove.mutate(r.id, {
       onSuccess: () => notify.success('Đã xoá phiên bản'),
       onError: (err) => notify.error(getErrorMessage(err)),
@@ -32,30 +34,37 @@ export function EscalationCard() {
   }
 
   return (
-    <Card
-      title="Quy tắc nâng / hạ mức khi tái phạm"
-      extra={
-        <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-          <Button icon={<PlusOutlined />} onClick={() => setOpen(true)}>
-            Thêm phiên bản
-          </Button>
-        </ProtectedAction>
-      }
-    >
-      <Typography.Paragraph type="secondary" style={{ marginBottom: 12 }}>
-        {current ? (
-          <>
-            Đang áp dụng từ {formatDate(current.effectiveFrom)}: tiêu chí vi phạm từ <b>{current.thresholdCount} lần</b> trong
-            kỳ đếm sẽ nâng mức ảnh hưởng <b>+{current.stepIncrease}</b> bậc (tối đa mức {current.maxImpact}); sau{' '}
-            <b>{current.resetPeriodMonths} tháng</b> liên tục không vi phạm thì hạ về mức gốc.{' '}
-          </>
-        ) : (
-          'Chưa khai báo quy tắc nâng mức. '
-        )}
-        Nhà hàng cần khắt khe hơn (vd fine dining) đặt ngưỡng riêng trong Danh mục cơ sở.
-      </Typography.Paragraph>
-      <EscalationVersionTable rules={rules.data ?? []} loading={rules.isFetching} onDelete={(r) => void onDelete(r)} />
-      <EscalationFormModal open={open} current={current} onClose={() => setOpen(false)} />
-    </Card>
+    <>
+      <RuleSummaryCard
+        step={2}
+        title="Nâng / hạ mức khi tái phạm"
+        purpose="Tái phạm đủ số lần trong kỳ đếm thì mức ảnh hưởng của tiêu chí được nâng thêm bậc; sạch lỗi đủ lâu thì hạ về mức gốc."
+        loading={rules.isLoading}
+        value={current && <>Từ lần thứ {current.thresholdCount} → +{current.stepIncrease} bậc</>}
+        details={
+          current && (
+            <>
+              Tối đa mức {current.maxImpact} · Hạ về mức gốc sau {current.resetPeriodMonths} tháng liên tục không lỗi
+            </>
+          )
+        }
+        since={current?.effectiveFrom}
+        scheduled={
+          scheduled && {
+            label: <b>từ lần thứ {scheduled.thresholdCount}, +{scheduled.stepIncrease} bậc</b>,
+            from: scheduled.effectiveFrom,
+          }
+        }
+        footnote="Nhà hàng cần khắt khe hơn (vd fine dining) đặt ngưỡng riêng trong form Nhà hàng ở Danh mục cơ sở."
+        emptyText="Chưa khai báo – hiện không nâng mức"
+        historyCount={list.length}
+        onChange={() => setFormOpen(true)}
+        onHistory={() => setHistoryOpen(true)}
+      />
+      <EscalationFormModal open={formOpen} current={current} onClose={() => setFormOpen(false)} />
+      <RuleHistoryModal open={historyOpen} title="Lịch sử quy tắc nâng / hạ mức" onClose={() => setHistoryOpen(false)}>
+        <EscalationVersionTable rules={list} loading={rules.isFetching} onDelete={(r) => void onDelete(r)} />
+      </RuleHistoryModal>
+    </>
   )
 }

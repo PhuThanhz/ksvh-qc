@@ -44,7 +44,7 @@ export function EscalationFormModal({ open, current, onClose }: EscalationFormMo
       { ...v, note: v.note || undefined },
       {
         onSuccess: () => {
-          notify.success('Đã thêm phiên bản quy tắc nâng mức')
+          notify.success('Đã lưu quy tắc nâng / hạ mức mới')
           onClose()
         },
         onError: (err) => {
@@ -57,7 +57,7 @@ export function EscalationFormModal({ open, current, onClose }: EscalationFormMo
   return (
     <Modal
       open={open}
-      title="Thêm phiên bản quy tắc nâng mức"
+      title="Thay đổi quy tắc nâng / hạ mức"
       okText="Lưu"
       cancelText="Huỷ"
       centered
@@ -86,9 +86,10 @@ export function EscalationFormModal({ open, current, onClose }: EscalationFormMo
         <FormDatePicker
           control={control}
           name="effectiveFrom"
-          label="Hiệu lực từ ngày"
+          label="Áp dụng từ ngày"
           required
           disabledDate={(d) => d.isBefore(dayjs(), 'day')}
+          extra="Lỗi phát sinh trước ngày này vẫn tính theo quy tắc cũ."
         />
         <FormInput control={control} name="note" label="Ghi chú" maxLength={500} />
       </Form>

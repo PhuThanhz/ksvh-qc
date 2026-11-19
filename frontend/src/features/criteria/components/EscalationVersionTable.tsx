@@ -21,17 +21,16 @@ export function EscalationVersionTable({ rules, loading, onDelete }: EscalationV
       loading={loading}
       dataSource={rules}
       pagination={false}
-      scroll={{ x: 'max-content' }}
       locale={{ emptyText: 'Chưa có phiên bản nào – chưa áp dụng nâng mức' }}
       columns={[
         { title: 'Ngưỡng tái phạm', dataIndex: 'thresholdCount', render: (n: number) => `${n} lần` },
         { title: 'Mức nâng', dataIndex: 'stepIncrease', render: (n: number) => `+${n} bậc` },
         { title: 'Mức trần', dataIndex: 'maxImpact' },
         { title: 'Hạ mức sau', dataIndex: 'resetPeriodMonths', render: (n: number) => `${n} tháng sạch lỗi` },
-        { title: 'Hiệu lực từ', dataIndex: 'effectiveFrom', render: formatDate },
+        { title: 'Áp dụng từ', dataIndex: 'effectiveFrom', render: formatDate },
         { title: 'Trạng thái', dataIndex: 'status', render: (s: ConfigStatus) => <ConfigStatusTag status={s} /> },
         {
-          title: 'Tạo bởi',
+          title: 'Người tạo',
           key: 'by',
           render: (_: unknown, r: EscalationRule) => (
             <Flex vertical>
