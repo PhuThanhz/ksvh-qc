@@ -82,7 +82,7 @@ export function TemplateListPage() {
   return (
     <PageContainer
       title="Mẫu phiếu kiểm tra"
-      subtitle="Bộ tiêu chuẩn đánh giá áp dụng theo từng hình thức kiểm soát và mô hình vận hành"
+      subtitle="Bộ tiêu chí đánh giá áp dụng theo từng hình thức kiểm soát và mô hình vận hành"
       extra={
         <Space size={8}>
           <TemplateExcelActions />

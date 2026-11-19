@@ -27,7 +27,7 @@ export function CriterionDetailModal({ open, criterion, onClose, onEdit }: Crite
       label: 'Trạng thái',
       children: <StatusBadge status={criterion.active ? 'active' : 'inactive'} meta={ACTIVE_META} />,
     },
-    { key: 'group', label: 'Nhóm tiêu chuẩn', span: 2, children: criterion.groupName },
+    { key: 'group', label: 'Nhóm tiêu chí', span: 2, children: criterion.groupName },
     { key: 'name', label: 'Nội dung tiêu chí kiểm soát', span: 2, children: criterion.name },
     {
       key: 'impact',

@@ -61,7 +61,7 @@ export function DashboardPage() {
         )}
 
         {/* 3. QUY MÔ HỆ THỐNG & DANH MỤC TIÊU CHUẨN */}
-        <SectionTitle>Quy mô hệ thống & Danh mục tiêu chuẩn</SectionTitle>
+        <SectionTitle>Quy mô hệ thống & Danh mục tiêu chí</SectionTitle>
         <CatalogSection />
       </Flex>
     </PageContainer>

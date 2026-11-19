@@ -49,7 +49,7 @@ export function GroupTab({
   const handleDeleteGroup = async (group: CriterionGroup) => {
     if (group.criterionCount && group.criterionCount > 0) {
       notify.error(
-        `Nhóm tiêu chuẩn "${group.name}" đang chứa ${group.criterionCount} tiêu chí. Vui lòng di chuyển hoặc xoá các tiêu chí này trước khi xoá nhóm.`,
+        `Nhóm tiêu chí "${group.name}" đang chứa ${group.criterionCount} tiêu chí. Vui lòng di chuyển hoặc xoá các tiêu chí này trước khi xoá nhóm.`,
       )
       return
     }

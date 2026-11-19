@@ -45,7 +45,7 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
           render: (code: string) => <span className="code-tag--blue">{code}</span>,
         },
         {
-          title: 'Nhóm tiêu chuẩn',
+          title: 'Nhóm tiêu chí',
           dataIndex: 'groupName',
           key: 'groupName',
           sorter: true,

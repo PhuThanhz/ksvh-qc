@@ -45,7 +45,7 @@ export function useGroupTableColumns({
       render: (code: string) => <span className="code-tag--blue">{code}</span>,
     },
     {
-      title: 'Tên nhóm tiêu chuẩn',
+      title: 'Tên nhóm tiêu chí',
       dataIndex: 'name',
       key: 'name',
       sorter: true,
@@ -114,15 +114,15 @@ export function useGroupTableColumns({
         <TableActions
           recordName={g.name}
           onView={() => onViewCriteria(g)}
-          viewLabel="Xem chi tiết nhóm tiêu chuẩn"
+          viewLabel="Xem chi tiết nhóm tiêu chí"
           onAdd={() => onAddCriterion(g)}
           addLabel="Thêm tiêu chí vào nhóm"
           addAccess={PERMISSIONS.CRITERIA.MANAGE}
           onEdit={() => onEdit(g)}
-          editLabel="Chỉnh sửa nhóm tiêu chuẩn"
+          editLabel="Chỉnh sửa nhóm tiêu chí"
           editAccess={PERMISSIONS.CRITERIA.MANAGE}
           onDelete={() => onDelete(g)}
-          deleteLabel="Xoá nhóm tiêu chuẩn"
+          deleteLabel="Xoá nhóm tiêu chí"
           deleteAccess={PERMISSIONS.CRITERIA.MANAGE}
         />
       ),

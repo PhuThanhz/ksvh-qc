@@ -7,7 +7,7 @@ const READ = PERMISSIONS.CRITERIA.READ
 export const criteriaAdminRoutes: AppRoute[] = [
   {
     path: ROUTES.admin.criteriaGroups,
-    handle: { access: READ, menu: { label: 'Nhóm tiêu chuẩn', icon: 'criteriaGroups', group: 'catalog' } },
+    handle: { access: READ, menu: { label: 'Nhóm tiêu chí', icon: 'criteriaGroups', group: 'catalog' } },
     lazy: () => import('@/features/criteria/pages/CriterionGroupPage').then((m) => ({ Component: m.CriterionGroupPage })),
   },
   {

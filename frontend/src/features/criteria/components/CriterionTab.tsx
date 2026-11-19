@@ -99,7 +99,7 @@ export function CriterionTab({
           activeTags={activeTags}
         >
           <FilterSelect<number>
-            placeholder="Nhóm tiêu chuẩn"
+            placeholder="Nhóm tiêu chí"
             width={220}
             value={filters.groupId}
             showSearch={{ optionFilterProp: 'label' }}

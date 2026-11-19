@@ -66,7 +66,7 @@ export function GroupDetailModal({
       title={
         <Flex align="center" gap={10} wrap="wrap">
           <Typography.Title level={5} style={{ margin: 0 }}>
-            Chi tiết nhóm tiêu chuẩn: {group.name}
+            Chi tiết nhóm tiêu chí: {group.name}
           </Typography.Title>
           <Tag style={{ fontFamily: 'monospace', fontWeight: 600 }}>{group.code}</Tag>
           <StatusBadge status={group.active ? 'active' : 'inactive'} meta={ACTIVE_META} />
