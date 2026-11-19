@@ -68,7 +68,6 @@ export function FrequencyCard() {
       extra={
         <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
           <Button
-            type="primary"
             icon={<PlusOutlined />}
             onClick={() => {
               reset({ periodMonths: 6, effectiveFrom: dayjs().format('YYYY-MM-DD'), note: '' })

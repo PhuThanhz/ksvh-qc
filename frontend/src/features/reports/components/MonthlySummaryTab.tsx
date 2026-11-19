@@ -93,7 +93,6 @@ export function MonthlySummaryTab() {
         <ReportFilterBar filter={filter} onChange={setFilter} />
         <ProtectedAction access={{ anyOf: [PERMISSIONS.REPORT.EXPORT, PERMISSIONS.REPORT.READ] }}>
           <Button
-            type="primary"
             icon={<FileExcelOutlined />}
             loading={exporting}
             onClick={handleExport}

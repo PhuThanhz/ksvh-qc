@@ -1,5 +1,6 @@
 import { EyeOutlined } from '@ant-design/icons'
-import { Button, Flex, Table, Tag, Tooltip } from 'antd'
+import { Flex, Table, Tag, Tooltip } from 'antd'
+import { ActionButton } from '@/components/data-display/TableActions'
 import type { ColumnsType } from 'antd/es/table'
 import type { CriterionRiskProfileItem } from '@/features/inspections/risk-profile.types'
 import { formatDate } from '@/utils/format-date'
@@ -99,15 +100,13 @@ export function CriterionRiskTable({
       width: 80,
       align: 'center',
       render: (_, r) => (
-        <Tooltip title="Xem lịch sử các lần vi phạm">
-          <Button
-            size="small"
-            type="text"
-            icon={<EyeOutlined />}
-            onClick={() => onSelectCriterion(r)}
-            disabled={!r.occurrences?.length}
-          />
-        </Tooltip>
+        <ActionButton
+          tone="view"
+          icon={<EyeOutlined />}
+          tooltip="Xem lịch sử các lần vi phạm"
+          disabledReason={r.occurrences?.length ? undefined : 'Chưa có lần vi phạm nào'}
+          onClick={() => onSelectCriterion(r)}
+        />
       ),
     },
   ]

@@ -136,7 +136,6 @@ export function CriteriaViolationTab() {
         <ReportFilterBar filter={filter} onChange={setFilter} showGroup />
         <ProtectedAction access={{ anyOf: [PERMISSIONS.REPORT.EXPORT, PERMISSIONS.REPORT.READ] }}>
           <Button
-            type="primary"
             icon={<FileExcelOutlined />}
             loading={exporting}
             onClick={handleExport}

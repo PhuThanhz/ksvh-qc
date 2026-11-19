@@ -32,7 +32,7 @@ export function SystemEscalatedCriteriaTab({ onSelectRestaurant }: SystemEscalat
       ),
     },
     {
-      title: 'Công ty thành viên',
+      title: 'Công ty',
       dataIndex: 'companyName',
       key: 'companyName',
       width: 140,

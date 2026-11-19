@@ -43,39 +43,6 @@
   box-shadow: none !important;
 }
 
-/* Nút chính: Chuẩn xanh dương #2563eb */
-.ant-btn-primary:not(:disabled) {
-  background: #2563eb !important;
-  border: 1px solid #2563eb !important;
-  color: #ffffff !important;
-  border-radius: 8px !important;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.18) !important;
-  font-weight: 600 !important;
-}
-.ant-btn-primary:not(:disabled):hover {
-  background: #1d4ed8 !important;
-  border-color: #1d4ed8 !important;
-  color: #ffffff !important;
-}
-.ant-btn-primary.ant-btn-dangerous:not(:disabled) {
-  background: rgba(220, 38, 38, 0.1) !important;
-  border-color: rgba(220, 38, 38, 0.3) !important;
-  color: #b91c1c !important;
-}
-
-/* Nút chính trên header tối */
-.bitrix-frosted-header .ant-btn-primary:not(:disabled) {
-  background: rgba(255, 255, 255, 0.14) !important;
-  border: 1px solid rgba(255, 255, 255, 0.24) !important;
-  color: #ffffff !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-}
-.bitrix-frosted-header .ant-btn-primary:not(:disabled):hover {
-  background: rgba(255, 255, 255, 0.22) !important;
-  border-color: rgba(255, 255, 255, 0.36) !important;
-  color: #ffffff !important;
-}
-
 /* Modal dùng chung toàn hệ thống */
 .ant-modal-content,
 .ant-modal-container {
@@ -123,26 +90,6 @@
 }
 .ant-notification-notice-message, .ant-notification-notice-title { font-size: 14.5px !important; font-weight: 600 !important; color: #0f172a !important; }
 .ant-notification-notice-icon { font-size: 18px !important; margin-top: 2px !important; }
-
-/* Tabs điều hướng */
-.ant-tabs-nav {
-  background: #ffffff !important;
-  border-radius: 12px !important;
-  padding: 5px 6px !important;
-  margin-bottom: 14px !important;
-  border: 1px solid rgba(15, 23, 42, 0.12) !important;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04) !important;
-}
-.ant-tabs-nav::before { display: none !important; }
-.ant-tabs-tab { font-size: 13.5px !important; font-weight: 500 !important; padding: 7px 18px !important; color: #475569 !important; border-radius: 8px !important; transition: all 0.15s ease !important; }
-.ant-tabs-tab:hover { color: #0f172a !important; background: rgba(15, 23, 42, 0.04) !important; }
-.ant-tabs-tab-active {
-  background: #eff6ff !important;
-  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.22) !important;
-}
-.ant-tabs-tab-active .ant-tabs-tab-btn { font-weight: 600 !important; color: #1d4ed8 !important; text-shadow: none !important; }
-.ant-tabs-tab-active .anticon { color: #2563eb !important; }
-.ant-tabs-ink-bar { display: none !important; }
 
 /* Focus thấy rõ khi dùng bàn phím */
 :focus-visible {
@@ -213,3 +160,6 @@
     width: 100% !important;
   }
 }
+
+/* Nút chính đậm hơn nút phụ một bậc (màu, bo góc, chiều cao lấy từ theme antd) */
+.ant-btn-primary { font-weight: 600; }

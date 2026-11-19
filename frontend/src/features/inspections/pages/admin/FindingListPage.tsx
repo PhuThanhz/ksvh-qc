@@ -3,6 +3,7 @@ import { Button, Flex } from 'antd'
 import { useCallback, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { PageContainer } from '@/components/layout/PageContainer'
+import { ViewTabs } from '@/components/layout/ViewTabs'
 import { FindingActionModal, type FindingActionType } from '@/features/inspections/components/FindingActionModal'
 import {
   FindingBatchActionModal,
@@ -11,6 +12,7 @@ import {
 import { FindingBatchToolbar } from '@/features/inspections/components/FindingBatchToolbar'
 import { FindingDetailModal } from '@/features/inspections/components/FindingDetailModal'
 import { FindingListFilterBar } from '@/features/inspections/components/FindingListFilterBar'
+import { findingStatusTabs } from '@/features/inspections/constants/status'
 import { FindingTable } from '@/features/inspections/components/FindingTable'
 import { useFindings, usePendingReviews } from '@/features/inspections/hooks/useInspectionData'
 import type { FindingResponse, FindingStatus } from '@/features/inspections/inspection.types'
@@ -102,20 +104,22 @@ export function FindingListPage() {
     >
       <Flex vertical gap={16}>
         <FindingListFilterBar
-          activeTab={(filters.status as string) || 'ALL'}
-          pendingCount={pendingReviews.data?.length}
           keyword={filters.keyword}
           restaurantId={filters.restaurantId}
           status={filters.status as FindingStatus}
           activeFilterCount={activeFilterCount}
           restaurants={restaurants.data?.items ?? []}
           onSearch={onSearch}
-          onFilterTab={onFilterTab}
           onFilterStatus={(v) => setFilter('status', v)}
           onFilterRestaurant={(v) => setFilter('restaurantId', v)}
           onReset={resetFilters}
         />
 
+        <ViewTabs
+          items={findingStatusTabs(pendingReviews.data?.length)}
+          activeKey={(filters.status as string) || 'ALL'}
+          onChange={onFilterTab}
+        />
         <FindingBatchToolbar
           selectedCount={selectedFindings.length}
           canConfirm={canBatchConfirm}

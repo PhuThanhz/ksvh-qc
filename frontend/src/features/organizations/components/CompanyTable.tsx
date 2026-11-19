@@ -28,7 +28,7 @@ export function CompanyTable({ onView, onEdit, onDelete, ...props }: CompanyTabl
             ((props.params?.page ?? 0) * (props.params?.size ?? 20)) + index + 1,
         },
         { title: 'Mã công ty', dataIndex: 'code', key: 'code', sorter: true, width: 130, className: 'col-code', render: (code: string) => <span className="code-tag--blue">{code}</span> },
-        { title: 'Tên công ty thành viên', dataIndex: 'name', key: 'name', sorter: true, width: 250, render: (name: string, row: Company) => <span className="cell-title-link" onClick={() => onView(row)}>{name}</span> },
+        { title: 'Tên công ty', dataIndex: 'name', key: 'name', sorter: true, width: 250, render: (name: string, row: Company) => <span className="cell-title-link" onClick={() => onView(row)}>{name}</span> },
         { title: 'Trạng thái hoạt động', dataIndex: 'active', width: 170, render: (active: boolean) => <ActiveBadge active={active} /> },
         { title: 'Cập nhật lần cuối', dataIndex: 'updatedAt', width: 170, render: formatDateTime },
         {

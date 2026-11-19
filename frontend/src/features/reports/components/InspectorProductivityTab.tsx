@@ -92,7 +92,6 @@ export function InspectorProductivityTab() {
         <ReportFilterBar filter={filter} onChange={setFilter} showRestaurant={false} />
         <ProtectedAction access={{ anyOf: [PERMISSIONS.REPORT.EXPORT, PERMISSIONS.REPORT.READ] }}>
           <Button
-            type="primary"
             icon={<FileExcelOutlined />}
             loading={exporting}
             onClick={handleExport}

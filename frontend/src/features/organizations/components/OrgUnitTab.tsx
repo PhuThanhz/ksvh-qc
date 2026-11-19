@@ -1,5 +1,5 @@
 import { Flex } from 'antd'
-import { useCallback, useMemo, useState } from 'react'
+import { type ReactNode, useCallback, useMemo, useState } from 'react'
 import { ActiveFilter } from '@/components/data-entry/ActiveFilter'
 import { AdvancedFilter, type FilterTagItem } from '@/components/data-entry/AdvancedFilter'
 import { FilterSelect } from '@/components/data-entry/FilterSelect'
@@ -21,6 +21,8 @@ export interface OrgUnitTabProps {
   fixedUnitType?: OrgUnitType
   createOpen?: boolean
   onCreateClose?: () => void
+  /** Thanh chuyển tab (Nhà hàng / Phòng ban), hiển thị giữa bộ lọc và bảng. */
+  tabs?: ReactNode
 }
 
 interface OrgUnitFilters extends Record<string, unknown> {
@@ -36,7 +38,7 @@ const TYPE_OPTIONS = (Object.keys(ORG_UNIT_TYPE_LABEL) as OrgUnitType[]).map((t)
   label: ORG_UNIT_TYPE_LABEL[t],
 }))
 
-export function OrgUnitTab({ fixedUnitType, createOpen, onCreateClose }: OrgUnitTabProps = {}) {
+export function OrgUnitTab({ fixedUnitType, createOpen, onCreateClose, tabs }: OrgUnitTabProps = {}) {
   const { params, filters, setFilter, onTableChange, resetFilters, activeFilterCount } = useListParams<OrgUnitFilters>()
   const queryParams = useMemo(
     () => ({
@@ -141,6 +143,7 @@ export function OrgUnitTab({ fixedUnitType, createOpen, onCreateClose }: OrgUnit
         <ActiveFilter value={filters.active} onChange={(v) => setFilter('active', v)} />
       </AdvancedFilter>
 
+      {tabs}
       <OrgUnitTable
         data={units.data}
         loading={units.isFetching}

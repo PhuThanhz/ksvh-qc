@@ -82,17 +82,17 @@
   background: transparent !important;
   border: 1px solid transparent !important;
 }
+/* Icon thao tác trong bảng: màu theo hành động, giống nhau ở mọi bảng
+   (xem = xanh dương, thêm/bật = xanh lá, sửa = cam, xoá = đỏ); rê chuột hiện nền nhạt cùng màu */
 .action-btn-view, .table-action-view { color: #2563eb !important; }
 .action-btn-add, .table-action-add, .action-btn-on, .table-action-on { color: #059669 !important; }
 .action-btn-edit, .table-action-edit { color: #d97706 !important; }
 .action-btn-delete, .table-action-delete, .action-btn-danger { color: #dc2626 !important; }
 .action-btn-neutral { color: #64748b !important; }
-
-.action-btn-view:hover:not(:disabled), .table-action-view:hover:not(:disabled) { background: #eff6ff !important; border-color: #bfdbfe !important; }
-.action-btn-add:hover:not(:disabled), .table-action-add:hover:not(:disabled),
-.action-btn-on:hover:not(:disabled), .table-action-on:hover:not(:disabled) { background: #ecfdf5 !important; border-color: #a7f3d0 !important; }
-.action-btn-edit:hover:not(:disabled), .table-action-edit:hover:not(:disabled) { background: #fffbeb !important; border-color: #fde68a !important; }
-.action-btn-delete:hover:not(:disabled), .table-action-delete:hover:not(:disabled), .action-btn-danger:hover:not(:disabled) { background: #fef2f2 !important; border-color: #fecaca !important; }
+:is(.action-btn-view, .table-action-view):hover:not(:disabled) { background: #eff6ff !important; border-color: #bfdbfe !important; }
+:is(.action-btn-add, .table-action-add, .action-btn-on, .table-action-on):hover:not(:disabled) { background: #ecfdf5 !important; border-color: #a7f3d0 !important; }
+:is(.action-btn-edit, .table-action-edit):hover:not(:disabled) { background: #fffbeb !important; border-color: #fde68a !important; }
+:is(.action-btn-delete, .table-action-delete, .action-btn-danger):hover:not(:disabled) { background: #fef2f2 !important; border-color: #fecaca !important; }
 .action-btn-neutral:hover:not(:disabled) { color: #0f172a !important; background: #f1f5f9 !important; border-color: #e2e8f0 !important; }
 .action-btn:disabled { opacity: 0.35; }
 
@@ -169,7 +169,7 @@
   background: rgba(255, 255, 255, 0.6) !important;
   backdrop-filter: blur(14px) saturate(160%) !important;
   border: 1px solid rgba(15, 23, 42, 0.16) !important;
-  border-radius: 10px !important; min-height: 40px !important; padding-inline: 14px !important;
+  border-radius: 8px !important; min-height: 36px !important; padding-inline: 12px !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important; width: 100% !important;
 }
 .search-input--transparent input.ant-input { background: transparent !important; color: #0f172a !important; font-size: 14px !important; }

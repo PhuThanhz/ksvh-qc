@@ -19,9 +19,9 @@ export interface ExcelActionsProps {
   canImport: boolean
   errorMessage: (err: unknown) => string
   /**
-   * 'dropdown': luôn gom thành 1 nút dropdown Excel
-   * 'buttons': hiển thị riêng 3 nút (có wrap)
-   * 'auto' (mặc định): tự động gom thành dropdown trên màn hình nhỏ (< 768px)
+   * 'dropdown' (mặc định – chuẩn toàn hệ thống): 1 nút "Excel ▾" ở đầu trang
+   * 'buttons': hiển thị riêng 3 nút (chỉ dùng khi thật cần)
+   * 'auto': gom thành dropdown trên màn hình nhỏ (< 768px)
    */
   mode?: 'dropdown' | 'buttons' | 'auto'
 }
@@ -37,7 +37,7 @@ export function ExcelActions(props: ExcelActionsProps) {
     onImported,
     canImport,
     errorMessage,
-    mode = 'auto',
+    mode = 'dropdown',
   } = props
 
   const isMobile = useIsMobile()

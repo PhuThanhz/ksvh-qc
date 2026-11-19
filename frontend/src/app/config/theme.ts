@@ -36,7 +36,7 @@ export const antdTheme: ThemeConfig = {
 
     borderRadius: 8,
     fontSize: 14,
-    controlHeight: 34,
+    controlHeight: 36,
     fontFamily:
       "'Inter Variable', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif",
   },
@@ -64,9 +64,17 @@ export const antdTheme: ThemeConfig = {
       borderColor: 'rgba(15, 23, 42, 0.06)',
       rowHoverBg: 'rgba(15, 23, 42, 0.03)',
     },
+    /**
+     * Nút: nguồn style DUY NHẤT (không ghi đè .ant-btn bằng CSS !important).
+     * Cao 36px như ô nhập; nút chính xanh đặc có bóng nhẹ; nút phụ viền mảnh.
+     */
     Button: {
       fontWeight: 500,
       borderRadius: 8,
+      paddingInline: 14,
+      primaryShadow: '0 1px 2px rgba(15, 23, 42, 0.18)',
+      defaultShadow: 'none',
+      dangerShadow: 'none',
     },
     Segmented: {
       itemSelectedBg: '#eff6ff',

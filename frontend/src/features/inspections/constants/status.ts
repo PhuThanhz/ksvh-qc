@@ -1,3 +1,4 @@
+import type { ViewTabItem } from '@/components/layout/ViewTabs'
 import type { BadgeTone } from '@/components/data-display/StatusBadge'
 import type { FindingEventAction, FindingStatus } from '../finding.types'
 import type { ItemResult } from '../inspection.types'
@@ -66,4 +67,18 @@ export const ITEM_RESULT_META: Record<ItemResult, StatusMeta> = {
   FAIL: { label: 'Không đạt', tone: 'danger', color: 'error' },
   NA: { label: 'K/A', tone: 'default', color: 'default' },
   UNRATED: { label: 'Chưa chấm', tone: 'warning', color: 'warning' },
+}
+
+/** Tab trạng thái của danh sách lỗi (đặt dưới bộ lọc, trên bảng). */
+export function findingStatusTabs(pendingCount?: number): ViewTabItem[] {
+  return [
+    { key: 'ALL', label: 'Tất cả' },
+    { key: 'PENDING_REVIEW', label: 'Chờ tôi thẩm định', count: pendingCount || undefined },
+    { key: 'OPEN', label: 'Chờ phản hồi' },
+    { key: 'APPEALED', label: 'Đang khiếu nại' },
+    { key: 'APPEAL_MEETING', label: 'Họp khiếu nại' },
+    { key: 'REMEDIATING', label: 'Đang khắc phục' },
+    { key: 'PENDING_VERIFICATION', label: 'Chờ thẩm tra' },
+    { key: 'CLOSED', label: 'Đã đóng' },
+  ]
 }

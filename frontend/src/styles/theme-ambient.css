@@ -102,23 +102,6 @@
   transform: translateY(-1px);
 }
 
-/* Nút chính: xanh phẳng một màu, không viền sáng, không đổ bóng chữ */
-.app-shell--themed :is(.ant-btn-primary, .ant-btn-color-primary, .ant-dropdown-button .ant-btn-primary):not(.ant-btn-dangerous):not(:disabled) {
-  border: 1px solid #2563eb !important;
-  background: #2563eb !important;
-  color: #ffffff !important;
-  font-weight: 600 !important;
-  text-shadow: none !important;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.18) !important;
-  transition: background-color 0.15s ease, border-color 0.15s ease !important;
-}
-.app-shell--themed :is(.ant-btn-primary, .ant-btn-color-primary, .ant-dropdown-button .ant-btn-primary) .anticon { color: #ffffff !important; }
-.app-shell--themed :is(.ant-btn-primary, .ant-btn-color-primary, .ant-dropdown-button .ant-btn-primary):not(.ant-btn-dangerous):not(:disabled):hover {
-  background: #1d4ed8 !important;
-  border-color: #1d4ed8 !important;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.18) !important;
-}
-
 /* ---------- 4. Khối nội dung nổi (Floating Surfaces) ---------- */
 .app-shell--themed .glass-panel,
 .app-shell--themed .ant-card:not(.ant-card-bordered-none) {

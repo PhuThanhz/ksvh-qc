@@ -1,11 +1,9 @@
-import { Segmented, Select } from 'antd'
+import { Select } from 'antd'
 import { AdvancedFilter } from '@/components/data-entry/AdvancedFilter'
-import { INSPECTION_STATUS_TABS } from '../constants/status'
 import type { InspectionStatus } from '../inspection.types'
 import type { OrgUnit } from '@/features/organizations/organizations.types'
 
 export interface InspectionListFilterBarProps {
-  activeTab: string
   keyword?: string
   restaurantId?: number
   status?: InspectionStatus
@@ -27,7 +25,6 @@ const STATUS_SELECT_OPTIONS: { value: InspectionStatus; label: string }[] = [
 ]
 
 export function InspectionListFilterBar({
-  activeTab,
   keyword,
   restaurantId,
   status,
@@ -40,14 +37,6 @@ export function InspectionListFilterBar({
 }: InspectionListFilterBarProps) {
   return (
     <AdvancedFilter
-      top={
-        <Segmented
-          options={INSPECTION_STATUS_TABS}
-          value={activeTab}
-          onChange={(val) => onFilterStatus(val === 'ALL' ? undefined : (val as InspectionStatus))}
-          style={{ width: 'fit-content', background: 'var(--app-surface-sunken)', padding: 3, borderRadius: 8 }}
-        />
-      }
       search={{
         placeholder: 'Tìm theo mã biên bản, loại kiểm tra...',
         value: keyword,

@@ -1,8 +1,9 @@
 import { ApartmentOutlined, PlusOutlined, ShopOutlined } from '@ant-design/icons'
-import { Badge, Button, Space, Tabs } from 'antd'
+import { Button, Space } from 'antd'
 import { useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { PageContainer } from '@/components/layout/PageContainer'
+import { ViewTabs } from '@/components/layout/ViewTabs'
 import { OrganizationExcelActions } from '@/features/organizations/components/OrganizationExcelActions'
 import { OrgUnitTab } from '@/features/organizations/components/OrgUnitTab'
 import { useOrgUnits } from '@/features/organizations/hooks/useOrganizations'
@@ -16,22 +17,14 @@ const TABS: { key: string; type: OrgUnitType; label: string; addLabel: string; i
   { key: 'departments', type: 'DEPARTMENT', label: 'Phòng ban', addLabel: 'Thêm phòng ban', icon: <ApartmentOutlined /> },
 ]
 
-function TabLabel({ type, label, icon }: { type: OrgUnitType; label: string; icon: React.ReactNode }) {
-  const count = useOrgUnits({ page: 0, size: 1, unitType: type })
-  return (
-    <Space size={6}>
-      {icon}
-      {label}
-      <Badge count={count.data?.totalItems ?? 0} showZero overflowCount={9999} color="#e8e8ed" style={{ color: '#3a3936', fontWeight: 600 }} />
-    </Space>
-  )
-}
-
-/** Danh mục 2: nhà hàng và phòng ban, tách 2 tab ngay trên bảng. */
+/** Danh mục 2: nhà hàng và phòng ban, tách 2 tab nằm giữa bộ lọc và bảng. */
 export function OrgUnitPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [createOpen, setCreateOpen] = useState(false)
   const active = TABS.find((t) => t.key === searchParams.get(ORG_UNIT_TAB_PARAM)) ?? TABS[0]!
+  const restaurantCount = useOrgUnits({ page: 0, size: 1, unitType: 'RESTAURANT' }).data?.totalItems
+  const departmentCount = useOrgUnits({ page: 0, size: 1, unitType: 'DEPARTMENT' }).data?.totalItems
+  const counts: Record<OrgUnitType, number | undefined> = { RESTAURANT: restaurantCount, DEPARTMENT: departmentCount }
 
   return (
     <PageContainer
@@ -48,25 +41,21 @@ export function OrgUnitPage() {
         </Space>
       }
     >
-      <Tabs
-        activeKey={active.key}
-        onChange={(key) => {
-          setCreateOpen(false)
-          setSearchParams({ [ORG_UNIT_TAB_PARAM]: key }, { replace: true })
-        }}
-        destroyOnHidden
-        items={TABS.map((t) => ({
-          key: t.key,
-          label: <TabLabel type={t.type} label={t.label} icon={t.icon} />,
-          children: (
-            <OrgUnitTab
-              key={t.key}
-              fixedUnitType={t.type}
-              createOpen={createOpen && active.key === t.key}
-              onCreateClose={() => setCreateOpen(false)}
-            />
-          ),
-        }))}
+      <OrgUnitTab
+        key={active.key}
+        fixedUnitType={active.type}
+        createOpen={createOpen}
+        onCreateClose={() => setCreateOpen(false)}
+        tabs={
+          <ViewTabs
+            items={TABS.map((t) => ({ key: t.key, label: t.label, icon: t.icon, count: counts[t.type] }))}
+            activeKey={active.key}
+            onChange={(key) => {
+              setCreateOpen(false)
+              setSearchParams({ [ORG_UNIT_TAB_PARAM]: key }, { replace: true })
+            }}
+          />
+        }
       />
     </PageContainer>
   )

@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 import { useCallback, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { PageContainer } from '@/components/layout/PageContainer'
+import { ViewTabs } from '@/components/layout/ViewTabs'
 import { CancelInspectionModal } from '@/features/inspections/components/CancelInspectionModal'
 import { InspectionDetailModal } from '@/features/inspections/components/InspectionDetailModal'
 import { InspectionFormModal } from '@/features/inspections/components/InspectionFormModal'
@@ -26,6 +27,7 @@ import { useNotify } from '@/hooks/useNotify'
 import { PERMISSIONS, ProtectedAction } from '@/permissions'
 import { exportToCsv } from '@/utils/export-csv'
 import { formatDate } from '@/utils/format-date'
+import { INSPECTION_STATUS_TABS } from '@/features/inspections/constants/status'
 
 interface Filters extends Record<string, unknown> {
   keyword?: string
@@ -134,7 +136,6 @@ export function InspectionListPage() {
     >
       <Flex vertical gap={16}>
         <InspectionListFilterBar
-          activeTab={activeTab}
           keyword={filters.keyword}
           restaurantId={filters.restaurantId}
           status={filters.status}
@@ -146,6 +147,11 @@ export function InspectionListPage() {
           onReset={resetFilters}
         />
 
+        <ViewTabs
+          items={INSPECTION_STATUS_TABS.map((t) => ({ key: t.value, label: t.label }))}
+          activeKey={activeTab}
+          onChange={(val) => setFilter('status', val === 'ALL' ? undefined : (val as InspectionStatus))}
+        />
         <InspectionTable
           data={inspections.data?.items}
           loading={inspections.isLoading}
