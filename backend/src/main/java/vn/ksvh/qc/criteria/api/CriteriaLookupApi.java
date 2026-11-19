@@ -1,5 +1,7 @@
 package vn.ksvh.qc.criteria.api;
 
+import vn.ksvh.qc.organization.api.RiskPolicy;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -15,8 +17,16 @@ public interface CriteriaLookupApi {
 
     List<RiskLevelRef> listRiskLevels();
 
-    /** Kỳ đếm, quy tắc nâng mức và bảng mức rủi ro đang hiệu lực tại ngày {@code date}. */
-    RiskConfigRef riskConfigAt(java.time.LocalDate date);
+    /**
+     * Kỳ đếm, quy tắc nâng mức của chính sách {@code policy} và bảng mức rủi ro đang hiệu lực tại ngày {@code date}.
+     * Chính sách chưa có phiên bản nào hiệu lực thì dùng quy tắc của chính sách Tiêu chuẩn.
+     */
+    RiskConfigRef riskConfigAt(java.time.LocalDate date, RiskPolicy policy);
+
+    /** Như trên với chính sách Tiêu chuẩn. */
+    default RiskConfigRef riskConfigAt(java.time.LocalDate date) {
+        return riskConfigAt(date, RiskPolicy.STANDARD);
+    }
 
     /** Nhóm tiêu chí theo id (id không tồn tại thì không có trong kết quả). */
     java.util.Map<Long, CriterionGroupRef> findGroups(Collection<Long> ids);

@@ -11,27 +11,25 @@ export type RestaurantAssignment = Schemas['RestaurantAssignmentResponse']
 export type RestaurantAssignmentPayload = Schemas['RestaurantAssignmentRequest']
 export type AssignedRestaurant = Schemas['AssignedRestaurant']
 
-export type RiskPolicy = 'STANDARD' | 'STRICT'
+export type RiskPolicy = Schemas['OrgUnitResponse']['riskPolicy']
 
+/** Ngưỡng nâng / hạ mức của từng chính sách khai báo ở trang Quy tắc tái phạm & nâng mức (theo ngày hiệu lực). */
 export const RISK_POLICY_LABEL: Record<RiskPolicy, string> = {
   STANDARD: 'Tiêu chuẩn',
-  STRICT: 'Khắt khe (Fine Dining)',
+  STRICT: 'Khắt khe (Fine dining)',
 }
 
-export const RISK_POLICY_OPTIONS = [
-  { value: 'STANDARD', label: 'Tiêu chuẩn (ngưỡng 3 lần vi phạm)' },
-  { value: 'STRICT', label: 'Khắt khe - Fine Dining (ngưỡng 2 lần vi phạm)' },
-]
+export const RISK_POLICY_OPTIONS = (Object.keys(RISK_POLICY_LABEL) as RiskPolicy[]).map((value) => ({
+  value,
+  label: RISK_POLICY_LABEL[value],
+}))
 
 /** OpenAPI không gắn được null cho trường kiểu tham chiếu: CHT/OBM có thể chưa gán (phòng ban luôn trống). */
 export type OrgUnit = Omit<Schemas['OrgUnitResponse'], 'storeManager' | 'obm'> & {
   storeManager: UserRef | null
   obm: UserRef | null
-  riskPolicy?: RiskPolicy
 }
-export type OrgUnitPayload = Schemas['OrgUnitRequest'] & {
-  riskPolicy?: RiskPolicy
-}
+export type OrgUnitPayload = Schemas['OrgUnitRequest']
 
 export interface CompanyListParams extends PageParams {
   keyword?: string

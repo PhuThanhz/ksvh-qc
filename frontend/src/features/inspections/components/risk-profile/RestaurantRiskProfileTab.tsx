@@ -105,7 +105,13 @@ export function RestaurantRiskProfileTab({ initialRestaurantId }: RestaurantRisk
             icon={<CheckCircleOutlined />}
             tone="good"
             loading={isLoading}
-            footnote="Liên tục không phát sinh lỗi"
+            footnote={
+              data
+                ? `Chính sách ${data.riskPolicy === 'STRICT' ? 'Khắt khe' : 'Tiêu chuẩn'}${
+                    data.escalationThreshold != null ? ` · nâng mức từ ${data.escalationThreshold} lần` : ''
+                  }`
+                : 'Liên tục không phát sinh lỗi'
+            }
           />
         </Col>
       </Row>

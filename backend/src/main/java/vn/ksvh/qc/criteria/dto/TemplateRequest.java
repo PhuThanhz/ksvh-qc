@@ -1,7 +1,5 @@
 package vn.ksvh.qc.criteria.dto;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
@@ -32,22 +30,5 @@ public record TemplateRequest(
         @Size(max = 500, message = "Mẫu phiếu tối đa 500 tiêu chí")
         List<Long> criterionIds,
 
-        boolean active,
-
-        @Min(value = 1, message = "Kỳ đếm tần suất tối thiểu 1 tháng")
-        @Max(value = 24, message = "Kỳ đếm tần suất tối đa 24 tháng")
-        Integer frequencyPeriodMonths,
-
-        @Min(value = 1, message = "Ngưỡng nâng mức rủi ro tối thiểu 1 lần")
-        @Max(value = 10, message = "Ngưỡng nâng mức rủi ro tối đa 10 lần")
-        Integer escalationThresholdCount,
-
-        @Min(value = 1, message = "Kỳ hạ mức rủi ro tối thiểu 1 tháng")
-        @Max(value = 24, message = "Kỳ hạ mức rủi ro tối đa 24 tháng")
-        Integer resetPeriodMonths) {
-
-    public TemplateRequest(String code, String name, String inspectionType, String description,
-                           Long companyId, List<Long> criterionIds, boolean active) {
-        this(code, name, inspectionType, description, companyId, criterionIds, active, null, null, null);
-    }
+        boolean active) {
 }

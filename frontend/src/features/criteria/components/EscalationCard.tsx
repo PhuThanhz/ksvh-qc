@@ -1,51 +1,43 @@
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Button, Card, Col, Flex, Form, Modal, Row, Table, Typography } from 'antd'
-import dayjs from 'dayjs'
+import { PlusOutlined } from '@ant-design/icons'
+import { Button, Card, Tabs, Typography } from 'antd'
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { FormDatePicker } from '@/components/data-entry/FormDatePicker'
-import { FormInput } from '@/components/data-entry/FormInput'
-import { FormNumber } from '@/components/data-entry/FormNumber'
 import { useConfirm } from '@/components/feedback/useConfirm'
 import { useNotify } from '@/components/feedback/useNotify'
-import { ConfigStatusTag } from '@/features/criteria/components/ConfigStatusTag'
-import type { ConfigStatus, EscalationRule } from '@/features/criteria/criteria.types'
-import { useCreateEscalation, useDeleteEscalation, useEscalationRules } from '@/features/criteria/hooks/useRiskConfig'
-import { escalationSchema, type EscalationFormValues } from '@/features/criteria/schemas/criteria.schema'
-import { applyFieldErrors, getErrorMessage } from '@/lib/http'
+import { EscalationFormModal } from '@/features/criteria/components/EscalationFormModal'
+import { EscalationVersionTable } from '@/features/criteria/components/EscalationVersionTable'
+import { RISK_POLICIES, type EscalationRule, type RiskPolicy } from '@/features/criteria/criteria.types'
+import { useDeleteEscalation, useEscalationRules } from '@/features/criteria/hooks/useRiskConfig'
+import { getErrorMessage } from '@/lib/http'
 import { PERMISSIONS, ProtectedAction } from '@/permissions'
-import { formatDate, formatDateTime } from '@/utils/format-date'
-import { ActionButton } from '@/components/data-display/TableActions'
+import { formatDate } from '@/utils/format-date'
 
-/** Danh mục 9: quy tắc nâng mức ảnh hưởng khi lỗi lặp lại, theo phiên bản ngày hiệu lực. */
+function Summary({ current, fallback }: { current?: EscalationRule; fallback: boolean }) {
+  if (!current) {
+    return (
+      <Typography.Paragraph type="secondary" style={{ marginBottom: 12 }}>
+        {fallback ? 'Chưa khai báo – nhà hàng thuộc chính sách này đang dùng quy tắc Tiêu chuẩn.' : 'Chưa khai báo quy tắc nâng mức.'}
+      </Typography.Paragraph>
+    )
+  }
+  return (
+    <Typography.Paragraph type="secondary" style={{ marginBottom: 12 }}>
+      Đang áp dụng từ {formatDate(current.effectiveFrom)}: tiêu chí vi phạm từ <b>{current.thresholdCount} lần</b> trong kỳ
+      đếm sẽ nâng mức ảnh hưởng <b>+{current.stepIncrease}</b> bậc (tối đa mức {current.maxImpact}); sau{' '}
+      <b>{current.resetPeriodMonths} tháng</b> liên tục không vi phạm thì hạ về mức gốc.
+    </Typography.Paragraph>
+  )
+}
+
+/** Danh mục 9: quy tắc nâng mức theo chính sách rủi ro của nhà hàng, mỗi chính sách có phiên bản theo ngày hiệu lực. */
 export function EscalationCard() {
   const notify = useNotify()
   const confirm = useConfirm()
   const rules = useEscalationRules()
-  const create = useCreateEscalation()
   const remove = useDeleteEscalation()
+  const [policy, setPolicy] = useState<RiskPolicy>('STANDARD')
   const [open, setOpen] = useState(false)
-  const current = rules.data?.find((r) => r.status === 'CURRENT')
-  const { control, handleSubmit, reset, setError } = useForm<EscalationFormValues>({
-    resolver: zodResolver(escalationSchema),
-    defaultValues: { thresholdCount: 3, stepIncrease: 1, maxImpact: 5, resetPeriodMonths: 6, effectiveFrom: '', note: '' },
-  })
-
-  const onSubmit = handleSubmit((v) =>
-    create.mutate(
-      { ...v, note: v.note || undefined },
-      {
-        onSuccess: () => {
-          notify.success('Đã thêm phiên bản quy tắc nâng mức')
-          setOpen(false)
-        },
-        onError: (err) => {
-          if (!applyFieldErrors(err, setError)) notify.error(getErrorMessage(err))
-        },
-      },
-    ),
-  )
+  const byPolicy = (p: RiskPolicy) => rules.data?.filter((r) => r.riskPolicy === p) ?? []
+  const currentOf = (p: RiskPolicy) => byPolicy(p).find((r) => r.status === 'CURRENT')
 
   const onDelete = async (r: EscalationRule) => {
     if (!(await confirm({ title: `Xoá phiên bản hiệu lực từ ${formatDate(r.effectiveFrom)}?`, okText: 'Xoá', danger: true }))) return
@@ -57,112 +49,36 @@ export function EscalationCard() {
 
   return (
     <Card
-      title="Quy tắc nâng mức ảnh hưởng khi tái phạm"
+      title="Quy tắc nâng / hạ mức khi tái phạm"
       extra={
         <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => {
-              reset({
-                thresholdCount: current?.thresholdCount ?? 3,
-                stepIncrease: current?.stepIncrease ?? 1,
-                maxImpact: current?.maxImpact ?? 5,
-                resetPeriodMonths: current?.resetPeriodMonths ?? 6,
-                effectiveFrom: dayjs().format('YYYY-MM-DD'),
-                note: '',
-              })
-              setOpen(true)
-            }}
-          >
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => setOpen(true)}>
             Thêm phiên bản
           </Button>
         </ProtectedAction>
       }
     >
-      {current && (
-        <Typography.Paragraph type="secondary" style={{ marginBottom: 12 }}>
-          Đang áp dụng từ {formatDate(current.effectiveFrom)}: Tiêu chí vi phạm từ {current.thresholdCount} lần trong chu kỳ theo dõi sẽ tự động nâng mức ảnh hưởng thêm +{current.stepIncrease} bậc (tối đa mức {current.maxImpact}); sau {current.resetPeriodMonths} tháng liên tục không phát sinh vi phạm sẽ hoàn nguyên về mức độ ảnh hưởng cơ sở.
-        </Typography.Paragraph>
-      )}
-      <Table<EscalationRule>
-        rowKey="id"
-        size="small"
-        loading={rules.isFetching}
-        dataSource={rules.data}
-        pagination={false}
-        scroll={{ x: 'max-content' }}
-        columns={[
-          { title: 'Ngưỡng vi phạm', dataIndex: 'thresholdCount', render: (n: number) => `${n} lần` },
-          { title: 'Mức nâng', dataIndex: 'stepIncrease', render: (n: number) => `+${n} bậc` },
-          { title: 'Giới hạn mức trần', dataIndex: 'maxImpact' },
-          { title: 'Thời hạn hoàn nguyên', dataIndex: 'resetPeriodMonths', render: (n: number) => `${n} tháng` },
-          { title: 'Hiệu lực từ', dataIndex: 'effectiveFrom', render: formatDate },
-          { title: 'Trạng thái', dataIndex: 'status', render: (s: ConfigStatus) => <ConfigStatusTag status={s} /> },
-          {
-            title: 'Tạo bởi',
-            key: 'by',
-            render: (_: unknown, r: EscalationRule) => (
-              <Flex vertical>
-                <span>{r.createdByName ?? 'Hệ thống'}</span>
-                <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                  {formatDateTime(r.createdAt)}
-                </Typography.Text>
-              </Flex>
-            ),
-          },
-          {
-            title: '',
-            key: 'actions',
-            width: 50,
-            render: (_: unknown, r: EscalationRule) =>
-              r.status === 'SCHEDULED' && (
-                <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-                  <ActionButton tone="delete" icon={<DeleteOutlined />} tooltip="Xoá phiên bản" onClick={() => void onDelete(r)} />
-                </ProtectedAction>
-              ),
-          },
-        ]}
+      <Typography.Paragraph type="secondary" style={{ marginBottom: 4 }}>
+        Mỗi nhà hàng chọn một chính sách rủi ro (ở Danh mục cơ sở). Kỳ đếm tần suất dùng chung cho mọi chính sách.
+      </Typography.Paragraph>
+      <Tabs
+        activeKey={policy}
+        onChange={(k) => setPolicy(k as RiskPolicy)}
+        items={RISK_POLICIES.map((p) => ({
+          key: p.value,
+          label: p.label,
+          children: (
+            <>
+              <Typography.Text type="secondary" style={{ display: 'block', marginBottom: 8, fontSize: 12 }}>
+                {p.hint}
+              </Typography.Text>
+              <Summary current={currentOf(p.value)} fallback={p.value !== 'STANDARD'} />
+              <EscalationVersionTable rules={byPolicy(p.value)} loading={rules.isFetching} onDelete={(r) => void onDelete(r)} />
+            </>
+          ),
+        }))}
       />
-      <Modal
-        open={open}
-        title="Thiết lập phiên bản quy tắc nâng mức ảnh hưởng"
-        okText="Lưu"
-        cancelText="Huỷ"
-        centered
-        styles={{ body: { maxHeight: 'calc(100vh - 180px)', overflowY: 'auto', paddingRight: 4 } }}
-        confirmLoading={create.isPending}
-        onOk={() => void onSubmit()}
-        onCancel={() => setOpen(false)}
-        destroyOnHidden
-      >
-        <Form layout="vertical" onFinish={() => void onSubmit()}>
-          {/* Nút submit ẩn: nhấn Enter trong ô nhập sẽ lưu (nút Lưu nằm ở footer, ngoài form). */}
-          <button type="submit" hidden />
-          <Row gutter={16}>
-            <Col span={12}>
-              <FormNumber control={control} name="thresholdCount" label="Ngưỡng tái phạm (số lần vi phạm trong chu kỳ)" required min={2} max={50} precision={0} />
-            </Col>
-            <Col span={12}>
-              <FormNumber control={control} name="stepIncrease" label="Số bậc nâng mức (+)" required min={1} max={4} precision={0} />
-            </Col>
-            <Col span={12}>
-              <FormNumber control={control} name="maxImpact" label="Mức độ ảnh hưởng tối đa (1–5)" required min={1} max={5} precision={0} />
-            </Col>
-            <Col span={12}>
-              <FormNumber control={control} name="resetPeriodMonths" label="Thời hạn hoàn nguyên (tháng không vi phạm)" required min={1} max={24} precision={0} />
-            </Col>
-          </Row>
-          <FormDatePicker
-            control={control}
-            name="effectiveFrom"
-            label="Hiệu lực từ ngày"
-            required
-            disabledDate={(d) => d.isBefore(dayjs(), 'day')}
-          />
-          <FormInput control={control} name="note" label="Ghi chú" maxLength={500} />
-        </Form>
-      </Modal>
+      <EscalationFormModal open={open} policy={policy} current={currentOf(policy)} onClose={() => setOpen(false)} />
     </Card>
   )
 }

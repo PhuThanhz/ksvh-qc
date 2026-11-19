@@ -30,6 +30,9 @@ export interface RestaurantRiskProfileResponse {
   asOfDate: string
   periodMonths: number
   periodStart: string
+  /** Chính sách rủi ro của nhà hàng – quyết định ngưỡng nâng / hạ mức. */
+  riskPolicy: 'STANDARD' | 'STRICT'
+  escalationThreshold?: number | null
   resetPeriodMonths?: number
   totalEscalatedCriteria: number
   totalActiveFindings: number

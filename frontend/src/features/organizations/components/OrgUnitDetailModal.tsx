@@ -4,6 +4,7 @@ import { DetailModal, type DetailField } from '@/components/feedback/DetailModal
 import { ActiveBadge } from '@/features/organizations/components/ActiveBadge'
 import { OrgUnitTypeTag } from '@/features/organizations/components/OrgUnitTypeTag'
 import {
+  RISK_POLICY_LABEL,
   type OrgUnit,
   type OrgUnitType,
   type UserRef,
@@ -62,11 +63,7 @@ export function OrgUnitDetailModal({ open, unit, fixedUnitType, onClose, onEdit 
       },
       {
         label: 'Chính sách rủi ro',
-        value: unit.riskPolicy === 'STRICT' ? (
-          <Tag color="error">Khắt khe - Fine Dining (Ngưỡng 2 lần)</Tag>
-        ) : (
-          <Tag color="blue">Tiêu chuẩn (Ngưỡng 3 lần)</Tag>
-        ),
+        value: <Tag color={unit.riskPolicy === 'STRICT' ? 'error' : 'default'}>{RISK_POLICY_LABEL[unit.riskPolicy]}</Tag>,
       },
     )
   }

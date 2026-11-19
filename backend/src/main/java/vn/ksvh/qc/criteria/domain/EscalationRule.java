@@ -5,11 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import vn.ksvh.qc.organization.api.RiskPolicy;
 
 import java.time.Instant;
 import java.time.LocalDate;
 
-/** Quy tắc nâng mức ảnh hưởng (danh mục 9), phiên bản theo ngày hiệu lực; không sửa sau khi tạo. */
+/** Quy tắc nâng mức ảnh hưởng (danh mục 9) theo chính sách rủi ro, phiên bản theo ngày hiệu lực; không sửa sau khi tạo. */
 @Entity
 @Table(name = "impact_escalation_rules")
 @Getter
@@ -20,6 +21,11 @@ public class EscalationRule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    /** Chính sách rủi ro áp dụng; mỗi chính sách có chuỗi phiên bản riêng. */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "risk_policy", nullable = false, length = 20)
+    private RiskPolicy riskPolicy = RiskPolicy.STANDARD;
 
     /** Số lần lỗi trong kỳ đếm để bắt đầu nâng mức. */
     @Column(name = "threshold_count", nullable = false)
@@ -35,7 +41,7 @@ public class EscalationRule {
     @Column(name = "reset_period_months", nullable = false)
     private short resetPeriodMonths;
 
-    @Column(name = "effective_from", nullable = false, unique = true)
+    @Column(name = "effective_from", nullable = false)
     private LocalDate effectiveFrom;
 
     @Column(length = 500)

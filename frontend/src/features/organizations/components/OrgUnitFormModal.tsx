@@ -42,7 +42,7 @@ function toFormValues(u: OrgUnit): OrgUnitFormValues {
     longitude: u.longitude,
     checkinRadiusM: u.checkinRadiusM ?? DEFAULT_CHECKIN_RADIUS_M,
     active: u.active,
-    riskPolicy: u.riskPolicy === 'STRICT' ? 'STRICT' : 'STANDARD',
+    riskPolicy: u.riskPolicy,
   }
 }
 
@@ -58,7 +58,7 @@ function toPayload(v: OrgUnitFormValues): OrgUnitPayload {
     longitude: v.longitude ?? undefined,
     checkinRadiusM: v.checkinRadiusM ?? undefined,
     active: v.active,
-    riskPolicy: v.riskPolicy ?? 'STANDARD',
+    riskPolicy: v.unitType === 'RESTAURANT' ? v.riskPolicy : undefined,
   }
 }
 

@@ -6,6 +6,8 @@ import { ActiveBadge } from '@/features/organizations/components/ActiveBadge'
 import { OrgUnitTypeTag } from '@/features/organizations/components/OrgUnitTypeTag'
 import {
   ORG_UNIT_TYPE_LABEL,
+  RISK_POLICY_LABEL,
+  type RiskPolicy,
   type OrgUnit,
   type OrgUnitType,
 } from '@/features/organizations/organizations.types'
@@ -117,12 +119,9 @@ export function OrgUnitTable({ onView, onEdit, onDelete, onFilterType, fixedUnit
             dataIndex: 'riskPolicy',
             key: 'riskPolicy',
             width: 170,
-            render: (policy?: string) =>
-              policy === 'STRICT' ? (
-                <Tag color="error" style={{ fontSize: 11 }}>Khắt khe (Fine Dining)</Tag>
-              ) : (
-                <Tag color="default" style={{ fontSize: 11 }}>Tiêu chuẩn</Tag>
-              ),
+            render: (policy: RiskPolicy) => (
+              <Tag color={policy === 'STRICT' ? 'error' : 'default'}>{RISK_POLICY_LABEL[policy]}</Tag>
+            ),
           },
         ]
       : []),

@@ -160,7 +160,7 @@ export interface paths {
         get?: never;
         put: operations["updateGroup"];
         post?: never;
-        delete?: never;
+        delete: operations["deleteGroup"];
         options?: never;
         head?: never;
         patch?: never;
@@ -256,6 +256,22 @@ export interface paths {
         get: operations["list"];
         put?: never;
         post: operations["create_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/risk-levels/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["importRiskLevels"];
         delete?: never;
         options?: never;
         head?: never;
@@ -961,6 +977,38 @@ export interface paths {
             cookie?: never;
         };
         get: operations["riskLevelVersions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/risk-levels/import-template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["riskLevelsTemplate"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/risk-levels/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["exportRiskLevels"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1820,6 +1868,8 @@ export interface components {
             /** Format: int32 */
             checkinRadiusM?: number;
             active?: boolean;
+            /** @enum {string|null} */
+            riskPolicy?: "STANDARD" | "STRICT" | null;
         };
         OrgUnitResponse: {
             /** Format: int64 */
@@ -1842,6 +1892,8 @@ export interface components {
             /** Format: int32 */
             checkinRadiusM: number | null;
             active: boolean;
+            /** @enum {string} */
+            riskPolicy: "STANDARD" | "STRICT";
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -2477,6 +2529,8 @@ export interface components {
             note?: string | null;
         };
         EscalationRuleRequest: {
+            /** @enum {string} */
+            riskPolicy: "STANDARD" | "STRICT";
             /** Format: int32 */
             thresholdCount: number;
             /** Format: int32 */
@@ -2492,6 +2546,8 @@ export interface components {
         EscalationRuleResponse: {
             /** Format: int64 */
             id: number;
+            /** @enum {string} */
+            riskPolicy: "STANDARD" | "STRICT";
             /** Format: int32 */
             thresholdCount: number;
             /** Format: int32 */
@@ -2543,6 +2599,8 @@ export interface components {
         RiskPreviewResponse: {
             /** Format: date */
             date: string;
+            /** @enum {string} */
+            policy: "STANDARD" | "STRICT";
             /** Format: int32 */
             periodMonths: number;
             /** Format: date */
@@ -2638,8 +2696,12 @@ export interface components {
             periodMonths: number;
             /** Format: date */
             periodStart: string;
+            /** @enum {string} */
+            riskPolicy: "STANDARD" | "STRICT";
             /** Format: int32 */
-            resetPeriodMonths: number;
+            escalationThreshold: number | null;
+            /** Format: int32 */
+            resetPeriodMonths: number | null;
             /** Format: int32 */
             totalEscalatedCriteria: number;
             /** Format: int32 */
@@ -3816,6 +3878,26 @@ export interface operations {
             };
         };
     };
+    deleteGroup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     get_7: {
         parameters: {
             query?: never;
@@ -4099,6 +4181,35 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["RoleResponse"];
+                };
+            };
+        };
+    };
+    importRiskLevels: {
+        parameters: {
+            query?: {
+                commit?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ImportResult"];
                 };
             };
         };
@@ -5373,6 +5484,7 @@ export interface operations {
                 baseImpact: number;
                 violations: number;
                 date?: string;
+                policy?: "STANDARD" | "STRICT";
             };
             header?: never;
             path?: never;
@@ -5429,6 +5541,46 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["RiskLevelVersionResponse"][];
+                };
+            };
+        };
+    };
+    riskLevelsTemplate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
+                };
+            };
+        };
+    };
+    exportRiskLevels: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
                 };
             };
         };

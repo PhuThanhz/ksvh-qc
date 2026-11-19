@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import vn.ksvh.qc.criteria.api.CriteriaLookupApi;
-import vn.ksvh.qc.criteria.api.TemplateRef;
 import vn.ksvh.qc.inspection.api.event.FindingM4AlertEvent;
 import vn.ksvh.qc.inspection.api.event.InspectionSubmittedEvent;
 import vn.ksvh.qc.inspection.domain.*;
@@ -116,17 +115,7 @@ public class InspectionExecutionService {
                 .toList();
         boolean hasFail = !failedSubs.isEmpty();
 
-        RiskRules rules = null;
-        if (hasFail) {
-            OrgUnitRef rest = orgUnitLookupApi.findRefs(List.of(inspection.getRestaurantId())).get(inspection.getRestaurantId());
-            TemplateRef tpl = inspection.getTemplateId() != null
-                    ? criteriaLookupApi.findTemplate(inspection.getTemplateId()).orElse(null) : null;
-            Integer freqMonths = tpl != null ? tpl.frequencyPeriodMonths() : null;
-            Integer escThreshold = tpl != null ? tpl.escalationThresholdCount() : null;
-            Integer resetMonths = tpl != null ? tpl.resetPeriodMonths() : null;
-            String riskPolicy = rest != null ? rest.riskPolicy() : null;
-            rules = RiskRules.forContext(criteriaLookupApi.riskConfigAt(today), freqMonths, escThreshold, resetMonths, riskPolicy);
-        }
+        RiskRules rules = hasFail ? riskAssessor.rulesFor(inspection.getRestaurantId(), today) : null;
         Map<Long, List<LocalDate>> occurrencesByCriterion = Map.of();
         if (hasFail) {
             List<Long> failedCritIds = failedSubs.stream().map(InspectionSubmitItemRequest::criterionId).distinct().toList();

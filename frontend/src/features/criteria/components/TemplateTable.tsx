@@ -79,17 +79,6 @@ export function TemplateTable({ onView, onEdit, onDelete, ...props }: TemplateTa
           render: (v: string | null) => (v ? <Tag>{v}</Tag> : <Typography.Text type="secondary">—</Typography.Text>),
         },
         {
-          title: 'Kỳ & Ngưỡng rủi ro',
-          key: 'riskRule',
-          width: 170,
-          render: (_: unknown, t: Template) => (
-            <Flex vertical gap={2}>
-              <span className="cell-num">{`Kỳ đếm: ${t.frequencyPeriodMonths ?? 6} tháng`}</span>
-              <span className="cell-sub">{`Nâng mức: ≥ ${t.escalationThresholdCount ?? 3} lần`}</span>
-            </Flex>
-          ),
-        },
-        {
           title: 'Số lượng tiêu chí',
           dataIndex: 'criterionCount',
           align: 'center',

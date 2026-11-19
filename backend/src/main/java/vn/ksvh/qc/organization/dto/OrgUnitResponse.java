@@ -1,5 +1,7 @@
 package vn.ksvh.qc.organization.dto;
 
+import vn.ksvh.qc.organization.api.RiskPolicy;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import vn.ksvh.qc.organization.domain.OrgUnit;
 import vn.ksvh.qc.organization.domain.OrgUnitType;
@@ -24,7 +26,7 @@ public record OrgUnitResponse(
         @Schema(nullable = true) Double longitude,
         @Schema(nullable = true) Integer checkinRadiusM,
         boolean active,
-        String riskPolicy,
+        RiskPolicy riskPolicy,
         Instant createdAt,
         Instant updatedAt) {
 

@@ -150,9 +150,6 @@ public class TemplateService {
         t.setInspectionType(blankToNull(req.inspectionType()));
         t.setDescription(blankToNull(req.description()));
         t.setActive(req.active());
-        t.setFrequencyPeriodMonths(req.frequencyPeriodMonths() != null ? req.frequencyPeriodMonths() : 6);
-        t.setEscalationThresholdCount(req.escalationThresholdCount() != null ? req.escalationThresholdCount() : 3);
-        t.setResetPeriodMonths(req.resetPeriodMonths() != null ? req.resetPeriodMonths() : 6);
         t.setUpdatedBy(actorId);
         t.getItems().clear();
         for (int i = 0; i < ordered.size(); i++) {

@@ -5,6 +5,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import vn.ksvh.qc.organization.api.RiskPolicy;
 import vn.ksvh.qc.organization.domain.*;
 import vn.ksvh.qc.organization.dto.CompanyRequest;
 import vn.ksvh.qc.organization.dto.OrgUnitRequest;
@@ -28,11 +29,17 @@ public class OrganizationExcelService {
     static final String CO_CODE = "Mã công ty", CO_NAME = "Tên công ty", ACTIVE = "Hoạt động";
     static final String U_CODE = "Mã đơn vị", U_NAME = "Tên đơn vị", U_COMPANY = "Mã công ty", U_TYPE = "Loại đơn vị",
             U_ADDRESS = "Địa chỉ", U_CHT = "Tài khoản CHT", U_OBM = "Tài khoản OBM",
-            U_LAT = "Vĩ độ", U_LNG = "Kinh độ", U_RADIUS = "Bán kính GPS (m)";
+            U_LAT = "Vĩ độ", U_LNG = "Kinh độ", U_RADIUS = "Bán kính GPS (m)", U_POLICY = "Chính sách rủi ro";
     private static final Map<String, OrgUnitType> TYPES = new LinkedHashMap<>();
     static {
         TYPES.put("Nhà hàng", OrgUnitType.RESTAURANT);
         TYPES.put("Phòng ban", OrgUnitType.DEPARTMENT);
+    }
+    private static final Map<String, RiskPolicy> POLICIES = new LinkedHashMap<>();
+    static {
+        for (RiskPolicy p : RiskPolicy.values()) {
+            POLICIES.put(p.label(), p);
+        }
     }
     private static final List<String> YES_NO = List.of("Có", "Không");
 
@@ -46,7 +53,7 @@ public class OrganizationExcelService {
     private record CompanyRow(String code, String name, Boolean active) {}
 
     private record UnitRow(String code, String name, String companyCode, String type, String address,
-                           String cht, String obm, Double lat, Double lng, Integer radius, Boolean active) {}
+                           String cht, String obm, Double lat, Double lng, Integer radius, String policy, Boolean active) {}
 
     private static ExcelSheet<CompanyRow> companySheet(List<CompanyRow> rows) {
         return ExcelSheet.of("Công ty", "DANH MỤC CÔNG TY", rows)
@@ -67,6 +74,8 @@ public class OrganizationExcelService {
                 .column(U_LAT, 13, UnitRow::lat).note("Không bắt buộc. Số thập phân, vd 10.762622. Nhập thì phải có cả kinh độ.")
                 .column(U_LNG, 13, UnitRow::lng).note("Không bắt buộc. Số thập phân, vd 106.660172")
                 .column(U_RADIUS, 14, UnitRow::radius).note("Không bắt buộc. Từ 10 đến 5000 mét.")
+                .column(U_POLICY, 16, UnitRow::policy).options(List.copyOf(POLICIES.keySet()))
+                .note("Chỉ cho nhà hàng. Bỏ trống: nhà hàng mới = Tiêu chuẩn, nhà hàng đã có = giữ nguyên.")
                 .column(ACTIVE, 12, UnitRow::active).options(YES_NO);
     }
 
@@ -82,7 +91,8 @@ public class OrganizationExcelService {
                 u.getCompany() != null ? companyCodes.get(u.getCompany().getId()) : null,
                 u.getUnitType() == OrgUnitType.RESTAURANT ? "Nhà hàng" : "Phòng ban",
                 u.getAddress(), username(users, u.getStoreManagerUserId()), username(users, u.getObmUserId()),
-                u.getLatitude(), u.getLongitude(), u.getCheckinRadiusM(), u.isActive())).toList();
+                u.getLatitude(), u.getLongitude(), u.getCheckinRadiusM(),
+                u.getUnitType() == OrgUnitType.RESTAURANT ? u.getRiskPolicy().label() : null, u.isActive())).toList();
         return ExcelWriter.export(List.of(
                 companySheet(companies.stream().map(c -> new CompanyRow(c.getCode(), c.getName(), c.isActive())).toList()),
                 unitSheet(unitRows)));
@@ -129,7 +139,8 @@ public class OrganizationExcelService {
                         .orElseThrow(() -> new ExcelCellException(U_COMPANY, "Không tìm thấy công ty có mã \"%s\"".formatted(companyCode)));
                 OrgUnitRequest req = session.validate(new OrgUnitRequest(companyId, row.choice(U_TYPE, TYPES), code,
                         row.text(U_NAME), row.text(U_ADDRESS),
-                        row.number(U_LAT), row.number(U_LNG), row.integer(U_RADIUS), row.bool(ACTIVE, true)), row, unitFields);
+                        row.number(U_LAT), row.number(U_LNG), row.integer(U_RADIUS), row.bool(ACTIVE, true),
+                        row.choice(U_POLICY, POLICIES)), row, unitFields);
                 Long chtId = userId(row, U_CHT);
                 Long obmId = userId(row, U_OBM);
                 Long unitId = existing.isPresent()

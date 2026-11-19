@@ -5,9 +5,14 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import vn.ksvh.qc.organization.api.RiskPolicy;
+
 import java.time.LocalDate;
 
 public record EscalationRuleRequest(
+        @NotNull(message = "Vui lòng chọn chính sách rủi ro")
+        RiskPolicy riskPolicy,
+
         @NotNull(message = "Vui lòng nhập ngưỡng")
         @Min(value = 2, message = "Ngưỡng tối thiểu 2 lần")
         @Max(value = 50, message = "Ngưỡng tối đa 50 lần")

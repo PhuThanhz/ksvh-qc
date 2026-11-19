@@ -42,15 +42,6 @@ public class InspectionTemplate extends BaseEntity {
     @Column(name = "company_id")
     private Long companyId;
 
-    @Column(name = "frequency_period_months")
-    private Integer frequencyPeriodMonths = 6;
-
-    @Column(name = "escalation_threshold_count")
-    private Integer escalationThresholdCount = 3;
-
-    @Column(name = "reset_period_months")
-    private Integer resetPeriodMonths = 6;
-
     @Column(name = "updated_by")
     private Long updatedBy;
 

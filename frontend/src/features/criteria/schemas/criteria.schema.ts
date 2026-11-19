@@ -44,9 +44,6 @@ export const templateSchema = z.object({
   description: z.string().trim().max(500, 'Mô tả tối đa 500 ký tự'),
   criterionIds: z.array(z.number()).min(1, 'Mẫu phiếu phải có ít nhất một tiêu chí'),
   active: z.boolean(),
-  frequencyPeriodMonths: z.number().int().min(1, 'Kỳ đếm từ 1 đến 24 tháng').max(24, 'Kỳ đếm từ 1 đến 24 tháng').nullable().optional(),
-  escalationThresholdCount: z.number().int().min(1, 'Ngưỡng từ 1 đến 10 lần').max(10, 'Ngưỡng từ 1 đến 10 lần').nullable().optional(),
-  resetPeriodMonths: z.number().int().min(1, 'Kỳ hạ lại từ 1 đến 24 tháng').max(24, 'Kỳ hạ lại từ 1 đến 24 tháng').nullable().optional(),
 })
 export type TemplateFormValues = z.infer<typeof templateSchema>
 

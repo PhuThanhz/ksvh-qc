@@ -8,6 +8,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import io.swagger.v3.oas.annotations.media.Schema;
+import vn.ksvh.qc.organization.api.RiskPolicy;
 import vn.ksvh.qc.organization.domain.OrgUnitType;
 
 /**
@@ -47,11 +49,12 @@ public record OrgUnitRequest(
 
         boolean active,
 
-        @Size(max = 20, message = "Chính sách rủi ro tối đa 20 ký tự")
-        String riskPolicy) {
+        /** Chỉ dùng cho nhà hàng; bỏ trống khi sửa = giữ nguyên, khi tạo = Tiêu chuẩn. */
+        @Schema(nullable = true)
+        RiskPolicy riskPolicy) {
 
     public OrgUnitRequest(Long companyId, OrgUnitType unitType, String code, String name, String address,
                           Double latitude, Double longitude, Integer checkinRadiusM, boolean active) {
-        this(companyId, unitType, code, name, address, latitude, longitude, checkinRadiusM, active, "STANDARD");
+        this(companyId, unitType, code, name, address, latitude, longitude, checkinRadiusM, active, null);
     }
 }

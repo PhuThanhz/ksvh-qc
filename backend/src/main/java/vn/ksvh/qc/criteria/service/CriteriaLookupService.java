@@ -1,5 +1,7 @@
 package vn.ksvh.qc.criteria.service;
 
+import vn.ksvh.qc.criteria.domain.EscalationRule;
+import vn.ksvh.qc.organization.api.RiskPolicy;
 import vn.ksvh.qc.criteria.domain.CriterionGroupRepository;
 import vn.ksvh.qc.criteria.domain.CriterionGroup;
 import vn.ksvh.qc.criteria.api.CriterionGroupRef;
@@ -68,8 +70,7 @@ class CriteriaLookupService implements CriteriaLookupApi {
                 .collect(Collectors.toUnmodifiableMap(
                         InspectionTemplate::getId,
                         t -> new TemplateRef(t.getId(), t.getCode(), t.getName(), t.isActive(),
-                                t.getCompanyId(), t.getFrequencyPeriodMonths(), t.getEscalationThresholdCount(),
-                                t.getResetPeriodMonths(), List.of())
+                                t.getCompanyId(), List.of())
                 ));
     }
 
@@ -90,8 +91,7 @@ class CriteriaLookupService implements CriteriaLookupApi {
                     .map(this::toCriterionRef)
                     .toList();
             return new TemplateRef(t.getId(), t.getCode(), t.getName(), t.isActive(),
-                    t.getCompanyId(), t.getFrequencyPeriodMonths(), t.getEscalationThresholdCount(),
-                    t.getResetPeriodMonths(), items);
+                    t.getCompanyId(), items);
         });
     }
 
@@ -124,17 +124,25 @@ class CriteriaLookupService implements CriteriaLookupApi {
 
     /** Chưa khai báo kỳ đếm → mặc định 6 tháng (giá trị ví dụ trong tài liệu nghiệp vụ). */
     @Override
-    public RiskConfigRef riskConfigAt(LocalDate date) {
+    public RiskConfigRef riskConfigAt(LocalDate date, RiskPolicy policy) {
         int period = frequencyRepository.findFirstByEffectiveFromLessThanEqualOrderByEffectiveFromDesc(date)
                 .map(f -> (int) f.getPeriodMonths()).orElse(6);
-        RiskConfigRef.Escalation escalation = escalationRepository.findFirstByEffectiveFromLessThanEqualOrderByEffectiveFromDesc(date)
+        RiskPolicy requested = policy != null ? policy : RiskPolicy.STANDARD;
+        Optional<EscalationRule> rule = escalationRepository
+                .findFirstByRiskPolicyAndEffectiveFromLessThanEqualOrderByEffectiveFromDesc(requested, date);
+        if (rule.isEmpty() && requested != RiskPolicy.STANDARD) {
+            rule = escalationRepository.findFirstByRiskPolicyAndEffectiveFromLessThanEqualOrderByEffectiveFromDesc(
+                    RiskPolicy.STANDARD, date);
+        }
+        RiskPolicy applied = rule.map(EscalationRule::getRiskPolicy).orElse(requested);
+        RiskConfigRef.Escalation escalation = rule
                 .map(r -> new RiskConfigRef.Escalation(r.getThresholdCount(), r.getStepIncrease(), r.getMaxImpact(), r.getResetPeriodMonths()))
                 .orElse(null);
         List<RiskLevelRef> levels = riskLevelRepository.findEffectiveAt(date).stream()
                 .map(r -> new RiskLevelRef(r.getId(), r.getCode(), r.getName(), r.getMinScore(), r.getMaxScore(),
                         r.getRemediationDays(), r.getAction()))
                 .toList();
-        return new RiskConfigRef(date, period, escalation, levels);
+        return new RiskConfigRef(date, applied, period, escalation, levels);
     }
 
     @Override

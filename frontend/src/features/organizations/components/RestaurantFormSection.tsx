@@ -83,9 +83,9 @@ export function RestaurantFormSection({ control, setValue, unit }: RestaurantFor
           <FormSelect
             control={control}
             name="riskPolicy"
-            label="Chính sách kiểm soát rủi ro"
+            label="Chính sách rủi ro"
             options={RISK_POLICY_OPTIONS}
-            extra="Áp dụng ngưỡng vi phạm khắt khe hơn (2 lần) đối với các chuỗi Fine Dining như Tenku, Ussina"
+            extra="Quyết định ngưỡng nâng mức và thời gian hạ mức khi tái phạm. Thông số từng chính sách khai báo ở Quy tắc tái phạm & nâng mức."
           />
         </Col>
       </Row>

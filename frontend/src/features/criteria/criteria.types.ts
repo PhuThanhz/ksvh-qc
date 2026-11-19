@@ -25,15 +25,9 @@ export type CriterionPayload = Omit<Schemas['CriterionRequest'], 'templateIds'> 
 export type Template = Schemas['TemplateResponse'] & {
   companyId?: number | null
   companyName?: string | null
-  frequencyPeriodMonths?: number | null
-  escalationThresholdCount?: number | null
-  resetPeriodMonths?: number | null
 }
 export type TemplatePayload = Omit<Schemas['TemplateRequest'], 'companyId'> & {
   companyId?: number | null
-  frequencyPeriodMonths?: number | null
-  escalationThresholdCount?: number | null
-  resetPeriodMonths?: number | null
 }
 export type TemplateOption = Schemas['TemplateOption']
 export type RiskLevel = Schemas['RiskLevelItem']
@@ -43,6 +37,12 @@ export type FrequencyConfig = Schemas['FrequencyConfigResponse']
 export type FrequencyConfigPayload = Schemas['FrequencyConfigRequest']
 export type EscalationRule = Schemas['EscalationRuleResponse']
 export type EscalationRulePayload = Schemas['EscalationRuleRequest']
+export type RiskPolicy = EscalationRule['riskPolicy']
+/** Chính sách rủi ro: nhà hàng chọn ở Danh mục cơ sở, mỗi chính sách có quy tắc nâng mức riêng. */
+export const RISK_POLICIES: { value: RiskPolicy; label: string; hint: string }[] = [
+  { value: 'STANDARD', label: 'Tiêu chuẩn', hint: 'Áp dụng cho đa số nhà hàng' },
+  { value: 'STRICT', label: 'Khắt khe', hint: 'Nhà hàng fine dining – ngưỡng nâng mức thấp hơn' },
+]
 export type ConfigStatus = FrequencyConfig['status']
 
 export interface CriterionListParams extends PageParams {

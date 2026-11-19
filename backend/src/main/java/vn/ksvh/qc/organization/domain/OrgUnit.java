@@ -1,5 +1,7 @@
 package vn.ksvh.qc.organization.domain;
 
+import vn.ksvh.qc.organization.api.RiskPolicy;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -52,8 +54,9 @@ public class OrgUnit extends BaseEntity {
     @Column(name = "checkin_radius_m")
     private Integer checkinRadiusM;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "risk_policy", nullable = false, length = 20)
-    private String riskPolicy = "STANDARD";
+    private RiskPolicy riskPolicy = RiskPolicy.STANDARD;
 
     @Column(nullable = false)
     private boolean active = true;

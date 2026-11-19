@@ -43,7 +43,7 @@ class RestaurantRiskProfileApiTests extends ApiTestSupport {
                 VALUES (?, ?, 'Bàn ghế bụi', 1) RETURNING id""",
                 Long.class, groupId, "CRIT-" + suffix);
 
-        jdbc.update("INSERT INTO impact_escalation_rules (threshold_count, step_increase, max_impact, reset_period_months, effective_from, note) VALUES (3, 1, 5, 6, '2025-01-01', 'Test') ON CONFLICT (effective_from) DO NOTHING");
+        jdbc.update("INSERT INTO impact_escalation_rules (threshold_count, step_increase, max_impact, reset_period_months, effective_from, note) VALUES (3, 1, 5, 6, '2025-01-01', 'Test') ON CONFLICT (risk_policy, effective_from) DO NOTHING");
         jdbc.update("INSERT INTO frequency_configs (period_months, effective_from, note) VALUES (6, '2025-01-01', 'Test') ON CONFLICT (effective_from) DO NOTHING");
     }
 
