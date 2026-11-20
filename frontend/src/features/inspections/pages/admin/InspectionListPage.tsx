@@ -149,7 +149,7 @@ export function InspectionListPage() {
         />
 
         <ViewTabs
-          items={INSPECTION_STATUS_TABS.map((t) => ({ key: t.value, label: t.label }))}
+          items={INSPECTION_STATUS_TABS.map((t) => ({ key: t.value, label: t.label, color: t.color }))}
           activeKey={activeTab}
           onChange={(val) => setFilter('status', val === 'ALL' ? undefined : (val as InspectionStatus))}
         />

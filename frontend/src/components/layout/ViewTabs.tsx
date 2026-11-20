@@ -7,6 +7,8 @@ export interface ViewTabItem {
   icon?: ReactNode
   /** Số đếm hiển thị bên cạnh nhãn (bỏ trống = không hiện). */
   count?: number
+  /** Màu chấm trạng thái trực quan (vd: '#22c55e', '#ef4444'...). */
+  color?: string
 }
 
 export interface ViewTabsProps {
@@ -30,7 +32,21 @@ export function ViewTabs({ items, activeKey, onChange }: ViewTabsProps) {
         icon: t.icon,
         label: (
           <span className="view-tabs__label">
-            {t.label}
+            {t.color && (
+              <span
+                className="view-tabs__dot"
+                style={{
+                  width: 7,
+                  height: 7,
+                  borderRadius: '50%',
+                  backgroundColor: t.color,
+                  display: 'inline-block',
+                  flexShrink: 0,
+                  boxShadow: `0 0 6px ${t.color}88`,
+                }}
+              />
+            )}
+            <span>{t.label}</span>
             {t.count != null && <span className="view-tabs__count">{t.count}</span>}
           </span>
         ),

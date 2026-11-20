@@ -52,14 +52,14 @@ export const FINDING_EVENT_ACTION_META: Record<FindingEventAction, StatusMeta> =
   OVERDUE: { label: 'Quá hạn khắc phục (+1 tần suất vi phạm)', tone: 'danger', color: 'red' },
 }
 
-export const INSPECTION_STATUS_TABS: { value: string; label: string }[] = [
+export const INSPECTION_STATUS_TABS: { value: string; label: string; color?: string }[] = [
   { value: 'ALL', label: 'Tất cả' },
-  { value: 'ASSIGNED', label: 'Đã phân công' },
-  { value: 'IN_PROGRESS', label: 'Đang đánh giá' },
-  { value: 'SUBMITTED', label: 'Đã nộp' },
-  { value: 'AWAITING_ACK', label: 'Chờ cơ sở xác nhận' },
-  { value: 'COMPLETED', label: 'Hoàn thành' },
-  { value: 'CANCELLED', label: 'Đã huỷ' },
+  { value: 'ASSIGNED', label: 'Đã phân công', color: '#94a3b8' },
+  { value: 'IN_PROGRESS', label: 'Đang đánh giá', color: '#3b82f6' },
+  { value: 'SUBMITTED', label: 'Đã nộp', color: '#f59e0b' },
+  { value: 'AWAITING_ACK', label: 'Chờ cơ sở xác nhận', color: '#f97316' },
+  { value: 'COMPLETED', label: 'Hoàn thành', color: '#10b981' },
+  { value: 'CANCELLED', label: 'Đã huỷ', color: '#64748b' },
 ]
 
 export const ITEM_RESULT_META: Record<ItemResult, StatusMeta> = {
@@ -73,12 +73,12 @@ export const ITEM_RESULT_META: Record<ItemResult, StatusMeta> = {
 export function findingStatusTabs(pendingCount?: number): ViewTabItem[] {
   return [
     { key: 'ALL', label: 'Tất cả' },
-    { key: 'PENDING_REVIEW', label: 'Chờ tôi thẩm định', count: pendingCount || undefined },
-    { key: 'OPEN', label: 'Chờ phản hồi' },
-    { key: 'APPEALED', label: 'Đang khiếu nại' },
-    { key: 'APPEAL_MEETING', label: 'Họp khiếu nại' },
-    { key: 'REMEDIATING', label: 'Đang khắc phục' },
-    { key: 'PENDING_VERIFICATION', label: 'Chờ thẩm tra' },
-    { key: 'CLOSED', label: 'Đã đóng' },
+    { key: 'PENDING_REVIEW', label: 'Chờ tôi thẩm định', count: pendingCount || undefined, color: '#f59e0b' },
+    { key: 'OPEN', label: 'Chờ phản hồi', color: '#f97316' },
+    { key: 'APPEALED', label: 'Đang khiếu nại', color: '#ef4444' },
+    { key: 'APPEAL_MEETING', label: 'Họp khiếu nại', color: '#c026d3' },
+    { key: 'REMEDIATING', label: 'Đang khắc phục', color: '#2563eb' },
+    { key: 'PENDING_VERIFICATION', label: 'Chờ thẩm tra', color: '#eab308' },
+    { key: 'CLOSED', label: 'Đã đóng', color: '#16a34a' },
   ]
 }
