@@ -43,7 +43,7 @@ class DashboardApiTests extends ApiTestSupport {
         jdbc.update("""
                 INSERT INTO findings(inspection_id, inspection_item_id, restaurant_id, criterion_id, base_impact, effective_impact, violation_count,
                                      calculated_score, risk_level_code, risk_level_name, deadline_date, status, description)
-                VALUES (?, ?, ?, ?, 3, 3, 3, 9, 'M3', 'Cao', current_date - 2, 'CONFIRMED', 'Lỗi quá hạn')""", ins, item, store, crit);
+                VALUES (?, ?, ?, ?, 3, 3, 3, 999, 'M3', 'Cao', current_date - 2, 'CONFIRMED', 'Lỗi quá hạn')""", ins, item, store, crit);
 
         JsonNode after = dashboard();
         JsonNode k0 = before.get("kpis"), k1 = after.get("kpis");
@@ -56,7 +56,7 @@ class DashboardApiTests extends ApiTestSupport {
         for (JsonNode r : after.get("topRestaurants")) {
             if (r.get("id").asLong() == store) {
                 listed = true;
-                assertThat(r.get("riskScore").asLong()).isEqualTo(9);
+                assertThat(r.get("riskScore").asLong()).isEqualTo(999);
             }
         }
         assertThat(listed).isTrue();
