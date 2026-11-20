@@ -96,40 +96,45 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18) !important;
 }
 
-/* Nút chính (Thêm mới...) đặt trên nền ảnh bìa: kính mờ trong suốt thích ứng với mọi ảnh nền, viền trắng sáng, chữ rõ nét */
+/* Nút chính (Thêm mới...) trên nền ảnh bìa: Kính mờ trắng sang trọng chuẩn Apple, chữ đen tuyền siêu nét */
 .app-shell--themed :is(.page-actions, .advanced-filter) .ant-btn-primary:not(:disabled) {
-  background: rgba(15, 23, 42, 0.34) !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.78) !important;
-  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  border: 1px solid rgba(255, 255, 255, 0.98) !important;
+  color: #0f172a !important;
   font-weight: 600 !important;
-  backdrop-filter: blur(18px) saturate(160%) !important;
-  -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
-  transition: all 0.18s ease !important;
+  letter-spacing: -0.01em !important;
+  backdrop-filter: blur(16px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  text-shadow: none !important;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .app-shell--themed :is(.page-actions, .advanced-filter) .ant-btn-primary:not(:disabled) .anticon {
-  color: #ffffff !important;
+  color: #0f172a !important;
 }
 
 .app-shell--themed :is(.page-actions, .advanced-filter) .ant-btn-primary:not(:disabled):hover {
-  background: rgba(15, 23, 42, 0.48) !important;
+  background: #ffffff !important;
   border-color: #ffffff !important;
-  color: #ffffff !important;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+  color: #0f172a !important;
   transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+}
+
+.app-shell--themed :is(.page-actions, .advanced-filter) .ant-btn-primary:not(:disabled):hover .anticon {
+  color: #0f172a !important;
 }
 
 .app-shell--themed :is(.page-actions, .advanced-filter) .ant-btn-primary:not(:disabled):active {
-  background: rgba(15, 23, 42, 0.56) !important;
+  background: rgba(241, 245, 249, 0.95) !important;
   transform: translateY(0);
 }
 
 /* Nút phụ trên vùng header (VD: Gợi ý đột xuất): line trắng rõ nét, kính trong nhẹ nhàng */
-.app-shell--themed .page-header .page-actions .ant-btn:not(.ant-btn-primary):not(.btn-tint-excel):not(.btn-tint-import):not(.btn-tint-template):not(:disabled) {
+.app-shell--themed .page-header .page-actions .ant-btn:not(.ant-btn-primary):not(.btn-tint-excel):not(.btn-tint-import):not(.btn-tint-template):not(.btn-tint-amber):not(.btn-tint-surprise):not(:disabled) {
   border: 1px solid rgba(255, 255, 255, 0.72) !important;
-  background: rgba(15, 23, 42, 0.25) !important;
+  background: rgba(15, 23, 42, 0.35) !important;
   color: #ffffff !important;
   font-weight: 500 !important;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
@@ -139,17 +144,17 @@
   transition: all 0.15s ease !important;
 }
 
-.app-shell--themed .page-header .page-actions .ant-btn:not(.ant-btn-primary):not(.btn-tint-excel):not(.btn-tint-import):not(.btn-tint-template):not(:disabled) .anticon {
+.app-shell--themed .page-header .page-actions .ant-btn:not(.ant-btn-primary):not(.btn-tint-excel):not(.btn-tint-import):not(.btn-tint-template):not(.btn-tint-amber):not(.btn-tint-surprise):not(:disabled) :is(.anticon, .ant-badge, span) {
   color: #ffffff !important;
 }
 
-.app-shell--themed .page-header .page-actions .ant-btn:not(.ant-btn-primary):not(.btn-tint-excel):not(.btn-tint-import):not(.btn-tint-template):not(:disabled):hover {
-  background: rgba(15, 23, 42, 0.38) !important;
+.app-shell--themed .page-header .page-actions .ant-btn:not(.ant-btn-primary):not(.btn-tint-excel):not(.btn-tint-import):not(.btn-tint-template):not(.btn-tint-amber):not(.btn-tint-surprise):not(:disabled):hover {
+  background: rgba(15, 23, 42, 0.5) !important;
   border-color: #ffffff !important;
   color: #ffffff !important;
 }
 
-.app-shell--themed .page-header .page-actions .ant-btn:not(.ant-btn-primary):not(.btn-tint-excel):not(.btn-tint-import):not(.btn-tint-template):not(:disabled):hover .anticon {
+.app-shell--themed .page-header .page-actions .ant-btn:not(.ant-btn-primary):not(.btn-tint-excel):not(.btn-tint-import):not(.btn-tint-template):not(.btn-tint-amber):not(.btn-tint-surprise):not(:disabled):hover :is(.anticon, .ant-badge, span) {
   color: #ffffff !important;
 }
 
@@ -162,7 +167,7 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 8px 24px -10px rgba(0, 0, 0, 0.35) !important;
 }
 
-/* Ô nhập liệu & Placeholder: Tương phản cao đạt chuẩn WCAG AAA, phân tách sắc nét */
+/* Ô nhập liệu & Placeholder: chữ gợi ý nhạt, nét thường để ô nhập gọn, không tranh chỗ với dữ liệu thật */
 input::placeholder,
 textarea::placeholder,
 .ant-input::placeholder,
@@ -171,13 +176,19 @@ textarea::placeholder,
 .app-shell--themed input::placeholder,
 .app-shell--themed textarea::placeholder,
 .app-shell--themed .ant-select-selection-placeholder {
-  color: #475569 !important;
+  color: #94a3b8 !important;
   opacity: 1 !important;
-  font-weight: 500 !important;
+  font-weight: 400 !important;
+}
+
+/* Chữ giá trị trong ô nhập: nét thường, đen dịu */
+:is(.ant-input, .ant-input-number-input, .ant-picker-input > input, .ant-select-selection-item) {
+  color: #1e293b;
+  font-weight: 400;
 }
 
 .app-shell--themed .ant-input-prefix {
-  color: #64748b !important;
+  color: #94a3b8 !important;
   margin-right: 8px !important;
 }
 
@@ -202,8 +213,8 @@ textarea::placeholder,
 .app-shell--themed .glass-panel :is(.ant-input:not(.ant-input-affix-wrapper input):focus, .ant-input-affix-wrapper-focused, .ant-select-focused .ant-select-selector, .ant-picker-focused),
 .ant-input-affix-wrapper-focused {
   background: #ffffff !important;
-  border-color: #2563eb !important;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.16) !important;
+  border-color: var(--app-focus-border) !important;
+  box-shadow: 0 0 0 3px var(--app-focus-ring) !important;
 }
 
 .app-shell--themed .app-stat-chip {

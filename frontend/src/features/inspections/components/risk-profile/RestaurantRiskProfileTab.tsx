@@ -112,7 +112,7 @@ export function RestaurantRiskProfileTab({ initialRestaurantId }: RestaurantRisk
               data
                 ? `${data.customEscalation ? 'Ngưỡng riêng' : 'Quy tắc chung'}${
                     data.escalationThreshold != null ? ` · nâng mức từ ${data.escalationThreshold} lần` : ''
-                  }`
+                  }${data.stepIncrease != null ? ` · +${data.stepIncrease} bậc` : ''}`
                 : 'Liên tục không phát sinh lỗi'
             }
           />

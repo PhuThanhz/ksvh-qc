@@ -32,7 +32,4 @@ public class CriterionGroup extends BaseEntity {
 
     @Column(name = "company_id")
     private Long companyId;
-
-    @Column(name = "updated_by")
-    private Long updatedBy;
 }

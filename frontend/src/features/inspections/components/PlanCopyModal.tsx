@@ -1,5 +1,4 @@
 import { Alert, Form, Modal, Select } from 'antd'
-import dayjs from 'dayjs'
 import { useState } from 'react'
 import { plansApi } from '@/features/inspections/api/inspection.api'
 import { usePlans } from '@/features/inspections/hooks/useInspectionData'
@@ -9,12 +8,11 @@ import { useNotify } from '@/hooks/useNotify'
 interface Props {
   open: boolean
   currentPlanId?: number
-  defaultDate?: string
   onClose: () => void
   onCopy: (assignments: PlanAssignmentRequest[]) => void
 }
 
-export function PlanCopyModal({ open, currentPlanId, defaultDate, onClose, onCopy }: Props) {
+export function PlanCopyModal({ open, currentPlanId, onClose, onCopy }: Props) {
   const [selectedPlanId, setSelectedPlanId] = useState<number | undefined>()
   const [loading, setLoading] = useState(false)
   const notify = useNotify()
@@ -35,7 +33,8 @@ export function PlanCopyModal({ open, currentPlanId, defaultDate, onClose, onCop
         restaurantId: a.restaurantId,
         inspectorId: a.inspectorId,
         templateId: a.templateId,
-        scheduledDate: defaultDate || dayjs().format('YYYY-MM-DD'),
+        topicGroupIds: a.topicGroupIds,
+        criterionIds: a.criterionIds,
       }))
       onCopy(mapped)
       notify.success(`Đã sao chép ${mapped.length} phân công từ kế hoạch đã chọn`)

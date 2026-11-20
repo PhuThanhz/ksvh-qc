@@ -464,9 +464,7 @@ export function RoleFormModal({ open, role, onClose }: RoleFormModalProps) {
                           <Typography.Text strong style={{ fontSize: 14, color: '#0f172a' }}>
                             {moduleLabel(module)}
                           </Typography.Text>
-                          <Tag style={{ margin: 0, fontSize: 11, fontFamily: 'monospace' }}>
-                            {module.toUpperCase()}
-                          </Tag>
+                          <span className="code-tag--blue">{module.toUpperCase()}</span>
                           <Tag color="blue" style={{ margin: 0, borderRadius: 999 }}>
                             {items.length} quyền
                           </Tag>

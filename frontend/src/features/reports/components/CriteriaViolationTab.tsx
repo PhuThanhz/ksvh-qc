@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react'
 import { EChart } from '@/components/charts/EChart'
 import { TableCard } from '@/components/data-display/TableCard'
 import { useNotify } from '@/components/feedback/useNotify'
+import { CriteriaCharts } from '@/features/reports/components/ReportCharts'
 import { ReportFilterBar } from '@/features/reports/components/ReportFilterBar'
 import { useCriteriaViolations } from '@/features/reports/hooks/useReports'
 import { reportApi } from '@/features/reports/api/report.api'
@@ -132,25 +133,31 @@ export function CriteriaViolationTab() {
 
   return (
     <Flex vertical gap={16}>
-      <Flex justify="space-between" align="center" wrap="wrap" gap={12}>
-        <ReportFilterBar filter={filter} onChange={setFilter} showGroup />
-        <ProtectedAction access={{ anyOf: [PERMISSIONS.REPORT.EXPORT, PERMISSIONS.REPORT.READ] }}>
-          <Button
-            className="btn-tint-excel"
-            icon={<FileExcelOutlined />}
-            loading={exporting}
-            onClick={handleExport}
-          >
-            Xuất Excel
-          </Button>
-        </ProtectedAction>
-      </Flex>
+      <ReportFilterBar
+        filter={filter}
+        onChange={setFilter}
+        showGroup
+        extra={
+          <ProtectedAction access={{ anyOf: [PERMISSIONS.REPORT.EXPORT, PERMISSIONS.REPORT.READ] }}>
+            <Button
+              className="btn-tint-excel"
+              icon={<FileExcelOutlined />}
+              loading={exporting}
+              onClick={handleExport}
+            >
+              Xuất Excel
+            </Button>
+          </ProtectedAction>
+        }
+      />
 
       {items.length > 0 && (
         <Card size="small" title="Biểu đồ Pareto lỗi vi phạm (Top 10 tiêu chí phát hiện nhiều nhất)">
           <EChart option={chartOption} height={290} ariaLabel="Biểu đồ Pareto tiêu chí vi phạm" />
         </Card>
       )}
+
+      <CriteriaCharts items={items} loading={isLoading} />
 
       <TableCard>
         <Flex justify="space-between" align="center" style={{ borderBottom: '1px solid #eef2f6' }}>

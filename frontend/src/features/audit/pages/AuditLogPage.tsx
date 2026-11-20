@@ -56,14 +56,18 @@ export function AuditLogPage() {
     {
       title: 'Người thực hiện',
       width: 170,
-      render: (_, r) => (
-        <div>
-          <div style={{ fontWeight: 600 }}>{r.userFullName || r.username || 'Hệ thống'}</div>
-          {r.userFullName && r.username && (
-            <div style={{ fontSize: 12, color: 'var(--app-text-secondary)' }}>{r.username}</div>
-          )}
-        </div>
-      ),
+      render: (_, r) => {
+        const isUserPlaceholder = r.username?.startsWith('user#')
+        const displayName = r.userFullName || (isUserPlaceholder ? 'Quản trị viên' : (r.username || 'Hệ thống'))
+        return (
+          <div>
+            <div style={{ fontWeight: 600 }}>{displayName}</div>
+            {r.username && !isUserPlaceholder && (
+              <div style={{ fontSize: 12, color: 'var(--app-text-secondary)' }}>{r.username}</div>
+            )}
+          </div>
+        )
+      },
     },
     {
       title: 'Hành động',

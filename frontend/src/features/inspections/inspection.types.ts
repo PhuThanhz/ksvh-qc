@@ -94,8 +94,12 @@ export type InspectionResponse = Omit<
   items?: InspectionItemResponse[]
 }
 
-export type InspectionCreateRequest = Schemas['InspectionCreateRequest']
-export type InspectionBatchCreateRequest = Schemas['InspectionBatchCreateRequest']
+export type InspectionCreateRequest = Schemas['InspectionCreateRequest'] & {
+  criterionIds?: number[]
+}
+export type InspectionBatchCreateRequest = Schemas['InspectionBatchCreateRequest'] & {
+  criterionIds?: number[]
+}
 export type InspectionCheckinRequest = Partial<Schemas['InspectionCheckinRequest']>
 export type InspectionSubmitItemRequest = Schemas['InspectionSubmitItemRequest']
 export type InspectionSubmitRequest = Schemas['InspectionSubmitRequest']
@@ -103,5 +107,6 @@ export type InspectionCancelRequest = Schemas['InspectionCancelRequest']
 export type CandidateFindingResponse = Schemas['CandidateFindingResponse']
 export type SurpriseInspectionSuggestion = Schemas['SurpriseInspectionSuggestion']
 export type PriorFindingsWarning = Schemas['PriorFindingsWarning']
+export type InspectorScheduleItem = Schemas['InspectorScheduleItem']
 
 export type InspectionPageResponse = PageResponse<InspectionResponse>

@@ -41,6 +41,16 @@ public record InspectionBatchCreateRequest(
         List<Long> topicGroupIds,
 
         @Size(max = 1000, message = "Ghi chú tối đa 1000 ký tự")
-        String notes
+        String notes,
+
+        /** Danh sách ID tiêu chí kiểm soát cụ thể cho kiểm tra đột xuất (trống = lấy toàn bộ tiêu chí trong topicGroupIds). */
+        @Size(max = 500, message = "Tối đa 500 tiêu chí")
+        List<Long> criterionIds
 ) {
+    public InspectionBatchCreateRequest(
+            String codePrefix, Long planId, List<Long> restaurantIds, Long templateId,
+            Long inspectorId, InspectionKind inspectionType, InspectionMode inspectionMode,
+            List<Long> topicGroupIds, String notes) {
+        this(codePrefix, planId, restaurantIds, templateId, inspectorId, inspectionType, inspectionMode, topicGroupIds, notes, List.of());
+    }
 }

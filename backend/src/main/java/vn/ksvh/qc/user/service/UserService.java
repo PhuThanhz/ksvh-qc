@@ -43,7 +43,7 @@ public class UserService {
     private final ApplicationEventPublisher events;
 
     /** Trường được phép sắp xếp ở danh sách người dùng. */
-    public static final Set<String> SORTABLE = Set.of("username", "fullName", "createdAt");
+    public static final Set<String> SORTABLE = Set.of("username", "fullName", "createdAt", "lastLoginAt");
 
     public PageResponse<UserResponse> search(String keyword, String role, Boolean active, Pageable pageable) {
         Pageable safe = Pageables.restrictSort(pageable, SORTABLE);

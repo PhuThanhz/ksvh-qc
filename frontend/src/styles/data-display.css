@@ -107,7 +107,9 @@
 /* 3 nút Excel góc trên: Viền trắng rõ nét (line trắng), ruột kính trong có màu nhẹ, chữ & icon đậm sắc nét */
 .btn-tint-excel,
 .btn-tint-import,
-.btn-tint-template {
+.btn-tint-template,
+.btn-tint-amber,
+.btn-tint-surprise {
   border: 1.5px solid rgba(255, 255, 255, 0.92) !important;
   backdrop-filter: blur(14px) saturate(150%) !important;
   -webkit-backdrop-filter: blur(14px) saturate(150%) !important;
@@ -150,6 +152,26 @@
   color: #78350f !important;
 }
 
+.btn-tint-amber,
+.btn-tint-surprise {
+  color: #92400e !important;
+  background: rgba(255, 251, 235, 0.82) !important;
+}
+.btn-tint-amber .anticon,
+.btn-tint-surprise .anticon { color: #d97706 !important; }
+.btn-tint-amber .ant-badge,
+.btn-tint-surprise .ant-badge { color: #92400e !important; }
+.btn-tint-amber:hover:not(:disabled),
+.btn-tint-surprise:hover:not(:disabled) {
+  background: rgba(254, 243, 199, 0.95) !important;
+  border-color: #ffffff !important;
+  color: #78350f !important;
+}
+.btn-tint-amber:hover:not(:disabled) .ant-badge,
+.btn-tint-surprise:hover:not(:disabled) .ant-badge {
+  color: #78350f !important;
+}
+
 /* Khung TableCard */
 .table-card .ant-table { border-radius: 0 !important; background: transparent !important; }
 .table-card .ant-table-container { border-radius: 0 !important; }
@@ -158,55 +180,62 @@
 .table-card .ant-pagination { margin: 12px 16px !important; }
 .table-card > :not(.ant-table-wrapper):not(.ant-spin-nested-loading) { padding: 12px 16px; }
 
-/* Nhãn trạng thái */
+/* ==========================================================================
+   TAG CHUẨN CHUNG TOÀN HỆ THỐNG
+   Mọi tag (trạng thái, loại đơn vị, mã, mức rủi ro, tag antd) dùng MỘT hình dạng:
+   chữ nhật bo 6px, cao 22px, chữ 12px đậm vừa, nền nhạt + viền mảnh cùng tông. Chỉ khác màu.
+   ========================================================================== */
+.ant-tag,
 .status-tag,
-.ant-tag:is(.ant-tag-success, .ant-tag-processing, .ant-tag-warning, .ant-tag-error) {
-  display: inline-flex !important; align-items: center;
-  padding: 1px 10px !important; border-radius: 999px !important; border: none !important;
-  font-size: 12px !important; font-weight: 500 !important; line-height: 20px !important; letter-spacing: 0.01em;
-  margin-inline-end: 0 !important;
+.unit-tag,
+.code-tag--blue,
+.risk-tag,
+.plan-team__code,
+.plan-team__load {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 4px;
+  height: 22px !important;
+  padding: 0 8px !important;
+  border-radius: 6px !important;
+  border: 1px solid #e2e8f0;
+  box-shadow: none !important;
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 20px !important;
+  letter-spacing: normal !important;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap !important;
+  vertical-align: middle;
+  margin-inline: 0 !important;
 }
-.status-tag--success, .ant-tag.ant-tag-success { background: #f0fdf4 !important; color: #15803d !important; box-shadow: inset 0 0 0 1px rgba(22, 163, 74, 0.22) !important; }
-.status-tag--processing, .ant-tag.ant-tag-processing { background: #eff6ff !important; color: #1d4ed8 !important; box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.2) !important; }
-.status-tag--warning, .ant-tag.ant-tag-warning { background: #fffbeb !important; color: #b45309 !important; box-shadow: inset 0 0 0 1px rgba(217, 119, 6, 0.24) !important; }
-.status-tag--error, .ant-tag.ant-tag-error { background: #fef2f2 !important; color: #b91c1c !important; box-shadow: inset 0 0 0 1px rgba(220, 38, 38, 0.2) !important; }
-.status-tag--default { background: #f8fafc !important; color: #475569 !important; box-shadow: inset 0 0 0 1px rgba(100, 116, 139, 0.22) !important; }
 
-/* Nhãn phân loại đơn vị */
-.unit-tag {
-  display: inline-flex !important; align-items: center;
-  padding: 1px 10px !important; border-radius: 999px !important; border: none !important;
-  font-size: 12px !important; font-weight: 500 !important; line-height: 20px !important; letter-spacing: 0.01em;
-  margin-inline-end: 0 !important;
-  transition: all 0.15s ease;
-}
-.unit-tag--restaurant { background: #fff7ed !important; color: #c2410c !important; box-shadow: inset 0 0 0 1px rgba(234, 88, 12, 0.22) !important; }
+/* Màu trạng thái */
+.status-tag--success, .ant-tag.ant-tag-success { background: #f0fdf4 !important; color: #15803d !important; border-color: #bbf7d0 !important; }
+.status-tag--processing, .ant-tag.ant-tag-processing { background: #eff6ff !important; color: #1d4ed8 !important; border-color: #dbeafe !important; }
+.status-tag--warning, .ant-tag.ant-tag-warning { background: #fffbeb !important; color: #b45309 !important; border-color: #fde68a !important; }
+.status-tag--error, .ant-tag.ant-tag-error { background: #fef2f2 !important; color: #b91c1c !important; border-color: #fecaca !important; }
+.status-tag--default { background: #f8fafc !important; color: #475569 !important; border-color: #e2e8f0 !important; }
+
+/* Màu loại đơn vị */
+.unit-tag { transition: background 0.15s ease; }
+.unit-tag--restaurant { background: #fff7ed !important; color: #c2410c !important; border-color: #fed7aa !important; }
 .unit-tag--restaurant:hover { background: #ffedd5 !important; }
-.unit-tag--department { background: #f5f3ff !important; color: #6d28d9 !important; box-shadow: inset 0 0 0 1px rgba(124, 58, 237, 0.22) !important; }
+.unit-tag--department { background: #f5f3ff !important; color: #6d28d9 !important; border-color: #ddd6fe !important; }
 .unit-tag--department:hover { background: #ede9fe !important; }
 
-/* Tag mã hệ thống */
-.code-tag--blue, .ant-tag.code-tag--blue {
-  display: inline-flex !important; align-items: center; justify-content: center;
-  padding: 0 6px !important; height: 20px !important; line-height: 18px !important;
-  border-radius: 4px !important; font-size: 11.5px !important; font-weight: 600 !important;
-  font-variant-numeric: tabular-nums; background: #f0f7ff !important; color: #1677ff !important;
-  border: 1px solid #91caff !important; margin-inline: 0 !important; white-space: nowrap !important;
-}
+/* Màu mã hệ thống (mã đơn vị, mã biên bản, MSNV…) */
+.code-tag--blue, .ant-tag.code-tag--blue, .plan-team__code { background: #eff6ff !important; color: #1d4ed8 !important; border-color: #dbeafe !important; }
 
-/* Tag mức độ rủi ro M1-M5 */
-.risk-tag {
-  display: inline-flex !important; align-items: center; justify-content: center;
-  padding: 0 6px !important; height: 20px !important; line-height: 18px !important;
-  border-radius: 4px !important; font-size: 11.5px !important; font-weight: 700 !important;
-  font-variant-numeric: tabular-nums; white-space: nowrap !important; vertical-align: middle;
-}
-.risk-tag--m1 { background: #f6ffed !important; border: 1px solid #b7eb8f !important; color: #389e0d !important; }
-.risk-tag--m2 { background: #f0f7ff !important; border: 1px solid #91caff !important; color: #0958d9 !important; }
-.risk-tag--m3 { background: #fff7e6 !important; border: 1px solid #ffd591 !important; color: #d46b08 !important; }
-.risk-tag--m4 { background: #fff1f0 !important; border: 1px solid #ffa39e !important; color: #cf1322 !important; }
-.risk-tag--m5 { background: #fff0f6 !important; border: 1px solid #ffadd2 !important; color: #c41d7f !important; }
-.risk-tag--default { background: #f8fafc !important; border: 1px solid #cbd5e1 !important; color: #475569 !important; }
+/* Màu mức độ rủi ro M1–M5 */
+.risk-tag { justify-content: center; }
+.risk-tag--m1 { background: #f0fdf4 !important; border-color: #bbf7d0 !important; color: #15803d !important; }
+.risk-tag--m2 { background: #eff6ff !important; border-color: #dbeafe !important; color: #1d4ed8 !important; }
+.risk-tag--m3 { background: #fff7ed !important; border-color: #fed7aa !important; color: #c2410c !important; }
+.risk-tag--m4 { background: #fef2f2 !important; border-color: #fecaca !important; color: #b91c1c !important; }
+.risk-tag--m5 { background: #fdf2f8 !important; border-color: #fbcfe8 !important; color: #be185d !important; }
+.risk-tag--default { background: #f8fafc !important; border-color: #e2e8f0 !important; color: #475569 !important; }
 
 /* Search bar & links */
 .search-input--transparent.ant-input-affix-wrapper {
@@ -217,7 +246,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important; width: 100% !important;
 }
 .search-input--transparent input.ant-input { background: transparent !important; color: #0f172a !important; font-size: 14px !important; }
-.search-input--transparent input.ant-input::placeholder { color: #475569 !important; font-weight: 500 !important; }
+.search-input--transparent input.ant-input::placeholder { color: #94a3b8 !important; font-weight: 400 !important; }
 .search-input--transparent .ant-input-prefix { margin-inline-end: 10px !important; color: #475569 !important; font-size: 15px !important; }
 
 .cell-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -233,3 +262,15 @@
 .ant-table-wrapper a:not(.ant-btn):not(.cell-force-color):hover,
 .ant-table-wrapper .ant-typography a:hover,
 .ant-table-wrapper a.ant-typography:hover { color: #2563eb !important; }
+
+/* Ô lọc báo cáo: tên dài (công ty, nhà hàng, nhóm tiêu chí) xuống dòng thay vì bị cắt "..." */
+.report-filter__option { display: block; white-space: normal; line-height: 1.4; padding: 2px 0; }
+
+/* Ô "Ngưỡng nâng mức" (bảng nhà hàng): tag Ngưỡng riêng + từng thông số, khác quy tắc chung tô cam */
+.esc-cell { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.esc-cell__items { display: flex; flex-direction: column; gap: 1px; font-size: 12px; color: #94a3b8; line-height: 1.45; }
+.esc-cell__item b { font-weight: 600; color: #64748b; }
+.esc-cell__item.is-custom { color: #c2410c; }
+.esc-cell__item.is-custom b { color: #c2410c; }
+.esc-cell__item em { font-style: normal; color: #94a3b8; }
+.row--custom-escalation > td:first-child { box-shadow: inset 3px 0 0 #f97316; }

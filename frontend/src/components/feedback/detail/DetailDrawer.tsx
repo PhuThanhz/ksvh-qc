@@ -36,6 +36,14 @@ export interface DetailDrawerProps {
   audit?: DetailAudit
   /** Co chiều cao theo nội dung (trang ít thông tin) thay vì phủ gần hết màn hình. */
   fit?: boolean
+  /** Ghi chú ở chân bên trái, thay cho dòng người tạo / cập nhật (vd drawer nhập liệu). */
+  footerNote?: ReactNode
+  /** Chữ của nút đóng ở chân (mặc định "Đóng"; drawer nhập liệu dùng "Huỷ"). */
+  closeText?: string
+  /** false = bấm ra ngoài không đóng (tránh mất dữ liệu đang nhập). Mặc định true. */
+  maskClosable?: boolean
+  /** Gọi sau khi drawer đóng xong (hết hiệu ứng), vd để làm mới form. */
+  afterClose?: () => void
 }
 
 const fmt = (by?: string | null, at?: string | null) => (by ? `${by}${at ? ` (${at})` : ''}` : (at ?? '—'))
@@ -46,7 +54,7 @@ const fmt = (by?: string | null, at?: string | null) => (by ? `${by}${at ? ` (${
  * khối hero màu thương hiệu, tab nội dung, chân có người tạo / cập nhật và nút thao tác.
  */
 export function DetailDrawer(props: DetailDrawerProps) {
-  const { open, onClose, icon, title, subtitle, hero, stats, tabs, children, actions, audit } = props
+  const { open, onClose, icon, title, subtitle, hero, stats, tabs, children, actions, audit, footerNote, afterClose } = props
   const hasAudit = audit && (audit.createdAt || audit.updatedAt || audit.createdBy || audit.updatedBy)
   return (
     <Drawer
@@ -55,10 +63,23 @@ export function DetailDrawer(props: DetailDrawerProps) {
       placement="bottom"
       size={props.fit ? 'auto' : 'calc(100vh - 24px)'}
       closable={false}
+      mask={{ closable: props.maskClosable ?? true }}
+      afterOpenChange={(visible) => {
+        if (!visible) afterClose?.()
+      }}
       destroyOnHidden
       rootClassName={props.fit ? 'detail-drawer detail-drawer--fit' : 'detail-drawer'}
       title={
         <Flex align="center" gap={12}>
+          {/* Nút đóng đứng đầu bên trái tiêu đề – thống nhất mọi drawer */}
+          <Button
+            type="text"
+            shape="circle"
+            className="detail-drawer__close-btn"
+            icon={<CloseOutlined style={{ fontSize: 13, color: '#64748b' }} />}
+            onClick={onClose}
+            aria-label="Đóng"
+          />
           {icon && <span className="detail-drawer__icon">{icon}</span>}
           <div style={{ minWidth: 0 }}>
             <Typography.Title level={5} className="detail-drawer__title">{title}</Typography.Title>
@@ -66,18 +87,11 @@ export function DetailDrawer(props: DetailDrawerProps) {
           </div>
         </Flex>
       }
-      drawerRender={(node) => (
-        <>
-          <button type="button" className="detail-drawer__close" aria-label="Đóng" onClick={onClose}>
-            <CloseOutlined />
-          </button>
-          {node}
-        </>
-      )}
       footer={
         <Flex justify="space-between" align="center" gap={12} wrap>
           <span className="detail-drawer__audit">
-            {hasAudit && (
+            {footerNote}
+            {!footerNote && hasAudit && (
               <>
                 {(audit.createdBy || audit.createdAt) && <span>{audit.createdBy ? 'Tạo bởi' : 'Ngày tạo'}: {fmt(audit.createdBy, audit.createdAt)}</span>}
                 {(audit.createdBy || audit.createdAt) && (audit.updatedBy || audit.updatedAt) && (
@@ -91,7 +105,7 @@ export function DetailDrawer(props: DetailDrawerProps) {
           </span>
           <Flex gap={8}>
             {actions}
-            <Button onClick={onClose}>Đóng</Button>
+            <Button onClick={onClose}>{props.closeText ?? 'Đóng'}</Button>
           </Flex>
         </Flex>
       }

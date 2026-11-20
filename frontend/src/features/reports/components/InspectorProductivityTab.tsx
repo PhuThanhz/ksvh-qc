@@ -4,6 +4,7 @@ import type { ColumnsType } from 'antd/es/table'
 import { useState } from 'react'
 import { TableCard } from '@/components/data-display/TableCard'
 import { useNotify } from '@/components/feedback/useNotify'
+import { InspectorCharts } from '@/features/reports/components/ReportCharts'
 import { ReportFilterBar } from '@/features/reports/components/ReportFilterBar'
 import { useInspectorProductivity } from '@/features/reports/hooks/useReports'
 import { reportApi } from '@/features/reports/api/report.api'
@@ -88,19 +89,25 @@ export function InspectorProductivityTab() {
 
   return (
     <Flex vertical gap={16}>
-      <Flex justify="space-between" align="center" wrap="wrap" gap={12}>
-        <ReportFilterBar filter={filter} onChange={setFilter} showRestaurant={false} />
-        <ProtectedAction access={{ anyOf: [PERMISSIONS.REPORT.EXPORT, PERMISSIONS.REPORT.READ] }}>
-          <Button
-            className="btn-tint-excel"
-            icon={<FileExcelOutlined />}
-            loading={exporting}
-            onClick={handleExport}
-          >
-            Xuất Excel
-          </Button>
-        </ProtectedAction>
-      </Flex>
+      <ReportFilterBar
+        filter={filter}
+        onChange={setFilter}
+        showRestaurant={false}
+        extra={
+          <ProtectedAction access={{ anyOf: [PERMISSIONS.REPORT.EXPORT, PERMISSIONS.REPORT.READ] }}>
+            <Button
+              className="btn-tint-excel"
+              icon={<FileExcelOutlined />}
+              loading={exporting}
+              onClick={handleExport}
+            >
+              Xuất Excel
+            </Button>
+          </ProtectedAction>
+        }
+      />
+
+      <InspectorCharts items={items} loading={isLoading} />
 
       <TableCard>
         <Flex justify="space-between" align="center" style={{ borderBottom: '1px solid #eef2f6' }}>

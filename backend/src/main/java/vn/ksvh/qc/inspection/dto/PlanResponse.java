@@ -10,6 +10,7 @@ import java.time.LocalDate;
 public record PlanResponse(
         Long id,
         String planCode,
+        vn.ksvh.qc.inspection.domain.InspectionKind inspectionKind,
         String title,
         LocalDate startDate,
         LocalDate endDate,
@@ -32,6 +33,7 @@ public record PlanResponse(
         return new PlanResponse(
                 p.getId(),
                 p.getPlanCode(),
+                p.getInspectionKind(),
                 p.getTitle(),
                 p.getStartDate(),
                 p.getEndDate(),

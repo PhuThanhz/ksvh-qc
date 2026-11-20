@@ -113,7 +113,7 @@ export function InspectionListPage() {
             Xuất CSV
           </Button>
           <ProtectedAction access={canCreateRule}>
-            <Button icon={<ThunderboltOutlined />} onClick={() => setSurpriseModal(true)}>
+            <Button className="btn-tint-surprise" icon={<ThunderboltOutlined />} onClick={() => setSurpriseModal(true)}>
               <Badge count={suggestions.data?.length ?? 0} offset={[8, -2]} size="small">
                 Gợi ý đột xuất
               </Badge>

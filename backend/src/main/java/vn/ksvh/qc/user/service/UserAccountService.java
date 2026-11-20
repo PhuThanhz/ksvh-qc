@@ -54,6 +54,14 @@ class UserAccountService implements UserAccountApi {
                 .toList();
     }
 
+    @Override
+    @Transactional
+    public void recordLogin(Long userId, java.time.Instant loginAt) {
+        if (userId != null) {
+            userRepository.findById(userId).ifPresent(u -> u.setLastLoginAt(loginAt));
+        }
+    }
+
     private static UserAccount toAccount(User u) {
         return new UserAccount(u.getId(), u.getUsername(), u.getFullName(), u.getPasswordHash(), u.isActive(),
                 u.roleCodes(), u.permissionCodes());

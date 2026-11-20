@@ -26,6 +26,11 @@ export function OperationsSection({ period }: { period: DashboardPeriod }) {
   const d = dash.data
   const k = d?.kpis
   const loading = dash.isLoading
+  // Lỗi đã đóng / đã bỏ thường rất nhiều, vẽ chung sẽ che các bước đang xử lý → chỉ vẽ bước đang xử lý, ghi số đã xong ở dòng phụ
+  const DONE = new Set(['CLOSED', 'DISMISSED'])
+  const statuses = d?.findingsByStatus ?? []
+  const inProgress = statuses.filter((s) => !DONE.has(s.key))
+  const doneSummary = statuses.filter((s) => DONE.has(s.key)).map((s) => `${s.label.toLowerCase()} ${s.count}`).join(' · ') || 'chưa có lỗi đóng'
 
   return (
     <>
@@ -87,6 +92,7 @@ export function OperationsSection({ period }: { period: DashboardPeriod }) {
             periodLabel={label}
             loading={loading}
             onSelectRestaurant={(r) => navigate(`${ROUTES.admin.inspections}?restaurantId=${r.id}`)}
+            onViewAll={() => navigate(ROUTES.admin.reports)}
           />
         </Col>
         <Col xs={24} xl={8}>
@@ -129,12 +135,12 @@ export function OperationsSection({ period }: { period: DashboardPeriod }) {
         </Col>
         <Col xs={24} lg={12}>
           <HorizontalBarChart
-            title="Tình trạng xử lý lỗi"
-            subtitle={`Lỗi phát sinh trong ${label}, theo bước xử lý`}
+            title="Lỗi đang trong quy trình xử lý"
+            subtitle={`Lỗi phát sinh trong ${label}, theo bước · ${doneSummary}`}
             valueName="Số lỗi"
             loading={loading}
-            emptyText="Chưa có lỗi nào trong kỳ"
-            rows={(d?.findingsByStatus ?? []).map((s) => ({ label: s.label, value: s.count }))}
+            emptyText="Không còn lỗi nào đang xử lý"
+            rows={inProgress.map((s) => ({ label: s.label, value: s.count }))}
           />
         </Col>
       </Row>

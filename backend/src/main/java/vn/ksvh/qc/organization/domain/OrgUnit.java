@@ -60,6 +60,10 @@ public class OrgUnit extends BaseEntity {
     @Column(name = "escalation_reset_months")
     private Short escalationResetMonths;
 
+    /** Số bậc nâng mức ảnh hưởng riêng khi chạm ngưỡng (1–4); null = theo quy tắc chung. */
+    @Column(name = "escalation_step")
+    private Short escalationStep;
+
     @Column(nullable = false)
     private boolean active = true;
 

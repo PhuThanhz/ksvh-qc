@@ -26,7 +26,7 @@ export const inspectionsAdminRoutes: AppRoute[] = [
     path: ROUTES.admin.findings,
     handle: {
       access: { anyOf: [PERMISSIONS.FINDING.RESPOND, PERMISSIONS.FINDING.VERIFY, PERMISSIONS.INSPECTION.READ_ALL] },
-      menu: { label: 'Khắc phục điểm không phù hợp', icon: 'findings', group: 'operations' },
+      menu: { label: 'Khắc phục vi phạm', icon: 'findings', group: 'operations' },
     },
     lazy: () =>
       import('@/features/inspections/pages/admin/FindingListPage').then((m) => ({ Component: m.FindingListPage })),

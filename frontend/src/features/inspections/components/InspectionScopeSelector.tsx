@@ -1,4 +1,5 @@
 import { Form, Select } from 'antd'
+import { SurpriseCriteriaPicker } from './SurpriseCriteriaPicker'
 import { VerificationCandidateSelector } from './VerificationCandidateSelector'
 import type { CriterionGroup, Template } from '@/features/criteria/criteria.types'
 import type { InspectionKind } from '../inspection.types'
@@ -12,6 +13,9 @@ export interface InspectionScopeSelectorProps {
   filteredGroups: CriterionGroup[]
   findingIds?: number[]
   onChangeFindingIds: (ids: number[]) => void
+  topicGroupIds?: number[]
+  criterionIds?: number[]
+  onChangeSurpriseScope?: (criterionIds: number[], topicGroupIds: number[]) => void
 }
 
 export function InspectionScopeSelector({
@@ -22,6 +26,9 @@ export function InspectionScopeSelector({
   filteredGroups,
   findingIds,
   onChangeFindingIds,
+  topicGroupIds,
+  criterionIds,
+  onChangeSurpriseScope,
 }: InspectionScopeSelectorProps) {
   if (kind === 'PERIODIC') {
     return (
@@ -47,17 +54,15 @@ export function InspectionScopeSelector({
   if (kind === 'SURPRISE') {
     return (
       <Form.Item
-        name="topicGroupIds"
-        label="Chuyên đề kiểm tra"
-        rules={[{ required: true, message: 'Chọn ít nhất một chuyên đề' }]}
+        label="Phạm vi kiểm tra đột xuất (Nhóm chuyên đề & Từng tiêu chí nhỏ)"
+        required
+        extra="Bạn có thể tích chọn cả nhóm hoặc tích chọn chi tiết từng tiêu chí nhỏ cần soi đột xuất."
       >
-        <Select
-          mode="multiple"
-          placeholder="Chọn chuyên đề..."
-          options={filteredGroups.map((g) => ({
-            value: g.id,
-            label: `${g.name} (${g.criterionCount} tiêu chí)`,
-          }))}
+        <SurpriseCriteriaPicker
+          groups={filteredGroups}
+          selectedGroupIds={topicGroupIds}
+          selectedCriterionIds={criterionIds}
+          onChange={(cIds, gIds) => onChangeSurpriseScope?.(cIds, gIds)}
         />
       </Form.Item>
     )

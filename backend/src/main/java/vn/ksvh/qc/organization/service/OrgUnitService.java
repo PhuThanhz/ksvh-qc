@@ -115,6 +115,7 @@ public class OrgUnitService {
         if (req.unitType() == OrgUnitType.RESTAURANT) {
             u.setEscalationThreshold(req.escalationThreshold() == null ? null : req.escalationThreshold().shortValue());
             u.setEscalationResetMonths(req.escalationResetMonths() == null ? null : req.escalationResetMonths().shortValue());
+            u.setEscalationStep(req.escalationStep() == null ? null : req.escalationStep().shortValue());
             // Toạ độ chưa bắt buộc; nếu nhập thì phải đủ cả vĩ độ và kinh độ.
             if ((req.latitude() == null) != (req.longitude() == null)) {
                 throw new BusinessException(ErrorCode.ORGANIZATION_GPS_REQUIRED, "Nhập đủ cả vĩ độ và kinh độ, hoặc để trống cả hai");
@@ -126,6 +127,7 @@ public class OrgUnitService {
         } else {
             u.setEscalationThreshold(null);
             u.setEscalationResetMonths(null);
+            u.setEscalationStep(null);
             // Phòng ban không được kiểm tra: không có CHT, OBM, toạ độ.
             u.setStoreManagerUserId(null);
             u.setObmUserId(null);

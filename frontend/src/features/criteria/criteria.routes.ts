@@ -27,7 +27,7 @@ export const criteriaAdminRoutes: AppRoute[] = [
   },
   {
     path: ROUTES.admin.riskRules,
-    handle: { access: READ, menu: { label: 'Quy tắc tái phạm & Nâng mức', icon: 'riskRules', group: 'catalog' } },
+    handle: { access: READ, menu: { label: 'Quy tắc nâng mức', icon: 'riskRules', group: 'catalog' } },
     lazy: () => import('@/features/criteria/pages/RiskRulesPage').then((m) => ({ Component: m.RiskRulesPage })),
   },
 ]

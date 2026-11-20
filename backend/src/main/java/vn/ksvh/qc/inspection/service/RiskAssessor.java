@@ -39,7 +39,8 @@ public class RiskAssessor {
     public static RiskRules rulesFor(OrgUnitRef restaurant, RiskConfigRef config) {
         RiskRules rules = RiskRules.from(config);
         return restaurant == null ? rules
-                : rules.withEscalationOverride(restaurant.escalationThreshold(), restaurant.escalationResetMonths());
+                : rules.withEscalationOverride(restaurant.escalationThreshold(), restaurant.escalationResetMonths(),
+                        restaurant.escalationStep());
     }
 
     /** Lần lỗi đang tính chưa có trong bảng occurrence (gọi trước khi ghi lần +1). */

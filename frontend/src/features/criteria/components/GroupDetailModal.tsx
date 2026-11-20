@@ -1,5 +1,5 @@
 import { AppstoreOutlined, ArrowRightOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
-import { Badge, Button, Descriptions, Empty, Flex, Input, Space, Table, Tag, Typography } from 'antd'
+import { Button, Col, Empty, Flex, Input, Row, Space, Table, Tag, Typography } from 'antd'
 import { DetailDrawer } from '@/components/feedback/detail'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
@@ -68,8 +68,8 @@ export function GroupDetailModal({
       icon={<AppstoreOutlined />}
       title={
         <Flex align="center" gap={10} wrap="wrap">
-          <span>Chi tiết nhóm tiêu chí: {group.name}</span>
-          <Tag style={{ fontFamily: 'monospace', fontWeight: 600 }}>{group.code}</Tag>
+          <span style={{ color: '#0f172a', fontWeight: 700 }}>Chi tiết nhóm tiêu chí: {group.name}</span>
+          <span className="code-tag--blue">{group.code}</span>
           <StatusBadge status={group.active ? 'active' : 'inactive'} meta={ACTIVE_META} />
         </Flex>
       }
@@ -95,75 +95,164 @@ export function GroupDetailModal({
         </Space>
       }
     >
-      <div style={{ marginTop: 12 }}>
-        <Descriptions bordered size="small" column={{ xs: 1, sm: 3 }} style={{ marginBottom: 16 }}>
-          <Descriptions.Item label="Mã nhóm"><span className="code-tag--blue">{group.code}</span></Descriptions.Item>
-          <Descriptions.Item label="Thứ tự">#{group.sortOrder}</Descriptions.Item>
-          <Descriptions.Item label="Số lượng tiêu chí"><Badge count={totalCount} showZero color="var(--app-text-secondary)" /></Descriptions.Item>
-          <Descriptions.Item label="Công ty áp dụng" span={2}>
-            {group.companyName ? <Tag>{group.companyName}</Tag> : <Tag color="default">Dùng chung toàn hệ thống</Tag>}
-          </Descriptions.Item>
-          <Descriptions.Item label="Trạng thái">
-            <StatusBadge status={group.active ? 'active' : 'inactive'} meta={ACTIVE_META} />
-          </Descriptions.Item>
-        </Descriptions>
+      <div style={{ marginTop: 8 }}>
+        {/* Khối tóm tắt thông tin nhóm chuẩn Apple card: Nền trắng tinh, nhãn xám nét, chữ đen tuyền */}
+        <div
+          style={{
+            background: '#ffffff',
+            borderRadius: 16,
+            border: '1px solid rgba(15, 23, 42, 0.08)',
+            padding: '18px 22px',
+            marginBottom: 18,
+            boxShadow: '0 2px 8px -2px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02)',
+          }}
+        >
+          <Row gutter={[24, 14]} align="middle">
+            <Col xs={12} sm={5}>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#64748b', marginBottom: 4 }}>
+                Mã nhóm
+              </div>
+              <div>
+                <span className="code-tag--blue">{group.code}</span>
+              </div>
+            </Col>
+            <Col xs={12} sm={4}>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#64748b', marginBottom: 4 }}>
+                Thứ tự
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>
+                #{group.sortOrder}
+              </div>
+            </Col>
+            <Col xs={12} sm={5}>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#64748b', marginBottom: 4 }}>
+                Số lượng tiêu chí
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>
+                {totalCount} tiêu chí
+              </div>
+            </Col>
+            <Col xs={12} sm={6}>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#64748b', marginBottom: 4 }}>
+                Công ty áp dụng
+              </div>
+              <div style={{ fontSize: 13.5, fontWeight: 600, color: '#0f172a' }}>
+                {group.companyName ? (
+                  <Tag style={{ margin: 0, fontWeight: 600, color: '#0f172a', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                    {group.companyName}
+                  </Tag>
+                ) : (
+                  <Tag style={{ margin: 0, fontWeight: 600, color: '#475569', background: '#f1f5f9', border: '1px solid #e2e8f0' }}>
+                    Dùng chung toàn hệ thống
+                  </Tag>
+                )}
+              </div>
+            </Col>
+            <Col xs={12} sm={4}>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#64748b', marginBottom: 4 }}>
+                Trạng thái
+              </div>
+              <div>
+                <StatusBadge status={group.active ? 'active' : 'inactive'} meta={ACTIVE_META} />
+              </div>
+            </Col>
+          </Row>
+        </div>
 
-        <Flex justify="space-between" align="center" style={{ marginBottom: 10 }}>
-          <Typography.Text strong style={{ fontSize: 14 }}>Danh sách tiêu chí thuộc nhóm ({totalCount})</Typography.Text>
-          <Input
+        {/* Khối danh sách tiêu chí */}
+        <div
+          style={{
+            background: '#ffffff',
+            borderRadius: 16,
+            border: '1px solid rgba(15, 23, 42, 0.08)',
+            padding: '18px 20px',
+            boxShadow: '0 2px 8px -2px rgba(15, 23, 42, 0.04)',
+          }}
+        >
+          <Flex justify="space-between" align="center" style={{ marginBottom: 14 }} wrap="wrap" gap={12}>
+            <Typography.Text strong style={{ fontSize: 15, color: '#0f172a' }}>
+              Danh sách tiêu chí thuộc nhóm ({totalCount})
+            </Typography.Text>
+            <Input
+              size="middle"
+              prefix={<SearchOutlined style={{ color: '#94a3b8' }} />}
+              placeholder="Tìm theo mã hoặc tên tiêu chí..."
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              allowClear
+              style={{ width: 280, borderRadius: 8 }}
+            />
+          </Flex>
+
+          <Table<Criterion>
+            rowKey="id"
             size="small"
-            prefix={<SearchOutlined style={{ color: 'var(--app-text-secondary)' }} />}
-            placeholder="Tìm theo mã hoặc tên tiêu chí..."
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            allowClear
-            style={{ width: 250 }}
+            loading={isLoading}
+            dataSource={filteredList}
+            pagination={{ pageSize: 20, showSizeChanger: true, size: 'small' }}
+            locale={{ emptyText: <Empty description="Nhóm này chưa có tiêu chí nào" image={Empty.PRESENTED_IMAGE_SIMPLE} /> }}
+            columns={[
+              { title: '#', key: 'idx', width: 44, align: 'center', render: (_, __, i) => i + 1 },
+              {
+                title: 'Mã tiêu chí',
+                dataIndex: 'code',
+                key: 'code',
+                width: 120,
+                className: 'col-code',
+                render: (code: string) => <span className="code-tag--blue">{code}</span>,
+              },
+              {
+                title: 'Nội dung tiêu chí kiểm soát',
+                dataIndex: 'name',
+                key: 'name',
+                render: (name: string, c) => (
+                  <div>
+                    <div style={{ fontWeight: 600, color: c.active ? '#0f172a' : '#94a3b8', fontSize: 13.5, textDecoration: c.active ? 'none' : 'line-through' }}>
+                      {name}
+                    </div>
+                    {c.checkMethod && (
+                      <div style={{ fontSize: 12, color: '#64748b', marginTop: 3 }}>
+                        {c.checkMethod}
+                      </div>
+                    )}
+                  </div>
+                ),
+              },
+              {
+                title: 'Mức độ ảnh hưởng',
+                dataIndex: 'baseImpact',
+                key: 'baseImpact',
+                width: 130,
+                align: 'center',
+                render: (val: number) => <ImpactTag value={val} />,
+              },
+              {
+                title: 'Trạng thái',
+                dataIndex: 'active',
+                key: 'active',
+                width: 140,
+                render: (act: boolean) => <StatusBadge status={act ? 'active' : 'inactive'} meta={ACTIVE_META} />,
+              },
+              {
+                title: 'Thao tác',
+                key: 'actions',
+                width: actionColumnWidth(2),
+                className: 'col-actions',
+                align: 'center' as const,
+                render: (_, c) => (
+                  <TableActions
+                    recordName={c.name}
+                    onView={onViewCriterion ? () => onViewCriterion(c) : undefined}
+                    viewLabel="Xem chi tiết tiêu chí"
+                    onEdit={onEditCriterion ? () => { onClose(); onEditCriterion(c) } : undefined}
+                    editLabel="Chỉnh sửa tiêu chí"
+                    editAccess={PERMISSIONS.CRITERIA.MANAGE}
+                  />
+                ),
+              },
+            ]}
           />
-        </Flex>
-
-        <Table<Criterion>
-          rowKey="id"
-          size="small"
-          loading={isLoading}
-          dataSource={filteredList}
-          pagination={{ pageSize: 20, showSizeChanger: true, size: 'small' }}
-          locale={{ emptyText: <Empty description="Nhóm này chưa có tiêu chí nào" image={Empty.PRESENTED_IMAGE_SIMPLE} /> }}
-          columns={[
-            { title: '#', key: 'idx', width: 44, align: 'center', render: (_, __, i) => i + 1 },
-            { title: 'Mã tiêu chí', dataIndex: 'code', key: 'code', width: 110, className: 'col-code', render: (code: string) => <span className="code-tag--blue">{code}</span> },
-            {
-              title: 'Nội dung tiêu chí kiểm soát',
-              dataIndex: 'name',
-              key: 'name',
-              render: (name: string, c) => (
-                <div>
-                  <Typography.Text strong={c.active} delete={!c.active}>{name}</Typography.Text>
-                  {c.checkMethod && <div style={{ fontSize: 11, color: 'var(--app-text-secondary)' }}>{c.checkMethod}</div>}
-                </div>
-              ),
-            },
-            { title: 'Mức độ ảnh hưởng', dataIndex: 'baseImpact', key: 'baseImpact', width: 120, align: 'center', render: (val: number) => <ImpactTag value={val} /> },
-            { title: 'Trạng thái', dataIndex: 'active', key: 'active', width: 160, render: (act: boolean) => <StatusBadge status={act ? 'active' : 'inactive'} meta={ACTIVE_META} /> },
-            {
-              title: 'Thao tác',
-              key: 'actions',
-              width: actionColumnWidth(2),
-              // Ghim mép phải bằng CSS sticky (.col-actions), không làm đổi bố cục các cột khác.
-      className: 'col-actions',
-              align: 'center' as const,
-              render: (_, c) => (
-                <TableActions
-                  recordName={c.name}
-                  onView={onViewCriterion ? () => onViewCriterion(c) : undefined}
-                  viewLabel="Xem chi tiết tiêu chí"
-                  onEdit={onEditCriterion ? () => { onClose(); onEditCriterion(c) } : undefined}
-                  editLabel="Chỉnh sửa tiêu chí"
-                  editAccess={PERMISSIONS.CRITERIA.MANAGE}
-                />
-              ),
-            },
-          ]}
-        />
+        </div>
       </div>
     </DetailDrawer>
   )

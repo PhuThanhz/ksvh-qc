@@ -34,7 +34,7 @@ export function OrgUnitPage() {
       extra={
         <ProtectedAction access={PERMISSIONS.ORGANIZATION.MANAGE}>
           <Button type="primary" onClick={() => setCreateOpen(true)}>
-            {active.addLabel}
+            Thêm đơn vị & cơ sở
           </Button>
         </ProtectedAction>
       }

@@ -88,7 +88,7 @@ export function ApprovalQueueSection() {
                         {p.planCode} - {p.title}
                       </Typography.Text>
                       <div style={{ fontSize: 12, color: 'var(--app-text-secondary)' }}>
-                        {formatDate(p.startDate)} → {formatDate(p.endDate)} · {p.restaurantCount} nhà hàng
+                        Hạn {formatDate(p.endDate)} · {p.restaurantCount} nhà hàng
                       </div>
                     </div>
                     <Button size="small" type="primary" ghost onClick={() => navigate('/admin/plans')}>

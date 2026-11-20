@@ -50,11 +50,18 @@ public class InspectionPlanController {
 
     @GetMapping("/{id}/copyable-assignments")
     @PreAuthorize("hasAnyAuthority('" + PermissionCodes.PLAN_READ + "', '" + PermissionCodes.PLAN_CREATE + "')")
-    public List<PlanAssignmentRequest> getCopyableAssignments(
-            @PathVariable Long id,
-            @RequestParam java.time.LocalDate targetStartDate,
-            @RequestParam java.time.LocalDate targetEndDate) {
-        return service.getCopyableAssignments(id, targetStartDate, targetEndDate);
+    public List<PlanAssignmentRequest> getCopyableAssignments(@PathVariable Long id) {
+        return service.getCopyableAssignments(id);
+    }
+
+    /** Lịch đã có của chuyên viên trong khoảng ngày, để cảnh báo trùng lịch (không chặn). */
+    @GetMapping("/inspector-schedule")
+    @PreAuthorize("hasAnyAuthority('" + PermissionCodes.PLAN_READ + "', '" + PermissionCodes.PLAN_CREATE + "')")
+    public List<vn.ksvh.qc.inspection.dto.InspectorScheduleItem> inspectorSchedule(
+            @RequestParam java.time.LocalDate from,
+            @RequestParam java.time.LocalDate to,
+            @RequestParam(required = false) Long excludePlanId) {
+        return service.inspectorSchedule(from, to, excludePlanId);
     }
 
     @GetMapping("/restaurant-warnings")

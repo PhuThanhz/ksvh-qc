@@ -73,6 +73,7 @@ export function Sidebar({ menu, onSelect }: SidebarProps) {
     <ConfigProvider theme={sidebarMenuTheme}>
       <Menu
         mode="inline"
+        inlineIndent={16}
         selectedKeys={selected ? [selected] : []}
         defaultOpenKeys={[...groups.keys()].map(groupKey)}
         items={items}

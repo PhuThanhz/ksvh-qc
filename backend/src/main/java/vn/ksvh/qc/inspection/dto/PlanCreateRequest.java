@@ -9,7 +9,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 public record PlanCreateRequest(
-        @NotBlank(message = "Vui lòng nhập mã kế hoạch")
+        /** Bỏ trống = server tự sinh KH-<yyyyMM>-<stt>. */
+        @io.swagger.v3.oas.annotations.media.Schema(nullable = true)
         @Size(max = 30, message = "Mã kế hoạch tối đa 30 ký tự")
         String planCode,
 
@@ -17,10 +18,12 @@ public record PlanCreateRequest(
         @Size(max = 200, message = "Tiêu đề kế hoạch tối đa 200 ký tự")
         String title,
 
-        @NotNull(message = "Vui lòng chọn ngày bắt đầu")
+        /** Tuỳ chọn: bỏ trống = server đặt ngày tạo kế hoạch (tạo mới) hoặc giữ nguyên (sửa). */
+        @io.swagger.v3.oas.annotations.media.Schema(nullable = true)
         LocalDate startDate,
 
-        @NotNull(message = "Vui lòng chọn ngày kết thúc")
+        /** Hạn hoàn thành: mọi phiếu chấm của kế hoạch phải xong trước ngày này. */
+        @NotNull(message = "Vui lòng chọn hạn hoàn thành")
         LocalDate endDate,
 
         @Size(max = 1000, message = "Ghi chú tối đa 1000 ký tự")
@@ -28,6 +31,15 @@ public record PlanCreateRequest(
 
         /** Danh sách phân công; bắt buộc có ít nhất 1 dòng khi gửi duyệt. Trống = chưa phân công. */
         @Size(max = 200, message = "Tối đa 200 dòng phân công trong một kế hoạch")
-        List<@Valid PlanAssignmentRequest> assignments
+        List<@Valid PlanAssignmentRequest> assignments,
+
+        /** PERIODIC (mặc định) hoặc SURPRISE. Không nhận VERIFICATION. */
+        @io.swagger.v3.oas.annotations.media.Schema(nullable = true)
+        vn.ksvh.qc.inspection.domain.InspectionKind inspectionKind
 ) {
+    /** Kế hoạch định kỳ. */
+    public PlanCreateRequest(String planCode, String title, LocalDate startDate, LocalDate endDate, String notes,
+                             List<PlanAssignmentRequest> assignments) {
+        this(planCode, title, startDate, endDate, notes, assignments, null);
+    }
 }

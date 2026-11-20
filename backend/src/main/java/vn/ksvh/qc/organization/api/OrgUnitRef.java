@@ -16,15 +16,17 @@ public record OrgUnitRef(
         /** Ngưỡng nâng mức riêng; null = theo quy tắc chung. */
         Integer escalationThreshold,
         /** Số tháng hạ mức riêng; null = theo quy tắc chung. */
-        Integer escalationResetMonths
+        Integer escalationResetMonths,
+        /** Số bậc nâng riêng; null = theo quy tắc chung. */
+        Integer escalationStep
 ) {
     public OrgUnitRef(Long id, String code, String name, String unitType, boolean active) {
-        this(id, code, name, unitType, active, null, null, null, null, null, null, null, null);
+        this(id, code, name, unitType, active, null, null, null, null, null, null, null, null, null);
     }
 
     public OrgUnitRef(Long id, String code, String name, String unitType, boolean active,
                       Double latitude, Double longitude, Integer checkinRadiusM,
                       Long storeManagerUserId, Long obmUserId, Long companyId) {
-        this(id, code, name, unitType, active, latitude, longitude, checkinRadiusM, storeManagerUserId, obmUserId, companyId, null, null);
+        this(id, code, name, unitType, active, latitude, longitude, checkinRadiusM, storeManagerUserId, obmUserId, companyId, null, null, null);
     }
 }

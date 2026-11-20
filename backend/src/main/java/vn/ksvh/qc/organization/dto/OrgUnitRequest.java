@@ -58,10 +58,16 @@ public record OrgUnitRequest(
         @Schema(nullable = true)
         @Min(value = 1, message = "Hạ mức sau 1 đến 24 tháng")
         @Max(value = 24, message = "Hạ mức sau 1 đến 24 tháng")
-        Integer escalationResetMonths) {
+        Integer escalationResetMonths,
+
+        /** Số bậc nâng mức ảnh hưởng riêng khi chạm ngưỡng; bỏ trống = theo quy tắc chung. */
+        @Schema(nullable = true)
+        @Min(value = 1, message = "Số bậc nâng riêng từ 1 đến 4")
+        @Max(value = 4, message = "Số bậc nâng riêng từ 1 đến 4")
+        Integer escalationStep) {
 
     public OrgUnitRequest(Long companyId, OrgUnitType unitType, String code, String name, String address,
                           Double latitude, Double longitude, Integer checkinRadiusM, boolean active) {
-        this(companyId, unitType, code, name, address, latitude, longitude, checkinRadiusM, active, null, null);
+        this(companyId, unitType, code, name, address, latitude, longitude, checkinRadiusM, active, null, null, null);
     }
 }

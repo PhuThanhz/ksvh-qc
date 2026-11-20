@@ -23,6 +23,11 @@ public class InspectionPlan extends BaseEntity {
     @Column(name = "plan_code", nullable = false, length = 30)
     private String planCode;
 
+    /** PERIODIC: dòng phân công có mẫu phiếu; SURPRISE: dòng phân công có chuyên đề. Không đổi sau khi tạo. */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "inspection_kind", nullable = false, length = 20)
+    private InspectionKind inspectionKind = InspectionKind.PERIODIC;
+
     @Column(nullable = false, length = 200)
     private String title;
 
@@ -41,9 +46,6 @@ public class InspectionPlan extends BaseEntity {
 
     @Column(length = 1000)
     private String notes;
-
-    @Column(name = "created_by")
-    private Long createdBy;
 
     @Column(name = "approved_by")
     private Long approvedBy;

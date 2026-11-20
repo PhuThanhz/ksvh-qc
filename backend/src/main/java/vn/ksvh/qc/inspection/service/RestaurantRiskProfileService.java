@@ -129,9 +129,10 @@ public class RestaurantRiskProfileService {
                 asOf,
                 config.periodMonths(),
                 asOf.withDayOfMonth(1).minusMonths(config.periodMonths() - 1L),
-                rest.escalationThreshold() != null || rest.escalationResetMonths() != null,
+                rest.escalationThreshold() != null || rest.escalationResetMonths() != null || rest.escalationStep() != null,
                 rules.escalation() != null ? rules.escalation().thresholdCount() : null,
                 resetPeriod,
+                rules.escalation() != null ? rules.escalation().stepIncrease() : null,
                 totalEscalated,
                 activeFindings.size(),
                 items

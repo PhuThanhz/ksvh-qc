@@ -72,7 +72,10 @@ public class InspectionCreationService {
 
     @Transactional
     public InspectionResponse createFromPlanAssignment(InspectionPlan plan, PlanAssignment a, String restaurantCode, Long actorId) {
-        String prefix = "PER-%s-%s-".formatted(a.getScheduledDate().format(java.time.format.DateTimeFormatter.ofPattern("yyMM")),
+        boolean surprise = plan.getInspectionKind() == InspectionKind.SURPRISE;
+        String prefix = "%s-%s-%s-".formatted(surprise ? "DX" : "PER",
+                // Mã phiếu theo tháng của ngày kiểm tra (kế hoạch cũ) hoặc của hạn hoàn thành kế hoạch
+                (a.getScheduledDate() != null ? a.getScheduledDate() : plan.getEndDate()).format(java.time.format.DateTimeFormatter.ofPattern("yyMM")),
                 restaurantCode.toUpperCase(java.util.Locale.ROOT));
         String code = null;
         int maxInspections = properties.maxInspectionsPerMonth();
@@ -87,9 +90,17 @@ public class InspectionCreationService {
             throw new BusinessException(ErrorCode.VALIDATION_FAILED,
                     "Không sinh được mã phiếu cho nhà hàng '%s' (mã quá dài hoặc đã đủ %d phiếu trong tháng)".formatted(restaurantCode, maxInspections));
         }
-        InspectionCreateRequest req = new InspectionCreateRequest(code, plan.getId(), a.getRestaurantId(), a.getTemplateId(),
-                a.getInspectorId(), InspectionKind.PERIODIC, InspectionMode.ON_SITE, null,
-                "Theo kế hoạch %s, ngày dự kiến %s".formatted(plan.getPlanCode(), a.getScheduledDate()));
+        InspectionCreateRequest req = new InspectionCreateRequest(code, plan.getId(), a.getRestaurantId(),
+                surprise ? null : a.getTemplateId(), a.getInspectorId(),
+                surprise ? InspectionKind.SURPRISE : InspectionKind.PERIODIC, InspectionMode.ON_SITE,
+                surprise ? List.copyOf(a.getTopicGroupIds()) : null,
+                a.getScheduledDate() != null
+                        ? "Theo kế hoạch %s, ngày dự kiến %s".formatted(plan.getPlanCode(), a.getScheduledDate())
+                        : "Theo kế hoạch %s, hạn hoàn thành %s".formatted(plan.getPlanCode(),
+                                plan.getEndDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"))),
+                List.of(),
+                // Đột xuất có tick tiêu chí → phiếu chỉ gồm các tiêu chí đó; rỗng → toàn bộ tiêu chí của chuyên đề
+                surprise ? List.copyOf(a.getCriterionIds()) : List.of());
         return createChecked(req, actorId);
     }
 
@@ -137,13 +148,25 @@ public class InspectionCreationService {
             criteria = template.items();
         } else if (kind == InspectionKind.SURPRISE) {
             topics = req.topicGroupIds() == null ? List.of() : req.topicGroupIds().stream().filter(Objects::nonNull).distinct().toList();
-            if (topics.isEmpty()) {
-                throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Kiểm tra đột xuất phải chọn ít nhất một chuyên đề (nhóm tiêu chí)");
+            List<Long> critIds = req.criterionIds() == null ? List.of() : req.criterionIds().stream().filter(Objects::nonNull).distinct().toList();
+            if (topics.isEmpty() && critIds.isEmpty()) {
+                throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Kiểm tra đột xuất phải chọn ít nhất một chuyên đề hoặc tiêu chí");
             }
-            validateTopics(topics, restaurant);
-            criteria = criteriaLookupApi.findActiveCriteriaInGroups(topics);
-            if (criteria.isEmpty()) {
-                throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Các chuyên đề đã chọn chưa có tiêu chí nào đang hoạt động");
+            if (!critIds.isEmpty()) {
+                Map<Long, CriterionRef> critMap = criteriaLookupApi.findCriteria(critIds);
+                criteria = critIds.stream().map(critMap::get).filter(Objects::nonNull).filter(CriterionRef::active).toList();
+                if (criteria.isEmpty()) {
+                    throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Các tiêu chí đã chọn không tồn tại hoặc đã ngưng hoạt động");
+                }
+                if (topics.isEmpty()) {
+                    topics = criteria.stream().map(CriterionRef::groupId).filter(Objects::nonNull).distinct().toList();
+                }
+            } else {
+                validateTopics(topics, restaurant);
+                criteria = criteriaLookupApi.findActiveCriteriaInGroups(topics);
+                if (criteria.isEmpty()) {
+                    throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Các chuyên đề đã chọn chưa có tiêu chí nào đang hoạt động");
+                }
             }
         } else if (kind == InspectionKind.VERIFICATION) {
             verificationFindings = resolveVerificationFindings(req);

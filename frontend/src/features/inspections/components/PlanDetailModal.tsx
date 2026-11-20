@@ -1,21 +1,29 @@
-import { CalendarOutlined } from '@ant-design/icons'
-import { Descriptions, Flex, Spin, Table, Tag, Typography } from 'antd'
+import { CalendarOutlined, CheckOutlined, CloseOutlined, SendOutlined } from '@ant-design/icons'
+import { Button, Descriptions, Flex, Space, Spin, Table, Tag, Typography } from 'antd'
 import { DetailDrawer } from '@/components/feedback/detail'
 import type { ColumnsType } from 'antd/es/table'
 import { StatusBadge } from '@/components/data-display/StatusBadge'
 import { INSPECTION_STATUS_META, PLAN_STATUS_META } from '../constants/status'
 import { RestaurantPriorWarningTag } from '@/features/inspections/components/RestaurantPriorWarningTag'
 import { usePlan } from '@/features/inspections/hooks/useInspectionData'
-import type { PlanAssignmentResponse } from '@/features/inspections/inspection.types'
+import type { PlanAssignmentResponse, PlanResponse } from '@/features/inspections/inspection.types'
 import { formatDate } from '@/utils/format-date'
+import { PERMISSIONS, usePermission } from '@/permissions'
 
 interface Props {
   planId?: number
   open: boolean
   onClose: () => void
+  onSubmit?: (plan: PlanResponse) => void
+  onApprove?: (plan: PlanResponse) => void
+  onReject?: (plan: PlanResponse) => void
 }
 
-export function PlanDetailModal({ planId, open, onClose }: Props) {
+export function PlanDetailModal({ planId, open, onClose, onSubmit, onApprove, onReject }: Props) {
+  const { can } = usePermission()
+  const canCreate = can(PERMISSIONS.PLAN.CREATE)
+  const canApprove = can(PERMISSIONS.PLAN.APPROVE)
+
   const planQuery = usePlan(open ? planId : undefined)
   const plan = planQuery.data
 
@@ -51,17 +59,19 @@ export function PlanDetailModal({ planId, open, onClose }: Props) {
       width: 170,
     },
     {
-      title: 'Mẫu phiếu',
-      dataIndex: 'templateName',
-      key: 'templateName',
-      width: 180,
+      title: 'Mẫu phiếu / Chuyên đề',
+      key: 'scope',
+      width: 220,
+      render: (_, r) =>
+        r.templateName ?? (r.topicNames?.length ? r.topicNames.map((n) => <Tag key={n} color="orange">{n}</Tag>) : '—'),
     },
     {
+      // Kế hoạch cũ có ngày kiểm tra từng nhà hàng; kế hoạch mới chỉ có hạn hoàn thành → hiện "—"
       title: 'Ngày dự kiến',
       dataIndex: 'scheduledDate',
       key: 'scheduledDate',
       width: 120,
-      render: (d: string) => formatDate(d),
+      render: (d?: string | null) => (d ? formatDate(d) : '—'),
     },
     {
       title: 'Phiếu kiểm tra đã tạo',
@@ -89,6 +99,49 @@ export function PlanDetailModal({ planId, open, onClose }: Props) {
       onClose={onClose}
       icon={<CalendarOutlined />}
       title={`Chi tiết kế hoạch: ${plan?.planCode ?? ''}`}
+      actions={
+        plan && (
+          <Space>
+            {(plan.status === 'DRAFT' || plan.status === 'REJECTED') && canCreate && onSubmit && (
+              <Button
+                type="primary"
+                icon={<SendOutlined />}
+                onClick={() => {
+                  onClose()
+                  onSubmit(plan)
+                }}
+              >
+                Gửi duyệt
+              </Button>
+            )}
+            {plan.status === 'PENDING_APPROVAL' && canApprove && onApprove && (
+              <Button
+                type="primary"
+                icon={<CheckOutlined />}
+                style={{ background: '#16a34a', borderColor: '#16a34a', color: '#ffffff' }}
+                onClick={() => {
+                  onClose()
+                  onApprove(plan)
+                }}
+              >
+                Phê duyệt
+              </Button>
+            )}
+            {plan.status === 'PENDING_APPROVAL' && canApprove && onReject && (
+              <Button
+                danger
+                icon={<CloseOutlined />}
+                onClick={() => {
+                  onClose()
+                  onReject(plan)
+                }}
+              >
+                Từ chối
+              </Button>
+            )}
+          </Space>
+        )
+      }
     >
       <Spin spinning={planQuery.isLoading}>
         {plan && (
@@ -99,9 +152,7 @@ export function PlanDetailModal({ planId, open, onClose }: Props) {
               <Descriptions.Item label="Trạng thái">
                 <StatusBadge status={plan.status} meta={PLAN_STATUS_META} />
               </Descriptions.Item>
-              <Descriptions.Item label="Thời gian thực hiện">
-                {`${formatDate(plan.startDate)} - ${formatDate(plan.endDate)}`}
-              </Descriptions.Item>
+              <Descriptions.Item label="Hạn hoàn thành">{formatDate(plan.endDate)}</Descriptions.Item>
               <Descriptions.Item label="Người tạo">{plan.createdByName || '—'}</Descriptions.Item>
               <Descriptions.Item label="Ngày tạo">{formatDate(plan.createdAt)}</Descriptions.Item>
               <Descriptions.Item label="Người duyệt">{plan.approvedByName || '—'}</Descriptions.Item>

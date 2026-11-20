@@ -17,9 +17,16 @@ export interface SidebarProfileProps {
   collapsed: boolean
 }
 
+function cleanDisplayName(fullName?: string): string {
+  if (!fullName) return 'Người dùng'
+  // Loại bỏ các hậu tố ngoặc đơn chức vụ nếu có ví dụ: "Nguyễn Hoàng Minh (Quản trị Hệ thống)" -> "Nguyễn Hoàng Minh"
+  return fullName.replace(/\s*\([^)]*\)/g, '').trim() || fullName
+}
+
 function initialsOf(fullName?: string): string {
-  if (!fullName) return 'U'
-  const parts = fullName.trim().split(/\s+/)
+  const clean = cleanDisplayName(fullName)
+  if (!clean) return 'U'
+  const parts = clean.trim().split(/\s+/)
   const last = parts[parts.length - 1]
   return (last?.[0] ?? 'U').toUpperCase()
 }
@@ -46,7 +53,7 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
       label: (
         <Flex vertical gap={2} style={{ padding: '4px 2px', maxWidth: 260 }}>
           <Typography.Text strong style={{ fontSize: 13.5, color: '#0f172a' }}>
-            {user?.fullName ?? 'Người dùng'}
+            {cleanDisplayName(user?.fullName)}
           </Typography.Text>
           <Typography.Text
             type="secondary"
@@ -116,7 +123,7 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
     >
       <Dropdown menu={{ items: dropdownItems }} trigger={['click']} placement="topRight">
         {collapsed ? (
-          <Tooltip title={user?.fullName ?? 'Tài khoản'} placement="right">
+          <Tooltip title={cleanDisplayName(user?.fullName)} placement="right">
             <Flex justify="center" style={{ cursor: 'pointer' }}>
               {avatar}
             </Flex>
@@ -155,8 +162,9 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
                     textOverflow: 'ellipsis',
                     textShadow: '0 1px 2px rgba(0, 0, 0, 0.35)',
                   }}
+                  title={cleanDisplayName(user?.fullName)}
                 >
-                  {user?.fullName ?? 'Người dùng'}
+                  {cleanDisplayName(user?.fullName)}
                 </span>
                 <span
                   style={{
@@ -169,6 +177,7 @@ export function SidebarProfile({ user, onLogout, loggingOut, collapsed }: Sideba
                     background: 'rgba(255, 255, 255, 0.22)',
                     color: '#ffffff',
                     lineHeight: 1.2,
+                    flexShrink: 0,
                   }}
                 >
                   {user?.roles?.includes('SYSTEM_ADMIN') ? 'Admin' : 'QC'}

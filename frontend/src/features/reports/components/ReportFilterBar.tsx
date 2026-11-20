@@ -1,6 +1,7 @@
-import { ReloadOutlined } from '@ant-design/icons'
-import { Button, DatePicker, Flex, Select } from 'antd'
+import { DatePicker, Select } from 'antd'
 import dayjs from 'dayjs'
+import type { ReactNode } from 'react'
+import { AdvancedFilter } from '@/components/data-entry/AdvancedFilter'
 import { useCriterionGroups } from '@/features/criteria/hooks/useCriteria'
 import { useCompanies, useOrgUnits } from '@/features/organizations/hooks/useOrganizations'
 import type { ReportFilter } from '@/features/reports/report.types'
@@ -13,6 +14,8 @@ export interface ReportFilterBarProps {
   showGroup?: boolean
   showInspector?: boolean
   showRestaurant?: boolean
+  /** Nút phụ bên phải cùng hàng nút Bộ lọc (vd Xuất Excel). */
+  extra?: ReactNode
 }
 
 export function ReportFilterBar({
@@ -21,6 +24,7 @@ export function ReportFilterBar({
   showGroup = false,
   showInspector = true,
   showRestaurant = true,
+  extra,
 }: ReportFilterBarProps) {
   const companies = useCompanies({ page: 0, size: 100, active: true })
   const restaurants = useOrgUnits({
@@ -38,87 +42,82 @@ export function ReportFilterBar({
     filter.to ? dayjs(filter.to) : null,
   ]
 
-  const handleReset = () => {
-    onChange({})
-  }
+  const activeCount = [filter.from || filter.to, filter.companyId, filter.restaurantId, filter.inspectorId, filter.groupId].filter(Boolean).length
 
-  const hasActiveFilters = Boolean(
-    filter.from || filter.to || filter.companyId || filter.restaurantId || filter.inspectorId || filter.groupId,
-  )
-
+  // Thu gọn như các trang danh sách: bấm "Bộ lọc" mới bung các ô điều kiện, nút phụ (Xuất Excel) nằm cùng hàng bên phải.
   return (
-    <div className="advanced-filter">
-      <Flex wrap="wrap" gap={8} align="center">
-        <DatePicker.RangePicker
-          value={dateValue}
-          placeholder={['Từ ngày', 'Đến ngày']}
-          format="DD/MM/YYYY"
-          onChange={(dates) => {
-            onChange({
-              ...filter,
-              from: dates?.[0] ? dates[0].format('YYYY-MM-DD') : undefined,
-              to: dates?.[1] ? dates[1].format('YYYY-MM-DD') : undefined,
-            })
-          }}
-          style={{ width: 240 }}
-        />
+    <AdvancedFilter activeCount={activeCount} onReset={() => onChange({})} extra={extra}>
+      <DatePicker.RangePicker
+        value={dateValue}
+        placeholder={['Từ ngày', 'Đến ngày']}
+        format="DD/MM/YYYY"
+        onChange={(dates) => {
+          onChange({
+            ...filter,
+            from: dates?.[0] ? dates[0].format('YYYY-MM-DD') : undefined,
+            to: dates?.[1] ? dates[1].format('YYYY-MM-DD') : undefined,
+          })
+        }}
+        style={{ width: 240 }}
+      />
 
+      <Select
+        placeholder="Công ty"
+        allowClear
+        showSearch
+        value={filter.companyId}
+        onChange={(companyId) => onChange({ ...filter, companyId, restaurantId: undefined, groupId: undefined })}
+        style={{ width: 200 }}
+        popupMatchSelectWidth={420}
+        filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
+        options={companies.data?.items.map((c) => ({ value: c.id, label: `${c.code} – ${c.name}` }))}
+        optionRender={(o) => <span className="report-filter__option" title={String(o.label)}>{o.label}</span>}
+      />
+
+      {showRestaurant && (
         <Select
-          placeholder="Công ty"
+          placeholder="Nhà hàng"
           allowClear
           showSearch
-          value={filter.companyId}
-          onChange={(companyId) => onChange({ ...filter, companyId, restaurantId: undefined, groupId: undefined })}
-          style={{ width: 170 }}
+          value={filter.restaurantId}
+          onChange={(restaurantId) => onChange({ ...filter, restaurantId })}
+          style={{ width: 200 }}
+          popupMatchSelectWidth={420}
+          optionRender={(o) => <span className="report-filter__option" title={String(o.label)}>{o.label}</span>}
           filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
-          options={companies.data?.items.map((c) => ({ value: c.id, label: c.name }))}
+          options={restaurants.data?.items.map((r) => ({ value: r.id, label: `${r.code} - ${r.name}` }))}
         />
+      )}
 
-        {showRestaurant && (
-          <Select
-            placeholder="Nhà hàng"
-            allowClear
-            showSearch
-            value={filter.restaurantId}
-            onChange={(restaurantId) => onChange({ ...filter, restaurantId })}
-            style={{ width: 190 }}
-            filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
-            options={restaurants.data?.items.map((r) => ({ value: r.id, label: `${r.code} - ${r.name}` }))}
-          />
-        )}
+      {showInspector && (
+        <Select
+          placeholder="Chuyên viên KSVH"
+          allowClear
+          showSearch
+          value={filter.inspectorId}
+          onChange={(inspectorId) => onChange({ ...filter, inspectorId })}
+          style={{ width: 180 }}
+          popupMatchSelectWidth={320}
+          filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
+          options={inspectors.data?.items.map((u) => ({ value: u.id, label: u.fullName || u.username }))}
+        />
+      )}
 
-        {showInspector && (
-          <Select
-            placeholder="Chuyên viên KSVH"
-            allowClear
-            showSearch
-            value={filter.inspectorId}
-            onChange={(inspectorId) => onChange({ ...filter, inspectorId })}
-            style={{ width: 180 }}
-            filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
-            options={inspectors.data?.items.map((u) => ({ value: u.id, label: u.fullName || u.username }))}
-          />
-        )}
+      {showGroup && (
+        <Select
+          placeholder="Nhóm tiêu chí"
+          allowClear
+          showSearch
+          value={filter.groupId}
+          onChange={(groupId) => onChange({ ...filter, groupId })}
+          style={{ width: 200 }}
+          popupMatchSelectWidth={380}
+          filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
+          options={groups.data?.map((g) => ({ value: g.id, label: g.name }))}
+          optionRender={(o) => <span className="report-filter__option" title={String(o.label)}>{o.label}</span>}
+        />
+      )}
 
-        {showGroup && (
-          <Select
-            placeholder="Nhóm tiêu chí"
-            allowClear
-            showSearch
-            value={filter.groupId}
-            onChange={(groupId) => onChange({ ...filter, groupId })}
-            style={{ width: 180 }}
-            filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
-            options={groups.data?.map((g) => ({ value: g.id, label: g.name }))}
-          />
-        )}
-
-        {hasActiveFilters && (
-          <Button className="filter-reset" icon={<ReloadOutlined />} onClick={handleReset}>
-            Đặt lại
-          </Button>
-        )}
-      </Flex>
-    </div>
+    </AdvancedFilter>
   )
 }

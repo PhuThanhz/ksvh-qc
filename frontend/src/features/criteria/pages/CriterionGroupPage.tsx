@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { ROUTES } from '@/constants/routes'
 import { CriteriaExcelActions } from '@/features/criteria/components/CriteriaExcelActions'
-import { CriterionBatchModal } from '@/features/criteria/components/CriterionBatchModal'
 import { CriterionFormModal } from '@/features/criteria/components/CriterionFormModal'
 import { GroupTab } from '@/features/criteria/components/GroupTab'
 import type { Criterion, CriterionGroup } from '@/features/criteria/criteria.types'
@@ -20,9 +19,6 @@ export function CriterionGroupPage() {
     defaultGroupId?: number
     criterion?: Criterion
   }>({ open: false })
-
-  // Tạo nhóm xong → mở ngay bảng thêm nhiều tiêu chí cho nhóm đó.
-  const [batchGroup, setBatchGroup] = useState<CriterionGroup>()
 
   const handleSelectGroup = (groupId: number) => {
     navigate(`${ROUTES.admin.criteria}?groupId=${groupId}`)
@@ -55,14 +51,7 @@ export function CriterionGroupPage() {
         onSelectGroup={handleSelectGroup}
         onAddCriterionToGroup={handleAddCriterionToGroup}
         onEditCriterion={handleEditCriterion}
-        onGroupCreated={setBatchGroup}
-      />
-      <CriterionBatchModal
-        open={!!batchGroup}
-        groups={groups.data ?? []}
-        defaultGroupId={batchGroup?.id}
-        hint={batchGroup ? `Nhóm "${batchGroup.name}" vừa được tạo – thêm các tiêu chí của nhóm ngay bây giờ, hoặc đóng để làm sau.` : undefined}
-        onClose={() => setBatchGroup(undefined)}
+        onGroupCreated={(newGroup) => setCriterionModal({ open: true, defaultGroupId: newGroup.id, criterion: undefined })}
       />
       <CriterionFormModal
         open={criterionModal.open}

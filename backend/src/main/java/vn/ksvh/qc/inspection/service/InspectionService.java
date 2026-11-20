@@ -72,6 +72,11 @@ public class InspectionService {
         return executionService.cancel(id, req, user);
     }
 
+    /** Chuyên đề phải tồn tại, đang hoạt động và dùng được cho công ty của nhà hàng. */
+    public void validateTopics(List<Long> topics, OrgUnitRef restaurant) {
+        creationService.validateTopics(topics, restaurant);
+    }
+
     public static void validateTemplateForAssignment(TemplateRef template, OrgUnitRef restaurant) {
         InspectionCreationService.validateTemplateForAssignment(template, restaurant);
     }

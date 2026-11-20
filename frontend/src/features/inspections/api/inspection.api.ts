@@ -31,6 +31,7 @@ import type {
   PlanStatus,
   PlanUpdateRequest,
   PriorFindingsWarning,
+  InspectorScheduleItem,
   SurpriseInspectionSuggestion,
 } from '@/features/inspections/inspection.types'
 import { api } from '@/lib/http'
@@ -43,6 +44,7 @@ const PATH = {
   planApprove: (id: Id) => `/inspection-plans/${id}/approve`,
   planReject: (id: Id) => `/inspection-plans/${id}/reject`,
   planWarnings: '/inspection-plans/restaurant-warnings',
+  inspectorSchedule: '/inspection-plans/inspector-schedule',
   planCopyableAssignments: (id: Id) => `/inspection-plans/${id}/copyable-assignments`,
   inspections: '/inspections',
   inspection: (id: Id) => `/inspections/${id}`,
@@ -85,6 +87,9 @@ export const plansApi = {
   delete: (id: Id) => api.delete<void>(PATH.plan(id)).then(() => undefined),
   restaurantWarning: (restaurantId: number, beforeDate?: string) =>
     api.get<PriorFindingsWarning>(PATH.planWarnings, { params: { restaurantId, beforeDate } }).then(data),
+  /** Lịch đã có của chuyên viên trong khoảng ngày (cảnh báo trùng lịch). */
+  inspectorSchedule: (params: { from: string; to: string; excludePlanId?: number }) =>
+    api.get<InspectorScheduleItem[]>(PATH.inspectorSchedule, { params }).then(data),
   copyableAssignments: (id: Id) =>
     api.get<PlanAssignmentResponse[]>(PATH.planCopyableAssignments(id)).then(data),
 }

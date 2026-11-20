@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -15,6 +17,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class EscalationRule {
 
     @Id
@@ -45,6 +48,7 @@ public class EscalationRule {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
+    @CreatedBy
     @Column(name = "created_by", updatable = false)
     private Long createdBy;
 }

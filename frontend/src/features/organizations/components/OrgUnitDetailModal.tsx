@@ -1,6 +1,7 @@
 import { AlertOutlined, ApartmentOutlined, BankOutlined, BarcodeOutlined, EditOutlined, EnvironmentOutlined, ShopOutlined, UserOutlined } from '@ant-design/icons'
-import { Button, Space, Tag, Typography } from 'antd'
+import { Button, Space, Typography } from 'antd'
 import { DetailModal, type DetailField } from '@/components/feedback/DetailModal'
+import { EscalationCell } from '@/features/organizations/components/EscalationCell'
 import { ActiveBadge } from '@/features/organizations/components/ActiveBadge'
 import { OrgUnitTypeTag } from '@/features/organizations/components/OrgUnitTypeTag'
 import {
@@ -63,11 +64,7 @@ export function OrgUnitDetailModal({ open, unit, fixedUnitType, onClose, onEdit 
       },
       {
         label: 'Ngưỡng nâng mức',
-        value: escalationOverrideText(unit) ? (
-          <Tag color="warning">Riêng: {escalationOverrideText(unit)}</Tag>
-        ) : (
-          'Theo quy tắc chung'
-        ),
+        value: <EscalationCell unit={unit} />,
       },
     )
   }

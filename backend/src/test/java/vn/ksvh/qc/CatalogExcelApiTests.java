@@ -38,16 +38,17 @@ class CatalogExcelApiTests extends ApiTestSupport {
                 "Công ty", List.of(row("CTY-" + suffix, "Công ty nhập", "Có")),
                 "Nhà hàng - Phòng ban", List.of(
                         row("NH-" + suffix, "Nhà hàng 1", "CTY-" + suffix, "Nhà hàng", "1 Lê Lợi", "cht_" + suffix, null,
-                                10.762622, 106.660172, 150, 2, null, "Có"),
+                                10.762622, 106.660172, 150, 2, null, 3, "Có"),
                         row("PB-" + suffix, "Phòng KSVH", "cty-" + suffix, "phòng ban"))));
         mvc.perform(multipart("/api/v1/organizations/import").file(file).param("commit", "true").with(as(1L, perms)))
                 .andExpect(jsonPath("$.errors.length()").value(0))
                 .andExpect(jsonPath("$.committed").value(true))
                 .andExpect(jsonPath("$.created").value(3));
         Map<String, Object> unit = jdbc.queryForMap(
-                "SELECT unit_type, store_manager_user_id, checkin_radius_m, escalation_threshold FROM org_units WHERE code = ?", "NH-" + suffix);
+                "SELECT unit_type, store_manager_user_id, checkin_radius_m, escalation_threshold, escalation_step FROM org_units WHERE code = ?", "NH-" + suffix);
         assertThat(unit.get("unit_type")).isEqualTo("RESTAURANT");
         assertThat(((Number) unit.get("escalation_threshold")).intValue()).isEqualTo(2);
+        assertThat(((Number) unit.get("escalation_step")).intValue()).isEqualTo(3);
         assertThat(((Number) unit.get("store_manager_user_id")).longValue()).isEqualTo(cht);
 
         // Tài khoản CHT không tồn tại → lỗi, không ghi gì

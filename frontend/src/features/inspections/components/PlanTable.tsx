@@ -1,4 +1,4 @@
-import { Table } from 'antd'
+import { Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { StatusBadge } from '@/components/data-display/StatusBadge'
 import { PLAN_STATUS_META } from '../constants/status'
@@ -58,6 +58,15 @@ export function PlanTable({
       render: (v) => <span className="code-tag--blue">{v}</span>,
     },
     {
+      title: 'Loại',
+      dataIndex: 'inspectionKind',
+      key: 'inspectionKind',
+      width: 100,
+      render: (k?: string) => (
+        <Tag color={k === 'SURPRISE' ? 'orange' : 'blue'}>{k === 'SURPRISE' ? 'Đột xuất' : 'Định kỳ'}</Tag>
+      ),
+    },
+    {
       title: 'Tiêu đề kế hoạch',
       dataIndex: 'title',
       key: 'title',
@@ -80,10 +89,10 @@ export function PlanTable({
       ),
     },
     {
-      title: 'Thời hạn thực hiện',
-      key: 'period',
-      width: 180,
-      render: (_, r) => `${formatDate(r.startDate)} - ${formatDate(r.endDate)}`,
+      title: 'Hạn hoàn thành',
+      key: 'deadline',
+      width: 140,
+      render: (_, r) => formatDate(r.endDate),
     },
     {
       title: 'Trạng thái',

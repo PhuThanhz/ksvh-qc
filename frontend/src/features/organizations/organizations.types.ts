@@ -11,10 +11,19 @@ export type RestaurantAssignment = Schemas['RestaurantAssignmentResponse']
 export type RestaurantAssignmentPayload = Schemas['RestaurantAssignmentRequest']
 export type AssignedRestaurant = Schemas['AssignedRestaurant']
 
+export type EscalationOverride = Pick<OrgUnit, 'escalationThreshold' | 'escalationResetMonths' | 'escalationStep'>
+
+/** Nhà hàng có khai báo ít nhất một thông số nâng / hạ mức riêng. */
+export const hasEscalationOverride = (u: EscalationOverride) =>
+  u.escalationThreshold != null || u.escalationStep != null || u.escalationResetMonths != null
+
 /** Ngưỡng nâng / hạ mức riêng của nhà hàng; trống = theo quy tắc chung (trang Quy tắc tái phạm & nâng mức). */
-export function escalationOverrideText(u: Pick<OrgUnit, 'escalationThreshold' | 'escalationResetMonths'>): string | null {
+export function escalationOverrideText(
+  u: Pick<OrgUnit, 'escalationThreshold' | 'escalationResetMonths' | 'escalationStep'>,
+): string | null {
   const parts = [
     u.escalationThreshold != null ? `nâng mức từ ${u.escalationThreshold} lần` : null,
+    u.escalationStep != null ? `+${u.escalationStep} bậc` : null,
     u.escalationResetMonths != null ? `hạ mức sau ${u.escalationResetMonths} tháng` : null,
   ].filter(Boolean)
   return parts.length ? parts.join(' · ') : null

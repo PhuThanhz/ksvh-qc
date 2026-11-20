@@ -16,4 +16,7 @@ public interface UserAccountApi {
 
     /** Tìm các người dùng active có ít nhất một trong các vai trò được truyền vào. */
     java.util.List<UserSummary> findActiveUsersByRoleIn(Collection<String> roleCodes);
+
+    /** Cập nhật thời điểm đăng nhập / hoạt động mới nhất của người dùng. */
+    void recordLogin(Long userId, java.time.Instant loginAt);
 }

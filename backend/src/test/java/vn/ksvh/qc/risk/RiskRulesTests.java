@@ -23,7 +23,7 @@ class RiskRulesTests {
     void restaurantThresholdEscalatesEarlier() {
         // Quy tắc chung: lần 2 chưa nâng; nhà hàng ngưỡng riêng 2 lần: lần 2 đã nâng 2 → 3, điểm 6 (M3)
         assertThat(COMMON.assess(2, List.of(t(3)), t(5)).escalated()).isFalse();
-        RiskAssessment strict = COMMON.withEscalationOverride(2, null).assess(2, List.of(t(3)), t(5));
+        RiskAssessment strict = COMMON.withEscalationOverride(2, null, null).assess(2, List.of(t(3)), t(5));
         assertThat(strict.escalated()).isTrue();
         assertThat(strict.effectiveImpact()).isEqualTo(3);
         assertThat(strict.score()).isEqualTo(6);
@@ -32,16 +32,34 @@ class RiskRulesTests {
 
     @Test
     void overrideKeepsCommonValuesWhenBlank() {
-        RiskRules r = COMMON.withEscalationOverride(null, 12);
+        RiskRules r = COMMON.withEscalationOverride(null, 12, null);
         assertThat(r.escalation().thresholdCount()).isEqualTo(3);
         assertThat(r.escalation().resetPeriodMonths()).isEqualTo(12);
         assertThat(r.escalation().stepIncrease()).isEqualTo(1);
-        assertThat(COMMON.withEscalationOverride(null, null)).isSameAs(COMMON);
+        assertThat(COMMON.withEscalationOverride(null, null, null)).isSameAs(COMMON);
     }
 
     @Test
     void noCommonRuleMeansNoEscalation() {
         RiskRules none = new RiskRules(new FrequencyRule(6), null, List.of());
-        assertThat(none.withEscalationOverride(2, 6).escalation()).isNull();
+        assertThat(none.withEscalationOverride(2, 6, 2).escalation()).isNull();
+    }
+
+    @Test
+    void restaurantStepRaisesImpactFurtherButKeepsCommonCap() {
+        // Nhà hàng +2 bậc: lần 3 mức 2 → 4, điểm 12; mức trần chung 5 vẫn giữ (mức 4 + 2 → 5)
+        RiskRules plusTwo = COMMON.withEscalationOverride(null, null, 2);
+        assertThat(plusTwo.escalation().stepIncrease()).isEqualTo(2);
+        assertThat(plusTwo.escalation().thresholdCount()).isEqualTo(3);
+        assertThat(plusTwo.escalation().maxImpact()).isEqualTo(5);
+
+        RiskAssessment r = plusTwo.assess(2, List.of(t(3), t(4)), t(5));
+        assertThat(r.escalated()).isTrue();
+        assertThat(r.effectiveImpact()).isEqualTo(4);
+        assertThat(r.score()).isEqualTo(12);
+
+        assertThat(plusTwo.assess(4, List.of(t(3), t(4)), t(5)).effectiveImpact()).isEqualTo(5);
+        // Quy tắc chung +1: cùng tình huống chỉ lên 3
+        assertThat(COMMON.assess(2, List.of(t(3), t(4)), t(5)).effectiveImpact()).isEqualTo(3);
     }
 }

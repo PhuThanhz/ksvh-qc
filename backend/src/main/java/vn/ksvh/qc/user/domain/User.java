@@ -34,8 +34,8 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private boolean active = true;
 
-    @Column(name = "updated_by")
-    private Long updatedBy;
+    @Column(name = "last_login_at")
+    private java.time.Instant lastLoginAt;
 
     @ManyToMany
     @BatchSize(size = 50)

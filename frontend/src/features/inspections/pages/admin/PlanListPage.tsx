@@ -106,7 +106,7 @@ export function PlanListPage() {
   return (
     <PageContainer
       title="Kế hoạch kiểm soát vận hành"
-      subtitle="Lập kế hoạch, phân bổ lịch trình và phê duyệt đợt kiểm soát vận hành định kỳ và đột xuất"
+      subtitle="Lập kế hoạch kiểm tra định kỳ hoặc đột xuất, phân công chuyên viên và phê duyệt; duyệt xong hệ thống tự sinh phiếu chấm."
       extra={
         <ProtectedAction access={PERMISSIONS.PLAN.CREATE}>
           <Button type="primary" onClick={() => setModal({ open: true })}>
@@ -166,6 +166,9 @@ export function PlanListPage() {
         open={Boolean(viewing)}
         planId={viewing?.id}
         onClose={() => setViewing(undefined)}
+        onSubmit={onSubmitPlan}
+        onApprove={onApprovePlan}
+        onReject={(plan) => setRejectDialog({ open: true, plan, reason: '' })}
       />
 
       <Modal

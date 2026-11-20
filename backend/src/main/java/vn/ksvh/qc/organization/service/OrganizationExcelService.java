@@ -29,7 +29,8 @@ public class OrganizationExcelService {
     static final String U_CODE = "Mã đơn vị", U_NAME = "Tên đơn vị", U_COMPANY = "Mã công ty", U_TYPE = "Loại đơn vị",
             U_ADDRESS = "Địa chỉ", U_CHT = "Tài khoản CHT", U_OBM = "Tài khoản OBM",
             U_LAT = "Vĩ độ", U_LNG = "Kinh độ", U_RADIUS = "Bán kính GPS (m)",
-            U_THRESHOLD = "Ngưỡng nâng mức riêng", U_RESET = "Hạ mức sau (tháng) riêng";
+            U_THRESHOLD = "Ngưỡng nâng mức riêng", U_RESET = "Hạ mức sau (tháng) riêng",
+            U_STEP = "Số bậc nâng riêng";
     private static final Map<String, OrgUnitType> TYPES = new LinkedHashMap<>();
     static {
         TYPES.put("Nhà hàng", OrgUnitType.RESTAURANT);
@@ -47,7 +48,7 @@ public class OrganizationExcelService {
     private record CompanyRow(String code, String name, Boolean active) {}
 
     private record UnitRow(String code, String name, String companyCode, String type, String address,
-                           String cht, String obm, Double lat, Double lng, Integer radius, Integer threshold, Integer reset, Boolean active) {}
+                           String cht, String obm, Double lat, Double lng, Integer radius, Integer threshold, Integer reset, Integer step, Boolean active) {}
 
     private static ExcelSheet<CompanyRow> companySheet(List<CompanyRow> rows) {
         return ExcelSheet.of("Công ty", "DANH MỤC CÔNG TY", rows)
@@ -72,6 +73,8 @@ public class OrganizationExcelService {
                 .note("Chỉ cho nhà hàng cần khác quy tắc chung (vd fine dining). Từ 2 đến 50 lần. Bỏ trống = theo quy tắc chung.")
                 .column(U_RESET, 16, UnitRow::reset)
                 .note("Số tháng liên tục không lỗi để hạ về mức gốc, 1–24. Bỏ trống = theo quy tắc chung.")
+                .column(U_STEP, 14, UnitRow::step)
+                .note("Số bậc nâng mức ảnh hưởng khi chạm ngưỡng, 1–4. Bỏ trống = theo quy tắc chung.")
                 .column(ACTIVE, 12, UnitRow::active).options(YES_NO);
     }
 
@@ -89,7 +92,8 @@ public class OrganizationExcelService {
                 u.getAddress(), username(users, u.getStoreManagerUserId()), username(users, u.getObmUserId()),
                 u.getLatitude(), u.getLongitude(), u.getCheckinRadiusM(),
                 u.getEscalationThreshold() == null ? null : u.getEscalationThreshold().intValue(),
-                u.getEscalationResetMonths() == null ? null : u.getEscalationResetMonths().intValue(), u.isActive())).toList();
+                u.getEscalationResetMonths() == null ? null : u.getEscalationResetMonths().intValue(),
+                u.getEscalationStep() == null ? null : u.getEscalationStep().intValue(), u.isActive())).toList();
         return ExcelWriter.export(List.of(
                 companySheet(companies.stream().map(c -> new CompanyRow(c.getCode(), c.getName(), c.isActive())).toList()),
                 unitSheet(unitRows)));
@@ -128,7 +132,8 @@ public class OrganizationExcelService {
             Map<String, String> unitFields = Map.ofEntries(Map.entry("companyId", U_COMPANY), Map.entry("unitType", U_TYPE),
                     Map.entry("code", U_CODE), Map.entry("name", U_NAME), Map.entry("address", U_ADDRESS),
                     Map.entry("latitude", U_LAT), Map.entry("longitude", U_LNG), Map.entry("checkinRadiusM", U_RADIUS),
-                    Map.entry("escalationThreshold", U_THRESHOLD), Map.entry("escalationResetMonths", U_RESET));
+                    Map.entry("escalationThreshold", U_THRESHOLD), Map.entry("escalationResetMonths", U_RESET),
+                    Map.entry("escalationStep", U_STEP));
             session.rows(unitRows, row -> {
                 String code = row.text(U_CODE);
                 Optional<OrgUnit> existing = code == null ? Optional.empty() : orgUnitRepository.findByCodeIgnoreCase(code);
@@ -138,7 +143,7 @@ public class OrganizationExcelService {
                 OrgUnitRequest req = session.validate(new OrgUnitRequest(companyId, row.choice(U_TYPE, TYPES), code,
                         row.text(U_NAME), row.text(U_ADDRESS),
                         row.number(U_LAT), row.number(U_LNG), row.integer(U_RADIUS), row.bool(ACTIVE, true),
-                        row.integer(U_THRESHOLD), row.integer(U_RESET)), row, unitFields);
+                        row.integer(U_THRESHOLD), row.integer(U_RESET), row.integer(U_STEP)), row, unitFields);
                 Long chtId = userId(row, U_CHT);
                 Long obmId = userId(row, U_OBM);
                 Long unitId = existing.isPresent()

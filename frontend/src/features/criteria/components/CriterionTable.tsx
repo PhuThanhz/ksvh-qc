@@ -1,4 +1,4 @@
-import { Flex, Space, Tag, Tooltip, Typography } from 'antd'
+import { Flex, Tag, Tooltip, Typography } from 'antd'
 import { DataTable, type DataTableProps } from '@/components/data-display/DataTable'
 import { StatusBadge } from '@/components/data-display/StatusBadge'
 import { TableActions } from '@/components/data-display/TableActions'
@@ -25,7 +25,7 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
     <DataTable<Criterion>
       {...props}
       rowKey="id"
-      scroll={{ x: 1600 }}
+      scroll={{ x: 1200 }}
       columns={[
         {
           title: '#',
@@ -75,7 +75,7 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
           dataIndex: 'name',
           key: 'name',
           sorter: true,
-          width: 320,
+          width: 380,
           render: (name: string, c: Criterion) => (
             <Flex vertical style={{ minWidth: 0 }}>
               <span className="cell-title-link" onClick={() => onView(c)}>
@@ -89,36 +89,11 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
             </Flex>
           ),
         },
-        {
-          title: 'Mẫu phiếu kiểm tra',
-          dataIndex: 'templates',
-          key: 'templates',
-          width: 170,
-          render: (templates: Criterion['templates']) => {
-            if (!templates || templates.length === 0) {
-              return <Tag color="default">Chưa gán mẫu</Tag>
-            }
-            return (
-              <Space size={4} wrap style={{ maxWidth: 220 }}>
-                {templates.map((t) => (
-                  <Tooltip key={t.id} title={`Nhấp để lọc mẫu: ${t.name}`}>
-                    <Tag
-                      style={{ cursor: onFilterTemplate ? 'pointer' : 'default' }}
-                      onClick={onFilterTemplate ? () => onFilterTemplate(t.id) : undefined}
-                    >
-                      {t.code}
-                    </Tag>
-                  </Tooltip>
-                ))}
-              </Space>
-            )
-          },
-        },
-        { title: 'Mức độ ảnh hưởng', dataIndex: 'baseImpact', key: 'baseImpact', sorter: true, width: 140, render: (v: number) => <ImpactTag value={v} /> },
+        { title: 'Mức độ ảnh hưởng', dataIndex: 'baseImpact', key: 'baseImpact', sorter: true, width: 150, render: (v: number) => <ImpactTag value={v} /> },
         {
           title: 'Trạng thái',
           dataIndex: 'active',
-          width: 160,
+          width: 140,
           render: (a: boolean) => <StatusBadge status={a ? 'active' : 'inactive'} meta={ACTIVE_META} />,
         },
         {
@@ -126,7 +101,7 @@ export function CriterionTable({ onView, onEdit, onDelete, onFilterGroup, onFilt
           key: 'actions',
           width: actionColumnWidth(3),
           // Ghim mép phải bằng CSS sticky (.col-actions), không làm đổi bố cục các cột khác.
-      className: 'col-actions',
+          className: 'col-actions',
           align: 'center' as const,
           render: (_: unknown, c: Criterion) => (
             <TableActions

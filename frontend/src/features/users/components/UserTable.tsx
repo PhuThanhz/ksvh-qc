@@ -1,5 +1,5 @@
 import { KeyOutlined } from '@ant-design/icons'
-import { Space, Tag } from 'antd'
+import { Badge, Space, Tag, Typography } from 'antd'
 import { DataTable, type DataTableProps } from '@/components/data-display/DataTable'
 import { StatusBadge, type BadgeTone } from '@/components/data-display/StatusBadge'
 import { ActionButton, TableActions } from '@/components/data-display/TableActions'
@@ -38,7 +38,18 @@ export function UserTable({ roleName, onView, onEdit, onDelete, onResetPassword,
             ((props.params?.page ?? 0) * (props.params?.size ?? 20)) + index + 1,
         },
         { title: 'Tên đăng nhập', dataIndex: 'username', key: 'username', sorter: true, width: 140, render: (u: string) => <span className="code-tag--blue">{u}</span> },
-        { title: 'Họ và tên', dataIndex: 'fullName', key: 'fullName', sorter: true, width: 170, render: (name: string, row: User) => <span className="cell-title-link" onClick={() => onEdit(row)}>{name}</span> },
+        {
+          title: 'Họ và tên',
+          dataIndex: 'fullName',
+          key: 'fullName',
+          sorter: true,
+          width: 170,
+          render: (name: string, row: User) => (
+            <span className="cell-title-link" onClick={() => onEdit(row)}>
+              {name ? name.replace(/\s*\(.*?\)/g, '') : ''}
+            </span>
+          ),
+        },
         {
           title: 'Vai trò người dùng',
           dataIndex: 'roles',
@@ -56,6 +67,36 @@ export function UserTable({ roleName, onView, onEdit, onDelete, onResetPassword,
           dataIndex: 'active',
           width: 160,
           render: (active: boolean) => <StatusBadge status={active ? 'active' : 'inactive'} meta={ACTIVE_META} />,
+        },
+        {
+          title: 'Đăng nhập gần nhất',
+          dataIndex: 'lastLoginAt',
+          key: 'lastLoginAt',
+          sorter: true,
+          width: 180,
+          render: (_: unknown, u: User) => {
+            if (u.online) {
+              return (
+                <div>
+                  <Badge status="processing" color="#10b981" text={<span style={{ fontWeight: 600, color: '#059669' }}>Đang trực tuyến</span>} />
+                  {u.lastLoginAt && (
+                    <div style={{ fontSize: 11, color: 'var(--app-text-secondary)', marginTop: 2 }}>
+                      {formatDateTime(u.lastLoginAt)}
+                    </div>
+                  )}
+                </div>
+              )
+            }
+            if (u.lastLoginAt) {
+              return (
+                <div>
+                  <span style={{ fontSize: 13, color: 'var(--app-text)' }}>{formatDateTime(u.lastLoginAt)}</span>
+                  <div style={{ fontSize: 11, color: 'var(--app-text-secondary)', marginTop: 2 }}>Ngoại tuyến</div>
+                </div>
+              )
+            }
+            return <Typography.Text type="secondary" style={{ fontSize: 12 }}>Chưa đăng nhập</Typography.Text>
+          },
         },
         { title: 'Thời gian khởi tạo', dataIndex: 'createdAt', key: 'createdAt', sorter: true, width: 150, render: formatDateTime },
         {

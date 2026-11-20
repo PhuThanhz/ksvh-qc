@@ -32,9 +32,12 @@ public class AuditLogService {
     private static final ZoneId VN_ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
 
     private final AuditLogRepository auditLogRepository;
+    private final org.springframework.beans.factory.ObjectProvider<vn.ksvh.qc.user.api.UserAccountApi> userAccountApi;
 
-    public AuditLogService(AuditLogRepository auditLogRepository) {
+    public AuditLogService(AuditLogRepository auditLogRepository,
+                           org.springframework.beans.factory.ObjectProvider<vn.ksvh.qc.user.api.UserAccountApi> userAccountApi) {
         this.auditLogRepository = auditLogRepository;
+        this.userAccountApi = userAccountApi;
     }
 
     @Transactional
@@ -52,6 +55,17 @@ public class AuditLogService {
         try {
             String username = event.username();
             String fullName = event.userFullName();
+
+            if (event.userId() != null && (username == null || fullName == null)) {
+                var api = userAccountApi.getIfAvailable();
+                if (api != null) {
+                    var summary = api.findSummaries(java.util.List.of(event.userId())).get(event.userId());
+                    if (summary != null) {
+                        if (username == null) username = summary.username();
+                        if (fullName == null) fullName = summary.fullName();
+                    }
+                }
+            }
 
             if (username == null && event.userId() != null) {
                 username = "user#" + event.userId();

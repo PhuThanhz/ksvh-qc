@@ -17,6 +17,8 @@ export const inspectionKeys = {
   all: ['inspections'] as const,
   plans: () => [...inspectionKeys.all, 'plans'] as const,
   planList: (params?: Record<string, unknown>) => [...inspectionKeys.plans(), 'list', params] as const,
+  inspectorSchedule: (from?: string, to?: string, excludePlanId?: number) =>
+    [...inspectionKeys.plans(), 'inspector-schedule', from, to, excludePlanId] as const,
   plan: (id: Id) => [...inspectionKeys.plans(), 'detail', id] as const,
 
   inspections: () => [...inspectionKeys.all, 'records'] as const,

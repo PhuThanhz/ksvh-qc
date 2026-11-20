@@ -20,7 +20,7 @@ export function InspectionFormModal({ open, onClose, initialValues }: Props) {
       onCancel={onClose}
       footer={null}
       destroyOnHidden
-      width={680}
+      width={780}
     >
       {!initialValues && (
         <Segmented

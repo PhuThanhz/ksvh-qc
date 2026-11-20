@@ -1,5 +1,5 @@
 import { EditOutlined, IdcardOutlined, KeyOutlined, SafetyOutlined, UserOutlined } from '@ant-design/icons'
-import { Button, Space, Tag } from 'antd'
+import { Badge, Button, Space, Tag } from 'antd'
 import { StatusBadge, type BadgeTone } from '@/components/data-display/StatusBadge'
 import { DetailModal, type DetailField } from '@/components/feedback/DetailModal'
 import type { User } from '@/features/users/users.types'
@@ -39,6 +39,17 @@ export function UserDetailModal({ open, user, roleName, onClose, onEdit, onReset
     {
       label: 'Trạng thái',
       value: <StatusBadge status={user.active ? 'active' : 'inactive'} meta={ACTIVE_META} />,
+    },
+    {
+      label: 'Đăng nhập gần nhất',
+      value: user.lastLoginAt ? (
+        <Space size={8}>
+          <Badge status={user.online ? 'processing' : 'default'} color={user.online ? '#10b981' : undefined} text={user.online ? 'Đang trực tuyến' : 'Ngoại tuyến'} />
+          <span style={{ color: 'var(--app-text-secondary)', fontSize: 13 }}>({formatDateTime(user.lastLoginAt)})</span>
+        </Space>
+      ) : (
+        <span style={{ color: 'var(--app-text-secondary)', fontSize: 13 }}>Chưa từng đăng nhập</span>
+      ),
     },
   ]
 

@@ -22,16 +22,18 @@ public record RiskRules(FrequencyRule frequency, EscalationRule escalation, List
     }
 
     /**
-     * Ghi đè ngưỡng nâng mức / số tháng hạ mức bằng giá trị riêng của nhà hàng (null = giữ quy tắc chung).
-     * Chưa có quy tắc nâng mức chung thì không áp dụng nâng mức, kể cả khi nhà hàng có ngưỡng riêng.
+     * Ghi đè ngưỡng nâng mức / số bậc nâng / số tháng hạ mức bằng giá trị riêng của nhà hàng (null = giữ quy tắc chung).
+     * Mức trần luôn theo quy tắc chung. Chưa có quy tắc nâng mức chung thì không áp dụng nâng mức,
+     * kể cả khi nhà hàng có giá trị riêng.
      */
-    public RiskRules withEscalationOverride(Integer thresholdCount, Integer resetPeriodMonths) {
-        if (escalation == null || (thresholdCount == null && resetPeriodMonths == null)) {
+    public RiskRules withEscalationOverride(Integer thresholdCount, Integer resetPeriodMonths, Integer stepIncrease) {
+        if (escalation == null || (thresholdCount == null && resetPeriodMonths == null && stepIncrease == null)) {
             return this;
         }
         return new RiskRules(frequency, new EscalationRule(
                 thresholdCount != null ? thresholdCount : escalation.thresholdCount(),
-                escalation.stepIncrease(), escalation.maxImpact(),
+                stepIncrease != null ? stepIncrease : escalation.stepIncrease(),
+                escalation.maxImpact(),
                 resetPeriodMonths != null ? resetPeriodMonths : escalation.resetPeriodMonths()), bands);
     }
 

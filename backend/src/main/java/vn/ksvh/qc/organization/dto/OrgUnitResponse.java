@@ -26,6 +26,7 @@ public record OrgUnitResponse(
         boolean active,
         @Schema(nullable = true) Integer escalationThreshold,
         @Schema(nullable = true) Integer escalationResetMonths,
+        @Schema(nullable = true) Integer escalationStep,
         Instant createdAt,
         Instant updatedAt) {
 
@@ -36,7 +37,8 @@ public record OrgUnitResponse(
                 UserRef.from(lookup(users, u.getStoreManagerUserId())), UserRef.from(lookup(users, u.getObmUserId())),
                 u.getLatitude(), u.getLongitude(), u.getCheckinRadiusM(), u.isActive(),
                 u.getEscalationThreshold() == null ? null : u.getEscalationThreshold().intValue(),
-                u.getEscalationResetMonths() == null ? null : u.getEscalationResetMonths().intValue(), u.getCreatedAt(), u.getUpdatedAt());
+                u.getEscalationResetMonths() == null ? null : u.getEscalationResetMonths().intValue(),
+                u.getEscalationStep() == null ? null : u.getEscalationStep().intValue(), u.getCreatedAt(), u.getUpdatedAt());
     }
 
     private static UserSummary lookup(Map<Long, UserSummary> users, Long id) {

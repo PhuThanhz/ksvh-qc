@@ -291,6 +291,122 @@ class VerificationAndSurpriseFlowTests extends ApiTestSupport {
                 .andExpect(jsonPath("$.assignments[0].priorUnresolvedCount").value(1));
     }
 
+    @Test
+    void surprisePlanUsesTopicsAndApprovalCreatesSurpriseInspections() throws Exception {
+        String[] planPerms = {PermissionCodes.PLAN_READ, PermissionCodes.PLAN_CREATE, PermissionCodes.PLAN_APPROVE,
+                PermissionCodes.INSPECTION_READ_ALL};
+        long qcUser = insertUser("qc_sur_plan", RoleCodes.KSVH_INSPECTOR);
+        long companyId = createCompany("C-SP-" + suffix);
+        long storeId = createStore(companyId, "SP" + suffix, 10.76, 106.66, 150, qcUser);
+        long groupId = createCriterionGroup("GRP-SP-" + suffix);
+        createCriterion(groupId, "C1-SP-" + suffix, 4);
+        createCriterion(groupId, "C2-SP-" + suffix, 2);
+
+        // Đột xuất mà thiếu chuyên đề → từ chối
+        var noTopic = new PlanCreateRequest(null, "Đột xuất thiếu chuyên đề", TODAY, TODAY.plusDays(10), null,
+                List.of(new PlanAssignmentRequest(storeId, qcUser, null, TODAY.plusDays(1), List.of())), InspectionKind.SURPRISE);
+        mvc.perform(withJson(post("/api/v1/inspection-plans"), noTopic).with(as(1L, planPerms)))
+                .andExpect(status().isBadRequest());
+
+        // Mã kế hoạch bỏ trống → server tự sinh; dòng có chuyên đề, không có mẫu phiếu
+        var req = new PlanCreateRequest(null, "Đột xuất VSATTP " + suffix, TODAY, TODAY.plusDays(10), null,
+                List.of(new PlanAssignmentRequest(storeId, qcUser, null, TODAY.plusDays(1), List.of(groupId))), InspectionKind.SURPRISE);
+        String created = mvc.perform(withJson(post("/api/v1/inspection-plans"), req).with(as(1L, planPerms)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.inspectionKind").value("SURPRISE"))
+                .andExpect(jsonPath("$.planCode").value(org.hamcrest.Matchers.startsWith("KH-")))
+                .andExpect(jsonPath("$.assignments[0].templateId").doesNotExist())
+                .andExpect(jsonPath("$.assignments[0].topicGroupIds[0]").value((int) groupId))
+                .andReturn().getResponse().getContentAsString();
+        long planId = extractId(created);
+
+        mvc.perform(post("/api/v1/inspection-plans/" + planId + "/submit").with(as(1L, planPerms))).andExpect(status().isOk());
+        String approved = mvc.perform(post("/api/v1/inspection-plans/" + planId + "/approve").with(as(2L, planPerms)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.assignments[0].inspectionCode").value(org.hamcrest.Matchers.startsWith("DX-")))
+                .andReturn().getResponse().getContentAsString();
+
+        long insId = jsonMapper.readTree(approved).get("assignments").get(0).get("inspectionId").asLong();
+        assertThat(jdbc.queryForObject("SELECT inspection_type FROM inspections WHERE id = ?", String.class, insId)).isEqualTo("SURPRISE");
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM inspection_items WHERE inspection_id = ?", Integer.class, insId)).isEqualTo(2);
+        assertThat(jdbc.queryForObject("SELECT criterion_group_id FROM inspection_topics WHERE inspection_id = ?", Long.class, insId))
+                .isEqualTo(groupId);
+    }
+
+    @Test
+    void planWithOnlyDeadlineAndNoInspectionDatesIsCreatedAndApproved() throws Exception {
+        String[] planPerms = {PermissionCodes.PLAN_READ, PermissionCodes.PLAN_CREATE, PermissionCodes.PLAN_APPROVE,
+                PermissionCodes.INSPECTION_READ_ALL};
+        long qcUser = insertUser("qc_deadline", RoleCodes.KSVH_INSPECTOR);
+        long companyId = createCompany("C-DL-" + suffix);
+        long storeId = createStore(companyId, "DL" + suffix, 10.76, 106.66, 150, qcUser);
+        long groupId = createCriterionGroup("GRP-DL-" + suffix);
+        createCriterion(groupId, "C1-DL-" + suffix, 3);
+
+        // Hạn hoàn thành trước ngày tạo kế hoạch → từ chối
+        var past = new PlanCreateRequest(null, "Hạn đã qua " + suffix, null, TODAY.minusDays(1), null,
+                List.of(new PlanAssignmentRequest(storeId, qcUser, null, null, List.of(groupId))), InspectionKind.SURPRISE);
+        mvc.perform(withJson(post("/api/v1/inspection-plans"), past).with(as(1L, planPerms)))
+                .andExpect(status().isBadRequest());
+
+        // Không ngày bắt đầu, không ngày kiểm tra: server đặt ngày bắt đầu = hôm nay, dòng không có ngày
+        var req = new PlanCreateRequest(null, "Chỉ hạn hoàn thành " + suffix, null, TODAY.plusDays(20), null,
+                List.of(new PlanAssignmentRequest(storeId, qcUser, null, null, List.of(groupId))), InspectionKind.SURPRISE);
+        String created = mvc.perform(withJson(post("/api/v1/inspection-plans"), req).with(as(1L, planPerms)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.startDate").value(TODAY.toString()))
+                .andExpect(jsonPath("$.assignments[0].scheduledDate").doesNotExist())
+                .andReturn().getResponse().getContentAsString();
+        long planId = extractId(created);
+
+        mvc.perform(post("/api/v1/inspection-plans/" + planId + "/submit").with(as(1L, planPerms))).andExpect(status().isOk());
+        String approved = mvc.perform(post("/api/v1/inspection-plans/" + planId + "/approve").with(as(2L, planPerms)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        long insId = jsonMapper.readTree(approved).get("assignments").get(0).get("inspectionId").asLong();
+        assertThat(jdbc.queryForObject("SELECT notes FROM inspections WHERE id = ?", String.class, insId)).contains("hạn hoàn thành");
+    }
+
+    @Test
+    void surprisePlanWithPickedCriteriaCreatesInspectionWithOnlyThoseCriteria() throws Exception {
+        String[] planPerms = {PermissionCodes.PLAN_READ, PermissionCodes.PLAN_CREATE, PermissionCodes.PLAN_APPROVE,
+                PermissionCodes.INSPECTION_READ_ALL};
+        long qcUser = insertUser("qc_sur_crit", RoleCodes.KSVH_INSPECTOR);
+        long companyId = createCompany("C-SC-" + suffix);
+        long storeId = createStore(companyId, "SC" + suffix, 10.76, 106.66, 150, qcUser);
+        long groupId = createCriterionGroup("GRP-SC-" + suffix);
+        long picked = createCriterion(groupId, "C1-SC-" + suffix, 4);
+        createCriterion(groupId, "C2-SC-" + suffix, 2);
+        long otherGroup = createCriterionGroup("GRP-SC2-" + suffix);
+        long outside = createCriterion(otherGroup, "C3-SC-" + suffix, 3);
+
+        // Tiêu chí không thuộc chuyên đề đã chọn → từ chối
+        var wrong = new PlanCreateRequest(null, "Đột xuất sai tiêu chí " + suffix, TODAY, TODAY.plusDays(10), null,
+                List.of(new PlanAssignmentRequest(storeId, qcUser, null, TODAY.plusDays(1), List.of(groupId), List.of(outside))),
+                InspectionKind.SURPRISE);
+        mvc.perform(withJson(post("/api/v1/inspection-plans"), wrong).with(as(1L, planPerms)))
+                .andExpect(status().isBadRequest());
+
+        var req = new PlanCreateRequest(null, "Đột xuất tick tiêu chí " + suffix, TODAY, TODAY.plusDays(10), null,
+                List.of(new PlanAssignmentRequest(storeId, qcUser, null, TODAY.plusDays(1), List.of(groupId), List.of(picked))),
+                InspectionKind.SURPRISE);
+        String created = mvc.perform(withJson(post("/api/v1/inspection-plans"), req).with(as(1L, planPerms)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.assignments[0].criterionIds[0]").value((int) picked))
+                .andReturn().getResponse().getContentAsString();
+        long planId = extractId(created);
+
+        mvc.perform(post("/api/v1/inspection-plans/" + planId + "/submit").with(as(1L, planPerms))).andExpect(status().isOk());
+        String approved = mvc.perform(post("/api/v1/inspection-plans/" + planId + "/approve").with(as(2L, planPerms)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        long insId = jsonMapper.readTree(approved).get("assignments").get(0).get("inspectionId").asLong();
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM inspection_items WHERE inspection_id = ?", Integer.class, insId)).isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT criterion_id FROM inspection_items WHERE inspection_id = ?", Long.class, insId))
+                .isEqualTo(picked);
+    }
+
     private long createCompany(String code) {
         return jdbc.queryForObject(
                 "INSERT INTO companies(code, name, active, created_at, updated_at) " +

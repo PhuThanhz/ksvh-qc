@@ -118,6 +118,8 @@ flowchart LR
 3. Chuyên viên **không được từ chối** phiếu được giao. Đổi người thực hiện = người có quyền **huỷ phiếu và lập phiếu mới** (không sửa người được giao trên phiếu cũ).
 - **Đã làm (17/11/2026):**
   - Kế hoạch chứa danh sách phân công (`inspection_plan_assignments`): nhà hàng × chuyên viên × mẫu phiếu × ngày dự kiến. Mỗi nhà hàng tối đa 1 dòng/kế hoạch.
+  - **Đã đổi (20/11/2026, theo yêu cầu người dùng):** kế hoạch **chỉ giao hạn hoàn thành** (`end_date`); không nhập ngày bắt đầu (server đặt `start_date` = ngày tạo) và không còn ngày kiểm tra từng nhà hàng — chuyên viên tự sắp lịch, miễn xong trước hạn. `scheduled_date` cho phép trống (kế hoạch cũ giữ ngày đã nhập). Mã kế hoạch `KH-<yyyyMM của hạn>`, mã phiếu `PER/DX-<yyMM của hạn>-…`; ghi chú phiếu ghi hạn hoàn thành. Hệ quả: không còn cảnh báo trùng lịch theo ngày. Migration `V20261120_1900__plan_deadline_only.sql`.
+  - Kế hoạch đột xuất có thể tick riêng từng tiêu chí trong chuyên đề (`inspection_plan_assignment_criteria`, `V20261120_1500`); rỗng = toàn bộ tiêu chí của chuyên đề.
   - Quản lý duyệt kế hoạch (`POST /inspection-plans/{id}/approve`) → server tự sinh phiếu định kỳ cho từng dòng (`InspectionStatus.ASSIGNED`, mã `PER-<yyMM>-<mã NH>-<stt>`, đủ tiêu chí của mẫu). Lỗi bất kỳ dòng nào sẽ rollback toàn bộ đợt duyệt.
   - Chặn tạo phiếu định kỳ (`PERIODIC`) mà không gắn với kế hoạch đã duyệt (áp dụng cho cả tạo đơn và tạo hàng loạt).
   - Đã có module Thông báo trong ứng dụng (Plan 2): thông báo ngay cho Chuyên viên khi kế hoạch được duyệt và tự sinh phiếu.

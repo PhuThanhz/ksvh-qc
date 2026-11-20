@@ -30,8 +30,9 @@
 .ant-input-focused:not(.ant-input-affix-wrapper input),
 .ant-input-affix-wrapper-focused,
 .ant-select-focused .ant-select-selector {
-  border-color: #2563eb !important;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.16) !important;
+  border-color: var(--app-focus-border) !important;
+  box-shadow: 0 0 0 3px var(--app-focus-ring) !important;
+  outline: none !important;
 }
 .ant-input-affix-wrapper input.ant-input,
 .ant-input-affix-wrapper input.ant-input:focus,
@@ -96,6 +97,8 @@
   outline: 2px solid var(--app-primary, #1677ff) !important;
   outline-offset: 1px !important;
 }
+/* Ô nhập đã có viền focus riêng (xám nhạt) – không vẽ thêm outline xanh */
+:is(input, textarea, .ant-input, .ant-select-selector):focus-visible { outline: none !important; }
 
 /* Đồng bộ thẻ & thanh điều hướng antd-mobile */
 .adm-card {

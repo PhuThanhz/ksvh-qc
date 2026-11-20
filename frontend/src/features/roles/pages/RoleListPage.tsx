@@ -1,4 +1,4 @@
-import { Button, Flex, Space, Table, Tag, Typography } from 'antd'
+import { Button, Flex, Table, Typography } from 'antd'
 import { useMemo, useState } from 'react'
 import { TableActions } from '@/components/data-display/TableActions'
 import { TableCard } from '@/components/data-display/TableCard'
@@ -100,15 +100,7 @@ export function RoleListPage() {
                 title: 'Vai trò',
                 dataIndex: 'name',
                 width: 200,
-                render: (name: string, r) => (
-                  <Flex vertical>
-                    <Space size={6}>
-                      <Typography.Text strong>{name}</Typography.Text>
-                      {r.systemRole && <Tag>Gốc</Tag>}
-                    </Space>
-                    <Typography.Text type="secondary" code>{r.code}</Typography.Text>
-                  </Flex>
-                ),
+                render: (name: string) => <Typography.Text strong>{name}</Typography.Text>,
               },
               { title: 'Mô tả', dataIndex: 'description', width: 280, render: (d: string | null) => d ?? '—' },
               { title: 'Số quyền', dataIndex: 'permissions', width: 100, align: 'right', render: (p: string[]) => p.length },

@@ -46,7 +46,7 @@ class OrgUnitLookupService implements OrgUnitLookupApi {
         return new OrgUnitRef(u.getId(), u.getCode(), u.getName(), u.getUnitType().name(), u.isActive(),
                 u.getLatitude(), u.getLongitude(), u.getCheckinRadiusM(), u.getStoreManagerUserId(), u.getObmUserId(),
                 u.getCompany() != null ? u.getCompany().getId() : null,
-                toInt(u.getEscalationThreshold()), toInt(u.getEscalationResetMonths()));
+                toInt(u.getEscalationThreshold()), toInt(u.getEscalationResetMonths()), toInt(u.getEscalationStep()));
     }
 
     private static Integer toInt(Short v) {

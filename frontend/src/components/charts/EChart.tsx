@@ -1,5 +1,5 @@
 import { BarChart, LineChart, PieChart } from 'echarts/charts'
-import { GridComponent, LegendComponent, TooltipComponent } from 'echarts/components'
+import { GridComponent, LegendComponent, TitleComponent, TooltipComponent } from 'echarts/components'
 import * as echarts from 'echarts/core'
 import type { EChartsCoreOption } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
@@ -7,7 +7,7 @@ import { useEffect, useRef } from 'react'
 import { CHART_FONT } from '@/components/charts/chart-theme'
 
 // Chỉ nạp phần ECharts cần dùng để bundle nhỏ.
-echarts.use([BarChart, LineChart, PieChart, GridComponent, LegendComponent, TooltipComponent, CanvasRenderer])
+echarts.use([BarChart, LineChart, PieChart, GridComponent, LegendComponent, TitleComponent, TooltipComponent, CanvasRenderer])
 
 export interface EChartProps {
   option: EChartsCoreOption

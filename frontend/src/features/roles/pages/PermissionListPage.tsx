@@ -1,5 +1,4 @@
-import { AppstoreOutlined, TableOutlined } from '@ant-design/icons'
-import { Button, Flex, Select, Space, Table, Tag, Typography } from 'antd'
+import { Button, Flex, Select, Table, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { useCallback, useMemo, useState } from 'react'
 import { TableActions } from '@/components/data-display/TableActions'
@@ -10,16 +9,12 @@ import { ErrorState } from '@/components/feedback/ErrorState'
 import { useConfirm } from '@/components/feedback/useConfirm'
 import { useNotify } from '@/components/feedback/useNotify'
 import { PageContainer } from '@/components/layout/PageContainer'
-import { ViewTabs } from '@/components/layout/ViewTabs'
 import { PermissionDetailModal } from '@/features/roles/components/PermissionDetailModal'
 import { deriveApiMeta, PermissionFormModal } from '@/features/roles/components/PermissionFormModal'
-import { PermissionToggleCell } from '@/features/roles/components/PermissionToggleCell'
 import { usePermissionCatalog, useRoles } from '@/features/roles/hooks/useRoles'
-import { lockReason, useTogglePermission } from '@/features/roles/hooks/useTogglePermission'
 import { MODULE_LABEL, moduleLabel, type PermissionInfo } from '@/features/roles/roles.types'
 import { PERMISSIONS, ProtectedAction, usePermission } from '@/permissions'
 
-type ViewMode = 'list' | 'matrix'
 type ExtendedPermission = PermissionInfo & { apiPath?: string; method?: string; isCustom?: boolean }
 
 const METHOD_COLOR: Record<string, string> = {
@@ -31,19 +26,17 @@ const METHOD_COLOR: Record<string, string> = {
 }
 
 /**
- * Danh mục permission và ma trận permission × vai trò.
- * Mặc định hiển thị bảng danh sách tiêu chuẩn (Tên Permission, API Path, Method, Module, Xem chi tiết / Sửa / Xoá).
+ * Danh mục permission (gán quyền cho vai trò làm ở form Vai trò).
+ * Bảng danh sách tiêu chuẩn (Tên Permission, API Path, Method, Module, Xem chi tiết / Sửa / Xoá).
  */
 export function PermissionListPage() {
   const { can } = usePermission()
   const canEdit = can(PERMISSIONS.ROLE.MANAGE)
   const confirm = useConfirm()
   const notify = useNotify()
-  const { toggle, saving } = useTogglePermission()
   const catalog = usePermissionCatalog()
   const roles = useRoles()
 
-  const [viewMode, setViewMode] = useState<ViewMode>('list')
   const [keyword, setKeyword] = useState('')
   const [moduleFilter, setModuleFilter] = useState<string | undefined>(undefined)
   const [methodFilter, setMethodFilter] = useState<string | undefined>(undefined)
@@ -199,25 +192,6 @@ export function PermissionListPage() {
         ),
       },
       {
-        title: 'Vai trò được cấp',
-        key: 'roles',
-        render: (_, p) => {
-          const granted = roleList.filter((r) => r.permissions.includes(p.code))
-          if (granted.length === 0) {
-            return <Typography.Text type="secondary">—</Typography.Text>
-          }
-          return (
-            <Space size={4} wrap>
-              {granted.map((r) => (
-                <Tag key={r.id} color="blue" style={{ margin: 0 }}>
-                  {r.name}
-                </Tag>
-              ))}
-            </Space>
-          )
-        },
-      },
-      {
         title: 'Thao tác',
         key: 'actions',
         width: actionColumnWidth(3),
@@ -226,68 +200,7 @@ export function PermissionListPage() {
         render: (_, p) => renderActions(p),
       },
     ],
-    [roleList, renderActions],
-  )
-
-  const matrixColumns = useMemo<ColumnsType<ExtendedPermission>>(
-    () => [
-      {
-        title: 'Nhóm',
-        dataIndex: 'module',
-        fixed: 'left',
-        width: 150,
-        onCell: (row, index = 0) => {
-          if (index > 0 && filteredList[index - 1]?.module === row.module) return { rowSpan: 0 }
-          let span = 1
-          while (filteredList[index + span]?.module === row.module) span++
-          return { rowSpan: span }
-        },
-        render: (m: string) => <Tag>{moduleLabel(m)}</Tag>,
-      },
-      {
-        title: 'Quyền chức năng',
-        dataIndex: 'description',
-        fixed: 'left',
-        width: 250,
-        render: (d: string, p) => (
-          <Flex vertical gap={2}>
-            <span className="cell-title-link" onClick={() => setViewing(p)}>
-              {d}
-            </span>
-            <div>
-              <span className="code-tag--blue">{p.code}</span>
-            </div>
-          </Flex>
-        ),
-      },
-      ...roleList.map((r) => ({
-        title: (
-          <span title={r.code} style={{ whiteSpace: 'normal', display: 'block', lineHeight: 1.3 }}>
-            {r.name}
-          </span>
-        ),
-        key: r.code,
-        align: 'center' as const,
-        width: 145,
-        render: (_: unknown, p: ExtendedPermission) => (
-          <PermissionToggleCell
-            granted={r.permissions.includes(p.code)}
-            editable={canEdit && !saving}
-            lockReason={canEdit ? lockReason(r, p) : null}
-            onToggle={() => void toggle(r, p)}
-          />
-        ),
-      })),
-      {
-        title: 'Thao tác',
-        key: 'actions',
-        width: actionColumnWidth(3),
-        className: 'col-actions',
-        align: 'center',
-        render: (_, p) => renderActions(p),
-      },
-    ],
-    [filteredList, roleList, canEdit, saving, toggle, renderActions],
+    [renderActions],
   )
 
   const error = (catalog.error && !catalog.data) || (roles.error && !roles.data)
@@ -296,7 +209,7 @@ export function PermissionListPage() {
   return (
     <PageContainer
       title="Quản lý quyền hạn"
-      subtitle="Quản lý danh mục quyền hạn (Permission), đường dẫn API Path, phương thức HTTP và ma trận phân quyền theo vai trò"
+      subtitle="Quản lý danh mục quyền hạn (Permission), đường dẫn API Path và phương thức HTTP; gán quyền cho vai trò ở trang Vai trò"
       extra={
         <ProtectedAction access={PERMISSIONS.ROLE.MANAGE}>
           <Button type="primary" onClick={() => setFormModal({ open: true })}>
@@ -346,24 +259,6 @@ export function PermissionListPage() {
           </span>
         </AdvancedFilter>
 
-        <ViewTabs
-          activeKey={viewMode}
-          onChange={(k) => setViewMode(k as ViewMode)}
-          items={[
-            {
-              key: 'list',
-              label: 'Danh sách quyền hạn',
-              icon: <TableOutlined />,
-              count: filteredList.length,
-            },
-            {
-              key: 'matrix',
-              label: 'Ma trận phân quyền × Vai trò',
-              icon: <AppstoreOutlined />,
-            },
-          ]}
-        />
-
         {error ? (
           <ErrorState
             onRetry={() => {
@@ -375,17 +270,12 @@ export function PermissionListPage() {
           <TableCard>
             <Table<ExtendedPermission>
               rowKey="code"
-              bordered={viewMode === 'matrix'}
               size="middle"
               loading={catalog.isFetching || roles.isFetching}
               dataSource={filteredList}
-              columns={viewMode === 'list' ? listColumns : matrixColumns}
+              columns={listColumns}
               pagination={false}
-              scroll={
-                viewMode === 'matrix'
-                  ? { x: 'max-content', y: 'calc(100vh - 320px)' }
-                  : { x: 1050 }
-              }
+              scroll={{ x: 1050 }}
             />
           </TableCard>
         )}

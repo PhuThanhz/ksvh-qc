@@ -44,12 +44,23 @@ public record InspectionCreateRequest(
         String notes,
 
         /** Danh sách ID lỗi cần nghiệm thu (dùng cho loại VERIFICATION). Trống = tự động gom tất cả lỗi chờ nghiệm thu. */
-        List<Long> findingIds
+        List<Long> findingIds,
+
+        /** Danh sách ID tiêu chí kiểm soát cụ thể cho kiểm tra đột xuất (trống = lấy toàn bộ tiêu chí trong topicGroupIds). */
+        @Size(max = 500, message = "Tối đa 500 tiêu chí")
+        List<Long> criterionIds
 ) {
     public InspectionCreateRequest(
             String code, Long planId, Long restaurantId, Long templateId,
             Long inspectorId, InspectionKind inspectionType, InspectionMode inspectionMode,
             List<Long> topicGroupIds, String notes) {
-        this(code, planId, restaurantId, templateId, inspectorId, inspectionType, inspectionMode, topicGroupIds, notes, List.of());
+        this(code, planId, restaurantId, templateId, inspectorId, inspectionType, inspectionMode, topicGroupIds, notes, List.of(), List.of());
+    }
+
+    public InspectionCreateRequest(
+            String code, Long planId, Long restaurantId, Long templateId,
+            Long inspectorId, InspectionKind inspectionType, InspectionMode inspectionMode,
+            List<Long> topicGroupIds, String notes, List<Long> findingIds) {
+        this(code, planId, restaurantId, templateId, inspectorId, inspectionType, inspectionMode, topicGroupIds, notes, findingIds, List.of());
     }
 }

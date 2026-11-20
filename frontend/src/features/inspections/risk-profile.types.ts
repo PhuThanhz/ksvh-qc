@@ -34,6 +34,7 @@ export interface RestaurantRiskProfileResponse {
   customEscalation: boolean
   escalationThreshold?: number | null
   resetPeriodMonths?: number
+  stepIncrease?: number | null
   totalEscalatedCriteria: number
   totalActiveFindings: number
   criteria: CriterionRiskProfileItem[]

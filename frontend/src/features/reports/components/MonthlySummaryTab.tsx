@@ -11,6 +11,7 @@ import { EChart } from '@/components/charts/EChart'
 import { KpiCard } from '@/components/data-display/KpiCard'
 import { TableCard } from '@/components/data-display/TableCard'
 import { useNotify } from '@/components/feedback/useNotify'
+import { MonthlyCharts } from '@/features/reports/components/ReportCharts'
 import { ReportFilterBar } from '@/features/reports/components/ReportFilterBar'
 import { useMonthlySummary } from '@/features/reports/hooks/useReports'
 import { reportApi } from '@/features/reports/api/report.api'
@@ -89,19 +90,22 @@ export function MonthlySummaryTab() {
 
   return (
     <Flex vertical gap={16}>
-      <Flex justify="space-between" align="center" wrap="wrap" gap={12}>
-        <ReportFilterBar filter={filter} onChange={setFilter} />
-        <ProtectedAction access={{ anyOf: [PERMISSIONS.REPORT.EXPORT, PERMISSIONS.REPORT.READ] }}>
-          <Button
-            className="btn-tint-excel"
-            icon={<FileExcelOutlined />}
-            loading={exporting}
-            onClick={handleExport}
-          >
-            Xuất Excel
-          </Button>
-        </ProtectedAction>
-      </Flex>
+      <ReportFilterBar
+        filter={filter}
+        onChange={setFilter}
+        extra={
+          <ProtectedAction access={{ anyOf: [PERMISSIONS.REPORT.EXPORT, PERMISSIONS.REPORT.READ] }}>
+            <Button
+              className="btn-tint-excel"
+              icon={<FileExcelOutlined />}
+              loading={exporting}
+              onClick={handleExport}
+            >
+              Xuất Excel
+            </Button>
+          </ProtectedAction>
+        }
+      />
 
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} lg={6}>
@@ -151,6 +155,8 @@ export function MonthlySummaryTab() {
           <EChart option={chartOption} height={280} ariaLabel="Biểu đồ tổng hợp tháng" />
         </Card>
       )}
+
+      <MonthlyCharts items={items} loading={isLoading} />
 
       <TableCard>
         <Flex justify="space-between" align="center" style={{ borderBottom: '1px solid #eef2f6' }}>

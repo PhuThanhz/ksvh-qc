@@ -1,12 +1,13 @@
 import { EnvironmentOutlined } from '@ant-design/icons'
-import { Flex, Space, Tag, Tooltip, Typography } from 'antd'
+import { Flex, Space, Tooltip, Typography } from 'antd'
 import { DataTable, type DataTableProps } from '@/components/data-display/DataTable'
 import { TableActions } from '@/components/data-display/TableActions'
 import { ActiveBadge } from '@/features/organizations/components/ActiveBadge'
+import { EscalationCell } from '@/features/organizations/components/EscalationCell'
 import { OrgUnitTypeTag } from '@/features/organizations/components/OrgUnitTypeTag'
 import {
   ORG_UNIT_TYPE_LABEL,
-  escalationOverrideText,
+  hasEscalationOverride,
   type OrgUnit,
   type OrgUnitType,
 } from '@/features/organizations/organizations.types'
@@ -116,11 +117,8 @@ export function OrgUnitTable({ onView, onEdit, onDelete, onFilterType, fixedUnit
           {
             title: 'Ngưỡng nâng mức',
             key: 'escalation',
-            width: 190,
-            render: (_: unknown, u: OrgUnit) => {
-              const text = escalationOverrideText(u)
-              return text ? <Tag color="warning">Riêng: {text}</Tag> : <span className="cell-sub">Theo quy tắc chung</span>
-            },
+            width: 230,
+            render: (_: unknown, u: OrgUnit) => <EscalationCell unit={u} />,
           },
         ]
       : []),
@@ -149,6 +147,8 @@ export function OrgUnitTable({ onView, onEdit, onDelete, onFilterType, fixedUnit
     <DataTable<OrgUnit>
       {...props}
       rowKey="id"
+      // Nhà hàng dùng ngưỡng nâng mức riêng: vạch cam ở mép trái dòng để dễ nhận ra khi lướt bảng
+      rowClassName={(u: OrgUnit) => (u.unitType === 'RESTAURANT' && hasEscalationOverride(u) ? 'row--custom-escalation' : '')}
       // Độ rộng các cột phù hợp sau khi ẩn 2 cột CHT và OBM ra modal chi tiết
       scroll={{ x: 1390 }}
       columns={columns}

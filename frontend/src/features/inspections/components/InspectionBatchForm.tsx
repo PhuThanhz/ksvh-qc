@@ -1,9 +1,10 @@
 import { Alert, Button, Flex, Form, Input, Radio, Select, Space } from 'antd'
 import dayjs from 'dayjs'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useSession } from '@/features/auth'
 import { useCriterionGroups } from '@/features/criteria/hooks/useCriteria'
 import { useTemplates } from '@/features/criteria/hooks/useTemplates'
+import { SurpriseCriteriaPicker } from './SurpriseCriteriaPicker'
 import { useInspectionMutations, usePlans } from '@/features/inspections/hooks/useInspectionData'
 import { INSPECTION_KIND_LABEL, INSPECTION_MODE_LABEL, type InspectionBatchCreateRequest } from '@/features/inspections/inspection.types'
 import { useOrgUnits } from '@/features/organizations/hooks/useOrganizations'
@@ -33,6 +34,8 @@ export function InspectionBatchForm({ onSuccess, onCancel }: Props) {
   const kind = Form.useWatch('inspectionType', form)
   const isPeriodic = kind !== 'SURPRISE'
   const selectedRestaurantIds = Form.useWatch('restaurantIds', form) ?? []
+  const [topicGroupIds, setTopicGroupIds] = useState<number[]>([])
+  const [criterionIds, setCriterionIds] = useState<number[]>([])
 
   useEffect(() => {
     const initialInspectorId = !canPlan && user?.id ? user.id : undefined
@@ -48,9 +51,15 @@ export function InspectionBatchForm({ onSuccess, onCancel }: Props) {
   const onSubmit = async () => {
     try {
       const vals = await form.validateFields()
+      if (!isPeriodic) {
+        if ((!vals.criterionIds || vals.criterionIds.length === 0) && (!vals.topicGroupIds || vals.topicGroupIds.length === 0)) {
+          notify.error('Vui lòng chọn ít nhất một chuyên đề hoặc tiêu chí cần kiểm tra đột xuất')
+          return
+        }
+      }
       const res = await createBatch.mutateAsync(
         isPeriodic
-          ? { ...vals, inspectionMode: 'ON_SITE', topicGroupIds: undefined }
+          ? { ...vals, inspectionMode: 'ON_SITE', topicGroupIds: undefined, criterionIds: undefined }
           : { ...vals, templateId: undefined },
       )
       notify.success(`Đã khởi tạo thành công ${res.length} biên bản kiểm tra KSVH!`)
@@ -122,22 +131,23 @@ export function InspectionBatchForm({ onSuccess, onCancel }: Props) {
       ) : (
         <>
           <Form.Item
-            name="topicGroupIds"
-            label="Chuyên đề kiểm tra"
-            rules={[{ required: true, message: 'Chọn ít nhất một chuyên đề' }]}
+            label="Phạm vi kiểm tra đột xuất (Nhóm chuyên đề & Từng tiêu chí nhỏ)"
+            required
+            extra="Tích chọn cả nhóm hoặc tích chọn chi tiết từng tiêu chí nhỏ áp dụng cho toàn bộ các nhà hàng đã chọn."
           >
-            <Select
-              mode="multiple"
-              placeholder="Chọn các chuyên đề kiểm tra..."
-              optionFilterProp="label"
-              options={(groups.data ?? [])
-                .filter((g) => g.active)
-                .map((g) => ({
-                  value: g.id,
-                  label: `${g.name} (${g.criterionCount} tiêu chí) ${g.companyName ? `[${g.companyName}]` : '[Dùng chung]'}`,
-                }))}
+            <SurpriseCriteriaPicker
+              groups={(groups.data ?? []).filter((g) => g.active)}
+              selectedGroupIds={topicGroupIds}
+              selectedCriterionIds={criterionIds}
+              onChange={(cIds, gIds) => {
+                setCriterionIds(cIds)
+                setTopicGroupIds(gIds)
+                form.setFieldsValue({ criterionIds: cIds, topicGroupIds: gIds })
+              }}
             />
           </Form.Item>
+          <Form.Item name="criterionIds" noStyle />
+          <Form.Item name="topicGroupIds" noStyle />
           <Form.Item name="inspectionMode" label="Hình thức" rules={[{ required: true }]}>
             <Radio.Group options={(['ON_SITE', 'REMOTE'] as const).map((m) => ({ value: m, label: INSPECTION_MODE_LABEL[m] }))} />
           </Form.Item>

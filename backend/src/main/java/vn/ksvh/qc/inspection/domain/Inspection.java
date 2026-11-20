@@ -96,9 +96,6 @@ public class Inspection extends BaseEntity {
     @Column(length = 1000)
     private String notes;
 
-    @Column(name = "created_by")
-    private Long createdBy;
-
     @OneToMany(mappedBy = "inspection", cascade = CascadeType.ALL, orphanRemoval = true)
     @BatchSize(size = 50)
     @OrderBy("sortOrder ASC")

@@ -1496,6 +1496,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/inspection-plans/inspector-schedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["inspectorSchedule"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/findings": {
         parameters: {
             query?: never;
@@ -1808,6 +1824,9 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+            /** Format: date-time */
+            lastLoginAt: string;
+            online: boolean;
         };
         RoleRequest: {
             code: string;
@@ -1872,6 +1891,8 @@ export interface components {
             escalationThreshold?: number | null;
             /** Format: int32 */
             escalationResetMonths?: number | null;
+            /** Format: int32 */
+            escalationStep?: number | null;
         };
         OrgUnitResponse: {
             /** Format: int64 */
@@ -1898,6 +1919,8 @@ export interface components {
             escalationThreshold: number | null;
             /** Format: int32 */
             escalationResetMonths: number | null;
+            /** Format: int32 */
+            escalationStep: number | null;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -2002,14 +2025,16 @@ export interface components {
             /** Format: int64 */
             inspectorId: number;
             /** Format: int64 */
-            templateId: number;
+            templateId?: number | null;
             /** Format: date */
-            scheduledDate: string;
+            scheduledDate?: string | null;
+            topicGroupIds?: number[] | null;
+            criterionIds?: number[] | null;
         };
         PlanUpdateRequest: {
             title: string;
             /** Format: date */
-            startDate: string;
+            startDate?: string | null;
             /** Format: date */
             endDate: string;
             notes?: string;
@@ -2026,10 +2051,10 @@ export interface components {
             inspectorId: number;
             inspectorName: string;
             /** Format: int64 */
-            templateId: number;
-            templateName: string;
+            templateId: number | null;
+            templateName: string | null;
             /** Format: date */
-            scheduledDate: string;
+            scheduledDate: string | null;
             /** Format: int64 */
             inspectionId: number | null;
             inspectionCode: string | null;
@@ -2037,11 +2062,16 @@ export interface components {
             inspectionStatus: "ASSIGNED" | "IN_PROGRESS" | "SUBMITTED" | "AWAITING_ACK" | "COMPLETED" | "CANCELLED" | null;
             /** Format: int32 */
             priorUnresolvedCount: number;
+            topicGroupIds: number[];
+            topicNames: string[];
+            criterionIds: number[];
         };
         PlanResponse: {
             /** Format: int64 */
             id: number;
             planCode: string;
+            /** @enum {string} */
+            inspectionKind: "PERIODIC" | "SURPRISE" | "VERIFICATION";
             title: string;
             /** Format: date */
             startDate: string;
@@ -2222,6 +2252,7 @@ export interface components {
             topicGroupIds?: number[];
             notes?: string;
             findingIds?: number[];
+            criterionIds?: number[];
         };
         InspectionItemResponse: {
             /** Format: int64 */
@@ -2346,16 +2377,19 @@ export interface components {
             inspectionMode?: "ON_SITE" | "REMOTE";
             topicGroupIds?: number[];
             notes?: string;
+            criterionIds?: number[];
         };
         PlanCreateRequest: {
-            planCode: string;
+            planCode?: string | null;
             title: string;
             /** Format: date */
-            startDate: string;
+            startDate?: string | null;
             /** Format: date */
             endDate: string;
             notes?: string;
             assignments?: components["schemas"]["PlanAssignmentRequest"][];
+            /** @enum {string|null} */
+            inspectionKind?: "PERIODIC" | "SURPRISE" | "VERIFICATION" | null;
         };
         PlanRejectRequest: {
             reason: string;
@@ -2699,6 +2733,8 @@ export interface components {
             escalationThreshold: number | null;
             /** Format: int32 */
             resetPeriodMonths: number | null;
+            /** Format: int32 */
+            stepIncrease: number | null;
             /** Format: int32 */
             totalEscalatedCriteria: number;
             /** Format: int32 */
@@ -3049,6 +3085,18 @@ export interface components {
             totalUnresolvedCount: number;
             warningDetails: string[];
         };
+        InspectorScheduleItem: {
+            /** Format: int64 */
+            inspectorId: number;
+            /** Format: date */
+            date: string;
+            /** Format: int64 */
+            planId: number;
+            planCode: string;
+            /** Format: int64 */
+            restaurantId: number;
+            restaurantName: string;
+        };
         PageResponseFindingResponse: {
             items: components["schemas"]["FindingResponse"][];
             /** Format: int32 */
@@ -3293,6 +3341,7 @@ export type PageResponseTemplateResponse = components['schemas']['PageResponseTe
 export type TemplateOption = components['schemas']['TemplateOption'];
 export type PageResponsePlanResponse = components['schemas']['PageResponsePlanResponse'];
 export type PriorFindingsWarning = components['schemas']['PriorFindingsWarning'];
+export type InspectorScheduleItem = components['schemas']['InspectorScheduleItem'];
 export type PageResponseFindingResponse = components['schemas']['PageResponseFindingResponse'];
 export type CandidateReviewerResponse = components['schemas']['CandidateReviewerResponse'];
 export type CandidateFindingResponse = components['schemas']['CandidateFindingResponse'];
@@ -6202,6 +6251,30 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PriorFindingsWarning"];
+                };
+            };
+        };
+    };
+    inspectorSchedule: {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+                excludePlanId?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["InspectorScheduleItem"][];
                 };
             };
         };

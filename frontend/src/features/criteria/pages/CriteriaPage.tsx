@@ -1,4 +1,5 @@
-import { Button } from 'antd'
+import { PlusCircleOutlined, UnorderedListOutlined } from '@ant-design/icons'
+import { Button, Space } from 'antd'
 import { useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { PageContainer } from '@/components/layout/PageContainer'
@@ -18,6 +19,7 @@ export function CriteriaPage() {
     open: boolean
     criterion?: Criterion
     defaultGroupId?: number
+    defaultMode?: 'single' | 'batch'
   }>({ open: false })
 
   const groups = useCriterionGroups()
@@ -29,27 +31,36 @@ export function CriteriaPage() {
       headerExtra={<CriteriaExcelActions />}
       extra={
         <ProtectedAction access={PERMISSIONS.CRITERIA.MANAGE}>
-          {/* Một nút duy nhất: trong modal chọn thêm một tiêu chí hoặc nhiều tiêu chí cùng lúc. */}
-          <Button
-            type="primary"
-            onClick={() => setCriterionModal({ open: true, defaultGroupId: initialGroupId })}
-          >
-            Thêm tiêu chí
-          </Button>
+          <Space>
+            <Button
+              type="primary"
+              icon={<PlusCircleOutlined />}
+              onClick={() => setCriterionModal({ open: true, defaultGroupId: initialGroupId, defaultMode: 'single' })}
+            >
+              Thêm tiêu chí
+            </Button>
+            <Button
+              icon={<UnorderedListOutlined />}
+              onClick={() => setCriterionModal({ open: true, defaultGroupId: initialGroupId, defaultMode: 'batch' })}
+            >
+              Thêm hàng loạt
+            </Button>
+          </Space>
         </ProtectedAction>
       }
     >
       <CriterionTab
         key={`tab-${initialGroupId ?? 'all'}`}
         initialGroupId={initialGroupId}
-        onCreateCriterion={(defaultGroupId) => setCriterionModal({ open: true, defaultGroupId })}
-        onEditCriterion={(criterion) => setCriterionModal({ open: true, criterion })}
+        onCreateCriterion={(defaultGroupId) => setCriterionModal({ open: true, defaultGroupId, defaultMode: 'single' })}
+        onEditCriterion={(criterion) => setCriterionModal({ open: true, criterion, defaultMode: 'single' })}
       />
       <CriterionFormModal
         open={criterionModal.open}
         criterion={criterionModal.criterion}
         groups={groups.data ?? []}
         defaultGroupId={criterionModal.defaultGroupId}
+        defaultMode={criterionModal.defaultMode}
         onClose={() => setCriterionModal({ open: false })}
       />
     </PageContainer>

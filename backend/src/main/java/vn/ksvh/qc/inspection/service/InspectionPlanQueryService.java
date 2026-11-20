@@ -16,6 +16,8 @@ import vn.ksvh.qc.inspection.dto.PlanResponse;
 import vn.ksvh.qc.inspection.dto.PriorFindingsWarning;
 import vn.ksvh.qc.organization.api.OrgUnitLookupApi;
 import vn.ksvh.qc.organization.api.OrgUnitRef;
+import vn.ksvh.qc.shared.error.BusinessException;
+import vn.ksvh.qc.shared.error.ErrorCode;
 import vn.ksvh.qc.shared.error.NotFoundException;
 import vn.ksvh.qc.shared.util.BusinessDates;
 import vn.ksvh.qc.shared.web.PageResponse;
@@ -99,7 +101,9 @@ public class InspectionPlanQueryService {
 
         var restIds = assignments.stream().map(PlanAssignment::getRestaurantId).distinct().toList();
         var inspectorIds = assignments.stream().map(PlanAssignment::getInspectorId).distinct().toList();
-        var templateIds = assignments.stream().map(PlanAssignment::getTemplateId).distinct().toList();
+        var templateIds = assignments.stream().map(PlanAssignment::getTemplateId).filter(Objects::nonNull).distinct().toList();
+        var groupIds = assignments.stream().flatMap(a -> a.getTopicGroupIds().stream()).distinct().toList();
+        var groups = criteriaLookupApi.findGroups(groupIds);
         var inspectionIds = assignments.stream().map(PlanAssignment::getInspectionId).filter(Objects::nonNull).distinct().toList();
 
         Map<Long, OrgUnitRef> rests = orgUnitLookupApi.findRefs(restIds);
@@ -121,7 +125,9 @@ public class InspectionPlanQueryService {
         List<PlanAssignmentResponse> list = assignments.stream().map(a -> {
             OrgUnitRef r = rests.get(a.getRestaurantId());
             UserSummary ins = inspectors.get(a.getInspectorId());
-            TemplateRef tpl = templates.get(a.getTemplateId());
+            TemplateRef tpl = a.getTemplateId() != null ? templates.get(a.getTemplateId()) : null;
+            List<Long> topicIds = List.copyOf(a.getTopicGroupIds());
+            List<String> topicNames = topicIds.stream().map(gid -> groups.containsKey(gid) ? groups.get(gid).name() : "#" + gid).toList();
             Inspection insp = a.getInspectionId() != null ? inspections.get(a.getInspectionId()) : null;
             int priorCount = priorUnresolvedCountByRest.getOrDefault(a.getRestaurantId(), 0L).intValue();
 
@@ -138,7 +144,10 @@ public class InspectionPlanQueryService {
                     a.getInspectionId(),
                     insp != null ? insp.getCode() : null,
                     insp != null ? insp.getStatus() : null,
-                    priorCount
+                    priorCount,
+                    topicIds,
+                    topicNames,
+                    List.copyOf(a.getCriterionIds())
             );
         }).toList();
 
@@ -180,17 +189,37 @@ public class InspectionPlanQueryService {
         return new PriorFindingsWarning(restaurantId, rCode, rName, unverified, priorFindings.size(), details);
     }
 
-    public List<PlanAssignmentRequest> getCopyableAssignments(Long sourcePlanId, LocalDate targetStartDate, LocalDate targetEndDate) {
-        InspectionPlan sourcePlan = planRepository.findById(sourcePlanId)
-                .orElseThrow(() -> new NotFoundException("Không tìm thấy kế hoạch nguồn #" + sourcePlanId));
-        List<PlanAssignment> assignments = planAssignmentRepository.findByPlanId(sourcePlanId);
-        return assignments.stream().map(a -> {
-            long offsetDays = java.time.temporal.ChronoUnit.DAYS.between(sourcePlan.getStartDate(), a.getScheduledDate());
-            LocalDate newDate = targetStartDate.plusDays(Math.max(0, offsetDays));
-            if (newDate.isAfter(targetEndDate)) {
-                newDate = targetEndDate;
-            }
-            return new PlanAssignmentRequest(a.getRestaurantId(), a.getInspectorId(), a.getTemplateId(), newDate);
+    public List<PlanAssignmentRequest> getCopyableAssignments(Long sourcePlanId) {
+        if (!planRepository.existsById(sourcePlanId)) {
+            throw new NotFoundException("Không tìm thấy kế hoạch nguồn #" + sourcePlanId);
+        }
+        // Kế hoạch chỉ giao hạn hoàn thành → dòng sao chép không mang ngày kiểm tra cụ thể
+        return planAssignmentRepository.findByPlanId(sourcePlanId).stream()
+                .map(a -> new PlanAssignmentRequest(a.getRestaurantId(), a.getInspectorId(), a.getTemplateId(), null,
+                        List.copyOf(a.getTopicGroupIds()), List.copyOf(a.getCriterionIds())))
+                .toList();
+    }
+
+    /**
+     * Lịch đã có của các chuyên viên trong khoảng ngày (để cảnh báo trùng lịch khi lập kế hoạch).
+     * Lấy từ dòng phân công của mọi kế hoạch chưa bị từ chối; phiếu đột xuất không có ngày dự kiến nên không tính.
+     */
+    public List<vn.ksvh.qc.inspection.dto.InspectorScheduleItem> inspectorSchedule(LocalDate from, LocalDate to, Long excludePlanId) {
+        if (to.isBefore(from)) {
+            throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Ngày kết thúc phải sau hoặc bằng ngày bắt đầu");
+        }
+        if (from.plusDays(366).isBefore(to)) {
+            throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Chỉ xem lịch tối đa 1 năm");
+        }
+        List<PlanAssignment> rows = planAssignmentRepository.findScheduled(from, to, excludePlanId);
+        Map<Long, InspectionPlan> plans = planRepository.findAllById(rows.stream().map(PlanAssignment::getPlanId).distinct().toList())
+                .stream().collect(Collectors.toMap(InspectionPlan::getId, Function.identity()));
+        Map<Long, OrgUnitRef> rests = orgUnitLookupApi.findRefs(rows.stream().map(PlanAssignment::getRestaurantId).distinct().toList());
+        return rows.stream().map(a -> {
+            InspectionPlan plan = plans.get(a.getPlanId());
+            OrgUnitRef rest = rests.get(a.getRestaurantId());
+            return new vn.ksvh.qc.inspection.dto.InspectorScheduleItem(a.getInspectorId(), a.getScheduledDate(), a.getPlanId(),
+                    plan != null ? plan.getPlanCode() : null, a.getRestaurantId(), rest != null ? rest.name() : null);
         }).toList();
     }
 }

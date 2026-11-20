@@ -19,6 +19,8 @@ public record RestaurantRiskProfileResponse(
         /** Ngưỡng nâng mức đang áp dụng cho nhà hàng; null nếu chưa cấu hình. */
         @Schema(nullable = true) Integer escalationThreshold,
         @Schema(nullable = true) Integer resetPeriodMonths,
+        /** Số bậc nâng đang áp dụng cho nhà hàng; null nếu chưa cấu hình quy tắc nâng mức. */
+        @Schema(nullable = true) Integer stepIncrease,
         int totalEscalatedCriteria,
         int totalActiveFindings,
         List<CriterionRiskProfileItem> criteria

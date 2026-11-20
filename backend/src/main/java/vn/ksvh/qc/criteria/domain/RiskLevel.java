@@ -45,9 +45,6 @@ public class RiskLevel extends BaseEntity {
     @Column(name = "sort_order", nullable = false)
     private int sortOrder;
 
-    @Column(name = "updated_by")
-    private Long updatedBy;
-
     /** score thuộc mức này nếu minScore ≤ score &lt; maxScore. */
     public boolean contains(BigDecimal score) {
         return score.compareTo(minScore) >= 0 && (maxScore == null || score.compareTo(maxScore) < 0);

@@ -46,7 +46,4 @@ public class Criterion extends BaseEntity {
 
     @Column(nullable = false)
     private boolean active = true;
-
-    @Column(name = "updated_by")
-    private Long updatedBy;
 }

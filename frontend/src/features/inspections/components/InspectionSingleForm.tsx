@@ -1,6 +1,6 @@
 import { Button, Flex, Form, Input, Radio, Select, Space } from 'antd'
 import dayjs from 'dayjs'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSession } from '@/features/auth'
 import { useCriterionGroups } from '@/features/criteria/hooks/useCriteria'
 import { useTemplates } from '@/features/criteria/hooks/useTemplates'
@@ -41,6 +41,8 @@ export function InspectionSingleForm({ onSuccess, onCancel, initialValues }: Pro
 
   const restaurantId = Form.useWatch('restaurantId', form)
   const findingIds = Form.useWatch('findingIds', form)
+  const [topicGroupIds, setTopicGroupIds] = useState<number[]>(() => initialValues?.topicGroupIds ?? [])
+  const [criterionIds, setCriterionIds] = useState<number[]>(() => initialValues?.criterionIds ?? [])
   const selectedRestaurant = useMemo(
     () => restaurants.data?.items.find((r) => r.id === restaurantId),
     [restaurants.data, restaurantId],
@@ -83,11 +85,15 @@ export function InspectionSingleForm({ onSuccess, onCancel, initialValues }: Pro
       const vals = await form.validateFields()
       let payload: InspectionCreateRequest
       if (vals.inspectionType === 'PERIODIC') {
-        payload = { ...vals, inspectionMode: 'ON_SITE', topicGroupIds: undefined, findingIds: undefined }
+        payload = { ...vals, inspectionMode: 'ON_SITE', topicGroupIds: undefined, findingIds: undefined, criterionIds: undefined }
       } else if (vals.inspectionType === 'SURPRISE') {
+        if ((!vals.criterionIds || vals.criterionIds.length === 0) && (!vals.topicGroupIds || vals.topicGroupIds.length === 0)) {
+          notify.error('Vui lòng chọn ít nhất một chuyên đề hoặc tiêu chí cần kiểm tra đột xuất')
+          return
+        }
         payload = { ...vals, templateId: undefined, findingIds: undefined }
       } else {
-        payload = { ...vals, templateId: undefined, topicGroupIds: undefined, planId: undefined }
+        payload = { ...vals, templateId: undefined, topicGroupIds: undefined, planId: undefined, criterionIds: undefined }
       }
       await create.mutateAsync(payload)
       notify.success('Khởi tạo đợt kiểm tra và phân công chuyên viên thành công')
@@ -151,7 +157,16 @@ export function InspectionSingleForm({ onSuccess, onCancel, initialValues }: Pro
         filteredGroups={filteredGroups}
         findingIds={findingIds}
         onChangeFindingIds={(ids) => form.setFieldValue('findingIds', ids)}
+        topicGroupIds={topicGroupIds}
+        criterionIds={criterionIds}
+        onChangeSurpriseScope={(cIds, gIds) => {
+          setCriterionIds(cIds)
+          setTopicGroupIds(gIds)
+          form.setFieldsValue({ criterionIds: cIds, topicGroupIds: gIds })
+        }}
       />
+      <Form.Item name="criterionIds" noStyle />
+      <Form.Item name="topicGroupIds" noStyle />
 
       {!isPeriodic && (
         <Form.Item name="inspectionMode" label="Hình thức" rules={[{ required: true }]}>

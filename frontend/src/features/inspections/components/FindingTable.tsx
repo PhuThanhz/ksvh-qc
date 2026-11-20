@@ -59,7 +59,7 @@ export function FindingTable({
           <div style={{ fontWeight: 600 }}>{r.restaurantName}</div>
           <div style={{ fontSize: 12, color: 'var(--app-text-secondary)', marginTop: 3, display: 'flex', alignItems: 'center', gap: 6 }}>
             <span>Biên bản:</span>
-            <Tag className="code-tag--blue" style={{ fontSize: 11.5, padding: '0 6px', lineHeight: '18px' }}>
+            <Tag className="code-tag--blue">
               {r.inspectionCode}
             </Tag>
           </div>

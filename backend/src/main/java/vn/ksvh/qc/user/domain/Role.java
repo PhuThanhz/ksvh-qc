@@ -36,9 +36,6 @@ public class Role extends BaseEntity {
     @Column(name = "system_role", nullable = false)
     private boolean systemRole;
 
-    @Column(name = "updated_by")
-    private Long updatedBy;
-
     @ElementCollection
     @BatchSize(size = 50)
     @CollectionTable(name = "role_permissions", joinColumns = @JoinColumn(name = "role_id"))

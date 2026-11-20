@@ -6,17 +6,19 @@ import { Link } from 'react-router'
 import { TableCard } from '@/components/data-display/TableCard'
 import { useNotify } from '@/components/feedback/useNotify'
 import { ROUTES } from '@/constants/routes'
+import { RankingCharts } from '@/features/reports/components/ReportCharts'
 import { ReportFilterBar } from '@/features/reports/components/ReportFilterBar'
 import { useRestaurantRankings } from '@/features/reports/hooks/useReports'
 import { reportApi } from '@/features/reports/api/report.api'
 import type { ReportFilter, RestaurantRankingItem } from '@/features/reports/report.types'
 import { PERMISSIONS, ProtectedAction } from '@/permissions'
 
+/** Xếp loại do server tính (RestaurantRankingReportService): M4 hoặc <60% → Nguy cơ cao; M3 hoặc <75% → Cần lưu ý; ≥90% → Tốt; còn lại Đạt. */
 const RANK_TAG: Record<string, { color: string; label: string }> = {
-  'Xuất sắc': { color: 'success', label: 'Xuất sắc (≥90%)' },
-  'Tốt': { color: 'blue', label: 'Tốt (80-89%)' },
-  'Trung bình': { color: 'warning', label: 'Trung bình (70-79%)' },
-  'Cần cải thiện': { color: 'error', label: 'Cần cải thiện (<70%)' },
+  'Tốt': { color: 'success', label: 'Tốt (≥90%)' },
+  'Đạt': { color: 'blue', label: 'Đạt (75–89%)' },
+  'Cần lưu ý': { color: 'warning', label: 'Cần lưu ý (có M3 / <75%)' },
+  'Nguy cơ cao': { color: 'error', label: 'Nguy cơ cao (có M4 / <60%)' },
 }
 
 export function RestaurantRankingTab() {
@@ -124,19 +126,24 @@ export function RestaurantRankingTab() {
 
   return (
     <Flex vertical gap={16}>
-      <Flex justify="space-between" align="center" wrap="wrap" gap={12}>
-        <ReportFilterBar filter={filter} onChange={setFilter} />
-        <ProtectedAction access={{ anyOf: [PERMISSIONS.REPORT.EXPORT, PERMISSIONS.REPORT.READ] }}>
-          <Button
-            className="btn-tint-excel"
-            icon={<FileExcelOutlined />}
-            loading={exporting}
-            onClick={handleExport}
-          >
-            Xuất Excel
-          </Button>
-        </ProtectedAction>
-      </Flex>
+      <ReportFilterBar
+        filter={filter}
+        onChange={setFilter}
+        extra={
+          <ProtectedAction access={{ anyOf: [PERMISSIONS.REPORT.EXPORT, PERMISSIONS.REPORT.READ] }}>
+            <Button
+              className="btn-tint-excel"
+              icon={<FileExcelOutlined />}
+              loading={exporting}
+              onClick={handleExport}
+            >
+              Xuất Excel
+            </Button>
+          </ProtectedAction>
+        }
+      />
+
+      <RankingCharts items={items} loading={isLoading} />
 
       <TableCard>
         <Flex justify="space-between" align="center" style={{ borderBottom: '1px solid #eef2f6' }}>

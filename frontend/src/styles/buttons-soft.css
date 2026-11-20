@@ -1,0 +1,33 @@
+/* ==========================================================================
+   Nút chính toàn hệ thống chuẩn Apple:
+   Nền trắng tinh sang trọng, viền thanh lịch, chữ đen tuyền sắc nét (#0f172a)
+   ========================================================================== */
+.ant-btn.ant-btn-primary:not(.ant-btn-dangerous):not(:disabled) {
+  background: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.18) !important;
+  color: #0f172a !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+  text-shadow: none !important;
+  font-weight: 600 !important;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.ant-btn.ant-btn-primary:not(.ant-btn-dangerous):not(:disabled) :is(.anticon, span) {
+  color: #0f172a !important;
+}
+.ant-btn.ant-btn-primary:not(.ant-btn-dangerous):not(:disabled):hover {
+  background: #f8fafc !important;
+  border-color: rgba(15, 23, 42, 0.35) !important;
+  color: #0f172a !important;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12) !important;
+  transform: translateY(-1px);
+}
+.ant-btn.ant-btn-primary:not(.ant-btn-dangerous):not(:disabled):hover :is(.anticon, span) {
+  color: #0f172a !important;
+}
+.ant-btn.ant-btn-primary:not(.ant-btn-dangerous):not(:disabled):active {
+  background: #f1f5f9 !important;
+  transform: translateY(0);
+}
+.ant-btn.ant-btn-primary.ant-btn-loading:not(.ant-btn-dangerous) {
+  color: #0f172a !important;
+}

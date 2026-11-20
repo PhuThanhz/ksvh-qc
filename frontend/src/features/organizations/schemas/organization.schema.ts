@@ -24,6 +24,7 @@ export const orgUnitSchema = z
     active: z.boolean(),
     escalationThreshold: z.number().int('Ngưỡng là số nguyên').min(2, 'Ngưỡng từ 2 đến 50 lần').max(50, 'Ngưỡng từ 2 đến 50 lần').nullable(),
     escalationResetMonths: z.number().int('Số tháng là số nguyên').min(1, 'Hạ mức sau 1 đến 24 tháng').max(24, 'Hạ mức sau 1 đến 24 tháng').nullable(),
+    escalationStep: z.number().int('Số bậc là số nguyên').min(1, 'Số bậc nâng từ 1 đến 4').max(4, 'Số bậc nâng từ 1 đến 4').nullable(),
   })
   .superRefine((v, ctx) => {
     if (v.companyId === null) ctx.addIssue({ code: 'custom', path: ['companyId'], message: 'Vui lòng chọn công ty' })

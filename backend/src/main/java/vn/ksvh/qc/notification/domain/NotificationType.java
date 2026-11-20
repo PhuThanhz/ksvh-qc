@@ -1,5 +1,9 @@
 package vn.ksvh.qc.notification.domain;
 
+/**
+ * Loại thông báo. DB có CHECK chk_notifications_type (V20261120_1800): thêm loại mới phải viết migration
+ * cập nhật ràng buộc đó, nếu không lưu thông báo sẽ lỗi.
+ */
 public enum NotificationType {
     PLAN_SUBMITTED,
     PLAN_APPROVED,

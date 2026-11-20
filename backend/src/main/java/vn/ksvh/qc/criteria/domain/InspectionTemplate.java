@@ -42,9 +42,6 @@ public class InspectionTemplate extends BaseEntity {
     @Column(name = "company_id")
     private Long companyId;
 
-    @Column(name = "updated_by")
-    private Long updatedBy;
-
     @ElementCollection
     @BatchSize(size = 50)
     @CollectionTable(name = "template_criteria", joinColumns = @JoinColumn(name = "template_id"))
