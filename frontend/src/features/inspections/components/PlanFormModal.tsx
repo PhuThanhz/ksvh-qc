@@ -104,7 +104,7 @@ export function PlanFormModal({ open, plan, onClose }: Props) {
     }
   }, [open, plan, planDetail.data, form])
 
-  const missingScope = (a: PlanAssignmentRequest) => (surprise ? !a.topicGroupIds?.length : !a.templateId)
+  const missingScope = (a: PlanAssignmentRequest) => (surprise ? (!a.templateId && !a.topicGroupIds?.length) : !a.templateId)
   const incomplete = assignments.filter((a) => !a.inspectorId || missingScope(a)).length
   const inspectorCount = new Set(assignments.map((a) => a.inspectorId).filter(Boolean)).size
 
@@ -117,7 +117,7 @@ export function PlanFormModal({ open, plan, onClose }: Props) {
     }
     const list = vals.assignments ?? []
     const bad = list.findIndex((a) => !a.restaurantId || !a.inspectorId || missingScope(a))
-    if (bad >= 0) return notify.error(`Dòng #${bad + 1} chưa đủ chuyên viên hoặc ${surprise ? 'chuyên đề' : 'mẫu phiếu'}`)
+    if (bad >= 0) return notify.error(`Dòng #${bad + 1} chưa đủ chuyên viên hoặc ${surprise ? 'phạm vi (mẫu đột xuất / chuyên đề)' : 'mẫu phiếu'}`)
     if (new Set(list.map((a) => a.restaurantId)).size !== list.length) {
       return notify.error('Có nhà hàng bị phân công trùng trong kế hoạch')
     }

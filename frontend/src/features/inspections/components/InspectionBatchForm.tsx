@@ -1,4 +1,4 @@
-import { Alert, Button, Flex, Form, Input, Radio, Select, Space } from 'antd'
+import { Alert, Button, Flex, Form, Input, Radio, Segmented, Select, Space } from 'antd'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import { useSession } from '@/features/auth'
@@ -37,6 +37,8 @@ export function InspectionBatchForm({ onSuccess, onCancel }: Props) {
   const [topicGroupIds, setTopicGroupIds] = useState<number[]>([])
   const [criterionIds, setCriterionIds] = useState<number[]>([])
 
+  const [batchSurpriseMode, setBatchSurpriseMode] = useState<'TEMPLATE' | 'TOPICS'>('TOPICS')
+
   useEffect(() => {
     const initialInspectorId = !canPlan && user?.id ? user.id : undefined
     form.setFieldsValue({
@@ -52,15 +54,15 @@ export function InspectionBatchForm({ onSuccess, onCancel }: Props) {
     try {
       const vals = await form.validateFields()
       if (!isPeriodic) {
-        if ((!vals.criterionIds || vals.criterionIds.length === 0) && (!vals.topicGroupIds || vals.topicGroupIds.length === 0)) {
-          notify.error('Vui lòng chọn ít nhất một chuyên đề hoặc tiêu chí cần kiểm tra đột xuất')
+        if (!vals.templateId && (!vals.criterionIds || vals.criterionIds.length === 0) && (!vals.topicGroupIds || vals.topicGroupIds.length === 0)) {
+          notify.error('Vui lòng chọn mẫu phiếu hoặc ít nhất một chuyên đề/tiêu chí cần kiểm tra đột xuất')
           return
         }
       }
       const res = await createBatch.mutateAsync(
         isPeriodic
           ? { ...vals, inspectionMode: 'ON_SITE', topicGroupIds: undefined, criterionIds: undefined }
-          : { ...vals, templateId: undefined },
+          : { ...vals, templateId: vals.templateId || undefined },
       )
       notify.success(`Đã khởi tạo thành công ${res.length} biên bản kiểm tra KSVH!`)
       onSuccess()
@@ -122,30 +124,72 @@ export function InspectionBatchForm({ onSuccess, onCancel }: Props) {
             showSearch
             placeholder="Chọn mẫu phiếu đánh giá định kỳ..."
             filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
-            options={templates.data?.items.map((t) => ({
-              value: t.id,
-              label: `${t.code} - ${t.name} (${t.criterionCount} tiêu chí) ${t.companyName ? `[${t.companyName}]` : '[Dùng chung]'}`,
-            }))}
+            options={templates.data?.items
+              ?.filter((t) => t.inspectionType !== 'SURPRISE')
+              .map((t) => ({
+                value: t.id,
+                label: `${t.code} - ${t.name} (${t.criterionCount} tiêu chí) ${t.companyName ? `[${t.companyName}]` : '[Dùng chung]'}`,
+              }))}
           />
         </Form.Item>
       ) : (
         <>
-          <Form.Item
-            label="Phạm vi kiểm tra đột xuất (Nhóm chuyên đề & Từng tiêu chí nhỏ)"
-            required
-            extra="Tích chọn cả nhóm hoặc tích chọn chi tiết từng tiêu chí nhỏ áp dụng cho toàn bộ các nhà hàng đã chọn."
-          >
-            <SurpriseCriteriaPicker
-              groups={(groups.data ?? []).filter((g) => g.active)}
-              selectedGroupIds={topicGroupIds}
-              selectedCriterionIds={criterionIds}
-              onChange={(cIds, gIds) => {
-                setCriterionIds(cIds)
-                setTopicGroupIds(gIds)
-                form.setFieldsValue({ criterionIds: cIds, topicGroupIds: gIds })
+          <div style={{ marginBottom: 12 }}>
+            <Segmented
+              value={batchSurpriseMode}
+              onChange={(val) => {
+                setBatchSurpriseMode(val as 'TEMPLATE' | 'TOPICS')
+                if (val === 'TEMPLATE') {
+                  form.setFieldsValue({ criterionIds: undefined, topicGroupIds: undefined })
+                  setCriterionIds([])
+                  setTopicGroupIds([])
+                } else {
+                  form.setFieldValue('templateId', undefined)
+                }
               }}
+              options={[
+                { label: 'Chọn mẫu phiếu đột xuất', value: 'TEMPLATE' },
+                { label: 'Tùy biến Chuyên đề & Tiêu chí', value: 'TOPICS' },
+              ]}
             />
-          </Form.Item>
+          </div>
+
+          {batchSurpriseMode === 'TEMPLATE' ? (
+            <Form.Item
+              name="templateId"
+              label="Mẫu phiếu kiểm tra đột xuất"
+              rules={[{ required: true, message: 'Vui lòng chọn mẫu phiếu đột xuất' }]}
+            >
+              <Select
+                showSearch
+                placeholder="Chọn mẫu phiếu đột xuất..."
+                filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
+                options={templates.data?.items
+                  ?.filter((t) => t.inspectionType === 'SURPRISE' || !t.inspectionType)
+                  .map((t) => ({
+                    value: t.id,
+                    label: `${t.code} - ${t.name} (${t.criterionCount} tiêu chí) ${t.companyName ? `[${t.companyName}]` : '[Dùng chung]'}`,
+                  }))}
+              />
+            </Form.Item>
+          ) : (
+            <Form.Item
+              label="Phạm vi kiểm tra đột xuất (Nhóm chuyên đề & Từng tiêu chí nhỏ)"
+              required
+              extra="Tích chọn cả nhóm hoặc tích chọn chi tiết từng tiêu chí nhỏ áp dụng cho toàn bộ các nhà hàng đã chọn."
+            >
+              <SurpriseCriteriaPicker
+                groups={(groups.data ?? []).filter((g) => g.active)}
+                selectedGroupIds={topicGroupIds}
+                selectedCriterionIds={criterionIds}
+                onChange={(cIds, gIds) => {
+                  setCriterionIds(cIds)
+                  setTopicGroupIds(gIds)
+                  form.setFieldsValue({ criterionIds: cIds, topicGroupIds: gIds })
+                }}
+              />
+            </Form.Item>
+          )}
           <Form.Item name="criterionIds" noStyle />
           <Form.Item name="topicGroupIds" noStyle />
           <Form.Item name="inspectionMode" label="Hình thức" rules={[{ required: true }]}>

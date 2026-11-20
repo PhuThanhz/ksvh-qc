@@ -8,10 +8,11 @@ public record TemplateOption(
         Long id,
         String code,
         String name,
+        @Schema(nullable = true) String inspectionType,
         @Schema(nullable = true) Long companyId,
         boolean active) {
 
     public static TemplateOption from(InspectionTemplate t) {
-        return new TemplateOption(t.getId(), t.getCode(), t.getName(), t.getCompanyId(), t.isActive());
+        return new TemplateOption(t.getId(), t.getCode(), t.getName(), t.getInspectionType(), t.getCompanyId(), t.isActive());
     }
 }

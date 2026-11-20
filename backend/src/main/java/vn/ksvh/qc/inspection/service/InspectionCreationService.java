@@ -91,16 +91,16 @@ public class InspectionCreationService {
                     "Không sinh được mã phiếu cho nhà hàng '%s' (mã quá dài hoặc đã đủ %d phiếu trong tháng)".formatted(restaurantCode, maxInspections));
         }
         InspectionCreateRequest req = new InspectionCreateRequest(code, plan.getId(), a.getRestaurantId(),
-                surprise ? null : a.getTemplateId(), a.getInspectorId(),
+                a.getTemplateId(), a.getInspectorId(),
                 surprise ? InspectionKind.SURPRISE : InspectionKind.PERIODIC, InspectionMode.ON_SITE,
-                surprise ? List.copyOf(a.getTopicGroupIds()) : null,
+                (a.getTopicGroupIds() != null && !a.getTopicGroupIds().isEmpty()) ? List.copyOf(a.getTopicGroupIds()) : null,
                 a.getScheduledDate() != null
                         ? "Theo kế hoạch %s, ngày dự kiến %s".formatted(plan.getPlanCode(), a.getScheduledDate())
                         : "Theo kế hoạch %s, hạn hoàn thành %s".formatted(plan.getPlanCode(),
                                 plan.getEndDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"))),
                 List.of(),
-                // Đột xuất có tick tiêu chí → phiếu chỉ gồm các tiêu chí đó; rỗng → toàn bộ tiêu chí của chuyên đề
-                surprise ? List.copyOf(a.getCriterionIds()) : List.of());
+                // Đột xuất có tick tiêu chí → phiếu chỉ gồm các tiêu chí đó; rỗng → toàn bộ tiêu chí của chuyên đề / mẫu
+                surprise && a.getCriterionIds() != null ? List.copyOf(a.getCriterionIds()) : List.of());
         return createChecked(req, actorId);
     }
 
@@ -147,25 +147,46 @@ public class InspectionCreationService {
             templateId = template.id();
             criteria = template.items();
         } else if (kind == InspectionKind.SURPRISE) {
-            topics = req.topicGroupIds() == null ? List.of() : req.topicGroupIds().stream().filter(Objects::nonNull).distinct().toList();
-            List<Long> critIds = req.criterionIds() == null ? List.of() : req.criterionIds().stream().filter(Objects::nonNull).distinct().toList();
-            if (topics.isEmpty() && critIds.isEmpty()) {
-                throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Kiểm tra đột xuất phải chọn ít nhất một chuyên đề hoặc tiêu chí");
-            }
-            if (!critIds.isEmpty()) {
-                Map<Long, CriterionRef> critMap = criteriaLookupApi.findCriteria(critIds);
-                criteria = critIds.stream().map(critMap::get).filter(Objects::nonNull).filter(CriterionRef::active).toList();
-                if (criteria.isEmpty()) {
-                    throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Các tiêu chí đã chọn không tồn tại hoặc đã ngưng hoạt động");
+            if (req.templateId() != null) {
+                TemplateRef template = criteriaLookupApi.findTemplate(req.templateId())
+                        .orElseThrow(() -> new NotFoundException("Không tìm thấy mẫu phiếu #" + req.templateId()));
+                validateTemplateForRestaurant(template, restaurant);
+                if (template.items().isEmpty()) {
+                    throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Mẫu phiếu này không còn tiêu chí nào đang hoạt động");
                 }
-                if (topics.isEmpty()) {
-                    topics = criteria.stream().map(CriterionRef::groupId).filter(Objects::nonNull).distinct().toList();
+                templateId = template.id();
+                List<Long> critIds = req.criterionIds() == null ? List.of() : req.criterionIds().stream().filter(Objects::nonNull).distinct().toList();
+                if (!critIds.isEmpty()) {
+                    Map<Long, CriterionRef> critMap = criteriaLookupApi.findCriteria(critIds);
+                    criteria = critIds.stream().map(critMap::get).filter(Objects::nonNull).filter(CriterionRef::active).toList();
+                    if (criteria.isEmpty()) {
+                        throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Các tiêu chí đã chọn không tồn tại hoặc đã ngưng hoạt động");
+                    }
+                } else {
+                    criteria = template.items();
                 }
+                topics = criteria.stream().map(CriterionRef::groupId).filter(Objects::nonNull).distinct().toList();
             } else {
-                validateTopics(topics, restaurant);
-                criteria = criteriaLookupApi.findActiveCriteriaInGroups(topics);
-                if (criteria.isEmpty()) {
-                    throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Các chuyên đề đã chọn chưa có tiêu chí nào đang hoạt động");
+                topics = req.topicGroupIds() == null ? List.of() : req.topicGroupIds().stream().filter(Objects::nonNull).distinct().toList();
+                List<Long> critIds = req.criterionIds() == null ? List.of() : req.criterionIds().stream().filter(Objects::nonNull).distinct().toList();
+                if (topics.isEmpty() && critIds.isEmpty()) {
+                    throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Kiểm tra đột xuất phải chọn mẫu phiếu hoặc ít nhất một chuyên đề / tiêu chí");
+                }
+                if (!critIds.isEmpty()) {
+                    Map<Long, CriterionRef> critMap = criteriaLookupApi.findCriteria(critIds);
+                    criteria = critIds.stream().map(critMap::get).filter(Objects::nonNull).filter(CriterionRef::active).toList();
+                    if (criteria.isEmpty()) {
+                        throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Các tiêu chí đã chọn không tồn tại hoặc đã ngưng hoạt động");
+                    }
+                    if (topics.isEmpty()) {
+                        topics = criteria.stream().map(CriterionRef::groupId).filter(Objects::nonNull).distinct().toList();
+                    }
+                } else {
+                    validateTopics(topics, restaurant);
+                    criteria = criteriaLookupApi.findActiveCriteriaInGroups(topics);
+                    if (criteria.isEmpty()) {
+                        throw new BusinessException(ErrorCode.VALIDATION_FAILED, "Các chuyên đề đã chọn chưa có tiêu chí nào đang hoạt động");
+                    }
                 }
             }
         } else if (kind == InspectionKind.VERIFICATION) {

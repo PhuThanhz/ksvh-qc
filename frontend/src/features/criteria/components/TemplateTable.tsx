@@ -61,6 +61,24 @@ export function TemplateTable({ onView, onEdit, onDelete, ...props }: TemplateTa
           ),
         },
         {
+          title: 'Loại mẫu',
+          dataIndex: 'inspectionType',
+          key: 'inspectionType',
+          width: 120,
+          render: (type: string | null | undefined) => {
+            const isSurprise = type === 'SURPRISE' || type?.toLowerCase().includes('đột')
+            return isSurprise ? (
+              <Tag color="orange" style={{ fontWeight: 600 }}>
+                Đột xuất
+              </Tag>
+            ) : (
+              <Tag color="blue" style={{ fontWeight: 600 }}>
+                Định kỳ
+              </Tag>
+            )
+          },
+        },
+        {
           title: 'Công ty áp dụng',
           dataIndex: 'companyName',
           key: 'companyName',

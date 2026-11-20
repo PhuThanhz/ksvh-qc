@@ -334,6 +334,40 @@ class VerificationAndSurpriseFlowTests extends ApiTestSupport {
     }
 
     @Test
+    void surprisePlanWithSurpriseTemplateCreatesInspection() throws Exception {
+        String[] planPerms = {PermissionCodes.PLAN_READ, PermissionCodes.PLAN_CREATE, PermissionCodes.PLAN_APPROVE,
+                PermissionCodes.INSPECTION_READ_ALL};
+        long qcUser = insertUser("qc_sur_tpl", RoleCodes.KSVH_INSPECTOR);
+        long companyId = createCompany("C-STPL-" + suffix);
+        long storeId = createStore(companyId, "STPL" + suffix, 10.76, 106.66, 150, qcUser);
+        long groupId = createCriterionGroup("GRP-STPL-" + suffix);
+        long c1 = createCriterion(groupId, "C1-STPL-" + suffix, 3);
+        long c2 = createCriterion(groupId, "C2-STPL-" + suffix, 4);
+        long templateId = createTemplate("TPL-SUR-" + suffix, List.of(c1, c2));
+
+        // Kế hoạch đột xuất nhưng chọn mẫu phiếu (SURPRISE template)
+        var req = new PlanCreateRequest(null, "Đột xuất theo mẫu " + suffix, TODAY, TODAY.plusDays(10), null,
+                List.of(new PlanAssignmentRequest(storeId, qcUser, templateId, TODAY.plusDays(1), List.of())), InspectionKind.SURPRISE);
+        String created = mvc.perform(withJson(post("/api/v1/inspection-plans"), req).with(as(1L, planPerms)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.inspectionKind").value("SURPRISE"))
+                .andExpect(jsonPath("$.assignments[0].templateId").value((int) templateId))
+                .andReturn().getResponse().getContentAsString();
+        long planId = extractId(created);
+
+        mvc.perform(post("/api/v1/inspection-plans/" + planId + "/submit").with(as(1L, planPerms))).andExpect(status().isOk());
+        String approved = mvc.perform(post("/api/v1/inspection-plans/" + planId + "/approve").with(as(2L, planPerms)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.assignments[0].inspectionCode").value(org.hamcrest.Matchers.startsWith("DX-")))
+                .andReturn().getResponse().getContentAsString();
+
+        long insId = jsonMapper.readTree(approved).get("assignments").get(0).get("inspectionId").asLong();
+        assertThat(jdbc.queryForObject("SELECT inspection_type FROM inspections WHERE id = ?", String.class, insId)).isEqualTo("SURPRISE");
+        assertThat(jdbc.queryForObject("SELECT template_id FROM inspections WHERE id = ?", Long.class, insId)).isEqualTo(templateId);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM inspection_items WHERE inspection_id = ?", Integer.class, insId)).isEqualTo(2);
+    }
+
+    @Test
     void planWithOnlyDeadlineAndNoInspectionDatesIsCreatedAndApproved() throws Exception {
         String[] planPerms = {PermissionCodes.PLAN_READ, PermissionCodes.PLAN_CREATE, PermissionCodes.PLAN_APPROVE,
                 PermissionCodes.INSPECTION_READ_ALL};

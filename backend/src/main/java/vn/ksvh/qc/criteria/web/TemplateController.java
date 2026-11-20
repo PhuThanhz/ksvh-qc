@@ -34,9 +34,10 @@ public class TemplateController {
     public PageResponse<TemplateResponse> search(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Long companyId,
+            @RequestParam(required = false) String inspectionType,
             @RequestParam(required = false) Boolean active,
             @ParameterObject @PageableDefault(size = 20, sort = "code", direction = Sort.Direction.ASC) Pageable pageable) {
-        return service.search(keyword, companyId, active, pageable);
+        return service.search(keyword, companyId, inspectionType, active, pageable);
     }
 
     @GetMapping("/options")

@@ -68,6 +68,13 @@ export function TemplateListPage() {
         onClose: () => setFilter('companyId', undefined),
       })
     }
+    if (filters.inspectionType) {
+      tags.push({
+        key: 'inspectionType',
+        label: `Loại: ${filters.inspectionType === 'SURPRISE' ? 'Đột xuất' : 'Định kỳ'}`,
+        onClose: () => setFilter('inspectionType', undefined),
+      })
+    }
     if (filters.active !== undefined) {
       tags.push({
         key: 'active',
@@ -112,6 +119,17 @@ export function TemplateListPage() {
             onChange={(v) => setFilter('companyId', v)}
             options={companies.data?.items.map((c) => ({ value: c.id, label: `${c.code} – ${c.name}` }))}
             loading={companies.isLoading}
+          />
+          <Select
+            allowClear
+            placeholder="Loại kiểm tra"
+            style={{ width: 150 }}
+            value={filters.inspectionType}
+            onChange={(v) => setFilter('inspectionType', v)}
+            options={[
+              { value: 'PERIODIC', label: 'Định kỳ' },
+              { value: 'SURPRISE', label: 'Đột xuất' },
+            ]}
           />
           <ActiveFilter
             value={filters.active}

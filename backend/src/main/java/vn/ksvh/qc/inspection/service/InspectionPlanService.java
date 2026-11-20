@@ -274,16 +274,35 @@ public class InspectionPlanService {
             List<Long> criterionIds = a.criterionIds() == null ? List.of()
                     : a.criterionIds().stream().filter(Objects::nonNull).distinct().toList();
             if (surprise) {
-                if (topics.isEmpty()) {
-                    throw new BusinessException(ErrorCode.VALIDATION_FAILED,
-                            "Nhà hàng '%s' chưa chọn chuyên đề kiểm tra đột xuất".formatted(rest.name()));
+                TemplateRef template = a.templateId() == null ? null : templates.get(a.templateId());
+                if (template != null) {
+                    if (!template.active()) {
+                        throw new BusinessException(ErrorCode.VALIDATION_FAILED,
+                                "Mẫu phiếu đột xuất chọn cho nhà hàng '%s' đã bị vô hiệu hoá".formatted(rest.name()));
+                    }
+                    InspectionService.validateTemplateForAssignment(template, rest);
+                    if (topics.isEmpty()) {
+                        topics = template.items().stream()
+                                .map(vn.ksvh.qc.criteria.api.CriterionRef::groupId)
+                                .filter(Objects::nonNull)
+                                .distinct()
+                                .toList();
+                    }
+                    if (!criterionIds.isEmpty()) {
+                        validatePickedCriteria(criterionIds, topics, rest);
+                    }
+                } else {
+                    if (topics.isEmpty()) {
+                        throw new BusinessException(ErrorCode.VALIDATION_FAILED,
+                                "Nhà hàng '%s' chưa chọn mẫu phiếu đột xuất hoặc chuyên đề kiểm tra".formatted(rest.name()));
+                    }
+                    inspectionService.validateTopics(topics, rest);
+                    if (criteriaLookupApi.findActiveCriteriaInGroups(topics).isEmpty()) {
+                        throw new BusinessException(ErrorCode.VALIDATION_FAILED,
+                                "Các chuyên đề chọn cho nhà hàng '%s' chưa có tiêu chí nào đang hoạt động".formatted(rest.name()));
+                    }
+                    validatePickedCriteria(criterionIds, topics, rest);
                 }
-                inspectionService.validateTopics(topics, rest);
-                if (criteriaLookupApi.findActiveCriteriaInGroups(topics).isEmpty()) {
-                    throw new BusinessException(ErrorCode.VALIDATION_FAILED,
-                            "Các chuyên đề chọn cho nhà hàng '%s' chưa có tiêu chí nào đang hoạt động".formatted(rest.name()));
-                }
-                validatePickedCriteria(criterionIds, topics, rest);
             } else {
                 TemplateRef template = a.templateId() == null ? null : templates.get(a.templateId());
                 if (template == null || !template.active()) {
@@ -297,9 +316,9 @@ public class InspectionPlanService {
             entity.setPlanId(plan.getId());
             entity.setRestaurantId(a.restaurantId());
             entity.setInspectorId(a.inspectorId());
-            entity.setTemplateId(surprise ? null : a.templateId());
-            entity.setTopicGroupIds(new LinkedHashSet<>(surprise ? topics : List.of()));
-            entity.setCriterionIds(new LinkedHashSet<>(surprise ? criterionIds : List.of()));
+            entity.setTemplateId(a.templateId());
+            entity.setTopicGroupIds(new LinkedHashSet<>(topics));
+            entity.setCriterionIds(new LinkedHashSet<>(criterionIds));
             entity.setScheduledDate(a.scheduledDate());
             entity.setSortOrder(i);
             list.add(entity);

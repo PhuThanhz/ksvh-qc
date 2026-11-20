@@ -49,7 +49,7 @@ public class TemplateService {
     private final CriterionRepository criterionRepository;
     private final CompanyLookupApi companyLookupApi;
 
-    public PageResponse<TemplateResponse> search(String keyword, Long companyId, Boolean active, Pageable pageable) {
+    public PageResponse<TemplateResponse> search(String keyword, Long companyId, String inspectionType, Boolean active, Pageable pageable) {
         Pageable safe = Pageables.restrictSort(pageable, SORTABLE);
         Specification<InspectionTemplate> spec = Specification.unrestricted();
         if (StringUtils.hasText(keyword)) {
@@ -61,6 +61,9 @@ public class TemplateService {
         }
         if (companyId != null) {
             spec = spec.and((root, q, cb) -> cb.or(cb.isNull(root.get("companyId")), cb.equal(root.get("companyId"), companyId)));
+        }
+        if (StringUtils.hasText(inspectionType)) {
+            spec = spec.and((root, q, cb) -> cb.equal(cb.upper(root.get("inspectionType")), inspectionType.trim().toUpperCase(Locale.ROOT)));
         }
         if (active != null) {
             spec = spec.and((root, q, cb) -> cb.equal(root.get("active"), active));
@@ -81,6 +84,10 @@ public class TemplateService {
             int count = itemCounts.getOrDefault(t.getId(), 0);
             return TemplateResponse.from(t, List.of(), cName, count);
         });
+    }
+
+    public PageResponse<TemplateResponse> search(String keyword, Long companyId, Boolean active, Pageable pageable) {
+        return search(keyword, companyId, null, active, pageable);
     }
 
     public PageResponse<TemplateResponse> search(String keyword, Boolean active, Pageable pageable) {

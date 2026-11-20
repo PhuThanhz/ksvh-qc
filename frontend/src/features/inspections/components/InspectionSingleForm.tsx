@@ -87,11 +87,15 @@ export function InspectionSingleForm({ onSuccess, onCancel, initialValues }: Pro
       if (vals.inspectionType === 'PERIODIC') {
         payload = { ...vals, inspectionMode: 'ON_SITE', topicGroupIds: undefined, findingIds: undefined, criterionIds: undefined }
       } else if (vals.inspectionType === 'SURPRISE') {
-        if ((!vals.criterionIds || vals.criterionIds.length === 0) && (!vals.topicGroupIds || vals.topicGroupIds.length === 0)) {
-          notify.error('Vui lòng chọn ít nhất một chuyên đề hoặc tiêu chí cần kiểm tra đột xuất')
+        if (!vals.templateId && (!vals.criterionIds || vals.criterionIds.length === 0) && (!vals.topicGroupIds || vals.topicGroupIds.length === 0)) {
+          notify.error('Vui lòng chọn mẫu phiếu hoặc ít nhất một chuyên đề/tiêu chí cần kiểm tra đột xuất')
           return
         }
-        payload = { ...vals, templateId: undefined, findingIds: undefined }
+        payload = {
+          ...vals,
+          templateId: vals.templateId || undefined,
+          findingIds: undefined,
+        }
       } else {
         payload = { ...vals, templateId: undefined, topicGroupIds: undefined, planId: undefined, criterionIds: undefined }
       }

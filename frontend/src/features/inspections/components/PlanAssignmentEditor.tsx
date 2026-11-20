@@ -146,16 +146,20 @@ export function PlanAssignmentEditor({
     },
     surprise
       ? {
-          title: <>Chuyên đề & tiêu chí <span className="req-mark">*</span></>,
+          title: <>Mẫu đột xuất / Chuyên đề <span className="req-mark">*</span></>,
           key: 'topics',
-          width: 280,
+          width: 290,
           render: (_, r) => (
             <PlanSurpriseScopeCell
               restaurantName={restMap.get(r.restaurantId)?.name}
               groups={topicsFor(r.restaurantId)}
+              templates={templatesFor(r.restaurantId)}
+              templateId={r.templateId}
               topicGroupIds={r.topicGroupIds ?? []}
               criterionIds={r.criterionIds ?? []}
-              onChange={(criterionIds, topicGroupIds) => update(r._idx, { criterionIds, topicGroupIds })}
+              onChange={(criterionIds, topicGroupIds, templateId) =>
+                update(r._idx, { criterionIds, topicGroupIds, templateId })
+              }
             />
           ),
         }

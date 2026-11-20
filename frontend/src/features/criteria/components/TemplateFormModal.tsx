@@ -36,11 +36,16 @@ import { useNotify } from '@/components/feedback/useNotify'
 import { applyFieldErrors, getErrorMessage } from '@/lib/http'
 import { nextSequentialCode } from '@/utils/auto-code'
 
+const INSPECTION_TYPE_OPTIONS = [
+  { value: 'PERIODIC', label: 'Định kỳ' },
+  { value: 'SURPRISE', label: 'Đột xuất' },
+]
+
 const EMPTY: TemplateFormValues = {
   code: '',
   name: '',
   companyId: null,
-  inspectionType: 'Định kỳ',
+  inspectionType: 'PERIODIC',
   description: '',
   criterionIds: [],
   active: true,
@@ -105,7 +110,10 @@ export function TemplateFormModal({ open, templateId, onClose }: TemplateFormMod
             code: t.code,
             name: t.name,
             companyId: t.companyId ?? null,
-            inspectionType: t.inspectionType || 'Định kỳ',
+            inspectionType:
+              t.inspectionType?.toUpperCase() === 'SURPRISE' || t.inspectionType?.toLowerCase().includes('đột')
+                ? 'SURPRISE'
+                : 'PERIODIC',
             description: t.description ?? '',
             criterionIds: t.criteria.map((c) => c.id),
             active: t.active,
@@ -352,7 +360,7 @@ export function TemplateFormModal({ open, templateId, onClose }: TemplateFormMod
                     placeholder="Tự động sinh"
                   />
                 </Col>
-                <Col xs={24} sm={18} md={7}>
+                <Col xs={24} sm={18} md={6}>
                   <FormInput
                     control={control}
                     name="name"
@@ -360,10 +368,19 @@ export function TemplateFormModal({ open, templateId, onClose }: TemplateFormMod
                     required
                     autoFocus={!editing}
                     maxLength={200}
-                    placeholder="VD: Mẫu kiểm tra định kỳ nhà hàng"
+                    placeholder="VD: Mẫu kiểm tra nhà hàng"
                   />
                 </Col>
-                <Col xs={24} sm={12} md={5}>
+                <Col xs={24} sm={12} md={4}>
+                  <FormSelect
+                    control={control}
+                    name="inspectionType"
+                    label="Loại kiểm tra"
+                    options={INSPECTION_TYPE_OPTIONS}
+                    placeholder="Chọn loại"
+                  />
+                </Col>
+                <Col xs={24} sm={12} md={4}>
                   <FormSelect
                     control={control}
                     name="companyId"
@@ -375,16 +392,16 @@ export function TemplateFormModal({ open, templateId, onClose }: TemplateFormMod
                     loading={companies.isLoading}
                   />
                 </Col>
-                <Col xs={24} sm={12} md={5}>
+                <Col xs={24} sm={12} md={4}>
                   <FormInput
                     control={control}
                     name="description"
                     label="Ghi chú / Mô tả"
                     maxLength={500}
-                    placeholder="Phạm vi áp dụng mẫu phiếu..."
+                    placeholder="Phạm vi áp dụng mẫu..."
                   />
                 </Col>
-                <Col xs={24} sm={12} md={3}>
+                <Col xs={24} sm={12} md={2}>
                   <Controller
                     control={control}
                     name="active"

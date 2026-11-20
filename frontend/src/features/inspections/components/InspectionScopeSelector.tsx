@@ -1,4 +1,6 @@
-import { Form, Select } from 'antd'
+import { AppstoreOutlined, FileTextOutlined } from '@ant-design/icons'
+import { Form, Segmented, Select } from 'antd'
+import { useState } from 'react'
 import { SurpriseCriteriaPicker } from './SurpriseCriteriaPicker'
 import { VerificationCandidateSelector } from './VerificationCandidateSelector'
 import type { CriterionGroup, Template } from '@/features/criteria/criteria.types'
@@ -30,6 +32,8 @@ export function InspectionScopeSelector({
   criterionIds,
   onChangeSurpriseScope,
 }: InspectionScopeSelectorProps) {
+  const [surpriseMode, setSurpriseMode] = useState<'TEMPLATE' | 'TOPICS'>('TOPICS')
+
   if (kind === 'PERIODIC') {
     return (
       <Form.Item
@@ -53,18 +57,56 @@ export function InspectionScopeSelector({
 
   if (kind === 'SURPRISE') {
     return (
-      <Form.Item
-        label="Phạm vi kiểm tra đột xuất (Nhóm chuyên đề & Từng tiêu chí nhỏ)"
-        required
-        extra="Bạn có thể tích chọn cả nhóm hoặc tích chọn chi tiết từng tiêu chí nhỏ cần soi đột xuất."
-      >
-        <SurpriseCriteriaPicker
-          groups={filteredGroups}
-          selectedGroupIds={topicGroupIds}
-          selectedCriterionIds={criterionIds}
-          onChange={(cIds, gIds) => onChangeSurpriseScope?.(cIds, gIds)}
-        />
-      </Form.Item>
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ marginBottom: 12 }}>
+          <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, fontSize: 14 }}>
+            Hình thức kiểm tra đột xuất
+          </label>
+          <Segmented
+            value={surpriseMode}
+            onChange={(val) => setSurpriseMode(val as 'TEMPLATE' | 'TOPICS')}
+            options={[
+              { value: 'TOPICS', label: 'Tùy biến Chuyên đề & Tiêu chí', icon: <AppstoreOutlined /> },
+              { value: 'TEMPLATE', label: 'Dùng Mẫu phiếu có sẵn', icon: <FileTextOutlined /> },
+            ]}
+          />
+        </div>
+
+        {surpriseMode === 'TEMPLATE' ? (
+          <Form.Item
+            name="templateId"
+            label="Mẫu phiếu kiểm tra áp dụng"
+            rules={[{ required: true, message: 'Vui lòng chọn mẫu phiếu kiểm tra đột xuất' }]}
+            extra="Áp dụng toàn bộ tiêu chí của mẫu phiếu đã chọn cho đợt kiểm tra đột xuất này."
+          >
+            <Select
+              showSearch
+              placeholder="Chọn mẫu phiếu kiểm tra..."
+              filterOption={(input, opt) => (opt?.label as string)?.toLowerCase().includes(input.toLowerCase())}
+              options={filteredTemplates.map((t) => {
+                const isSurprise = t.inspectionType === 'SURPRISE' || t.inspectionType?.toLowerCase().includes('đột')
+                return {
+                  value: t.id,
+                  label: `${isSurprise ? '[Đột xuất] ' : ''}${t.code} - ${t.name} (${t.criterionCount} tiêu chí)`,
+                }
+              })}
+            />
+          </Form.Item>
+        ) : (
+          <Form.Item
+            label="Phạm vi kiểm tra đột xuất (Nhóm chuyên đề & Từng tiêu chí nhỏ)"
+            required
+            extra="Bạn có thể tích chọn cả nhóm hoặc tích chọn chi tiết từng tiêu chí nhỏ cần soi đột xuất."
+          >
+            <SurpriseCriteriaPicker
+              groups={filteredGroups}
+              selectedGroupIds={topicGroupIds}
+              selectedCriterionIds={criterionIds}
+              onChange={(cIds, gIds) => onChangeSurpriseScope?.(cIds, gIds)}
+            />
+          </Form.Item>
+        )}
+      </div>
     )
   }
 

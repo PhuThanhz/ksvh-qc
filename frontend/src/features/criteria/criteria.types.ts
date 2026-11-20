@@ -51,6 +51,7 @@ export interface CriterionListParams extends PageParams {
 export interface TemplateListParams extends PageParams {
   keyword?: string
   companyId?: number
+  inspectionType?: string
   active?: boolean
 }
 
