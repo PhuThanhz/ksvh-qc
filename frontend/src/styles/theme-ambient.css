@@ -8,10 +8,17 @@
   background: rgba(15, 23, 42, 0.14) !important;
   backdrop-filter: blur(14px) saturate(140%) !important;
   -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
-  border-inline-end: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-inline-end: 1px solid rgba(255, 255, 255, 0.10) !important;
   box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1) !important;
   transform: translateZ(0);
   contain: layout style;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  caret-color: transparent !important;
+}
+
+.app-shell--themed .app-sidebar * {
+  caret-color: transparent !important;
 }
 
 .app-shell--themed .topbar.ant-layout-header {
@@ -28,6 +35,8 @@
   background: transparent !important;
   border-inline-end: none !important;
   padding-inline: 4px !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
 }
 
 .app-shell--themed .app-sidebar .ant-menu-item-group-title {

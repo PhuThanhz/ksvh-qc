@@ -81,7 +81,13 @@ export function Sidebar({ menu, onSelect }: SidebarProps) {
           navigate(e.key)
           onSelect?.()
         }}
-        style={{ borderInlineEnd: 'none', paddingInline: 4, paddingTop: 6, background: 'transparent' }}
+        style={{
+          borderInlineEnd: 'none',
+          paddingInline: 4,
+          paddingTop: 6,
+          background: 'transparent',
+          userSelect: 'none',
+        }}
       />
     </ConfigProvider>
   )

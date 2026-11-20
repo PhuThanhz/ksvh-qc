@@ -2,6 +2,20 @@
    LAYOUT STYLES: Sidebar, Header, Frosted Glass, Shell, Navigation
    ========================================================================== */
 
+.app-sidebar,
+.apple-frosted-sidebar,
+:is(.bitrix-frosted-sidebar, .glass-chrome-sidebar) {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  caret-color: transparent !important;
+}
+
+.app-sidebar *,
+.apple-frosted-sidebar *,
+:is(.bitrix-frosted-sidebar, .glass-chrome-sidebar) * {
+  caret-color: transparent !important;
+}
+
 /* Sidebar kính mờ Apple */
 .apple-frosted-sidebar {
   background: rgba(255, 255, 255, 0.52) !important;
